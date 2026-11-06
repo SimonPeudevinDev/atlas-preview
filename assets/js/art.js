@@ -202,6 +202,39 @@
       [[-90, 18, 14], [-20, 14, 9], [70, 19, 12]].forEach(function (c) { o += '<ellipse cx="' + f(cx + c[0] * s) + '" cy="' + f(gy - c[1] * s) + '" rx="' + f(c[2] * s) + '" ry="' + f(c[2] * 0.28 * s) + '"/>'; });
       return o + '</g>';
     },
+    // Astronautes : une fusée sur son pas de tir
+    rocket: function (cx, gy, s, m) {
+      var o = '', b = gy - 4 * s;
+      o += rect(cx - 30 * s, b - 4 * s, 60 * s, 4 * s);
+      o += rect(cx + 18 * s, b - 120 * s, 5 * s, 116 * s);
+      o += rect(cx - 9 * s, b - 96 * s, 18 * s, 92 * s);
+      o += poly([[cx - 9 * s, b - 96 * s], [cx, b - 126 * s], [cx + 9 * s, b - 96 * s]]);
+      o += poly([[cx - 9 * s, b - 22 * s], [cx - 20 * s, b - 4 * s], [cx - 9 * s, b - 4 * s]]) + poly([[cx + 9 * s, b - 22 * s], [cx + 20 * s, b - 4 * s], [cx + 9 * s, b - 4 * s]]);
+      o += '<g fill="' + m.sun + '" opacity=".7"><circle cx="' + f(cx) + '" cy="' + f(b - 70 * s) + '" r="' + f(3.2 * s) + '"/></g>';
+      return o;
+    },
+    // Îles et jungle : palmiers et collines
+    palms: function (cx, gy, s, m) {
+      var o = poly([[cx - 140 * s, gy], [cx - 60 * s, gy - 30 * s], [cx + 30 * s, gy - 18 * s], [cx + 140 * s, gy]]);
+      [[-50, 92, -0.15], [-14, 112, 0.08], [44, 80, 0.2]].forEach(function (p) {
+        var x = cx + p[0] * s, h = p[1] * s, k = p[2], tx = x + k * h, ty = gy - 20 * s - h;
+        o += '<path d="M' + f(x) + ',' + f(gy - 20 * s) + ' Q' + f(x + k * h * 0.2) + ',' + f(ty + h * 0.5) + ' ' + f(tx) + ',' + f(ty) + '" fill="none" stroke="' + m.mid + '" stroke-width="' + f(4 * s) + '"/>';
+        [-2.6, -2, -1.2, -0.4, 0.3].forEach(function (a) {
+          o += '<path d="M' + f(tx) + ',' + f(ty) + ' q' + f(Math.cos(a) * 18 * s) + ',' + f(Math.sin(a) * 14 * s - 6 * s) + ' ' + f(Math.cos(a) * 34 * s) + ',' + f(Math.sin(a) * 18 * s + 10 * s) + '" fill="none" stroke="' + m.mid + '" stroke-width="' + f(3.2 * s) + '" stroke-linecap="round"/>';
+        });
+      });
+      return o;
+    },
+    // Forêt de Sherwood : sapins et chênes serrés
+    forest: function (cx, gy, s, m, r) {
+      var o = '';
+      for (var i = 0; i < 9; i++) {
+        var x = cx + (i - 4) * 30 * s + (r() - 0.5) * 10 * s, h = (60 + r() * 50) * s;
+        if (i % 3 === 1) o += rect(x - 2.5 * s, gy - h * 0.45, 5 * s, h * 0.45) + '<circle cx="' + f(x) + '" cy="' + f(gy - h * 0.62) + '" r="' + f(h * 0.3) + '"/>';
+        else o += poly([[x - h * 0.22, gy], [x, gy - h], [x + h * 0.22, gy]]);
+      }
+      return o;
+    },
     // Pharaons : pylône de temple encadré de deux obélisques
     obelisk: function (cx, gy, s, m) {
       var o = '';

@@ -53,6 +53,71 @@
       bio: 'Grande lune de Pluton, presque moitié aussi large qu’elle : les deux astres tournent l’un autour de l’autre comme un couple, en se montrant toujours la même face.',
       more: 'Découverte en 1978, elle porte le nom du passeur qui, dans la mythologie grecque, faisait traverser le Styx aux âmes des morts contre une obole. En 2015, la sonde New Horizons y a photographié une calotte rougeâtre à son pôle nord, surnommée Mordor.'
     },
+    astronautes: {
+      name: 'Laïka', title: 'La Chienne des étoiles', atk: 52, def: 70, esp: 80,
+      bio: 'Chienne errante recueillie dans les rues de Moscou, elle fut en novembre 1957 le premier être vivant mis en orbite, à bord de Spoutnik 2.',
+      more: 'Le vaisseau n’était pas conçu pour revenir sur Terre : elle mourut quelques heures après le lancement, de surchauffe. Son sacrifice a ouvert la voie aux vols habités, et un monument lui rend hommage à Moscou depuis 2008.'
+    },
+    missions: {
+      name: 'Le Disque d’or', title: 'Le Message aux étoiles', atk: 40, def: 99, esp: 99,
+      bio: 'Disque gravé emporté par les sondes [[voyager]], à l’intention d’éventuels êtres venus d’ailleurs.',
+      more: 'Ce disque de cuivre plaqué d’or contient 115 images, des sons de la Terre, des salutations en 55 langues et 90 minutes de musique, de Bach à Chuck Berry. Une notice gravée explique comment le lire. Il pourrait durer un milliard d’années.'
+    },
+    detectives: {
+      name: 'Mycroft Holmes', title: 'Le Frère de l’ombre', atk: 60, def: 88, esp: 99,
+      bio: 'Frère aîné de [[holmes]], plus doué encore que lui, il refuse pourtant de quitter son fauteuil.',
+      more: 'Il travaille pour le gouvernement britannique, au point d’être parfois, selon son frère, le gouvernement lui-même. Il passe ses soirées au Diogenes Club, un cercle où il est interdit de parler.'
+    },
+    verne: {
+      name: 'Le Nautilus', title: 'Le Sous-marin de Nemo', atk: 88, def: 96, esp: 90,
+      bio: 'Le sous-marin du [[nemo|capitaine Nemo]], long de soixante-dix mètres, entièrement mû par l’électricité.',
+      more: 'Verne le décrit avec un salon-musée, une bibliothèque de douze mille volumes et un orgue. Il emprunte son nom à un véritable sous-marin construit par Robert Fulton en 1800. En 1954, la marine américaine baptisa Nautilus son premier sous-marin nucléaire.'
+    },
+    mousquetaires: {
+      name: 'L’Homme au masque de fer', title: 'Le Prisonnier sans visage', atk: 60, def: 90, esp: 92,
+      bio: 'Prisonnier mystérieux de Louis XIV, il passa des décennies dans les prisons royales, le visage toujours caché.',
+      more: 'Il a réellement existé : il mourut à la Bastille en 1703 sans que personne connaisse son identité. Voltaire en fit une légende, et Dumas, dans Le Vicomte de Bragelonne, le frère jumeau du roi, au cœur d’un complot d’[[aramis]].'
+    },
+    nuits: {
+      name: 'Le Tapis volant', title: 'Le Voyageur instantané', atk: 70, def: 80, esp: 92,
+      bio: 'Tapis capable de transporter en un instant ses passagers d’un bout à l’autre du monde.',
+      more: 'Dans un conte ajouté par Galland, trois princes rivalisent pour rapporter l’objet le plus merveilleux : un tapis qui vole, une lunette qui voit au loin et une pomme qui guérit. Aucun ne l’emporte : les trois objets réunis sauvent ensemble la princesse.'
+    },
+    merveilleux: {
+      name: 'Le Magicien d’Oz', title: 'Le Maître des illusions', atk: 50, def: 80, esp: 96,
+      bio: 'Maître de la Cité d’émeraude, il apparaît à chacun sous une forme terrifiante différente.',
+      more: 'C’est en réalité un simple homme d’Omaha, arrivé à Oz en ballon, qui se cache derrière des illusions. Il ne peut rien accorder de magique, mais ses faux cadeaux révèlent à chacun ce qu’il possédait déjà. Il repart en ballon, sans [[dorothy]].'
+    },
+    jungle: {
+      name: 'Le Cobra blanc', title: 'Le Gardien du trésor', atk: 80, def: 92, esp: 88,
+      bio: 'Vieux cobra aveugle et blanchi par l’âge, il garde depuis des siècles le trésor d’une cité oubliée.',
+      more: 'Dans « L’Ankus du roi », [[mowgli]] et [[kaa]] découvrent sous les Grottes froides un trésor de rois. Mowgli emporte un aiguillon d’éléphant serti de pierres précieuses et découvre que les hommes s’entretuent pour le posséder. Il finit par le rapporter.'
+    },
+    arthur: {
+      name: 'Excalibur', title: 'L’Épée du roi', atk: 99, def: 90, esp: 80,
+      bio: 'L’épée du roi [[arthur]], remise par la [[damedulac|Dame du Lac]].',
+      more: 'Son fourreau rendait son porteur invulnérable. Selon les récits, elle se confond ou non avec l’épée tirée du rocher. En France, Durendal, l’épée de Roland, a sa propre légende : on dit qu’elle est plantée dans la falaise de Rocamadour.'
+    },
+    robin: {
+      name: 'Richard Cœur de Lion', title: 'Le Roi croisé', atk: 94, def: 88, esp: 84,
+      bio: 'Roi d’Angleterre parti en croisade, dont [[robin]] et ses compagnons attendent le retour.',
+      more: 'Il régna de 1189 à 1199 mais ne passa que quelques mois en Angleterre. Capturé au retour de la croisade, il fut libéré contre une énorme rançon. Dans la légende, il rentre déguisé, rencontre Robin dans la forêt et lui pardonne.'
+    },
+    etranges: {
+      name: 'Le Monstre du Loch Ness', title: 'La Bête des eaux noires', atk: 88, def: 86, esp: 70,
+      bio: 'Créature supposée vivre dans les eaux sombres du Loch Ness, en Écosse.',
+      more: 'La légende remonte à un récit du VIe siècle, où saint Columba aurait repoussé une bête de la rivière Ness. Elle devint célèbre en 1934 grâce à une photographie, révélée soixante ans plus tard comme un trucage réalisé avec un jouet. Aucune expédition n’a jamais apporté de preuve.'
+    },
+    flibustiers: {
+      name: 'Le Jolly Roger', title: 'Le Pavillon noir', atk: 90, def: 70, esp: 80,
+      bio: 'Le drapeau noir des pirates, orné le plus souvent d’une tête de mort et de tibias croisés.',
+      more: 'Chaque capitaine avait son propre dessin : on attribue à [[barbenoire]] un squelette transperçant un cœur, et [[roberts]] se représentait debout sur deux crânes. Hisser le pavillon noir signifiait : rendez-vous, et vous aurez la vie sauve.'
+    },
+    forbans: {
+      name: 'La Carte au trésor', title: 'La Croix rouge', atk: 50, def: 80, esp: 98,
+      bio: 'La carte de l’île au trésor, dessinée par le capitaine [[flint]], où une croix rouge marque la cachette.',
+      more: 'Stevenson eut l’idée du roman en dessinant une carte imaginaire avec son beau-fils, un jour de pluie en Écosse : c’est autour d’elle qu’il construisit toute l’histoire. L’image du trésor marqué d’une croix vient en grande partie de ce livre.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',

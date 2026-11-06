@@ -79,13 +79,13 @@ window.ATLAS = window.ATLAS || {};
       description: 'Notre Lune et ses cousines : des mondes de glace, de feu et de méthane, qui comptent parmi les meilleurs espoirs de trouver la vie ailleurs.'
     },
     {
-      id: 'gothique', name: 'Nuits gothiques', family: 'Monstres gothiques', universe: 'Littérature', motif: 'castle',
+      id: 'gothique', name: 'Nuits gothiques', family: 'Monstres gothiques', group: 'fantastique', universe: 'Littérature', motif: 'castle',
       edition: 'Édition I', status: 'live', popular: 3,
       tagline: 'Les créatures nées de la littérature fantastique du XIXᵉ siècle.',
       description: 'Châteaux battus par les vents, laboratoires clandestins et salons d’opéra : les grandes figures du roman gothique.'
     },
     {
-      id: 'contes', name: 'Il était une fois', family: 'Contes classiques', universe: 'Littérature', motif: 'tower',
+      id: 'contes', name: 'Il était une fois', family: 'Contes classiques', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
       edition: 'Édition I', status: 'live', popular: 4,
       tagline: 'Les héroïnes et les héros des contes de Perrault, Grimm, Carroll et Barrie.',
       description: 'Forêts profondes, tours oubliées et pays des merveilles : les personnages qui ont bercé des générations de lecteurs.'
@@ -101,6 +101,84 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'event', popular: 0,
       tagline: 'Les dieux d’Asgard et les créatures du Ragnarök.',
       description: 'Nouvelle collection. Entre fjords et neiges éternelles, les dieux nordiques et les êtres qui annoncent la fin des temps.'
+    },
+    {
+      id: 'astronautes', name: 'Les Astronautes', family: 'Conquête spatiale', group: 'solaire', universe: 'Sciences', motif: 'rocket',
+      edition: 'Édition I', status: 'live', popular: 14,
+      tagline: 'Les pionniers qui ont quitté la Terre, de Gagarine à Pesquet.',
+      description: 'Pilotes, ingénieurs et scientifiques : celles et ceux qui ont franchi les premiers la frontière de l’espace.'
+    },
+    {
+      id: 'missions', name: 'Les Missions', family: 'Conquête spatiale', group: 'solaire', universe: 'Sciences', motif: 'planet',
+      edition: 'Édition I', status: 'live', popular: 15,
+      tagline: 'Satellites, sondes et télescopes qui ont changé notre regard sur l’Univers.',
+      description: 'Du premier « bip-bip » de Spoutnik aux galaxies lointaines de James Webb : les grandes missions de l’histoire spatiale.'
+    },
+    {
+      id: 'detectives', name: 'Les Détectives', family: 'Romans policiers', group: 'aventure', universe: 'Littérature', motif: 'dome',
+      edition: 'Édition I', status: 'live', popular: 16,
+      tagline: 'Détectives de génie, gentlemen cambrioleurs et cerveaux du crime.',
+      description: 'De Baker Street aux salons parisiens, les enquêteurs et les criminels qui ont inventé le roman policier.'
+    },
+    {
+      id: 'verne', name: 'Jules Verne', family: 'Voyages extraordinaires', group: 'aventure', universe: 'Littérature', motif: 'ship',
+      edition: 'Édition I', status: 'live', popular: 17,
+      tagline: 'Sous les mers, au centre de la Terre, vers la Lune : les héros des Voyages extraordinaires.',
+      description: 'Savants, capitaines et aventuriers imaginés par Jules Verne, qui annonçaient le sous-marin, l’avion et la fusée.'
+    },
+    {
+      id: 'mousquetaires', name: 'Cape et épée', family: 'Romans de cape et d’épée', group: 'aventure', universe: 'Littérature', motif: 'castle',
+      edition: 'Édition I', status: 'live', popular: 18,
+      tagline: 'Mousquetaires, vengeurs et bretteurs : le panache à la française.',
+      description: 'Les héros de Dumas et de Rostand, entre duels, complots de cour et vengeances implacables.'
+    },
+    {
+      id: 'nuits', name: 'Les Mille et Une Nuits', family: 'Contes orientaux', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
+      edition: 'Édition I', status: 'live', popular: 19,
+      tagline: 'Lampes magiques, cavernes au trésor et tapis volants.',
+      description: 'Les contes que Shéhérazade raconta, nuit après nuit, pour sauver sa vie : Aladdin, Ali Baba, Sinbad et leurs merveilles.'
+    },
+    {
+      id: 'merveilleux', name: 'Pays merveilleux', family: 'Contes modernes', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
+      edition: 'Édition I', status: 'live', popular: 20,
+      tagline: 'La route de briques jaunes et le pantin qui voulait devenir un garçon.',
+      description: 'Le pays d’Oz de L. Frank Baum et l’Italie de Carlo Collodi : deux grands contes modernes, tels que leurs auteurs les ont écrits.'
+    },
+    {
+      id: 'jungle', name: 'Le Livre de la jungle', family: 'Récits de Kipling', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
+      edition: 'Édition I', status: 'live', popular: 21,
+      tagline: 'Mowgli et les peuples de la jungle indienne, tels que Kipling les a imaginés.',
+      description: 'Loups, ours, panthère et tigre : les héros des récits de Rudyard Kipling et la Loi de la jungle.'
+    },
+    {
+      id: 'arthur', name: 'La Table ronde', family: 'Légendes arthuriennes', group: 'medieval', universe: 'Littérature', motif: 'castle',
+      edition: 'Édition I', status: 'live', popular: 22,
+      tagline: 'Le roi Arthur, Merlin et les chevaliers de Camelot.',
+      description: 'Épées magiques, enchanteurs et quête du Graal : la grande légende du Moyen Âge, de Brocéliande à Avalon.'
+    },
+    {
+      id: 'robin', name: 'Robin des Bois', family: 'Légendes anglaises', group: 'medieval', universe: 'Littérature', motif: 'forest',
+      edition: 'Édition I', status: 'live', popular: 23,
+      tagline: 'Le hors-la-loi de Sherwood et sa joyeuse bande.',
+      description: 'Archers, moines bagarreurs et shérif cruel : la légende du voleur qui prenait aux riches pour donner aux pauvres.'
+    },
+    {
+      id: 'etranges', name: 'Êtres étranges', family: 'Récits fantastiques', group: 'fantastique', universe: 'Littérature', motif: 'tower',
+      edition: 'Édition I', status: 'live', popular: 24,
+      tagline: 'Hommes invisibles, golems et vaisseaux fantômes.',
+      description: 'Les créatures et les êtres à part nés des légendes et des grands récits fantastiques du XIXe siècle.'
+    },
+    {
+      id: 'flibustiers', name: 'Pirates et corsaires', family: 'Âge d’or de la piraterie', group: 'pirates', universe: 'Histoire', motif: 'ship',
+      edition: 'Édition I', status: 'live', popular: 25,
+      tagline: 'Les vrais pirates et corsaires qui ont terrorisé les mers.',
+      description: 'De Barbe-Noire à Surcouf, les flibustiers et corsaires bien réels, avec leurs trésors, leurs codes et leurs fins souvent tragiques.'
+    },
+    {
+      id: 'forbans', name: 'Pirates de roman', family: 'Romans de pirates', group: 'pirates', universe: 'Littérature', motif: 'palms',
+      edition: 'Édition I', status: 'live', popular: 26,
+      tagline: 'Jambes de bois, cartes au trésor et capitaines au crochet.',
+      description: 'Les pirates nés de la plume de Stevenson, de Barrie et de Sabatini, qui ont fixé pour toujours l’image du pirate.'
     }
   ];
 
@@ -140,16 +218,40 @@ window.ATLAS = window.ATLAS || {};
       text: 'Ulysse devait choisir entre Charybde, un tourbillon capable d’engloutir son navire, et Scylla, un monstre à six têtes. Sur le conseil de la magicienne Circé, il longea la falaise de Scylla, sacrifiant six marins pour sauver les autres. C’est l’origine de l’expression « tomber de Charybde en Scylla ».' }
   ];
   A.GROUPS.push({
-    id: 'solaire', name: 'Système solaire', subs: ['planetes', 'lunes'], title: 'Explorateur du système solaire',
-    tagline: 'Les planètes et les lunes qui gravitent autour du Soleil.',
-    description: 'Huit planètes et leurs lunes les plus remarquables : un voyage de Mercure à Neptune, des volcans d’Io aux geysers d’Encelade.'
+    id: 'solaire', name: 'Système solaire', subs: ['planetes', 'lunes', 'astronautes', 'missions'], title: 'Explorateur du système solaire',
+    tagline: 'Planètes, lunes, astronautes et missions : l’aventure spatiale.',
+    description: 'Les planètes et leurs lunes les plus remarquables, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : quatre sous-collections, de Mercure à Voyager.'
+  });
+  A.GROUPS.push({
+    id: 'aventure', name: 'Romans d’aventure', subs: ['detectives', 'verne', 'mousquetaires'], title: 'Grand Aventurier',
+    tagline: 'Détectives, explorateurs et mousquetaires : les héros des grands romans populaires.',
+    description: 'De Baker Street au Nautilus en passant par la cour de Louis XIII : les héros qui ont fait vibrer des générations de lecteurs, en trois sous-collections.'
+  });
+  A.GROUPS.push({
+    id: 'contesmonde', name: 'Contes et merveilles', subs: ['contes', 'nuits', 'merveilleux', 'jungle'], title: 'Grand Conteur',
+    tagline: 'Contes de Perrault et de Grimm, Mille et Une Nuits, Oz et la jungle de Kipling.',
+    description: 'Des forêts de Perrault aux palais de Bagdad, du pays d’Oz à la jungle indienne : les contes qui ont bercé le monde entier, en quatre sous-collections.'
+  });
+  A.GROUPS.push({
+    id: 'medieval', name: 'Légendes médiévales', subs: ['arthur', 'robin'], title: 'Chevalier de la Table ronde',
+    tagline: 'Chevaliers de Camelot et hors-la-loi de Sherwood.',
+    description: 'Épées magiques, enchanteurs et archers rebelles : les deux grandes légendes du Moyen Âge anglais, en deux sous-collections.'
+  });
+  A.GROUPS.push({
+    id: 'fantastique', name: 'Récits fantastiques', subs: ['gothique', 'etranges'], title: 'Maître de l’étrange',
+    tagline: 'Vampires, savants fous, créatures et vaisseaux fantômes.',
+    description: 'Les monstres du roman gothique et les êtres étranges des légendes et des récits fantastiques, en deux sous-collections.'
+  });
+  A.GROUPS.push({
+    id: 'pirates', name: 'L’Âge des pirates', subs: ['flibustiers', 'forbans'], title: 'Seigneur des sept mers',
+    tagline: 'Les vrais pirates des Caraïbes et ceux des grands romans.',
+    description: 'Barbe-Noire, Anne Bonny et Surcouf d’un côté, Long John Silver et le capitaine Crochet de l’autre : la piraterie, de l’histoire à la légende.'
   });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
   A.UPCOMING = [
     { id: 'japon',  name: 'Kami & Yōkai',       family: 'Mythologie japonaise',  motif: 'torii',  date: 'Printemps 2027', desc: 'Esprits, divinités et créatures du folklore japonais.' },
-    { id: 'arthur', name: 'La Table ronde',     family: 'Légendes arthuriennes', motif: 'castle', date: 'Été 2027',       desc: 'Chevaliers, enchanteurs et la quête du Graal.' },
     { id: 'explo',  name: 'Grands Explorateurs', family: 'Histoire',             motif: 'fjord',  date: 'Automne 2027',   desc: 'Navigateurs et voyageurs qui ont redessiné la carte du monde.' }
   ];
 
@@ -249,6 +351,136 @@ window.ATLAS = window.ATLAS || {};
       ['encelade', 'Encelade', 'Le Geyser glacé', 64, 76, 94, 'BREL', 'Petite lune de Saturne qui crache des jets d’eau.'],
       ['miranda', 'Miranda', 'La Lune rapiécée', 58, 72, 82, 'BRE', 'Petite lune d’Uranus au relief chaotique.'],
       ['triton', 'Triton', 'La Lune à contresens', 76, 80, 84, 'BRE', 'Grande lune de Neptune qui tourne à l’envers.']
+    ],
+    astronautes: [
+      ['gagarine', 'Youri Gagarine', 'Le Premier Homme dans l’espace', 82, 80, 88, 'BRELMU', 'Premier humain à voyager dans l’espace, le 12 avril 1961.'],
+      ['terechkova', 'Valentina Terechkova', 'La Mouette', 74, 82, 86, 'BRELM', 'Première femme dans l’espace, en 1963.'],
+      ['leonov', 'Alexeï Leonov', 'Le Premier Marcheur de l’espace', 80, 84, 82, 'BREL', 'Premier humain à sortir dans le vide spatial, en 1965.'],
+      ['armstrong', 'Neil Armstrong', 'Le Premier Pas', 84, 86, 90, 'BRELMU', 'Premier homme à marcher sur la Lune, en juillet 1969.'],
+      ['aldrin', 'Buzz Aldrin', 'Le Pilote d’Eagle', 82, 82, 88, 'BREL', 'Deuxième homme à marcher sur la Lune.'],
+      ['ride', 'Sally Ride', 'La Pionnière américaine', 72, 80, 94, 'BREL', 'Première Américaine dans l’espace, en 1983.'],
+      ['chretien', 'Jean-Loup Chrétien', 'Le Premier Français', 78, 80, 86, 'BRE', 'Premier Français dans l’espace, en 1982.'],
+      ['pesquet', 'Thomas Pesquet', 'Le Commandant de l’ISS', 80, 84, 90, 'BRELM', 'Premier Français à commander la Station spatiale internationale.']
+    ],
+    missions: [
+      ['spoutnik', 'Spoutnik 1', 'Le Premier Satellite', 50, 60, 80, 'BREL', 'Premier satellite artificiel, lancé par l’URSS en 1957.'],
+      ['apollo11', 'Apollo 11', 'La Mission lunaire', 90, 86, 92, 'BRELMU', 'Premier alunissage habité, en juillet 1969.'],
+      ['voyager', 'Voyager 1', 'La Sonde interstellaire', 72, 88, 96, 'BRELM', 'L’objet humain le plus lointain, sorti du système solaire.'],
+      ['hubble', 'Hubble', 'L’Œil dans l’espace', 66, 82, 94, 'BREL', 'Télescope spatial en orbite depuis 1990.'],
+      ['iss', 'La Station spatiale internationale', 'La Maison en orbite', 70, 94, 88, 'BRELM', 'Laboratoire habité en permanence depuis l’an 2000.'],
+      ['curiosity', 'Curiosity', 'Le Géologue de Mars', 74, 86, 90, 'BREL', 'Robot qui explore Mars depuis 2012.'],
+      ['rosetta', 'Rosetta et Philae', 'La Chasseuse de comète', 68, 78, 92, 'BRE', 'Première mission à se poser sur une comète.'],
+      ['webb', 'James Webb', 'Le Télescope des origines', 70, 84, 98, 'BRELMU', 'Le plus grand télescope spatial, lancé en 2021.']
+    ],
+    detectives: [
+      ['holmes', 'Sherlock Holmes', 'Le Détective de Baker Street', 72, 80, 99, 'BRELMU', 'Le plus célèbre détective de la littérature.'],
+      ['watson', 'Docteur Watson', 'Le Fidèle Narrateur', 74, 84, 82, 'BREL', 'Médecin militaire, ami et biographe de Sherlock Holmes.'],
+      ['moriarty', 'Professeur Moriarty', 'Le Napoléon du crime', 80, 82, 98, 'BRELM', 'Génie des mathématiques devenu maître du crime.'],
+      ['adler', 'Irene Adler', 'La Femme', 66, 78, 96, 'BREL', 'La seule personne à avoir déjoué Sherlock Holmes.'],
+      ['lestrade', 'Inspecteur Lestrade', 'L’Homme de Scotland Yard', 70, 82, 70, 'BRE', 'Inspecteur de Scotland Yard, rival et allié de Holmes.'],
+      ['lupin', 'Arsène Lupin', 'Le Gentleman cambrioleur', 82, 80, 98, 'BRELMU', 'Voleur élégant et insaisissable, maître du déguisement.'],
+      ['rouletabille', 'Joseph Rouletabille', 'Le Reporter détective', 72, 74, 94, 'BREL', 'Jeune reporter qui résout les mystères les plus fous.'],
+      ['dupin', 'Auguste Dupin', 'Le Premier Détective', 62, 72, 97, 'BRE', 'Le premier détective de la littérature, imaginé par Edgar Poe.']
+    ],
+    verne: [
+      ['nemo', 'Capitaine Nemo', 'Le Maître du Nautilus', 86, 88, 96, 'BRELMU', 'Mystérieux capitaine du sous-marin Nautilus.'],
+      ['fogg', 'Phileas Fogg', 'Le Gentleman ponctuel', 68, 84, 90, 'BRELM', 'Gentleman anglais qui fit le tour du monde en 80 jours.'],
+      ['passepartout', 'Passepartout', 'Le Valet aventurier', 76, 70, 74, 'BRE', 'Domestique français, fidèle compagnon de Phileas Fogg.'],
+      ['strogoff', 'Michel Strogoff', 'Le Courrier du tsar', 90, 86, 80, 'BREL', 'Courrier du tsar lancé à travers la Sibérie en guerre.'],
+      ['lidenbrock', 'Professeur Lidenbrock', 'Le Voyageur souterrain', 70, 78, 94, 'BRE', 'Savant parti pour le centre de la Terre.'],
+      ['barbicane', 'Impey Barbicane', 'Le Président du Gun Club', 80, 78, 88, 'BRE', 'Président d’un club d’artilleurs qui vise la Lune.'],
+      ['robur', 'Robur le Conquérant', 'Le Maître du ciel', 84, 80, 92, 'BREL', 'Inventeur d’une machine volante plus lourde que l’air.'],
+      ['cyrus', 'Cyrus Smith', 'L’Ingénieur naufragé', 76, 84, 96, 'BREL', 'Ingénieur qui recrée la civilisation sur une île déserte.']
+    ],
+    mousquetaires: [
+      ['dartagnan', 'D’Artagnan', 'Le Cadet de Gascogne', 90, 80, 86, 'BRELMU', 'Jeune Gascon devenu le quatrième mousquetaire.'],
+      ['athos', 'Athos', 'Le Noble mélancolique', 86, 84, 88, 'BREL', 'Le plus âgé et le plus noble des trois mousquetaires.'],
+      ['porthos', 'Porthos', 'Le Colosse', 94, 86, 60, 'BRE', 'Mousquetaire à la force herculéenne et au goût du panache.'],
+      ['aramis', 'Aramis', 'Le Mousquetaire abbé', 82, 78, 92, 'BREL', 'Mousquetaire élégant qui rêve d’entrer dans les ordres.'],
+      ['milady', 'Milady de Winter', 'L’Espionne du cardinal', 78, 76, 96, 'BRELM', 'Espionne redoutable au service de Richelieu.'],
+      ['richelieu', 'Le Cardinal de Richelieu', 'L’Éminence rouge', 70, 88, 97, 'BREL', 'Ministre tout-puissant de Louis XIII, adversaire des mousquetaires.'],
+      ['montecristo', 'Le Comte de Monte-Cristo', 'Le Vengeur', 84, 86, 98, 'BRELMU', 'Marin trahi qui revient, riche et méconnaissable, pour se venger.'],
+      ['cyrano', 'Cyrano de Bergerac', 'Le Panache', 88, 76, 94, 'BRELM', 'Poète bretteur au nez immense et au cœur généreux.']
+    ],
+    nuits: [
+      ['sheherazade', 'Shéhérazade', 'La Conteuse des mille nuits', 58, 80, 99, 'BRELMU', 'Conteuse qui sauva sa vie par ses histoires.'],
+      ['shahryar', 'Le Roi Shahryar', 'Le Roi trahi', 84, 82, 70, 'BRE', 'Roi qui se vengeait d’une trahison sur toutes les femmes.'],
+      ['aladdin', 'Aladdin', 'Le Garçon à la lampe', 72, 70, 88, 'BRELMU', 'Garçon pauvre devenu prince grâce à une lampe magique.'],
+      ['genie', 'Le Génie de la lampe', 'Le Serviteur enchaîné', 96, 88, 90, 'BRELM', 'Génie tout-puissant prisonnier d’une lampe.'],
+      ['alibaba', 'Ali Baba', 'Le Bûcheron chanceux', 66, 72, 80, 'BREL', 'Bûcheron qui découvrit la caverne des quarante voleurs.'],
+      ['morgiane', 'Morgiane', 'La Servante rusée', 76, 74, 96, 'BREL', 'Servante d’Ali Baba qui déjoua les quarante voleurs.'],
+      ['sinbad', 'Sinbad le marin', 'Le Navigateur', 82, 80, 84, 'BRELM', 'Marchand de Bagdad aux sept voyages extraordinaires.'],
+      ['rokh', 'L’Oiseau Rokh', 'Le Géant des airs', 94, 86, 56, 'BRE', 'Oiseau gigantesque capable d’emporter un éléphant.']
+    ],
+    merveilleux: [
+      ['dorothy', 'Dorothy', 'La Fille du Kansas', 60, 78, 86, 'BRELMU', 'Petite fille emportée par une tornade au pays d’Oz.'],
+      ['epouvantail', 'L’Épouvantail', 'Celui qui voulait un cerveau', 50, 70, 88, 'BREL', 'Épouvantail de paille qui rêve d’avoir un cerveau.'],
+      ['ferblanc', 'Le Bûcheron de fer-blanc', 'Celui qui voulait un cœur', 82, 90, 70, 'BREL', 'Bûcheron de métal qui rêve d’avoir un cœur.'],
+      ['lion', 'Le Lion poltron', 'Celui qui voulait du courage', 88, 80, 62, 'BRE', 'Lion peureux qui rêve d’avoir du courage.'],
+      ['sorciere', 'La Sorcière de l’Ouest', 'La Tyranne des Winkies', 86, 74, 88, 'BRELM', 'Méchante sorcière qui règne sur l’ouest d’Oz.'],
+      ['pinocchio', 'Pinocchio', 'Le Pantin de bois', 64, 72, 78, 'BRELMU', 'Pantin de bois qui rêve de devenir un vrai garçon.'],
+      ['geppetto', 'Geppetto', 'Le Menuisier', 54, 76, 84, 'BRE', 'Vieux menuisier qui sculpta Pinocchio.'],
+      ['fee', 'La Fée aux cheveux bleus', 'La Protectrice', 60, 86, 94, 'BREL', 'Fée bienveillante qui veille sur Pinocchio.']
+    ],
+    jungle: [
+      ['mowgli', 'Mowgli', 'Le Petit d’homme', 76, 74, 88, 'BRELMU', 'Enfant élevé par les loups dans la jungle indienne.'],
+      ['baloo', 'Baloo', 'Le Maître de la Loi', 86, 90, 84, 'BREL', 'Vieil ours sage qui enseigne la Loi de la jungle.'],
+      ['bagheera', 'Bagheera', 'La Panthère noire', 90, 80, 92, 'BRELM', 'Panthère noire rusée, protectrice de Mowgli.'],
+      ['sherekhan', 'Shere Khan', 'Le Tigre boiteux', 96, 82, 74, 'BRELMU', 'Tigre redoutable, ennemi juré de Mowgli.'],
+      ['kaa', 'Kaa', 'Le Python des rochers', 92, 88, 90, 'BREL', 'Immense python, vieux et sage.'],
+      ['akela', 'Akela', 'Le Grand Loup solitaire', 88, 84, 82, 'BRE', 'Chef de la meute des loups de Seeonee.'],
+      ['hathi', 'Hathi', 'Le Maître de la jungle', 94, 96, 80, 'BRE', 'Vieil éléphant qui proclame la trêve de l’eau.'],
+      ['rikki', 'Rikki-tikki-tavi', 'La Mangouste', 80, 70, 84, 'BREL', 'Jeune mangouste qui protège une famille des cobras.']
+    ],
+    arthur: [
+      ['arthur', 'Le Roi Arthur', 'Le Roi de Camelot', 90, 90, 88, 'BRELMU', 'Roi légendaire de Bretagne, fondateur de la Table ronde.'],
+      ['merlin', 'Merlin', 'L’Enchanteur', 66, 84, 99, 'BRELMU', 'Enchanteur et prophète, conseiller du roi Arthur.'],
+      ['lancelot', 'Lancelot du Lac', 'Le Meilleur Chevalier', 96, 88, 78, 'BRELM', 'Le plus valeureux des chevaliers de la Table ronde.'],
+      ['guenievre', 'Guenièvre', 'La Reine de Camelot', 62, 82, 90, 'BREL', 'Épouse du roi Arthur, aimée de Lancelot.'],
+      ['morgane', 'La Fée Morgane', 'La Magicienne d’Avalon', 78, 80, 96, 'BRELM', 'Demi-sœur d’Arthur, puissante magicienne.'],
+      ['perceval', 'Perceval', 'Le Chevalier naïf', 84, 80, 76, 'BREL', 'Jeune chevalier naïf, le premier à approcher le Graal.'],
+      ['damedulac', 'La Dame du Lac', 'La Fée des eaux', 64, 86, 96, 'BREL', 'Fée qui remit l’épée à Arthur et éleva Lancelot.'],
+      ['mordred', 'Mordred', 'Le Traître', 88, 78, 82, 'BRE', 'Neveu et fils d’Arthur, qui provoqua la chute de Camelot.']
+    ],
+    robin: [
+      ['robin', 'Robin des Bois', 'Le Prince des voleurs', 88, 80, 90, 'BRELMU', 'Hors-la-loi qui vole les riches pour donner aux pauvres.'],
+      ['marianne', 'Lady Marianne', 'La Compagne de Sherwood', 70, 78, 90, 'BREL', 'Jeune noble, amour et alliée de Robin des Bois.'],
+      ['petitjean', 'Petit Jean', 'Le Géant au bâton', 94, 88, 66, 'BREL', 'Colosse au bâton, bras droit de Robin des Bois.'],
+      ['tuck', 'Frère Tuck', 'Le Moine joyeux', 86, 84, 74, 'BRE', 'Moine gourmand et bagarreur de la bande de Robin.'],
+      ['sherif', 'Le Shérif de Nottingham', 'L’Ennemi juré', 82, 84, 80, 'BRELM', 'Officier cruel qui pourchasse Robin des Bois.'],
+      ['scarlet', 'Will Scarlet', 'L’Escrimeur', 86, 76, 78, 'BRE', 'Fine lame de la bande de Robin des Bois.'],
+      ['alan', 'Alan-a-Dale', 'Le Ménestrel', 62, 70, 90, 'BRE', 'Ménestrel de la bande, sauvé par Robin le jour de ses noces.'],
+      ['prince', 'Le Prince Jean', 'L’Usurpateur', 72, 82, 84, 'BREL', 'Frère du roi Richard, qui gouverne en son absence.']
+    ],
+    etranges: [
+      ['invisible', 'L’Homme invisible', 'Le Savant effacé', 78, 84, 92, 'BRELM', 'Savant devenu invisible, et peu à peu fou.'],
+      ['moreau', 'Le Docteur Moreau', 'Le Savant de l’île', 70, 80, 94, 'BREL', 'Savant qui transforme des animaux en créatures humaines.'],
+      ['horla', 'Le Horla', 'La Présence invisible', 84, 88, 96, 'BREL', 'Être invisible qui hante le narrateur de Maupassant.'],
+      ['quasimodo', 'Quasimodo', 'Le Sonneur de Notre-Dame', 92, 90, 70, 'BRELMU', 'Sonneur de cloches bossu de Notre-Dame de Paris.'],
+      ['mobydick', 'Moby Dick', 'La Baleine blanche', 98, 94, 64, 'BRELM', 'Cachalot blanc géant, obsession du capitaine Achab.'],
+      ['golem', 'Le Golem', 'Le Gardien d’argile', 96, 98, 50, 'BREL', 'Colosse d’argile animé par un rabbin de Prague.'],
+      ['hollandais', 'Le Hollandais volant', 'Le Vaisseau fantôme', 86, 92, 80, 'BREL', 'Navire fantôme condamné à errer sur les mers.'],
+      ['kraken', 'Le Kraken', 'Le Monstre des profondeurs', 99, 90, 54, 'BRE', 'Monstre marin géant des légendes scandinaves.']
+    ],
+    flibustiers: [
+      ['barbenoire', 'Barbe-Noire', 'La Terreur des Caraïbes', 96, 84, 80, 'BRELMU', 'Le plus célèbre pirate de l’âge d’or de la piraterie.'],
+      ['bonny', 'Anne Bonny', 'La Pirate irlandaise', 86, 78, 84, 'BRELM', 'L’une des rares femmes pirates célèbres.'],
+      ['read', 'Mary Read', 'La Combattante déguisée', 88, 80, 80, 'BREL', 'Femme pirate qui vécut des années déguisée en homme.'],
+      ['morgan', 'Henry Morgan', 'Le Corsaire devenu gouverneur', 88, 86, 88, 'BREL', 'Corsaire gallois qui mit à sac Panama.'],
+      ['roberts', 'Bartholomew Roberts', 'Black Bart', 92, 86, 86, 'BRELM', 'Le pirate le plus redoutable de son temps.'],
+      ['labuse', 'La Buse', 'Le Pirate au trésor perdu', 84, 80, 92, 'BRELMU', 'Pirate français dont le trésor n’a jamais été retrouvé.'],
+      ['omalley', 'Grace O’Malley', 'La Reine pirate', 84, 86, 90, 'BREL', 'Cheffe de clan irlandaise qui tint tête aux Anglais.'],
+      ['surcouf', 'Robert Surcouf', 'Le Roi des corsaires', 90, 84, 90, 'BRELM', 'Corsaire malouin, terreur des navires anglais.']
+    ],
+    forbans: [
+      ['silver', 'Long John Silver', 'Le Cuisinier à la jambe de bois', 86, 80, 94, 'BRELMU', 'Pirate rusé et charismatique de L’Île au trésor.'],
+      ['jim', 'Jim Hawkins', 'Le Mousse', 70, 72, 86, 'BREL', 'Jeune garçon héros de L’Île au trésor.'],
+      ['flint', 'Le Capitaine Flint', 'Le Pirate légendaire', 94, 82, 86, 'BRELM', 'Pirate redouté qui enterra son trésor sur une île.'],
+      ['bengunn', 'Ben Gunn', 'Le Naufragé', 64, 76, 80, 'BRE', 'Ancien pirate abandonné trois ans sur l’île au trésor.'],
+      ['billybones', 'Billy Bones', 'Le Vieux Loup de mer', 82, 74, 70, 'BRE', 'Vieux pirate qui cachait la carte du trésor.'],
+      ['crochet', 'Le Capitaine Crochet', 'L’Ennemi de Peter Pan', 90, 82, 88, 'BRELMU', 'Capitaine pirate à la main de fer, ennemi de Peter Pan.'],
+      ['smee', 'Smee', 'Le Maître d’équipage', 60, 70, 66, 'BRE', 'Maître d’équipage débonnaire du capitaine Crochet.'],
+      ['blood', 'Capitaine Blood', 'Le Médecin pirate', 88, 84, 92, 'BRELM', 'Médecin injustement déporté devenu capitaine pirate.']
     ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
@@ -382,6 +614,110 @@ window.ATLAS = window.ATLAS || {};
     'lunes-encelade': 'Cette petite lune de [[planetes:saturne|Saturne]], d’à peine 500 kilomètres de diamètre, est couverte d’une glace si pure qu’elle renvoie presque toute la lumière du Soleil. Près de son pôle sud, des geysers projettent dans l’espace l’eau d’un océan caché.',
     'lunes-miranda': 'Cette petite lune d’[[planetes:uranus|Uranus]] semble faite de morceaux mal assemblés : plaines, sillons et falaises se juxtaposent sans ordre. Sa falaise de Verona Rupes, haute de plusieurs kilomètres, compte parmi les plus hautes du système solaire.',
     'lunes-triton': 'La plus grande lune de [[planetes:neptune|Neptune]] tourne autour de sa planète dans le sens inverse de la rotation de celle-ci, un cas unique pour une lune de cette taille. C’est sans doute un astre venu de la ceinture de Kuiper, capturé par Neptune.',
+    'astronautes-gagarine': 'Le 12 avril 1961, à bord de Vostok 1, ce pilote soviétique de 27 ans fit le tour de la Terre en 108 minutes. Au décollage, il lança simplement : « Poïekhali ! », « On y va ! ».',
+    'astronautes-terechkova': 'Ancienne ouvrière du textile et parachutiste amatrice, elle s’envola le 16 juin 1963 à bord de Vostok 6 et passa près de trois jours en orbite, seule. Son indicatif radio était « Tchaïka », la mouette.',
+    'astronautes-leonov': 'Le 18 mars 1965, il sortit de la capsule Voskhod 2, relié par un câble, et flotta dans le vide une douzaine de minutes. Sa combinaison gonfla tant qu’il dut en laisser échapper de l’air pour réussir à rentrer.',
+    'astronautes-armstrong': 'Commandant d’[[missions:apollo11|Apollo 11]], il posa le module Eagle sur la [[lunes:lune|Lune]] le 20 juillet 1969, avec quelques secondes de carburant en réserve. Quelques heures plus tard, il y fit le premier pas de l’humanité.',
+    'astronautes-aldrin': 'Pilote du module lunaire d’Apollo 11, il rejoignit [[armstrong]] sur la [[lunes:lune|Lune]] une vingtaine de minutes après lui. Il décrivit le paysage d’une formule restée célèbre : « une magnifique désolation ».',
+    'astronautes-ride': 'Physicienne, elle s’envola en juin 1983 à bord de la navette Challenger et devint, à 32 ans, la première Américaine dans l’espace. Elle manipula le bras robotique de la navette pour déployer et récupérer un satellite.',
+    'astronautes-chretien': 'Pilote de chasse et d’essai, il s’envola en juin 1982 vers la station soviétique Saliout 7, devenant le premier Français et le premier Européen de l’Ouest dans l’espace.',
+    'astronautes-pesquet': 'Ingénieur et pilote de ligne, il passa six mois à bord de la [[missions:iss|Station spatiale internationale]] en 2016-2017, puis y retourna en 2021. Lors de ce second séjour, il en prit le commandement, une première pour un Français.',
+    'missions-spoutnik': 'Le 4 octobre 1957, l’Union soviétique mit en orbite une sphère de métal de 58 centimètres munie de quatre antennes. Son « bip-bip » radio, capté par les radioamateurs du monde entier, ouvrait l’ère spatiale.',
+    'missions-apollo11': 'Lancée le 16 juillet 1969 par une fusée Saturn V, la mission emmena [[astronautes:armstrong|Neil Armstrong]], [[astronautes:aldrin|Buzz Aldrin]] et Michael Collins vers la [[lunes:lune|Lune]]. Armstrong et Aldrin s’y posèrent pendant que Collins restait en orbite.',
+    'missions-voyager': 'Lancée en 1977, elle survola [[planetes:jupiter|Jupiter]] et [[planetes:saturne|Saturne]] avant de filer vers l’espace interstellaire, qu’elle atteignit en 2012. Elle se trouve aujourd’hui à plus de 24 milliards de kilomètres de la Terre.',
+    'missions-hubble': 'Placé en orbite en 1990, ce télescope échappe au flou de l’atmosphère terrestre. Ses premières images étaient floues à cause d’un miroir mal poli de deux microns : des astronautes vinrent le doter d’optiques correctrices en 1993.',
+    'missions-iss': 'Assemblée à partir de 1998 par une quinzaine de pays, elle est habitée en permanence depuis novembre 2000. Grande comme un terrain de football, elle fait le tour de la Terre en environ 90 minutes, à 400 kilomètres d’altitude.',
+    'missions-curiosity': 'Ce robot de la taille d’une voiture s’est posé sur [[planetes:mars|Mars]] en août 2012, descendu par une grue volante. Il a montré que le cratère Gale abritait autrefois un lac, avec les ingrédients chimiques nécessaires à la vie.',
+    'missions-rosetta': 'Lancée par l’Agence spatiale européenne en 2004, la sonde Rosetta rattrapa la comète Tchouri après dix ans de voyage. Le 12 novembre 2014, elle largua le petit robot Philae, qui se posa sur la comète : une première.',
+    'missions-webb': 'Lancé le 25 décembre 2021 par une fusée Ariane 5 depuis la Guyane, il observe l’Univers dans l’infrarouge. Son miroir doré de 6,5 mètres, trop grand pour la fusée, a voyagé plié comme un origami.',
+    'detectives-holmes': 'Créé par Arthur Conan Doyle en 1887, il résout les énigmes les plus obscures par l’observation et la déduction. Il vit au 221B Baker Street, à Londres, avec son ami le docteur [[watson]].',
+    'detectives-watson': 'Ancien médecin militaire blessé en Afghanistan, il partage l’appartement de [[holmes]] et l’accompagne dans ses enquêtes. C’est lui qui raconte presque toutes leurs aventures.',
+    'detectives-moriarty': 'Brillant professeur de mathématiques, il dirige dans l’ombre la moitié des crimes de Londres. [[holmes]] le surnomme « le Napoléon du crime ».',
+    'detectives-adler': 'Cantatrice d’opéra et aventurière, elle apparaît dans Un scandale en Bohême, en 1891. Elle devine les plans de [[holmes]] et lui échappe, ce qui lui vaut à jamais son admiration.',
+    'detectives-lestrade': 'Inspecteur de Scotland Yard, il fait appel à [[holmes]] quand une affaire le dépasse, tout en enviant son talent. Il apparaît dans une douzaine d’aventures.',
+    'detectives-lupin': 'Créé par Maurice Leblanc en 1905, ce cambrioleur au monocle dérobe les plus grands trésors avec panache, sans jamais tuer. Il se joue de la police et de l’inspecteur Ganimard.',
+    'detectives-rouletabille': 'Créé par Gaston Leroux en 1907, ce reporter de dix-huit ans à la tête ronde comme une boule résout Le Mystère de la chambre jaune : un crime commis dans une pièce fermée de l’intérieur.',
+    'detectives-dupin': 'Edgar Allan Poe l’imagina en 1841 dans Double Assassinat dans la rue Morgue, souvent considéré comme la première nouvelle policière. Ce Parisien solitaire résout les crimes par le seul raisonnement.',
+    'verne-nemo': 'Dans Vingt Mille Lieues sous les mers, en 1870, il parcourt les océans à bord du Nautilus, un sous-marin électrique en avance sur son temps. Il a rompu avec la terre ferme et avec toutes les nations.',
+    'verne-fogg': 'Ce gentleman londonien parie vingt mille livres qu’il fera le tour du monde en quatre-vingts jours. Il part le soir même avec son domestique [[passepartout]], en train et en paquebot.',
+    'verne-passepartout': 'Ancien acrobate et pompier, ce Français jovial cherchait une place tranquille quand il entra au service de [[fogg]]. Le jour même, il partait pour le tour du monde.',
+    'verne-strogoff': 'Officier du tsar, il doit traverser la Sibérie en pleine révolte tatare pour porter un message vital au frère de l’empereur, à Irkoutsk. Il voyage incognito, sous un faux nom.',
+    'verne-lidenbrock': 'Ce professeur de minéralogie de Hambourg déchiffre un vieux parchemin indiquant un passage vers le centre de la Terre. Avec son neveu Axel et le guide Hans, il descend dans le cratère d’un volcan d’Islande.',
+    'verne-barbicane': 'Président du Gun Club de Baltimore, il propose de tirer un énorme obus vers la [[lunes:lune|Lune]] avec un canon géant creusé dans le sol de Floride. Trois hommes prennent place à bord.',
+    'verne-robur': 'En 1886, Verne imagine Robur, un ingénieur qui enlève les membres d’un club de partisans des ballons pour leur prouver la supériorité de son engin, l’Albatros, porté par des hélices.',
+    'verne-cyrus': 'Pendant la guerre de Sécession, il s’évade en ballon avec quatre compagnons et un chien. Naufragés sur une île inconnue du Pacifique, ils recréent tout, du feu à l’électricité, grâce à sa science.',
+    'mousquetaires-dartagnan': 'Arrivé de Gascogne avec un vieux cheval et les conseils de son père, il provoque en duel le même jour [[athos]], [[porthos]] et [[aramis]]. Ils deviennent inséparables.',
+    'mousquetaires-athos': 'Sous ce nom d’emprunt se cache le comte de La Fère, un grand seigneur au passé douloureux. Sage et respecté, il est comme un père pour [[dartagnan]].',
+    'mousquetaires-porthos': 'Géant vaniteux et généreux, il aime les beaux habits, la bonne chère et les duels. Sa force est légendaire, sa ruse beaucoup moins.',
+    'mousquetaires-aramis': 'Raffiné, discret et galant, il hésite sans cesse entre l’épée et la soutane. Il entretient une correspondance secrète avec une duchesse.',
+    'mousquetaires-milady': 'Belle, intelligente et sans pitié, elle mène les missions secrètes du [[richelieu|cardinal de Richelieu]]. Elle porte à l’épaule la marque infamante d’une fleur de lys.',
+    'mousquetaires-richelieu': 'Principal ministre de Louis XIII, il dispose de ses propres gardes, rivaux des mousquetaires du roi. Chez Dumas, il trame ses intrigues contre la reine avec l’aide de [[milady]].',
+    'mousquetaires-montecristo': 'Edmond Dantès, jeune marin, est jeté au château d’If sur une fausse accusation, le jour de ses fiançailles. Quatorze ans plus tard, il s’évade et découvre le trésor de l’île de Monte-Cristo.',
+    'mousquetaires-cyrano': 'Dans la pièce d’Edmond Rostand, en 1897, ce cadet de Gascogne, poète et bretteur redoutable, aime en secret sa cousine Roxane. Persuadé que son nez le rend laid, il écrit pour elle les lettres d’amour d’un autre.',
+    'nuits-sheherazade': 'Pour mettre fin à la cruauté du roi [[shahryar]], qui épousait chaque soir une femme et la faisait exécuter à l’aube, elle se porta volontaire. Chaque nuit, elle lui conta une histoire, en s’arrêtant au moment le plus captivant.',
+    'nuits-shahryar': 'Trahi par sa première épouse, ce roi jura de ne plus jamais être trompé : il épousait chaque soir une jeune femme et la faisait exécuter le matin. [[sheherazade]] mit fin à ce cycle.',
+    'nuits-aladdin': 'Fils d’un tailleur pauvre, il est envoyé par un magicien chercher une vieille lampe au fond d’une caverne. En la frottant, il fait apparaître un [[genie|génie]] qui exauce tous ses souhaits.',
+    'nuits-genie': 'Enfermé dans une lampe, il doit obéir à celui qui la possède. Pour [[aladdin]], il fait surgir un palais en une nuit et des trésors à foison.',
+    'nuits-alibaba': 'Caché dans un arbre, ce pauvre bûcheron voit une bande de quarante voleurs ouvrir une caverne avec une formule magique : « Sésame, ouvre-toi ! ». Il la répète et découvre leur trésor.',
+    'nuits-morgiane': 'Servante d’[[alibaba]], elle découvre que les voleurs se cachent dans des jarres pour attaquer son maître pendant la nuit. Elle les neutralise un à un en versant de l’huile bouillante dans chaque jarre.',
+    'nuits-sinbad': 'Riche marchand de Bagdad, il raconte ses sept voyages, tous marqués par un naufrage et des prodiges. Il est emporté par l’oiseau [[rokh]], débarque sur une baleine qu’il prend pour une île et affronte un géant mangeur d’hommes.',
+    'nuits-rokh': 'Si grand que ses ailes cachent le soleil, il nourrit ses petits avec des éléphants. [[sinbad]] s’attache à sa patte pour quitter une île, et le Rokh l’emporte au-dessus des montagnes.',
+    'merveilleux-dorothy': 'Une tornade emporte la maison de cette fillette du Kansas, avec son chien Toto, jusqu’au merveilleux pays d’Oz. Pour rentrer chez elle, elle suit la route de briques jaunes jusqu’à la Cité d’émeraude.',
+    'merveilleux-epouvantail': 'Rencontré dans un champ de maïs, cet épouvantail rempli de paille suit [[dorothy]] pour demander un cerveau au magicien. Pourtant, c’est souvent lui qui trouve les solutions.',
+    'merveilleux-ferblanc': 'Ensorcelé par une méchante sorcière, ce bûcheron a vu son corps remplacé pièce par pièce par du fer-blanc. Rouillé et immobile dans la forêt, il est sauvé par [[dorothy]], qui lui huile les articulations.',
+    'merveilleux-lion': 'Ce lion rugit pour cacher sa peur : il tremble devant tout. Il rejoint [[dorothy]] pour demander du courage au magicien, mais se montre brave à chaque danger.',
+    'merveilleux-sorciere': 'Elle n’a qu’un œil, mais il voit aussi loin qu’un télescope. Elle asservit le peuple des Winkies et lance contre [[dorothy]] des loups, des corbeaux et des singes ailés.',
+    'merveilleux-pinocchio': 'Taillé par [[geppetto]] dans une bûche qui parle, ce pantin désobéissant enchaîne les bêtises. Chaque fois qu’il ment, son nez s’allonge.',
+    'merveilleux-geppetto': 'Vieux menuisier pauvre, il sculpte un pantin dans une bûche pour gagner sa vie en montreur de marionnettes. Il vend son seul manteau pour acheter un abécédaire à [[pinocchio]].',
+    'merveilleux-fee': 'D’abord petite fille aux cheveux bleus, puis jeune femme, elle sauve [[pinocchio]] à plusieurs reprises et l’aide à grandir. C’est devant elle que son nez s’allonge le plus.',
+    'jungle-mowgli': 'Perdu bébé dans la jungle et poursuivi par le tigre [[sherekhan]], il est recueilli par une famille de loups. Le conseil de la meute, présidé par [[akela]], l’accepte grâce à [[baloo]] et [[bagheera]].',
+    'jungle-baloo': 'Ours brun grave et somnolent, il enseigne aux jeunes loups la Loi de la jungle. Il prend la défense de [[mowgli]] devant le conseil et devient son professeur.',
+    'jungle-bagheera': 'Panthère noire aussi rusée que dangereuse, elle achète la vie de [[mowgli]] au conseil des loups en offrant un taureau fraîchement tué.',
+    'jungle-sherekhan': 'Ce tigre boiteux, méprisé pour chasser le bétail et les hommes, réclame [[mowgli]] comme proie depuis le premier jour. Il pousse les jeunes loups à chasser l’enfant.',
+    'jungle-kaa': 'Ce python des rochers, long de dix mètres, est l’un des êtres les plus anciens et les plus redoutés de la jungle. Il aide [[baloo]] et [[bagheera]] à délivrer [[mowgli]], enlevé par les singes.',
+    'jungle-akela': 'Grand loup gris, il dirige la meute par sa force et sa ruse. Il préside le conseil qui accepte [[mowgli]] parmi les loups.',
+    'jungle-hathi': 'Vieil éléphant sauvage respecté de tous, il est le maître de la jungle. Lors d’une grande sécheresse, il proclame la trêve de l’eau, pendant laquelle personne ne peut chasser près du point d’eau.',
+    'jungle-rikki': 'Recueillie par une famille anglaise en Inde, cette petite mangouste affronte deux cobras, Nag et Nagaïna, qui menacent le jardin. Son nom imite son cri de guerre.',
+    'arthur-arthur': 'Jeune écuyer inconnu, il devient roi en retirant d’un rocher une épée que nul autre n’avait pu en arracher. Conseillé par [[merlin]], il réunit à Camelot les meilleurs chevaliers autour de la Table ronde.',
+    'arthur-merlin': 'Fils d’une mortelle et d’un démon, il connaît le passé et devine l’avenir. Il organise la naissance d’[[arthur]], veille sur son éducation et le guide au début de son règne.',
+    'arthur-lancelot': 'Élevé par la [[damedulac|Dame du Lac]], d’où son nom, il devient le meilleur chevalier du monde. Mais son amour pour la reine [[guenievre]] le met en rivalité avec son roi, [[arthur]].',
+    'arthur-guenievre': 'Fille du roi Léodagan, elle épouse [[arthur]] et apporte en dot, selon certains récits, la Table ronde elle-même. Son amour pour [[lancelot]] fait le malheur du royaume.',
+    'arthur-morgane': 'Demi-sœur d’[[arthur]], elle apprend la magie et devient une enchanteresse redoutable, tantôt guérisseuse, tantôt ennemie du roi. Elle vole le fourreau magique de son épée.',
+    'arthur-perceval': 'Élevé par sa mère loin du monde et des chevaliers, ce garçon naïf quitte tout pour rejoindre la cour d’[[arthur]]. Au château du Roi Pêcheur, il voit passer le Graal mais n’ose pas poser de question.',
+    'arthur-damedulac': 'Fée vivant sous les eaux d’un lac enchanté, elle remet son épée à [[arthur]] et élève le jeune [[lancelot]]. On l’appelle souvent Viviane.',
+    'arthur-mordred': 'Neveu et, selon certains récits, fils d’[[arthur]], il profite de l’absence du roi pour s’emparer du trône et de la reine.',
+    'robin-robin': 'Archer d’exception réfugié dans la forêt de Sherwood, il défie le [[sherif|shérif de Nottingham]] et le [[prince|prince Jean]], qui écrasent le peuple d’impôts. Il prend aux riches pour donner aux pauvres.',
+    'robin-marianne': 'Jeune femme noble, elle aime [[robin]] et l’aide à déjouer les plans du [[sherif|shérif]]. Dans certains récits, elle se déguise en page pour le rejoindre à Sherwood.',
+    'robin-petitjean': 'Ce géant doit son surnom à une plaisanterie. Il rencontre [[robin]] sur un pont étroit : aucun ne veut céder le passage, et Petit Jean le fait tomber dans la rivière d’un coup de bâton.',
+    'robin-tuck': 'Moine bon vivant, gourmand et redoutable à l’épée, il rejoint la bande de [[robin]] après l’avoir affronté. Leur combat commence quand Robin se fait porter par lui pour traverser une rivière.',
+    'robin-sherif': 'Représentant du pouvoir royal, il lève les impôts sans pitié et pourchasse [[robin]] dans la forêt de Sherwood, sans jamais parvenir à le capturer.',
+    'robin-scarlet': 'Habile à l’épée et, dit-on, vêtu de rouge, il est l’un des plus anciens compagnons de [[robin]]. Dans certaines ballades, il est son cousin.',
+    'robin-alan': 'Ménestrel au cœur brisé, il voit sa fiancée promise de force à un vieux chevalier. [[robin]] interrompt la cérémonie et l’unit à celle qu’il aime.',
+    'robin-prince': 'Pendant que son frère, le roi Richard Cœur de Lion, est retenu prisonnier au retour de la croisade, il gouverne l’Angleterre et accable le peuple d’impôts. Il est l’ennemi de [[robin]].',
+    'etranges-invisible': 'Dans le roman de H. G. Wells, en 1897, le scientifique Griffin découvre comment rendre son corps invisible. Il se cache sous des bandages et des lunettes noires, mais ne parvient pas à inverser l’expérience.',
+    'etranges-moreau': 'Sur une île perdue du Pacifique, ce chirurgien chassé d’Angleterre opère des animaux pour les transformer en êtres presque humains. Wells publia L’Île du docteur Moreau en 1896.',
+    'etranges-horla': 'Dans la nouvelle de Guy de Maupassant, en 1887, un homme sent une présence invisible qui boit l’eau et le lait de sa carafe pendant la nuit, et prend peu à peu possession de sa volonté.',
+    'etranges-quasimodo': 'Abandonné bébé sur le parvis de Notre-Dame, il est recueilli par l’archidiacre Frollo et devient le sonneur de la cathédrale. Les cloches l’ont rendu sourd.',
+    'etranges-mobydick': 'Ce cachalot blanc a arraché la jambe du capitaine Achab, qui parcourt désormais les océans pour se venger. Herman Melville publia Moby Dick en 1851.',
+    'etranges-golem': 'Selon la légende, le rabbin Loew de Prague façonna au XVIe siècle un géant d’argile pour protéger la communauté juive de la ville. Il l’animait en lui glissant dans la bouche un parchemin portant le nom de Dieu.',
+    'etranges-hollandais': 'Selon la légende des marins, son capitaine jura de franchir le cap de Bonne-Espérance malgré la tempête, dût-il naviguer jusqu’au Jugement dernier. Il fut exaucé : son navire erre depuis, sans jamais pouvoir accoster.',
+    'etranges-kraken': 'Les marins norvégiens racontaient qu’un monstre immense, si grand qu’on le prenait pour une île, surgissait des profondeurs pour entraîner les navires vers le fond.',
+    'flibustiers-barbenoire': 'Edward Teach, dit Barbe-Noire, terrorisa les Caraïbes et les côtes d’Amérique vers 1717 et 1718. On raconte qu’il glissait des mèches allumées dans sa barbe pour paraître entouré de fumée au combat.',
+    'flibustiers-bonny': 'Née en Irlande, elle s’enfuit avec le pirate Calico Jack Rackham et combat à ses côtés, vêtue en homme, dans les Caraïbes. Elle y rencontre [[read]].',
+    'flibustiers-read': 'Élevée en garçon depuis l’enfance, elle servit comme soldat, puis devint marin. Capturée par des pirates, elle les rejoignit et rencontra [[bonny]] sur le navire de Rackham.',
+    'flibustiers-morgan': 'Corsaire au service de l’Angleterre, il attaqua les colonies espagnoles des Caraïbes. En 1671, il traversa l’isthme et mit à sac la ville de Panama.',
+    'flibustiers-roberts': 'Gallois enrôlé de force par des pirates en 1719, il devint leur capitaine six semaines plus tard. En trois ans, il captura plus de quatre cents navires.',
+    'flibustiers-labuse': 'Olivier Levasseur, dit La Buse, écuma l’océan Indien et s’empara en 1721 d’un navire portugais chargé d’un immense trésor. Il fut pendu à La Réunion en 1730.',
+    'flibustiers-omalley': 'Au XVIe siècle, cette cheffe de clan irlandaise commandait une flotte qui contrôlait les côtes de l’ouest de l’Irlande. On l’appelait Gráinne Mhaol.',
+    'flibustiers-surcouf': 'Né à Saint-Malo en 1773, ce corsaire muni d’une lettre de marque du gouvernement français captura des dizaines de navires britanniques dans l’océan Indien. Son plus célèbre exploit fut la prise du Kent, en 1800.',
+    'forbans-silver': 'Cuisinier du navire Hispaniola, ce marin à la jambe de bois et au perroquet sur l’épaule cache un chef pirate. Il prépare une mutinerie pour s’emparer du trésor du capitaine [[flint]].',
+    'forbans-jim': 'Fils d’aubergistes, il découvre dans le coffre d’un vieux marin la carte du trésor du capitaine [[flint]]. Il embarque comme mousse sur l’Hispaniola.',
+    'forbans-flint': 'Mort avant le début de L’Île au trésor, il est pourtant partout : c’est son trésor que tous cherchent, enterré sur une île dont il a dessiné la carte. Il fit tuer les six marins qui l’avaient aidé à le cacher.',
+    'forbans-bengunn': 'Ancien marin de [[flint]], il fut abandonné seul sur l’île par ses compagnons pendant trois ans. À moitié fou, il rêve de fromage.',
+    'forbans-billybones': 'Ce vieux marin balafré s’installe à l’auberge de l’Amiral Benbow, où il boit du rhum en chantant sa chanson de pirate. Il guette sans cesse l’arrivée d’un marin à une jambe.',
+    'forbans-crochet': 'Chef des pirates du Pays imaginaire, il porte un crochet de fer à la place de la main droite, tranchée par [[contes:peterpan|Peter Pan]] et jetée à un crocodile.',
+    'forbans-smee': 'Irlandais jovial, il sert le [[crochet|capitaine Crochet]] avec une fidélité touchante, bien qu’il soit le moins effrayant des pirates.',
+    'forbans-blood': 'Médecin irlandais, Peter Blood est condamné à tort pour avoir soigné un rebelle, puis vendu comme esclave à la Barbade. Il s’évade et devient le plus brillant capitaine pirate des Caraïbes.',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -498,6 +834,110 @@ window.ATLAS = window.ATLAS || {};
     'lunes-encelade': 'La sonde Cassini a traversé ces panaches et y a détecté du sel, des molécules organiques et des signes d’activité hydrothermale. Ces jets alimentent l’un des anneaux de Saturne, l’anneau E. Elle porte le nom du Géant [[geants:encelade|Encelade]], écrasé sous la Sicile par Athéna.',
     'lunes-miranda': 'Elle fut découverte en 1948 par Gerard Kuiper. On ne la connaît que par les images de Voyager 2, prises lors de son unique passage en 1986. Contrairement aux lunes de Jupiter et de Saturne, celles d’Uranus portent des noms de personnages de Shakespeare : Miranda est l’héroïne de La Tempête.',
     'lunes-triton': 'Il y fait environ −235 °C, l’une des températures de surface les plus basses jamais mesurées. Voyager 2 y a pourtant photographié en 1989 des geysers d’azote. Elle porte le nom de Triton, fils de [[grece:poseidon|Poséidon]], dieu marin qui soufflait dans une conque.',
+    'astronautes-gagarine': 'Revenu en héros, il devint l’homme le plus célèbre de la planète. Il mourut en 1968, à 34 ans, dans l’accident d’un avion d’entraînement. Le 12 avril est aujourd’hui la Journée internationale du vol spatial habité.',
+    'astronautes-terechkova': 'Elle reste la seule femme à avoir voyagé seule dans l’espace. Il fallut attendre dix-neuf ans pour qu’une autre femme, Svetlana Savitskaïa, y retourne.',
+    'astronautes-leonov': 'Peintre de talent, il emporta des crayons en orbite et dessina le premier lever de soleil vu de l’espace. En 1975, il commanda la partie soviétique d’Apollo-Soyouz, la première poignée de main en orbite entre Américains et Soviétiques.',
+    'astronautes-armstrong': 'Ingénieur et ancien pilote d’essai, il était connu pour son calme et sa discrétion. Après Apollo 11, il refusa la plupart des honneurs et enseigna l’aéronautique à l’université. Il est mort en 2012.',
+    'astronautes-aldrin': 'Docteur en astronautique, il avait mis au point des techniques de rendez-vous en orbite utilisées par la NASA. Comme c’est Armstrong qui tenait l’appareil photo, la plupart des célèbres photos d’un homme sur la Lune montrent en réalité Aldrin.',
+    'astronautes-ride': 'Après sa carrière, elle consacra sa vie à donner aux jeunes, et surtout aux filles, le goût des sciences. Elle siégea dans les commissions d’enquête sur les accidents des navettes Challenger et Columbia. Elle est morte en 2012.',
+    'astronautes-chretien': 'En 1988, lors d’un second vol, il devint le premier astronaute ni américain ni soviétique à sortir dans le vide spatial. Il vola aussi à bord de la navette américaine Atlantis en 1997.',
+    'astronautes-pesquet': 'Ses photographies de la Terre prises depuis la station, partagées chaque jour, ont été suivies par des millions de personnes. Il a passé au total près de 400 jours dans l’espace, un record pour un astronaute européen.',
+    'missions-spoutnik': 'Il fit le tour de la Terre en 96 minutes environ, pendant trois mois, avant de se consumer dans l’atmosphère. Le choc fut tel aux États-Unis qu’il poussa à la création de la NASA, en 1958, et lança la course à l’espace.',
+    'missions-apollo11': 'Environ 600 millions de personnes suivirent les premiers pas à la télévision. Les astronautes rapportèrent plus de 21 kilogrammes de roches lunaires et laissèrent sur place une plaque disant qu’ils étaient venus en paix pour toute l’humanité.',
+    'missions-voyager': 'Elle emporte un disque d’or chargé de sons et d’images de la Terre. En 1990, depuis les confins du système solaire, elle prit la photo « Pale Blue Dot », où la Terre n’est qu’un point minuscule. Ses signaux mettent près d’une journée à nous parvenir.',
+    'missions-hubble': 'Il a aidé à mesurer l’âge de l’Univers, environ 13,8 milliards d’années, et à montrer que son expansion accélère. Son image des « Piliers de la création », dans la nébuleuse de l’Aigle, est l’une des plus célèbres de l’astronomie.',
+    'missions-iss': 'Ses occupants voient ainsi seize levers et couchers de soleil par jour. On y étudie les effets de l’apesanteur sur le corps humain, la croissance des plantes ou le comportement des flammes. [[astronautes:pesquet|Thomas Pesquet]] l’a commandée en 2021.',
+    'missions-curiosity': 'Il porte un laser, la ChemCam, conçu en partie en France, qui vaporise la roche à distance pour en analyser la composition. Prévu pour deux ans, il a continué de rouler plus d’une décennie sur les pentes du mont Sharp.',
+    'missions-rosetta': 'Philae rebondit et finit coincé à l’ombre d’une falaise, sans assez de soleil pour ses panneaux. Il eut pourtant le temps d’envoyer ses mesures. Rosetta termina sa mission en 2016 en se posant doucement sur la comète.',
+    'missions-webb': 'Il se trouve à 1,5 million de kilomètres de la Terre, protégé du Soleil par un pare-soleil grand comme un court de tennis. Il observe des galaxies nées quelques centaines de millions d’années après le Big Bang.',
+    'detectives-holmes': 'Violoniste, chimiste amateur et maître du déguisement, il devine la vie d’un inconnu à ses chaussures ou à ses mains. Conan Doyle le fit mourir en 1893 face à [[moriarty]], mais dut le ressusciter dix ans plus tard sous la pression des lecteurs.',
+    'detectives-watson': 'Moins brillant que son ami, il apporte courage, loyauté et bon sens. Il sert d’intermédiaire avec le lecteur, à qui Holmes doit expliquer ses déductions. Il épouse Mary Morstan, rencontrée lors de l’enquête du Signe des quatre.',
+    'detectives-moriarty': 'Il n’apparaît en personne que dans une seule nouvelle, Le Dernier Problème, où il affronte Holmes au bord des chutes de Reichenbach, en Suisse. Cette brève apparition a suffi à en faire le modèle de tous les grands méchants intelligents.',
+    'detectives-adler': 'Pour Holmes, elle restera toujours « la femme ». Elle n’apparaît que dans une seule histoire, mais son intelligence et son indépendance en ont fait l’un des personnages les plus repris de l’univers du détective.',
+    'detectives-lestrade': 'Holmes le juge peu imaginatif mais tenace, le meilleur des policiers de métier. Avec le temps, Lestrade finit par reconnaître ouvertement le génie du détective. Il incarne la police officielle face au détective privé.',
+    'detectives-lupin': 'Leblanc l’opposa même à [[holmes|un célèbre détective anglais]], rebaptisé Herlock Sholmès après les protestations de Conan Doyle. Dans L’Aiguille creuse, Lupin découvre le secret des rois de France, caché dans une aiguille de craie à Étretat.',
+    'detectives-rouletabille': 'Le roman est l’un des modèles du crime en chambre close, où le coupable semble avoir traversé les murs. Rouletabille se fie au raisonnement plutôt qu’aux indices matériels. Gaston Leroux est aussi l’auteur du [[gothique:fantome|Fantôme de l’Opéra]].',
+    'detectives-dupin': 'Son ami, qui raconte ses enquêtes, annonce déjà le docteur [[watson]]. Dans La Lettre volée, Dupin retrouve un document caché à la vue de tous, là où personne ne pense à chercher. Baudelaire traduisit ses aventures en français.',
+    'verne-nemo': 'Son nom signifie « personne » en latin, un clin d’œil à [[heros:ulysse|Ulysse]] face au cyclope. On découvre dans L’Île mystérieuse qu’il est un prince indien révolté contre la domination britannique. Les vingt mille lieues sont la distance parcourue, et non la profondeur.',
+    'verne-fogg': 'De retour à Londres, il se croit en retard d’un jour. Mais en voyageant vers l’est, il a gagné une journée en franchissant la ligne de changement de date, et remporte son pari. La journaliste Nellie Bly releva le défi pour de vrai en 1889 et boucla le tour en 72 jours.',
+    'verne-passepartout': 'Il aide à sauver en Inde la jeune Aouda d’un bûcher, se fait engager dans une troupe d’acrobates au Japon et est enlevé par des Sioux aux États-Unis. Il n’a jamais remis à l’heure sa montre de famille, restée à l’heure de Londres.',
+    'verne-strogoff': 'Capturé, il est condamné à être aveuglé par une lame chauffée à blanc. Il ne perd pourtant pas la vue : les larmes versées en regardant sa mère une dernière fois l’ont protégé. Le roman parut en 1876.',
+    'verne-lidenbrock': 'Sous terre, ils découvrent une mer intérieure, des forêts de champignons géants et des animaux préhistoriques. Ils remontent à la surface projetés par une éruption du Stromboli, en Italie. Le Voyage au centre de la Terre parut en 1864.',
+    'verne-barbicane': 'Le canon de De la Terre à la Lune, en 1865, se trouve en Floride, comme le futur centre spatial du cap Canaveral. Comme l’équipage d’[[missions:apollo11|Apollo 11]], les voyageurs de Verne sont trois et finissent par amerrir dans le Pacifique.',
+    'verne-robur': 'Son appareil annonçait l’avion et l’hélicoptère, à une époque où l’on ne volait qu’en ballon. Dans Maître du monde, en 1904, Robur revient, devenu menaçant, à bord d’une machine capable de rouler, de naviguer et de voler.',
+    'verne-cyrus': 'Dans L’Île mystérieuse, en 1875, les naufragés sont aidés en secret par un protecteur caché : le [[nemo|capitaine Nemo]], qui vit ses derniers jours dans une grotte de l’île. Les traductions anglaises ont rebaptisé l’ingénieur Cyrus Harding.',
+    'mousquetaires-dartagnan': 'Alexandre Dumas s’inspira d’un homme réel, Charles de Batz de Castelmore, comte d’Artagnan, capitaine des mousquetaires de Louis XIV. La devise des quatre amis, « Tous pour un, un pour tous », est restée célèbre.',
+    'mousquetaires-athos': 'Il cache un secret : il a épousé autrefois une femme marquée de la fleur de lys des criminels, qu’il crut avoir fait périr. Cette femme n’est autre que [[milady]].',
+    'mousquetaires-porthos': 'Dans Le Vicomte de Bragelonne, il meurt écrasé en retenant à lui seul la voûte d’une grotte pour permettre à ses amis de s’enfuir. Dumas aurait pleuré en écrivant cette scène.',
+    'mousquetaires-aramis': 'Il finit par devenir évêque, puis général des Jésuites. Dans Le Vicomte de Bragelonne, il organise le complot de l’homme au masque de fer pour remplacer Louis XIV par son frère jumeau.',
+    'mousquetaires-milady': 'Elle vole deux ferrets de diamant au duc de Buckingham pour compromettre la reine, puis le fait assassiner. Démasquée par les mousquetaires et par [[athos]], son ancien mari, elle est jugée et exécutée au bord de la Lys.',
+    'mousquetaires-richelieu': 'Le vrai Richelieu gouverna la France de 1624 à 1642. Il renforça l’autorité du roi, fonda l’Académie française en 1635 et fit raser de nombreux châteaux forts. Son surnom d’Éminence rouge vient de sa robe de cardinal.',
+    'mousquetaires-montecristo': 'En prison, l’abbé Faria lui enseigne les sciences et les langues, et lui révèle l’emplacement du trésor. Devenu le mystérieux comte de Monte-Cristo, Dantès punit un à un ceux qui l’ont trahi. Le roman de Dumas parut en feuilleton de 1844 à 1846.',
+    'mousquetaires-cyrano': 'Il se bat en vers, en composant une ballade pendant un duel. Le vrai Savinien de Cyrano de Bergerac, écrivain du XVIIe siècle, imagina un voyage dans la [[lunes:lune|Lune]]. La pièce de Rostand est l’une des plus jouées du théâtre français.',
+    'nuits-sheherazade': 'Curieux de connaître la suite, le roi repoussait l’exécution au lendemain. Au bout de mille et une nuits, il renonça à sa cruauté. Le recueil fut révélé à l’Europe par la traduction française d’Antoine Galland, à partir de 1704.',
+    'nuits-shahryar': 'Au fil des contes, il apprend la patience, la justice et la compassion. Son histoire forme le récit-cadre des Mille et Une Nuits : elle enveloppe toutes les autres, qui s’emboîtent parfois les unes dans les autres.',
+    'nuits-aladdin': 'Le conte ne figure dans aucun manuscrit arabe ancien connu : Antoine Galland l’entendit en 1709 de la bouche d’un conteur syrien, Hanna Diyab, et l’ajouta à sa traduction. L’histoire se déroule pourtant en Chine.',
+    'nuits-genie': 'Dans le conte, il y a en réalité deux génies : celui de la lampe et celui d’un anneau magique, plus modeste. Dans les traditions arabes, les djinns sont des êtres faits d’un feu sans fumée, ni bons ni mauvais par nature.',
+    'nuits-alibaba': 'Son frère, trop avide, reste enfermé dans la caverne pour avoir oublié la formule. Les voleurs veulent ensuite se venger d’Ali Baba, mais c’est la ruse de sa servante [[morgiane]] qui le sauve. Ce conte fut lui aussi ajouté par Galland, d’après Hanna Diyab.',
+    'nuits-morgiane': 'Plus tard, elle démasque le chef des voleurs, déguisé en marchand, en dansant devant lui un poignard à la main. Pour la remercier, Ali Baba l’affranchit et la marie à son neveu. C’est la véritable héroïne du conte.',
+    'nuits-sinbad': 'Ses voyages reflètent les routes des marchands arabes vers l’Inde, l’Asie du Sud-Est et l’Afrique de l’Est. Le géant qu’il aveugle lors de son troisième voyage rappelle étrangement [[geants:polypheme|Polyphème]], le cyclope d’Ulysse.',
+    'nuits-rokh': 'Marco Polo affirmait que le Rokh vivait à Madagascar. La légende s’inspire peut-être de l’æpyornis, un oiseau géant de Madagascar haut de trois mètres, disparu depuis quelques siècles, dont les œufs étaient énormes.',
+    'merveilleux-dorothy': 'Dans le roman de L. Frank Baum, paru en 1900, ses chaussures magiques sont en argent ; elles ne deviendront rouges que dans le film de 1939. En les faisant claquer trois fois, elle rentre enfin chez elle.',
+    'merveilleux-epouvantail': 'Le magicien lui offre une tête bourrée de son, d’aiguilles et d’épingles, pour qu’il ait l’esprit vif. Il devient ensuite le souverain de la Cité d’émeraude. Comme ses compagnons, il possédait déjà ce qu’il cherchait.',
+    'merveilleux-ferblanc': 'Il veut un cœur pour pouvoir aimer à nouveau. Le magicien lui offre un cœur de soie rempli de sciure. Il pleure si facilement qu’il doit veiller à ne pas rouiller.',
+    'merveilleux-lion': 'Le magicien lui fait boire une potion présentée comme du courage. Le lion se sent alors plein de bravoure, et devient le roi des animaux d’une forêt du sud d’Oz.',
+    'merveilleux-sorciere': 'Elle craint l’eau et l’obscurité. Furieuse, Dorothy lui jette un seau d’eau, et la sorcière fond comme du sucre. Chez Baum, elle n’a pas la peau verte : ce trait vient du film de 1939.',
+    'merveilleux-pinocchio': 'Carlo Collodi publia ses aventures en feuilleton à partir de 1881. Pinocchio y est changé en âne au Pays des jouets, puis avalé par un énorme requin. Ce n’est qu’à la fin, pour avoir pris soin de son père, qu’il devient un vrai garçon.',
+    'merveilleux-geppetto': 'Parti en mer chercher son fils fugueur, il est avalé par un requin géant, dans lequel il vit deux ans à la lueur d’une bougie. C’est là que Pinocchio le retrouve et le sauve. Les gamins du quartier le surnomment Polendina, à cause de sa perruque jaune.',
+    'merveilleux-fee': 'Elle est pour Pinocchio à la fois une sœur et une mère. À la fin du roman, c’est elle qui le change en vrai garçon, pour le récompenser d’avoir pris soin de [[geppetto]].',
+    'jungle-mowgli': 'Rudyard Kipling publia Le Livre de la jungle en 1894. Mowgli y apprend la Loi de la jungle et finit par vaincre Shere Khan avec l’aide d’un troupeau de buffles. Son nom signifie « grenouille », car il est nu et sans poils.',
+    'jungle-baloo': 'Chez Kipling, Baloo est un maître exigeant, qui n’hésite pas à corriger son élève. Il lui apprend les « maîtres mots » qui lui permettent d’être reconnu par tous les peuples de la jungle.',
+    'jungle-bagheera': 'Née en captivité dans la ménagerie d’un roi, elle porte sous le cou la marque de son ancien collier. Elle conseille à Mowgli de voler la « Fleur rouge », le feu, pour se défendre de Shere Khan.',
+    'jungle-sherekhan': 'Boiteux de naissance, il est surnommé Lungri, « le boiteux », par la mère louve. Mowgli le vainc en lançant sur lui un troupeau de buffles dans un ravin, puis étend sa peau sur le rocher du conseil.',
+    'jungle-kaa': 'Chez Kipling, Kaa est un allié de Mowgli. Sa « danse de la faim » hypnotise les singes Bandar-log, qui s’avancent malgré eux vers sa gueule. Les grands animaux eux-mêmes en restent fascinés.',
+    'jungle-akela': 'Le jour où il manque sa proie, la meute, poussée par Shere Khan, veut le destituer et le tuer. Mowgli le défend avec la Fleur rouge. Les louveteaux scouts ont emprunté son nom pour désigner leur chef.',
+    'jungle-hathi': 'Il raconte comment le premier tigre a tué l’homme et apporté la peur dans la jungle. Avec ses trois fils, il aide plus tard [[mowgli]] à « lâcher la jungle » sur un village hostile.',
+    'jungle-rikki': 'Son histoire figure dans Le Livre de la jungle, sans lien avec [[mowgli]]. Rikki y gagne sa réputation en combattant d’abord un petit serpent venimeux. La mangouste est réellement l’un des rares prédateurs du cobra.',
+    'arthur-arthur': 'La légende naît de récits gallois, puis de la chronique de Geoffroy de Monmouth, au XIIe siècle. Chrétien de Troyes y ajoute Lancelot et la quête du Graal. Blessé à mort, Arthur est emmené sur l’île d’Avalon, d’où il doit, dit-on, revenir un jour.',
+    'arthur-merlin': 'On lui attribuait l’édification de Stonehenge, dont il aurait fait venir les pierres d’Irlande. Il finit enchanté par la fée Viviane, la [[damedulac|Dame du Lac]], à qui il avait enseigné sa magie, et reste prisonnier dans la forêt de Brocéliande.',
+    'arthur-lancelot': 'Chrétien de Troyes raconte comment il accepta de monter dans une charrette d’infamie pour retrouver la reine enlevée. Leur amour découvert déchire la Table ronde et précipite la chute de Camelot. Il est le père de Galaad, qui trouvera le Graal.',
+    'arthur-guenievre': 'Condamnée au bûcher quand sa liaison est découverte, elle est sauvée par Lancelot. Après la mort d’Arthur, elle se retire dans un couvent. Son nom vient du gallois Gwenhwyfar, souvent traduit par « blanche fée ».',
+    'arthur-morgane': 'Elle règne sur l’île d’Avalon, où elle emporte Arthur mourant pour le soigner. Les mirages que l’on aperçoit parfois au-dessus de la mer, au détroit de Messine, celui de [[monstres:scylla|Scylla]], s’appellent encore « fata Morgana ».',
+    'arthur-perceval': 'Chrétien de Troyes laissa son Conte du Graal inachevé vers 1180, ouvrant des siècles de suites et de mystères. Le compositeur Richard Wagner fit de son équivalent allemand, Parsifal, le héros de son dernier opéra.',
+    'arthur-damedulac': 'Élève de [[merlin]], elle finit par l’emprisonner grâce à la magie qu’il lui avait enseignée. À la mort d’Arthur, l’épée lui est rendue, jetée dans le lac : une main sort des eaux pour la saisir.',
+    'arthur-mordred': 'À la bataille de Camlann, Arthur et Mordred s’entretuent : le roi transperce son fils de sa lance, mais reçoit une blessure mortelle. C’est la fin de la Table ronde.',
+    'robin-robin': 'Ses premières ballades datent du XVe siècle, où il n’est encore qu’un brigand populaire. Les récits plus tardifs en font un noble dépossédé, fidèle au roi Richard Cœur de Lion. On raconte qu’il fendit d’une flèche celle de son adversaire plantée au cœur de la cible.',
+    'robin-marianne': 'Elle vient d’une autre tradition, celle des jeux de mai, où une Marion était la reine de la fête. Elle rejoint la légende de Robin au XVIe siècle. Une ballade raconte que les deux amoureux, déguisés, se battirent en duel sans se reconnaître.',
+    'robin-petitjean': 'Impressionné, Robin l’invite à rejoindre sa bande, dont il devient le bras droit. Une tombe du village de Hathersage, dans le Derbyshire, passe pour être la sienne.',
+    'robin-tuck': 'Il célèbre les messes de la bande et, dans certains récits, le mariage de Robin et de [[marianne]]. Un vrai chapelain hors-la-loi du Sussex se faisait appeler Frère Tuck au XVe siècle.',
+    'robin-sherif': 'Il organise un concours de tir à l’arc pour attirer Robin dans un piège ; le hors-la-loi y vient déguisé et remporte la flèche d’or. La fonction de shérif de Nottingham existe toujours, comme titre honorifique.',
+    'robin-scarlet': 'Les ballades le décrivent comme un jeune homme élégant au tempérament vif. Il est l’un des rares membres de la bande à figurer dès les plus anciens récits, aux côtés de [[petitjean]] et de Much, le fils du meunier.',
+    'robin-alan': 'Devenu membre de la bande, il chante ses exploits. Dans la tradition, c’est par les chansons des ménestrels que les aventures de Robin se répandirent dans toute l’Angleterre.',
+    'robin-prince': 'Il a réellement existé : devenu roi en 1199 sous le nom de Jean sans Terre, il dut accepter en 1215 la Grande Charte, qui limitait le pouvoir royal. Son surnom vient de ce qu’il n’avait reçu, enfant, aucune terre en héritage.',
+    'etranges-invisible': 'L’invisibilité, qui devait le rendre tout-puissant, le condamne au froid, à la faim et à la solitude : il doit rester nu pour ne pas être vu. Il sombre dans la folie et la violence. Wells imagina aussi les Martiens de La Guerre des mondes.',
+    'etranges-moreau': 'Ses créatures récitent une Loi qui leur interdit de marcher à quatre pattes ou de boire en lapant. Mais leur nature animale revient peu à peu. Le roman posait déjà la question des limites de la science.',
+    'etranges-horla': 'Le narrateur finit par incendier sa propre maison pour tuer le Horla, sans savoir s’il y est parvenu. Écrit sous forme de journal, le récit laisse planer le doute : créature réelle ou folie ?',
+    'etranges-quasimodo': 'Il s’éprend de la belle Esmeralda, qu’il arrache au gibet pour l’abriter dans la cathédrale en criant « Asile ! ». [[histoire:hugo|Victor Hugo]] écrivit Notre-Dame de Paris en 1831, notamment pour défendre la cathédrale, alors délabrée.',
+    'etranges-mobydick': 'Le roman s’inspire d’un fait réel : en 1820, le baleinier Essex fut coulé par un cachalot en plein Pacifique. Sa première phrase, « Appelez-moi Ismaël », est l’une des plus célèbres de la littérature américaine.',
+    'etranges-golem': 'Dans une autre version, le mot « emet », vérité, est inscrit sur son front ; en effaçant la première lettre, on obtient « met », mort, et le Golem s’effondre. On dit que ses restes reposent dans le grenier de la synagogue Vieille-Nouvelle de Prague.',
+    'etranges-hollandais': 'Le croiser en mer annonce le malheur. La légende inspira à Richard Wagner son opéra Le Vaisseau fantôme, en 1843. Des marins de la Royal Navy affirmèrent l’avoir aperçu en 1881, au large de l’Australie.',
+    'etranges-kraken': 'En 1752, l’évêque Erik Pontoppidan le décrivit dans son Histoire naturelle de la Norvège. La légende s’inspire sans doute du calmar géant, qui peut dépasser douze mètres et ne fut photographié vivant qu’en 2004. Le [[verne:nemo|capitaine Nemo]] affronte des poulpes géants dans Vingt Mille Lieues sous les mers.',
+    'flibustiers-barbenoire': 'Son navire, la Revanche de la reine Anne, s’échoua en 1718 ; son épave a été retrouvée en Caroline du Nord. Il fut tué la même année par la marine britannique, au terme d’un combat acharné : on lui compta plus de vingt blessures.',
+    'flibustiers-bonny': 'Capturées en 1720, Anne Bonny et Mary Read échappèrent à la pendaison en se déclarant enceintes. À Rackham, qui allait être pendu, Anne aurait reproché de ne pas s’être battu comme un homme. On ignore tout de sa fin.',
+    'flibustiers-read': 'Lors de leur capture en 1720, elle et Anne Bonny furent parmi les dernières à se battre, pendant que les hommes de l’équipage, ivres, se cachaient. Elle mourut de fièvre en prison l’année suivante.',
+    'flibustiers-morgan': 'Au lieu d’être puni, il fut anobli et nommé lieutenant-gouverneur de la Jamaïque, où il combattit… les pirates. Il mourut riche en 1688.',
+    'flibustiers-roberts': 'Il ne buvait que du thé et imposait à son équipage un code strict : extinction des feux à huit heures, jeux d’argent interdits à bord. Il fut tué en 1722 au large de l’Afrique, par une décharge de mitraille.',
+    'flibustiers-labuse': 'Selon la légende, il lança dans la foule, avant de mourir, un cryptogramme indiquant la cachette de son trésor. Des chasseurs de trésor le cherchent encore, notamment aux Seychelles et à La Réunion.',
+    'flibustiers-omalley': 'En 1593, elle se rendit à Londres et rencontra en personne la reine Élisabeth Ire pour obtenir la libération de son fils. Les deux femmes auraient conversé en latin. Elle obtint gain de cause.',
+    'flibustiers-surcouf': 'À la différence d’un pirate, un corsaire agit légalement, pour le compte de son pays en guerre. À un Anglais qui lui reprochait de se battre pour l’argent, il aurait répondu que chacun se bat pour ce qui lui manque. Il mourut riche armateur en 1827.',
+    'forbans-silver': 'Robert Louis Stevenson, l’auteur de [[gothique:jekyll|Dr Jekyll]], publia L’Île au trésor en 1883. Silver y est à la fois menaçant et attachant, et se prend d’affection pour le jeune [[jim]]. Il s’enfuit à la fin avec une partie du trésor. Son perroquet s’appelle Capitaine Flint.',
+    'forbans-jim': 'Caché dans un tonneau de pommes, il surprend [[silver]] en train de préparer la mutinerie. C’est lui qui raconte l’aventure et qui, seul, reprend le navire aux pirates.',
+    'forbans-flint': 'Son nom terrifie encore ses anciens hommes, comme [[billybones]] ou [[silver]]. Sur l’île, un squelette disposé comme une flèche indique la direction du trésor.',
+    'forbans-bengunn': 'Pendant sa solitude, il a déterré le trésor et l’a caché dans sa grotte : quand les pirates arrivent, la cachette est vide. Il aide [[jim]] et ses amis à l’emporter.',
+    'forbans-billybones': 'Ancien second de [[flint]], il détient la carte du trésor. Il meurt d’une attaque après avoir reçu la « tache noire », le message de mort des pirates. [[jim]] trouve la carte dans son coffre.',
+    'forbans-crochet': 'Le crocodile, qui a trouvé la main à son goût, le suit partout ; il a aussi avalé un réveil, dont le tic-tac annonce son approche. J. M. Barrie le décrit comme un ancien élève d’une grande école anglaise, obsédé par les bonnes manières.',
+    'forbans-smee': 'Barrie le décrit comme étrangement attachant : il tue sans méchanceté et coud à la machine pendant ses loisirs. Il est l’un des rares pirates à survivre au combat final contre [[contes:peterpan|Peter Pan]].',
+    'forbans-blood': 'Rafael Sabatini publia ses aventures en 1922. Blood reste un gentleman : il épargne les prisonniers et finit nommé gouverneur de la Jamaïque. Son parcours s’inspire en partie de celui d’[[flibustiers:morgan|Henry Morgan]].',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -591,12 +1031,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'astronautes', 'missions', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'contes-alice-base',
-      collections: ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire'],
+      collections: ALL.filter(function (c) { return c !== 'nordique'; }),
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette

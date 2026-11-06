@@ -277,7 +277,20 @@
     titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra'],
     pharaons: ['Scribe royal', 'Fils de Râ'],
     heros: ['Compagnon des Argonautes', 'Héros légendaire'], monstres: ['Chasseur de monstres', 'Dompteur de chimères'],
-    planetes: ['Astronome amateur', 'Maître des orbites'], lunes: ['Chasseur de lunes', 'Seigneur des satellites']
+    planetes: ['Astronome amateur', 'Maître des orbites'], lunes: ['Chasseur de lunes', 'Seigneur des satellites'],
+    astronautes: ['Cadet de l’espace', 'Vétéran des étoiles'],
+    missions: ['Contrôleur de vol', 'Directeur de mission'],
+    detectives: ['Apprenti détective', 'Maître de la déduction'],
+    verne: ['Passager du Nautilus', 'Voyageur extraordinaire'],
+    mousquetaires: ['Cadet de Gascogne', 'Fine lame'],
+    nuits: ['Conteur de Bagdad', 'Gardien de la lampe'],
+    merveilleux: ['Voyageur d’Oz', 'Sage de la Cité d’émeraude'],
+    jungle: ['Petit d’homme', 'Maître de la jungle'],
+    arthur: ['Écuyer de Camelot', 'Chevalier du Graal'],
+    robin: ['Archer de Sherwood', 'Prince des voleurs'],
+    etranges: ['Témoin de l’étrange', 'Chasseur de mystères'],
+    flibustiers: ['Mousse', 'Capitaine de la flibuste'],
+    forbans: ['Chercheur de trésor', 'Terreur des sept mers']
   };
   /* Collection globale : progression cumulée de ses sous-collections. */
   S.groupProgress = function (gid) {
