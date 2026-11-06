@@ -1531,3 +1531,14 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .at-out { margin: 14px 0 10px; padding: 12px; border-radius: 8px; background: var(--ink); color: #efe9dd; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
 @media (max-width: 600px) { .at-form { grid-template-columns: 1fr; } .ds-block { padding: 20px 16px; } .at-coll summary { grid-template-columns: minmax(0, 1fr) 22% 46px; } }
 .at-form .select { height: 40px; } .at-form .select select { flex: 1; font-size: 14px; }
+
+/* Inventaire : périodes d’obtention et doublons empilés */
+.inv-period + .inv-period { margin-top: 40px; }
+.inv-period > .eyebrow { margin: 0 0 16px; }
+.cg-item.is-stack { position: relative; }
+.cg-item.is-stack::before, .cg-item.is-stack::after { content: ""; position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 63 / 88; border-radius: 2.6cqw; background: #F3EDE1; border: 1px solid var(--line); box-shadow: 0 2px 6px rgba(40, 30, 15, .08); pointer-events: none; }
+.cg-item.is-stack { container-type: inline-size; isolation: isolate; }
+.cg-item.is-stack::before { translate: 5px 5px; rotate: 1.6deg; z-index: 0; }
+.cg-item.is-stack.is-stack-3::after { translate: 9px 9px; rotate: 3deg; z-index: -1; }
+.cg-item.is-stack:not(.is-stack-3)::after { display: none; }
+.cg-item.is-stack > .card { z-index: 1; }

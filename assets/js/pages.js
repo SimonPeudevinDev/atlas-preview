@@ -701,20 +701,52 @@
           if (inv.sort === 'rarity') return A.R[eb.rarity].rank - A.R[ea.rarity].rank || b.at - a.at;
           if (inv.sort === 'collection') return ca.coll.localeCompare(cb.coll) || ca.name.localeCompare(cb.name, 'fr');
           if (inv.sort === 'name') return ca.name.localeCompare(cb.name, 'fr') || A.R[eb.rarity].rank - A.R[ea.rarity].rank;
-          return b.at - a.at;
+          return b.at - a.at || A.R[eb.rarity].rank - A.R[ea.rarity].rank;
         });
         return { items: items, count: count };
       }
+      function dayLabel(t) {
+        var d = new Date(t), today = new Date(); today.setHours(0, 0, 0, 0);
+        var d0 = new Date(d); d0.setHours(0, 0, 0, 0);
+        var diff = Math.round((today - d0) / 86400000);
+        if (diff <= 0) return 'Aujourd’hui';
+        if (diff === 1) return 'Hier';
+        if (diff < 7) return 'Cette semaine';
+        if (diff < 31) return 'Ce mois-ci';
+        return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^./, function (c) { return c.toUpperCase(); });
+      }
       function draw() {
         var l = list();
-        res.innerHTML = '<p class="result-count">' + l.items.length + ' carte' + (l.items.length > 1 ? 's' : '') + '</p>' +
-          (l.items.length ? '<div class="card-grid">' + l.items.map(function (i) {
-            return '<div class="cg-item">' + U.card(i.ed, {
-              serial: i.serial, uid: i.uid, fav: i.fav, show: i.show,
-              badge: l.count[i.ed] > 1 ? 'Doublon ×' + l.count[i.ed] : '',
-              open: !inv.select, select: inv.select, selected: inv.selected.indexOf(i.uid) !== -1, tilt: !inv.select
-            }) + '<p class="cg-note">' + U.ago(i.at) + '</p></div>';
-          }).join('') + '</div>' : '<div class="empty">Aucune carte pour ces filtres. <a href="#/boutique">Ouvrir un booster</a></div>');
+        // Doublons empilés : une seule tuile par édition (l’exemplaire le mieux placé selon le tri),
+        // les autres exemplaires apparaissent en pile derrière. En mode échange, chaque exemplaire est sélectionnable.
+        var tiles = [];
+        if (inv.select) tiles = l.items.map(function (i) { return { i: i, n: 1 }; });
+        else {
+          var at = {};
+          l.items.forEach(function (i) {
+            if (at[i.ed] != null) { tiles[at[i.ed]].n++; return; }
+            at[i.ed] = tiles.length; tiles.push({ i: i, n: 1 });
+          });
+        }
+        function tile(t) {
+          var i = t.i;
+          return '<div class="cg-item' + (t.n > 1 ? ' is-stack' + (t.n > 2 ? ' is-stack-3' : '') : '') + '">' + U.card(i.ed, {
+            serial: i.serial, uid: i.uid, fav: i.fav, show: i.show,
+            badge: t.n > 1 ? '×' + t.n : (!inv.select ? '' : l.count[i.ed] > 1 ? 'Doublon ×' + l.count[i.ed] : ''),
+            open: !inv.select, select: inv.select, selected: inv.selected.indexOf(i.uid) !== -1, tilt: !inv.select
+          }) + '<p class="cg-note">' + (t.n > 1 ? t.n + ' exemplaires · ' : '') + U.ago(i.at) + '</p></div>';
+        }
+        // Tri par date : regroupement par période d’obtention
+        var body = '';
+        if (inv.sort === 'recent') {
+          var cur = null, buf = [];
+          var flush = function () { if (buf.length) body += '<div class="inv-period"><p class="eyebrow">' + cur + '</p><div class="card-grid">' + buf.join('') + '</div></div>'; buf = []; };
+          tiles.forEach(function (t) { var lb = dayLabel(t.i.at); if (lb !== cur) { flush(); cur = lb; } buf.push(tile(t)); });
+          flush();
+        } else body = '<div class="card-grid">' + tiles.map(tile).join('') + '</div>';
+        res.innerHTML = '<p class="result-count">' + l.items.length + ' carte' + (l.items.length > 1 ? 's' : '') +
+          (tiles.length !== l.items.length ? ' · ' + tiles.length + ' différente' + (tiles.length > 1 ? 's' : '') : '') + '</p>' +
+          (l.items.length ? body : '<div class="empty">Aucune carte pour ces filtres. <a href="#/boutique">Ouvrir un booster</a></div>');
         var n = inv.selected.length;
         root.querySelector('[data-sel-count]').textContent = n + ' carte' + (n > 1 ? 's' : '') + ' sélectionnée' + (n > 1 ? 's' : '');
       }

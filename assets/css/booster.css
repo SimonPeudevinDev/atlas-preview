@@ -221,6 +221,11 @@
 
 /* La caméra avance pendant la déchirure */
 .op-pack { position: relative; z-index: 4; display: grid; place-items: center; transition: scale .7s var(--ease-out); }
+/* Le sachet est centré entre le titre et la consigne : l’espace réservé au nom des cartes (.op-label)
+   est vide tant qu’on n’a pas ouvert, on descend donc le sachet de la moitié de cette hauteur.
+   À l’ouverture, les cartes partent de leur place réelle dans le sachet (opener.js → handoff) : aucun saut. */
+.opener { --op-lbl: 122px; }
+.op-pack { translate: 0 calc(var(--op-lbl) / 2); }
 .opener.is-tearing .op-pack { scale: 1.06; }
 .op-stage.is-quake { animation: quake .55s cubic-bezier(.3,.7,.4,1); }
 @keyframes quake { 15% { transform: translate(-7px, 3px); } 30% { transform: translate(6px, -4px); } 45% { transform: translate(-4px, 2px); } 62% { transform: translate(3px, -2px); } 80% { transform: translate(-1px, 1px); } }
@@ -407,6 +412,7 @@
   .op-top { padding: 12px 12px 0; }
   .op-icon { width: 40px; height: 40px; }
   .op-label { min-height: 104px; padding-top: 14px; }
+  .opener { --op-lbl: 104px; }
   .sum-item { width: calc(33.333vw - 22px); max-width: 170px; }
   .sum-grid { gap: 16px 10px; }
 
