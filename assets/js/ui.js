@@ -92,6 +92,13 @@
   U.card = function (edId, o) {
     o = o || {};
     var ed = A.ED[edId], ch = A.CHAR[ed.charId], coll = A.COLL[ch.coll], R = A.R[ed.rarity];
+    // Personne ne l’a encore trouvée : on ne montre que la rareté, comme une case vide du catalogue
+    if (o.unknown) return '<article class="card card-unknown r-' + ed.rarity + '" tabindex="0" aria-label="Carte ' + R.label + ' non découverte">' +
+      '<div class="card-inner"><div class="card-art"><span class="cu-mark" aria-hidden="true">?</span><span class="cu-k">Non découverte</span></div>' +
+      '<div class="card-body"><div class="card-row"><h3 class="card-name">? ? ?</h3></div>' +
+        '<div class="card-row card-sub"><span class="card-title">Personne ne l’a encore trouvée</span><span class="card-coll">' + U.esc(coll.name) + '</span></div>' +
+        '<div class="card-row card-foot"><span class="card-stats"><span>ATQ<b>?</b></span><span>DÉF<b>?</b></span><span>ESP<b>?</b></span></span><span class="card-rar"><i></i>' + R.label + '</span></div>' +
+      '</div></div></article>';
     var serialTxt = U.serial(o.serial, ed.supply);
     var cls = 'card r-' + ed.rarity + (o.missing ? ' is-missing' : '') + (o.selected ? ' is-selected' : '') + (o.cls ? ' ' + o.cls : '');
     var attrs = ' data-ed="' + ed.id + '"' + (o.uid ? ' data-uid="' + o.uid + '"' : '') +
@@ -99,6 +106,7 @@
     var longName = ch.name.length > 15 ? ' long' : '';
     var flags = '';
     if (o.badge) flags += '<span class="card-flag">' + o.badge + '</span>';
+    if (o.firstBadge) flags += '<span class="card-flag is-first">Première mondiale</span>';
     if (o.newBadge) flags += '<span class="card-flag is-new">Nouveau</span>';
     var corner = '';
     if (o.fav || o.show) corner = '<span class="card-corner">' + (o.fav ? U.icon('star', 'fav') : '') + (o.show ? U.icon('eye') : '') + '</span>';
@@ -128,6 +136,33 @@
       var own = S.ownedOf(charId + '-' + r.id).length > 0;
       return '<i class="ed-dot r-' + r.id + (own ? ' is-own' : '') + '" title="' + r.label + (own ? ' — possédée' : '') + '"></i>';
     }).join('') + '</div>';
+  };
+
+  /* ---------- Récompenses de collection ---------- */
+  U.rewardText = function (r) {
+    var out = [];
+    if (r.eclats) out.push(U.num(r.eclats) + ' ' + A.CURRENCY.name);
+    if (r.booster) out.push('1 ' + A.PACK[r.booster].name + ' offert');
+    if (r.titre) out.push('Titre « ' + r.titre + ' »');
+    return out.join(' + ');
+  };
+  U.rewardIcon = function (r) { return r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
+  // Piste des paliers d’une collection (page Collection)
+  U.rewardTrack = function (cid) {
+    var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
+    return '<div class="rw"><div class="rw-head"><p class="eyebrow">Récompenses de collection</p><span class="rw-count">' + got + ' / ' + steps.length + ' récupérées</span></div>' +
+      '<ol class="rw-track">' + steps.map(function (s) {
+        var unit = s.of === 'chars' ? (s.goal > 1 ? 'personnages' : 'personnage') : 'éditions';
+        var action = s.state === 'ready'
+          ? '<button type="button" class="btn btn-gold btn-sm rw-btn" data-claim="' + s.id + '">Récupérer</button>'
+          : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Récupérée</span>'
+          : '<span class="rw-left">Encore ' + (s.goal - s.have) + ' ' + (s.of === 'chars' ? (s.goal - s.have > 1 ? 'personnages' : 'personnage') : (s.goal - s.have > 1 ? 'éditions' : 'édition')) + '</span>';
+        return '<li class="rw-step is-' + s.state + '">' +
+          '<span class="rw-ico" aria-hidden="true">' + (s.state === 'claimed' ? U.icon('check') : U.rewardIcon(s.reward)) + '</span>' +
+          '<div class="rw-txt"><p class="rw-label">' + s.label + '</p><p class="rw-goal">' + s.have + ' / ' + s.goal + ' ' + unit + '</p>' +
+            '<div class="rw-bar"><span style="width:' + Math.round(s.have / Math.max(1, s.goal) * 100) + '%"></span></div>' +
+            '<p class="rw-gift">' + U.esc(U.rewardText(s.reward)) + '</p></div>' + action + '</li>';
+      }).join('') + '</ol></div>';
   };
 
   U.progress = function (p, label) {

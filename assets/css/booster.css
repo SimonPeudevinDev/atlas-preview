@@ -508,3 +508,11 @@
 .op-mega.is-lite { font-size: min(19vw, 250px); }
 .op-mega.is-off { animation: megaOut .9s ease forwards; }
 @keyframes megaOut { from { opacity: .2; filter: blur(0); transform: scale(1); } to { opacity: 0; filter: blur(10px); transform: scale(.94); } }
+
+/* Récapitulatif : première découverte et paliers de collection atteints */
+.sum-first { margin: 12px auto 0; max-width: 520px; font-size: 14px; color: #F3D38A; }
+.sum-reward { display: flex; align-items: center; gap: 12px; max-width: 460px; margin: 12px auto 0; padding: 12px 16px; border: 1px solid rgba(243, 211, 138, .45); border-radius: 10px; background: rgba(243, 211, 138, .08); color: #F6EEDC; text-align: left; font-size: 13px; line-height: 1.4; }
+.sum-reward span { flex: 1; min-width: 0; }
+.sum-reward b { display: block; font-weight: 600; color: #F3D38A; }
+.sum-reward .ic { width: 16px; height: 16px; flex: none; color: #F3D38A; }
+.sum-reward:hover { background: rgba(243, 211, 138, .14); }

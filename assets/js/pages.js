@@ -17,10 +17,18 @@
     var pr = S.collectionProgress(c.id);
     return '<a class="coll-tile' + (opts.cls ? ' ' + opts.cls : '') + '" href="#/collection/' + c.id + '">' +
       '<div class="coll-art">' + (opts.art || A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 })) +
-      (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') + '</div>' +
+      (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') +
+      (S.readyCount(c.id) ? '<span class="tag tag-reward">🎁 Récompense à récupérer</span>' : '') + '</div>' +
       '<div class="coll-meta"><p class="eyebrow">' + c.family + ' · ' + c.edition + '</p><h3 class="coll-name">' + c.name + '</h3>' +
       '<p class="coll-tag">' + c.tagline + '</p>' +
-      U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages</span><span>' + Math.round(pr.pct * 100) + ' %</span>') + '</div></a>';
+      U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages</span><span>' + Math.round(pr.pct * 100) + ' %</span>') + nextReward(c.id) + '</div></a>';
+  }
+  // Prochain palier encore verrouillé, pour donner un objectif sur la tuile
+  function nextReward(cid) {
+    var s = S.rewards(cid).filter(function (x) { return x.state === 'locked'; })[0];
+    if (!s) return '';
+    var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
+    return '<p class="coll-next">' + U.rewardIcon(s.reward) + ' Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
   }
   function globe() {
     var o = '<svg class="globe" viewBox="0 0 600 600" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width=".7">';
@@ -207,6 +215,7 @@
             '<div class="coll-stats-bar">' + U.progress(pr.pct, 'Progression ' + Math.round(pr.pct * 100) + ' %') + '</div>' +
           '</div>' +
         '</div></section>' +
+        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack(c.id) + '</div></section>' +
         '<section class="section-tight"><div class="container">' +
           '<div class="toolbar sticky-bar">' +
             '<div class="chips scroll-x" data-f="view">' + views.map(function (v) {
@@ -229,9 +238,10 @@
         var cells = [];
         if (cd.view === 'chars') {
           chars.forEach(function (ch) {
-            var best = S.bestOwned(ch.id);
+            var best = S.bestOwned(ch.id), no = c.chars.indexOf(ch.id) + 1;
             if (cd.missing && best) return;
-            cells.push('<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) + '</div>');
+            cells.push('<div class="cg-item' + (best ? '' : ' is-missing') + '">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) +
+              '<p class="cg-no">N° ' + (no < 10 ? '0' : '') + no + ' · ' + (best ? 'À vous' : 'Manquant') + '</p></div>');
           });
         } else {
           var rids = cd.view === 'all' ? A.RARITIES.map(function (r) { return r.id; }) : [cd.view];
@@ -241,7 +251,11 @@
               var edId = ch.id + '-' + rid, own = S.ownedOf(edId);
               if (cd.missing && own.length) return;
               var rem = S.remaining(edId);
-              cells.push('<div class="cg-item">' + U.card(edId, { serial: own[0] && own[0].serial, uid: own[0] && own[0].uid, missing: !own.length, badge: own.length > 1 ? '×' + own.length : '' }) +
+              if (!own.length && S.minted(edId) === 0) {         // personne ne l’a encore trouvée
+                cells.push('<div class="cg-item is-unknown">' + U.card(edId, { unknown: true }) + '<p class="cg-note">Soyez le premier à la découvrir</p></div>');
+                return;
+              }
+              cells.push('<div class="cg-item' + (own.length ? '' : ' is-missing') + '">' + U.card(edId, { serial: own[0] && own[0].serial, uid: own[0] && own[0].uid, missing: !own.length, badge: own.length > 1 ? '×' + own.length : '' }) +
                 '<p class="cg-note">' + (A.ED[edId].supply ? (rem > 0 ? U.num(rem) + ' disponibles sur ' + A.ED[edId].supply : '<span class="sold">Édition épuisée</span>') : 'Tirage illimité') + '</p></div>');
             });
           });
@@ -250,7 +264,15 @@
           '<div class="empty">' + (cd.missing ? 'Rien ne manque ici. Collection complète pour ce filtre.' : 'Aucune carte pour ce filtre.') + '</div>';
       }
       draw();
+      var rw = root.querySelector('[data-rewards]');
       root.addEventListener('click', function (e) {
+        var k = e.target.closest('[data-claim]');
+        if (k) {
+          var res = S.claim(c.id, k.getAttribute('data-claim'));
+          if (!res.ok) { U.toast(res.error, 'error'); return; }
+          U.toast(U.rewardIcon(res.reward) + ' ' + res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
+          return;
+        }
         var b = e.target.closest('[data-f="view"] .chip');
         if (!b) return;
         cd.view = b.getAttribute('data-v');
@@ -259,7 +281,7 @@
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = draw;
+      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); };
     }
   };
 
@@ -327,7 +349,11 @@
     if (p.event) return '<span class="pill pill-gold">' + I('clock') + 'Fin dans ' + U.duration(S.eventRemaining()) + '</span>';
     return '';
   }
-  function priceHTML(p) { return p.price ? U.price(p.price) : '<span class="free">Gratuit</span>'; }
+  function priceHTML(p) {
+    var tk = S.tokens(p.id);
+    if (tk) return '<span class="free">🎁 Offert' + (tk > 1 ? ' ×' + tk : '') + '</span>';
+    return p.price ? U.price(p.price) : '<span class="free">Gratuit</span>';
+  }
 
   /* ---------- Booster vedette ---------- */
   function featuredPack() {
@@ -822,6 +848,10 @@
           '<div class="coll-stats-bar">' + U.progress(xp / 25, 'Niveau ' + u.level + ' · encore ' + (25 - xp) + ' cartes avant le niveau ' + (u.level + 1)) + '</div>' +
         '</div></div></section>' +
         '<div class="container pf-body">' +
+          sec('Collection', 'Titres', 'Gagnés en complétant les collections : tous les personnages, puis toutes les éditions.',
+            (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">👑 ' + U.esc(t) + '</span>'; }).join('') + '</div>'
+              : '<p class="muted">Aucun titre pour l’instant. Complétez une collection pour obtenir le premier.</p>') +
+            (S.readyCount() ? '<p class="pf-ready">🎁 ' + S.readyCount() + ' récompense' + (S.readyCount() > 1 ? 's' : '') + ' à récupérer dans vos <a href="#/collections">collections</a>.</p>' : '')) +
           sec('Identité', 'Compte', 'Votre nom public et vos coordonnées.',
             '<form class="pf-form" data-profile-form>' +
               '<label class="field"><span>Pseudo</span><input class="input" name="name" maxlength="24" value="' + U.esc(u.name) + '" required></label>' +

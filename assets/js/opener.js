@@ -88,6 +88,7 @@
 
     var phase = 'pack', entering = !reduce, items = null, closed = false;
     var tp = 0, dir = 0, lastGrain = 0, drag = null;
+    var unlocked = [];
 
     function setHint(t) { hint.textContent = t; hint.classList.toggle('is-empty', !t); }
     function flash(a) {
@@ -137,6 +138,7 @@
       var res = S.openPack(packId);
       if (!res.ok) { U.toast(res.error, 'error'); close(); return false; }
       items = res.items.sort(function (a, b) { return rankOf(a) - rankOf(b); });
+      unlocked = res.unlocked || [];
       // Les cartes-témoins du sachet deviennent les vraies cartes, face visible : ce qui sort du sachet
       // est exactement ce qu’on va voir (la carte du dessus = la première présentée)
       // Seule la carte du dessus est la vraie : les autres témoins sont des leurres crédibles (cartes Base au hasard)
@@ -283,7 +285,7 @@
       return '<div class="rv-card r-' + ed.rarity + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + ';z-index:' + (50 - i) + '">' +
         '<div class="rv-tilt"><div class="rv-flip">' +
           '<div class="rv-face rv-back">' + U.cardBack(pack.theme) + '</div>' +
-          '<div class="rv-face rv-front">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, newBadge: it._new }) +
+          '<div class="rv-face rv-front">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, newBadge: it._new, firstBadge: it.first }) +
             '<span class="rv-holo"></span><span class="rv-glare"></span><span class="rv-sweep"></span><span class="rv-edge"></span>' +
             (i > 0 ? '<div class="rv-decoy">' + U.card(decoyFor(it), { open: false, tilt: false }) + '</div>' : '') + '</div>' +
         '</div></div></div>';
@@ -706,15 +708,20 @@
       var fromR = stack.getBoundingClientRect();
       stack.style.visibility = 'hidden';
       var newCount = items.filter(function (it) { return it._new; }).length;
+      var firsts = items.filter(function (it) { return it.first; }).length;
       var bestR = A.R[A.ED[items[items.length - 1].ed].rarity];
       var again = S.canOpen(packId);
       summaryEl.innerHTML =
         '<p class="eyebrow">Booster ouvert</p><h2 class="op-title">' + items.length + ' cartes obtenues</h2>' +
         '<p class="sum-sub">' + (newCount ? newCount + (newCount > 1 ? ' nouveaux personnages' : ' nouveau personnage') + ' · ' : '') + 'Meilleure carte : ' + bestR.label + '</p>' +
+        (firsts ? '<p class="sum-first">🌍 ' + (firsts > 1 ? firsts + ' cartes que personne n’avait encore trouvées' : 'Une carte que personne n’avait encore trouvée') + ' : vous êtes le premier découvreur.</p>' : '') +
+        unlocked.map(function (u) {
+          return '<a class="sum-reward" href="#/collection/' + u.coll + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(A.COLL[u.coll].name) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
+        }).join('') +
         '<div class="sum-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed], R = A.R[ed.rarity];
           return '<div class="sum-item r-' + ed.rarity + (i === items.length - 1 && R.rank >= 1 ? ' is-best' : '') + (unseen[i] ? ' is-down' : '') + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + '">' +
-            '<div class="sum-flip"><div class="sum-face">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new }) + '</div>' +
+            '<div class="sum-flip"><div class="sum-face">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</div>' +
             '<div class="sum-face sum-back">' + U.cardBack(pack.theme) + '</div></div>' +
             '<p class="sum-cap"><span class="rar-chip r-' + ed.rarity + '"><i></i>' + R.label + '</span>' + (ed.supply ? '<span class="mono">' + U.serial(it.serial, ed.supply) + '</span>' : '') + '</p></div>';
         }).join('') + '</div>' +

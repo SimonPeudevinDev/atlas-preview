@@ -13,12 +13,13 @@
    ========================================================================== */
 (function (A) {
   'use strict';
-  var KEY = 'atlas-demo-v1';
+  var KEY = 'atlas-demo-v2';
   var S = A.store = {};
   /* Mode test : Éclats illimités (rien n’est débité, le grand livre reste tenu). Passer à false pour revenir au solde réel. */
   S.UNLIMITED = true;
-  /* Mode test : toutes les éditions débloquées (un exemplaire de chaque rareté pour chaque personnage). Passer à false pour revenir à l’inventaire normal. */
-  S.UNLOCK_ALL = true;
+  /* Mode test : toutes les éditions débloquées (un exemplaire de chaque rareté pour chaque personnage). Passer à true pour tout débloquer.
+     Désactivé pour éprouver la progression des collections et leurs récompenses. */
+  S.UNLOCK_ALL = false;
   var state = null;
   var listeners = [];
 
@@ -84,7 +85,8 @@
       ledger: [{ id: uid('tx'), at: now, type: 'grant', amount: 2500, label: 'Dotation de bienvenue (démo)' }],
       minted: {}, used: {},
       inventory: [], listings: [], sales: [], offers: [],
-      lastDaily: null
+      lastDaily: null,
+      claimed: {}, tokens: {}, titles: []
     };
     var r = rng(A.hash('atlas-demo'));
 
@@ -147,6 +149,7 @@
   S.init = function () {
     state = load();
     if (!state || state.v !== 1) fresh();
+    state.claimed = state.claimed || {}; state.tokens = state.tokens || {}; state.titles = state.titles || [];
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
   };
@@ -252,10 +255,54 @@
   S.nextDailyIn = function () { var d = new Date(); d.setHours(24, 0, 0, 0); return d - Date.now(); };
   S.eventRemaining = function () { return Math.max(0, state.eventEndsAt - Date.now()); };
 
+  /* ---------- Récompenses de collection ----------
+     Chaque collection a quatre paliers : quelques personnages, la moitié, tous les personnages,
+     puis toutes les éditions (maîtrise). Un palier atteint se récupère à la main. */
+  var TITLES = {
+    grece: ['Initié de l’Olympe', 'Maître de l’Olympe'], egypte: ['Scribe du Nil', 'Gardien des Deux Terres'],
+    gothique: ['Veilleur des ombres', 'Seigneur des brumes'], contes: ['Conteur', 'Gardien des contes'],
+    histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard']
+  };
+  S.rewards = function (cid) {
+    var c = A.COLL[cid], pr = S.collectionProgress(cid), n = pr.total, t = TITLES[cid] || ['Collectionneur', 'Maître collectionneur'];
+    var steps = [
+      { id: 'debut', goal: Math.min(3, n), of: 'chars', label: 'Premiers pas', reward: { eclats: 150 } },
+      { id: 'moitie', goal: Math.ceil(n / 2), of: 'chars', label: 'À mi-chemin', reward: { booster: 'standard' } },
+      { id: 'complet', goal: n, of: 'chars', label: 'Collection complète', reward: { eclats: 1000, titre: t[0] } },
+      { id: 'maitrise', goal: pr.edTotal, of: 'eds', label: 'Maîtrise', reward: { eclats: 5000, titre: t[1] } }
+    ];
+    return steps.map(function (s) {
+      s.have = Math.min(s.goal, s.of === 'chars' ? pr.owned : pr.edOwned);
+      s.state = state.claimed[cid + ':' + s.id] ? 'claimed' : s.have >= s.goal ? 'ready' : 'locked';
+      s.coll = c.id;
+      return s;
+    });
+  };
+  function readyKeys() {
+    var out = [];
+    A.COLLECTIONS.forEach(function (c) { S.rewards(c.id).forEach(function (s) { if (s.state === 'ready') out.push(c.id + ':' + s.id); }); });
+    return out;
+  }
+  S.readyCount = function (cid) { return cid ? S.rewards(cid).filter(function (s) { return s.state === 'ready'; }).length : readyKeys().length; };
+  S.claim = function (cid, stepId) {
+    var s = S.rewards(cid).filter(function (x) { return x.id === stepId; })[0];
+    if (!s || s.state !== 'ready') return { ok: false, error: 'Ce palier n’est pas encore atteint.' };
+    var r = s.reward, now = Date.now(), label = 'Récompense · ' + A.COLL[cid].name + ' · ' + s.label;
+    state.claimed[cid + ':' + stepId] = now;
+    if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
+    if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
+    if (r.titre && state.titles.indexOf(r.titre) === -1) state.titles.push(r.titre);
+    emit();
+    return { ok: true, reward: r, step: s };
+  };
+  S.tokens = function (packId) { return (state.tokens && state.tokens[packId]) || 0; };
+  S.titles = function () { return state.titles || []; };
+
   S.canOpen = function (packId) {
     var p = A.PACK[packId];
     if (p.daily && !S.dailyAvailable()) return { ok: false, reason: 'Déjà ouvert' };
     if (p.event && S.eventRemaining() <= 0) return { ok: false, reason: 'Événement terminé' };
+    if (S.tokens(packId) > 0) return { ok: true, token: true };
     if (!S.UNLIMITED && state.wallet.balance < p.price) return { ok: false, reason: 'Solde insuffisant' };
     return { ok: true };
   };
@@ -284,6 +331,7 @@
     if (!check.ok) return { ok: false, error: check.reason };
     var pack = A.PACK[packId];
     var pool = poolFor(pack);
+    var readyBefore = readyKeys();
     var now = Date.now();
     var items = [], seen = {};
     for (var i = 0; i < pack.size; i++) {
@@ -297,20 +345,29 @@
         if (ed) serial = ed.supply ? 1 + Math.floor(Math.random() * ed.supply) : null;
       }
       if (!ed) ed = pickEdition(pool, 'base');
+      var first = minted(ed) === 0;                 // personne ne l’avait encore trouvée
       if (serial === undefined) serial = mintNew(ed);
       var it = makeItem(ed.id, serial, 'booster', now + i, 'Tirage — ' + pack.name);
+      if (first) { it.first = true; it.hist.push({ at: now + i, t: 'Première découverte mondiale' }); }
       it.isNew = !S.ownsChar(ed.charId) && !seen[ed.charId];
       seen[ed.charId] = true;
       items.push(it);
     }
     items.forEach(function (it) { var n = it.isNew; delete it.isNew; it._new = n; state.inventory.push(it); });
-    if (pack.price) {
+    if (check.token) {
+      state.tokens[packId]--;
+      state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: 0, label: pack.name + ' (offert par une récompense)' });
+    } else if (pack.price) {
       if (!S.UNLIMITED) state.wallet.balance -= pack.price;
       state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: -pack.price, label: pack.name });
     }
-    if (pack.daily) state.lastDaily = todayKey();
+    if (pack.daily && !check.token) state.lastDaily = todayKey();
     emit();
-    return { ok: true, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
+    // paliers de collection atteints grâce à ce booster
+    var unlocked = readyKeys().filter(function (k) { return readyBefore.indexOf(k) === -1; }).map(function (k) {
+      var p = k.split(':'); return { coll: p[0], step: S.rewards(p[0]).filter(function (r) { return r.id === p[1]; })[0] };
+    });
+    return { ok: true, unlocked: unlocked, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
   };
   S.resetDaily = function () { state.lastDaily = null; emit(); };
   S.grant = function (n) {
