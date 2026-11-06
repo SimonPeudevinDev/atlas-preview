@@ -123,6 +123,26 @@
       bio: 'La plus ancienne lumière de l’Univers, émise environ 380 000 ans après le Big Bang.',
       more: 'Elle baigne tout le ciel, refroidie aujourd’hui à 2,7 degrés au-dessus du zéro absolu. Deux ingénieurs américains la découvrirent par hasard en 1965 et crurent d’abord à des fientes de pigeon dans leur antenne. Une petite partie de la « neige » des vieilles télévisions venait de ce rayonnement.'
     },
+    presidents: {
+      name: 'Marianne', title: 'Figure de la République', atk: 70, def: 88, esp: 92,
+      bio: 'Coiffée du bonnet phrygien, elle incarne la République française et sa devise : liberté, égalité, fraternité.',
+      more: 'Ce prénom, très répandu au XVIIIe siècle, devint le surnom de la République pendant la Révolution. Son buste orne les mairies, son profil les timbres et les pièces de monnaie. Le tableau de Delacroix, La Liberté guidant le peuple, peint en 1830, a nourri son image de femme du peuple en marche.'
+    },
+    herosfr: {
+      name: 'Le Soldat inconnu', title: 'La Flamme du souvenir', atk: 80, def: 90, esp: 80,
+      bio: 'Soldat français mort pendant la Grande Guerre, dont on ignore le nom, inhumé sous l’Arc de triomphe.',
+      more: 'Il fut choisi en 1920 à Verdun parmi huit cercueils de soldats non identifiés, par un jeune soldat qui déposa un bouquet sur le sixième. Depuis 1923, une flamme y est ravivée chaque soir. Il représente tous les combattants morts pour la France.'
+    },
+    savants: {
+      name: 'Le Mètre étalon', title: 'La Mesure du monde', atk: 40, def: 96, esp: 99,
+      bio: 'La mesure de longueur inventée par la France révolutionnaire, pour un système valable pour tous.',
+      more: 'Le mètre fut défini en 1791 comme la dix-millionième partie du quart du méridien terrestre. Les astronomes Delambre et Méchain mesurèrent pendant sept ans l’arc de méridien entre Dunkerque et Barcelone. Seize mètres étalons de marbre furent installés dans Paris ; deux sont encore en place.'
+    },
+    ecrivains: {
+      name: 'L’Encyclopédie', title: 'Le Livre des Lumières', atk: 50, def: 90, esp: 99,
+      bio: 'Immense dictionnaire raisonné des sciences et des arts, dirigé par Diderot et d’Alembert au XVIIIe siècle.',
+      more: 'Publiée de 1751 à 1772 en dix-sept volumes de texte et onze de planches, elle rassemblait le savoir de son temps, avec la participation de [[voltaire]]. Interdite à plusieurs reprises, elle diffusa les idées des Lumières dans toute l’Europe.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',
@@ -134,9 +154,9 @@
       more: 'En 1697, le recueil de Charles Perrault s’ouvre sur une gravure : une vieille femme file la laine en racontant des histoires à des enfants, sous une pancarte « Contes de ma mère l’Oye ». Elle incarne la tradition orale, ces récits transmis de génération en génération bien avant d’être écrits. Le premier conte du recueil est celui de la [[belle]].'
     },
     histoire: {
-      name: 'Marianne', title: 'Figure de la République', atk: 70, def: 88, esp: 92,
-      bio: 'Coiffée du bonnet phrygien, elle incarne la République française et sa devise : liberté, égalité, fraternité.',
-      more: 'Ce prénom, très répandu au XVIIIe siècle, devient le surnom de la République pendant la Révolution. Son buste orne les mairies, son profil les timbres et les pièces de monnaie. Le tableau de Delacroix, La Liberté guidant le peuple, peint en 1830, a nourri son image de femme du peuple en marche.'
+      name: 'La Sainte Ampoule', title: 'L’Huile du sacre', atk: 50, def: 92, esp: 96,
+      bio: 'Fiole d’huile sainte qui, selon la légende, fut apportée par une colombe pour le baptême de [[clovis]].',
+      more: 'Elle servit pendant des siècles à sacrer les rois de France dans la cathédrale de Reims. Les révolutionnaires la brisèrent en 1793, mais un fragment conservé par un prêtre fut encore utilisé en 1825, pour le sacre de Charles X, le dernier roi sacré.'
     },
     nordique: {
       name: 'Mjöllnir', title: 'Le Marteau de Thor', atk: 99, def: 90, esp: 70,

@@ -91,10 +91,10 @@ window.ATLAS = window.ATLAS || {};
       description: 'Forêts profondes, châteaux endormis et ogres affamés : les contes de fées qui ont bercé des générations d’enfants.'
     },
     {
-      id: 'histoire', name: 'Figures de France', family: 'Histoire', universe: 'Histoire', motif: 'dome',
+      id: 'histoire', group: 'france', name: 'Les Souverains', family: 'Histoire de France', universe: 'Histoire', motif: 'dome',
       edition: 'Édition I', status: 'live', popular: 5,
-      tagline: 'Souverains, savants et résistants qui ont marqué l’histoire de France.',
-      description: 'De la Gaule à la Ve République, un panthéon de personnalités dont l’empreinte traverse les siècles.'
+      tagline: 'Chefs gaulois, rois et empereurs qui ont gouverné la France.',
+      description: 'De Vercingétorix à Napoléon, en passant par Clovis, Saint Louis et le Roi-Soleil : ceux qui ont régné sur la France et façonné son territoire.'
     },
     {
       id: 'nordique', name: 'Les Dieux d’Asgard', family: 'Mythologie nordique', group: 'norrois', universe: 'Mythologies', motif: 'fjord',
@@ -203,6 +203,30 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'event', popular: 0,
       tagline: 'Asgard, Midgard, Helheim : les mondes reliés par l’arbre Yggdrasil.',
       description: 'Le cosmos des Vikings : neuf mondes suspendus aux branches et aux racines du frêne Yggdrasil, du royaume des dieux à celui des morts.'
+    },
+    {
+      id: 'presidents', name: 'Les Présidents', family: 'Histoire de France', group: 'france', universe: 'Histoire', motif: 'dome',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Les présidents de la République, de 1848 à 2007.',
+      description: 'Les chefs de l’État qui ont présidé la République française, de la IIe à la Ve République, avec les grands moments de leurs mandats.'
+    },
+    {
+      id: 'herosfr', name: 'Les Héros de France', family: 'Histoire de France', group: 'france', universe: 'Histoire', motif: 'castle',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Chevaliers, combattantes et résistants qui ont défendu la France et ses libertés.',
+      description: 'De Jeanne d’Arc à Jean Moulin, celles et ceux qui ont pris les armes ou la plume pour la France et pour la liberté.'
+    },
+    {
+      id: 'savants', name: 'Les Savants', family: 'Histoire de France', group: 'france', universe: 'Sciences', motif: 'tower',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Chimistes, mathématiciens et inventeurs qui ont fait avancer la science.',
+      description: 'De Pascal à Marie Curie, les savants et inventeurs français qui ont changé notre regard sur le monde, du vaccin au cinéma.'
+    },
+    {
+      id: 'ecrivains', name: 'Les Écrivains', family: 'Histoire de France', group: 'france', universe: 'Littérature', motif: 'dome',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Les plumes qui ont fait la langue et la littérature françaises.',
+      description: 'De Molière à Zola, les auteurs qui ont fait rire, rêver et réfléchir des générations de lecteurs, et donné au français ses chefs-d’œuvre.'
     }
   ];
 
@@ -286,6 +310,11 @@ window.ATLAS = window.ATLAS || {};
     id: 'norrois', name: 'Mythologie nordique', subs: ['nordique', 'creatures', 'jotnar', 'mondes'], title: 'Survivant du Ragnarök',
     tagline: 'Dieux, créatures, géants et neuf mondes, jusqu’au Ragnarök.',
     description: 'D’Odin au serpent de Midgard, des géants de feu aux neuf mondes suspendus à l’arbre Yggdrasil : toute la mythologie des Vikings, en quatre sous-collections.'
+  });
+  A.GROUPS.push({
+    id: 'france', name: 'Histoire de France', subs: ['histoire', 'presidents', 'herosfr', 'savants', 'ecrivains'], title: 'Mémoire de la France',
+    tagline: 'Souverains, présidents, héros, savants et écrivains : ceux qui ont façonné la France.',
+    description: 'De la Gaule à la Ve République, les femmes et les hommes qui ont gouverné, défendu, inventé et raconté la France, en cinq sous-collections.'
   });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
@@ -567,6 +596,47 @@ window.ATLAS = window.ATLAS || {};
       ['niflheim', 'Niflheim', 'Le Monde des brumes', 60, 96, 80, 'BRE', 'Monde de glace et de brouillard, au nord du gouffre originel.'],
       ['helheim', 'Helheim', 'Le Royaume des morts', 78, 94, 84, 'BREL', 'Royaume froid où vont les morts qui ne périssent pas au combat.']
     ],
+    presidents: [
+      ['louisnapoleon', 'Louis-Napoléon Bonaparte', 'Le Premier Président', 78, 80, 88, 'BREL', 'Premier président de la République française, élu en 1848.'],
+      ['thiers', 'Adolphe Thiers', 'Le Président de 1871', 72, 84, 92, 'BRE', 'Premier président de la IIIe République.'],
+      ['carnot', 'Sadi Carnot', 'Le Président du centenaire', 70, 82, 86, 'BRE', 'Président de 1887 à 1894, assassiné à Lyon.'],
+      ['poincare', 'Raymond Poincaré', 'Le Président de la Grande Guerre', 74, 88, 90, 'BRE', 'Président de la République pendant la Première Guerre mondiale.'],
+      ['pompidou', 'Georges Pompidou', 'Le Président de la modernisation', 70, 82, 92, 'BREL', 'Président de 1969 à 1974.'],
+      ['giscard', 'Valéry Giscard d’Estaing', 'Le Président réformateur', 68, 80, 94, 'BREL', 'Président de 1974 à 1981.'],
+      ['mitterrand', 'François Mitterrand', 'Le Président des grands travaux', 72, 84, 94, 'BRELM', 'Président de 1981 à 1995, le plus long mandat de la Ve République.'],
+      ['chirac', 'Jacques Chirac', 'Le Président de deux mandats', 76, 84, 86, 'BREL', 'Président de 1995 à 2007.'],
+      ['degaulle', 'Charles de Gaulle', 'L’Homme du 18 Juin', 80, 90, 94, 'BRELMU', 'Chef de la France libre puis fondateur de la Ve République.']
+    ],
+    herosfr: [
+      ['duguesclin', 'Bertrand du Guesclin', 'Le Dogue de Brocéliande', 90, 86, 78, 'BREL', 'Chevalier breton, connétable de France pendant la guerre de Cent Ans.'],
+      ['bayard', 'Le Chevalier Bayard', 'Sans peur et sans reproche', 88, 90, 80, 'BREL', 'Chevalier modèle de la Renaissance.'],
+      ['lafayette', 'La Fayette', 'Le Héros des deux mondes', 84, 82, 88, 'BREL', 'Marquis parti combattre pour l’indépendance américaine.'],
+      ['gouges', 'Olympe de Gouges', 'La Plume de l’égalité', 62, 74, 96, 'BREL', 'Femme de lettres qui réclama l’égalité des droits pour les femmes.'],
+      ['moulin', 'Jean Moulin', 'L’Unificateur de la Résistance', 76, 88, 94, 'BRELM', 'Résistant qui unifia les mouvements de la Résistance.'],
+      ['baker', 'Joséphine Baker', 'La Résistante du music-hall', 70, 80, 90, 'BRELM', 'Star du music-hall, résistante et militante contre le racisme.'],
+      ['aubrac', 'Lucie Aubrac', 'L’Audacieuse', 80, 82, 90, 'BREL', 'Résistante qui fit évader son mari des mains de la Gestapo.'],
+      ['jeanne', 'Jeanne d’Arc', 'La Pucelle d’Orléans', 84, 82, 88, 'BRELM', 'Jeune paysanne lorraine devenue cheffe de guerre.']
+    ],
+    savants: [
+      ['pasteur', 'Louis Pasteur', 'Le Vainqueur de la rage', 62, 84, 98, 'BRELM', 'Chimiste et biologiste, inventeur du vaccin contre la rage.'],
+      ['lavoisier', 'Antoine Lavoisier', 'Le Père de la chimie', 58, 80, 99, 'BREL', 'Fondateur de la chimie moderne.'],
+      ['pascal', 'Blaise Pascal', 'Le Génie précoce', 54, 76, 99, 'BREL', 'Mathématicien, physicien et philosophe.'],
+      ['champollion', 'Jean-François Champollion', 'Le Déchiffreur', 56, 74, 99, 'BRELM', 'Il déchiffra les hiéroglyphes égyptiens en 1822.'],
+      ['lumiere', 'Les Frères Lumière', 'Les Inventeurs du cinéma', 60, 78, 96, 'BRELM', 'Inventeurs du cinématographe.'],
+      ['eiffel', 'Gustave Eiffel', 'Le Magicien du fer', 70, 92, 90, 'BREL', 'Ingénieur de la tour Eiffel.'],
+      ['germain', 'Sophie Germain', 'La Mathématicienne cachée', 52, 78, 98, 'BRE', 'Mathématicienne qui dut se cacher derrière un nom d’homme.'],
+      ['curie', 'Marie Curie', 'Pionnière de la radioactivité', 52, 70, 99, 'BREL', 'Double lauréate du prix Nobel, en physique puis en chimie.']
+    ],
+    ecrivains: [
+      ['moliere', 'Molière', 'Le Roi de la comédie', 66, 78, 98, 'BRELMU', 'Le plus grand auteur comique du théâtre français.'],
+      ['voltaire', 'Voltaire', 'Le Philosophe des Lumières', 62, 80, 99, 'BRELM', 'Philosophe des Lumières, défenseur de la tolérance.'],
+      ['lafontaine', 'Jean de La Fontaine', 'Le Fabuliste', 56, 72, 96, 'BREL', 'Auteur des Fables, où les animaux parlent aux hommes.'],
+      ['dumas', 'Alexandre Dumas', 'Le Conteur infatigable', 72, 78, 96, 'BRELM', 'Auteur des Trois Mousquetaires et du Comte de Monte-Cristo.'],
+      ['sand', 'George Sand', 'La Romancière libre', 64, 80, 94, 'BREL', 'Romancière qui choisit un nom d’homme et une vie libre.'],
+      ['zola', 'Émile Zola', 'L’Écrivain engagé', 66, 82, 96, 'BREL', 'Romancier des Rougon-Macquart, défenseur de Dreyfus.'],
+      ['jverne', 'Jules Verne', 'Le Voyageur immobile', 60, 76, 98, 'BRELMU', 'Auteur des Voyages extraordinaires.'],
+      ['hugo', 'Victor Hugo', 'Le Poète de la République', 58, 72, 97, 'BRE', 'Romancier, poète et dramaturge, voix de l’exil et de la liberté.']
+    ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
       ['creature', 'La Créature', 'Née de Frankenstein', 92, 88, 64, 'BRELM', 'Assemblée et animée par Victor Frankenstein, elle cherche sa place parmi les hommes.'],
@@ -590,13 +660,13 @@ window.ATLAS = window.ATLAS || {};
     ],
     histoire: [
       ['napoleon', 'Napoléon Bonaparte', 'Empereur des Français', 92, 76, 96, 'BRELMU', 'Général, Premier consul puis empereur, il redessine l’Europe.'],
-      ['degaulle', 'Charles de Gaulle', 'L’Homme du 18 Juin', 80, 90, 94, 'BRELMU', 'Chef de la France libre puis fondateur de la Ve République.'],
-      ['jeanne', 'Jeanne d’Arc', 'La Pucelle d’Orléans', 84, 82, 88, 'BRELM', 'Jeune paysanne lorraine devenue cheffe de guerre.'],
       ['louisxiv', 'Louis XIV', 'Le Roi-Soleil', 78, 84, 90, 'BREL', 'Soixante-douze ans de règne et la splendeur de Versailles.'],
-      ['curie', 'Marie Curie', 'Pionnière de la radioactivité', 52, 70, 99, 'BREL', 'Double lauréate du prix Nobel, en physique puis en chimie.'],
-      ['hugo', 'Victor Hugo', 'Le Poète de la République', 58, 72, 97, 'BRE', 'Romancier, poète et dramaturge, voix de l’exil et de la liberté.'],
       ['charlemagne', 'Charlemagne', 'Empereur d’Occident', 88, 86, 84, 'BREL', 'Couronné à Rome en l’an 800, il unifie une grande partie de l’Europe.'],
-      ['vercingetorix', 'Vercingétorix', 'Chef des Arvernes', 89, 80, 78, 'BRE', 'Il fédère les peuples gaulois face aux légions de César.']
+      ['vercingetorix', 'Vercingétorix', 'Chef des Arvernes', 89, 80, 78, 'BRE', 'Il fédère les peuples gaulois face aux légions de César.'],
+      ['clovis', 'Clovis', 'Le Premier Roi des Francs', 84, 82, 82, 'BREL', 'Roi des Francs, souvent présenté comme le premier roi de France.'],
+      ['saintlouis', 'Saint Louis', 'Le Roi justicier', 78, 84, 92, 'BREL', 'Louis IX, roi pieux et justicier, canonisé après sa mort.'],
+      ['francoisier', 'François Ier', 'Le Roi de la Renaissance', 84, 80, 90, 'BRELM', 'Roi bâtisseur et protecteur des arts de la Renaissance.'],
+      ['henriiv', 'Henri IV', 'Le Bon Roi Henri', 86, 82, 88, 'BRELM', 'Roi qui mit fin aux guerres de Religion.']
     ],
     nordique: [
       ['odin', 'Odin', 'Le Père de tout', 88, 82, 98, 'BRELMU', 'Il sacrifia un œil pour boire à la source de la sagesse.'],
@@ -841,6 +911,39 @@ window.ATLAS = window.ATLAS || {};
     'mondes-muspellheim': 'Au commencement, au sud du grand vide Ginnungagap, s’étendait ce monde de feu, si brûlant que seuls ses habitants peuvent y vivre. Il est gardé par le géant [[jotnar:surt|Surt]].',
     'mondes-niflheim': 'Au nord du gouffre originel, ce monde de glace, de froid et de brume est l’un des deux premiers mondes. De sa source, Hvergelmir, naissent tous les fleuves.',
     'mondes-helheim': 'Gouverné par [[jotnar:hel|Hel]], ce monde sombre accueille ceux qui meurent de maladie ou de vieillesse. On y parvient après neuf nuits de route, par le pont Gjallarbrú qui enjambe un fleuve glacé.',
+    'histoire-clovis': 'Chef des Francs saliens dès l’âge de quinze ans, il conquit presque toute la Gaule à la fin du Ve siècle. Son baptême à Reims, vers l’an 500, fit de lui l’allié de l’Église.',
+    'histoire-saintlouis': 'Louis IX régna de 1226 à 1270. La tradition le montre rendant la justice sous un chêne, à Vincennes, ouvert à tous ses sujets.',
+    'histoire-francoisier': 'Vainqueur à Marignan en 1515, il fit venir en France Léonard de Vinci, qui apporta avec lui La Joconde. Il fit construire le château de Chambord.',
+    'histoire-henriiv': 'Protestant devenu roi en 1589, il se convertit au catholicisme pour être accepté par Paris, puis signa en 1598 l’édit de Nantes, qui accordait la liberté de culte aux protestants.',
+    'presidents-louisnapoleon': 'Neveu de [[histoire:napoleon|Napoléon Ier]], il fut élu en décembre 1848 au premier suffrage universel masculin, devenant le premier président de la République française.',
+    'presidents-thiers': 'Historien et homme politique, il négocia la paix avec la Prusse en 1871 et devint le premier président de la IIIe République.',
+    'presidents-carnot': 'Ingénieur polytechnicien, petit-fils de Lazare Carnot, l’« organisateur de la victoire » de la Révolution, il fut élu en 1887. Il présida le centenaire de la Révolution et l’Exposition universelle de 1889, celle de la tour de [[savants:eiffel|Gustave Eiffel]].',
+    'presidents-poincare': 'Avocat lorrain, il fut président de 1913 à 1920. Pendant la Grande Guerre, il appela à l’« Union sacrée » de tous les partis et nomma en 1917 Georges Clemenceau à la tête du gouvernement.',
+    'presidents-pompidou': 'Professeur de lettres puis banquier, Premier ministre du général [[degaulle|de Gaulle]], il fut élu président en 1969. Son mandat fut marqué par une forte croissance et de grands projets industriels.',
+    'presidents-giscard': 'Élu à 48 ans, il fut l’un des plus jeunes présidents de la République. Sous son mandat, la majorité passa de 21 à 18 ans, et la loi Veil légalisa l’interruption volontaire de grossesse en 1975.',
+    'presidents-mitterrand': 'Premier président de gauche de la Ve République, il fut élu en 1981 et réélu en 1988. En 1981, la peine de mort fut abolie, à l’initiative du garde des Sceaux Robert Badinter.',
+    'presidents-chirac': 'Ancien maire de Paris et Premier ministre, il fut élu président en 1995. La même année, il reconnut la responsabilité de l’État français dans la rafle du Vél’ d’Hiv de 1942.',
+    'herosfr-duguesclin': 'Jeune noble breton réputé laid et bagarreur, il devint l’un des plus grands chefs de guerre du XIVe siècle et connétable de France sous Charles V. Il reprit aux Anglais une grande partie du royaume.',
+    'herosfr-bayard': 'Pierre Terrail, seigneur de Bayard, se couvrit de gloire dans les guerres d’Italie. On raconte qu’il défendit presque seul un pont, sur le Garigliano, contre une troupe espagnole.',
+    'herosfr-lafayette': 'À dix-neuf ans, ce jeune marquis partit en secret combattre aux côtés des insurgés américains contre les Anglais. Ami de George Washington, il participa à la victoire décisive de Yorktown, en 1781.',
+    'herosfr-gouges': 'En 1791, elle publia la Déclaration des droits de la femme et de la citoyenne, pour rappeler que les droits proclamés en 1789 devaient aussi valoir pour les femmes.',
+    'herosfr-moulin': 'Préfet révoqué par le régime de Vichy, il rejoignit le général [[presidents:degaulle|de Gaulle]] à Londres, puis fut parachuté en France pour unifier les mouvements de résistance. En mai 1943, il créa le Conseil national de la Résistance.',
+    'herosfr-baker': 'Née aux États-Unis, elle devint la vedette des cabarets parisiens dans les années 1920. Pendant la Seconde Guerre mondiale, elle s’engagea dans la France libre et transporta des renseignements cachés dans ses partitions.',
+    'herosfr-aubrac': 'Professeure d’histoire, elle cofonda le mouvement de résistance Libération-Sud. En octobre 1943, elle organisa l’attaque d’un camion allemand pour libérer son mari, Raymond Aubrac, arrêté avec [[moulin|Jean Moulin]].',
+    'savants-pasteur': 'Il montra que les maladies contagieuses et les fermentations sont causées par des micro-organismes, et mit au point la pasteurisation, qui conserve le lait et le vin en les chauffant.',
+    'savants-lavoisier': 'Par des pesées d’une grande précision, il montra que la matière se conserve au cours des réactions chimiques et découvrit le rôle de l’oxygène dans la combustion et la respiration.',
+    'savants-pascal': 'À dix-neuf ans, il inventa une machine à calculer, la pascaline, pour aider son père dans ses calculs d’impôts. Il prouva aussi l’existence du vide et étudia la pression de l’air.',
+    'savants-champollion': 'Passionné par l’Égypte depuis l’enfance, il apprit une dizaine de langues anciennes. En 1822, grâce à la pierre de Rosette, il perça le secret des hiéroglyphes et s’écria : « Je tiens l’affaire ! ».',
+    'savants-lumiere': 'Auguste et Louis Lumière, industriels lyonnais, mirent au point le cinématographe, un appareil capable de filmer et de projeter. Le 28 décembre 1895, ils organisèrent à Paris la première séance de cinéma payante.',
+    'savants-eiffel': 'Ingénieur spécialiste du métal, son entreprise construisit la tour de 300 mètres de l’Exposition universelle de 1889, alors le plus haut monument du monde.',
+    'savants-germain': 'Les femmes étant exclues de l’École polytechnique, elle se procura les cours et envoya ses devoirs sous le nom d’un ancien élève, Monsieur Le Blanc. Le grand mathématicien Lagrange découvrit la supercherie et l’encouragea.',
+    'ecrivains-moliere': 'Jean-Baptiste Poquelin prit le nom de Molière et parcourut la France avec sa troupe avant de triompher à Paris, protégé par [[histoire:louisxiv|Louis XIV]]. Il écrivit Le Tartuffe, L’Avare et Le Malade imaginaire.',
+    'ecrivains-voltaire': 'François-Marie Arouet, dit Voltaire, fut embastillé, exilé et adulé. Dans Candide et ses autres œuvres, il se moqua du fanatisme et de l’injustice.',
+    'ecrivains-lafontaine': 'Dans ses Fables, publiées à partir de 1668, il met en scène des animaux pour faire réfléchir les hommes : Le Corbeau et le Renard, La Cigale et la Fourmi, Le Lièvre et la Tortue.',
+    'ecrivains-dumas': 'Petit-fils d’une esclave de Saint-Domingue et fils d’un général de la Révolution, il devint l’écrivain le plus populaire de son temps grâce à [[mousquetaires:dartagnan|d’Artagnan]] et au [[mousquetaires:montecristo|comte de Monte-Cristo]].',
+    'ecrivains-sand': 'Aurore Dupin prit le nom de George Sand pour publier ses romans, qui eurent un immense succès. Elle porta souvent des vêtements d’homme pour circuler plus librement dans Paris.',
+    'ecrivains-zola': 'Dans les vingt romans des Rougon-Macquart, comme Germinal ou L’Assommoir, il peignit la société de son temps, des mines du Nord aux grands magasins parisiens.',
+    'ecrivains-jverne': 'Né à Nantes en 1828, il écrivit une soixantaine de Voyages extraordinaires, où l’on croise le [[verne:nemo|capitaine Nemo]] ou [[verne:fogg|Phileas Fogg]].',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -900,13 +1003,13 @@ window.ATLAS = window.ATLAS || {};
     'contes-loup': 'Rôdeur des sentiers à la voix trop douce, il guette les imprudents. Sa rencontre avec le [[chaperon|Petit Chaperon rouge]] rappelle aux enfants que les bois ne sont jamais tout à fait sûrs.',
 
     'histoire-napoleon': 'Général, Premier consul puis empereur des Français en 1804, il redessine l’Europe et fonde le Code civil. Il se voulait l’héritier de [[charlemagne]], dont il fit porter la couronne à son sacre.',
-    'histoire-degaulle': 'Le 18 juin 1940, depuis Londres, il appelle les Français à poursuivre le combat, puis fonde la Ve République en 1958. Sa « certaine idée de la France » se nourrit de figures comme [[jeanne]].',
-    'histoire-jeanne': 'Jeune paysanne de Domrémy, elle mène l’armée de Charles VII et délivre Orléans en 1429, avant d’être brûlée à Rouen. [[napoleon|Bonaparte]] en fit un symbole national dès 1803, et [[degaulle]] l’invoqua souvent.',
+    'presidents-degaulle': 'Le 18 juin 1940, depuis Londres, il appelle les Français à poursuivre le combat, puis fonde la Ve République en 1958. Sa « certaine idée de la France » se nourrit de figures comme [[herosfr:jeanne]].',
+    'herosfr-jeanne': 'Jeune paysanne de Domrémy, elle mène l’armée de Charles VII et délivre Orléans en 1429, avant d’être brûlée à Rouen. [[histoire:napoleon|Bonaparte]] en fit un symbole national dès 1803, et [[presidents:degaulle]] l’invoqua souvent.',
     'histoire-louisxiv': 'Roi à quatre ans, il gouverne seul à partir de 1661 et fait de Versailles le cœur de l’Europe. On l’appela Louis le Grand, comme [[charlemagne]] fut avant lui Charles le Grand.',
-    'histoire-curie': 'Née à Varsovie, elle découvre avec Pierre Curie le polonium et le radium, et reçoit deux prix Nobel, en physique puis en chimie. Elle repose au Panthéon depuis 1995, non loin de [[hugo]].',
-    'histoire-hugo': 'Romancier des Misérables, poète et dramaturge, il passe près de vingt ans en exil sous le Second Empire. Ennemi juré de Napoléon III, il célébra pourtant la légende de son oncle, [[napoleon]].',
+    'savants-curie': 'Née à Varsovie, elle découvre avec Pierre Curie le polonium et le radium, et reçoit deux prix Nobel, en physique puis en chimie. Elle repose au Panthéon depuis 1995, non loin de [[ecrivains:hugo]].',
+    'ecrivains-hugo': 'Romancier des Misérables, poète et dramaturge, il passe près de vingt ans en exil sous le Second Empire. Ennemi juré de Napoléon III, il célébra pourtant la légende de son oncle, [[histoire:napoleon]].',
     'histoire-charlemagne': 'Roi des Francs couronné empereur à Rome le jour de Noël de l’an 800, il unifie une grande partie de l’Europe occidentale. Mille ans plus tard, [[napoleon]] se réclamera de son héritage.',
-    'histoire-vercingetorix': 'Chef des Arvernes, il fédère les peuples gaulois contre les légions de César et triomphe à Gergovie en 52 av. J.-C. Vaincu à Alésia, il reste le plus ancien héros de l’histoire de France, bien avant [[jeanne]].',
+    'histoire-vercingetorix': 'Chef des Arvernes, il fédère les peuples gaulois contre les légions de César et triomphe à Gergovie en 52 av. J.-C. Vaincu à Alésia, il reste le plus ancien héros de l’histoire de France, bien avant [[herosfr:jeanne]].',
 
     'nordique-odin': 'Le Père de tout sacrifia un œil pour boire à la source de la sagesse et resta pendu neuf nuits à l’arbre-monde pour découvrir les runes. Il sait qu’au Ragnarök, [[creatures:fenrir]] le dévorera.',
     'nordique-thor': 'Fils d’[[odin]], il protège Asgard et Midgard avec Mjöllnir, un marteau forgé par des nains à la suite d’une ruse de [[loki]].',
@@ -1043,7 +1146,7 @@ window.ATLAS = window.ATLAS || {};
     'etranges-invisible': 'L’invisibilité, qui devait le rendre tout-puissant, le condamne au froid, à la faim et à la solitude : il doit rester nu pour ne pas être vu. Il sombre dans la folie et la violence. Wells imagina aussi les Martiens de La Guerre des mondes.',
     'etranges-moreau': 'Ses créatures récitent une Loi qui leur interdit de marcher à quatre pattes ou de boire en lapant. Mais leur nature animale revient peu à peu. Le roman posait déjà la question des limites de la science.',
     'etranges-horla': 'Le narrateur finit par incendier sa propre maison pour tuer le Horla, sans savoir s’il y est parvenu. Écrit sous forme de journal, le récit laisse planer le doute : créature réelle ou folie ?',
-    'etranges-quasimodo': 'Il s’éprend de la belle Esmeralda, qu’il arrache au gibet pour l’abriter dans la cathédrale en criant « Asile ! ». [[histoire:hugo|Victor Hugo]] écrivit Notre-Dame de Paris en 1831, notamment pour défendre la cathédrale, alors délabrée.',
+    'etranges-quasimodo': 'Il s’éprend de la belle Esmeralda, qu’il arrache au gibet pour l’abriter dans la cathédrale en criant « Asile ! ». [[ecrivains:hugo|Victor Hugo]] écrivit Notre-Dame de Paris en 1831, notamment pour défendre la cathédrale, alors délabrée.',
     'etranges-mobydick': 'Le roman s’inspire d’un fait réel : en 1820, le baleinier Essex fut coulé par un cachalot en plein Pacifique. Sa première phrase, « Appelez-moi Ismaël », est l’une des plus célèbres de la littérature américaine.',
     'etranges-golem': 'Dans une autre version, le mot « emet », vérité, est inscrit sur son front ; en effaçant la première lettre, on obtient « met », mort, et le Golem s’effondre. On dit que ses restes reposent dans le grenier de la synagogue Vieille-Nouvelle de Prague.',
     'etranges-hollandais': 'Le croiser en mer annonce le malheur. La légende inspira à Richard Wagner son opéra Le Vaisseau fantôme, en 1843. Des marins de la Royal Navy affirmèrent l’avoir aperçu en 1881, au large de l’Australie.',
@@ -1100,6 +1203,39 @@ window.ATLAS = window.ATLAS || {};
     'mondes-muspellheim': 'Les étincelles jaillies de Muspellheim devinrent le soleil, la lune et les étoiles, placés dans le ciel par les dieux. C’est la rencontre de son feu avec la glace de [[niflheim]] qui fit naître la vie.',
     'mondes-niflheim': 'Ses glaces, fondues au contact du feu de [[muspellheim]], donnèrent naissance au géant Ymir et à la vache [[creatures:audhumla|Audhumla]]. Le dragon [[creatures:nidhogg|Nidhögg]] ronge la racine d’Yggdrasil qui plonge jusqu’ici.',
     'mondes-helheim': 'L’entrée est gardée par le chien [[creatures:garm|Garm]]. Contrairement à l’enfer chrétien, ce n’est pas un lieu de châtiment. Le mot anglais « hell » partage pourtant la même origine que le nom de Hel.',
+    'histoire-clovis': 'L’épisode du vase de Soissons, qu’un guerrier brisa par défi et que Clovis vengea un an plus tard, est resté célèbre. Il fit de Paris sa capitale. Son nom a donné, au fil des siècles, le prénom Louis, porté par dix-huit rois de France.',
+    'histoire-saintlouis': 'Il fit bâtir la Sainte-Chapelle à Paris pour abriter la couronne d’épines du Christ, et mena deux croisades. Il mourut de maladie devant Tunis en 1270 et fut canonisé en 1297.',
+    'histoire-francoisier': 'En 1539, l’ordonnance de Villers-Cotterêts imposa le français à la place du latin dans les actes officiels. Il fonda aussi le futur Collège de France. Fait prisonnier à Pavie en 1525, il passa un an captif à Madrid.',
+    'histoire-henriiv': 'On lui prête le vœu que chaque paysan puisse mettre « la poule au pot » le dimanche. Il fut assassiné par Ravaillac en 1610, rue de la Ferronnerie, à Paris. Le Pont-Neuf, achevé sous son règne, porte sa statue.',
+    'presidents-louisnapoleon': 'Ne pouvant se représenter, il fit un coup d’État le 2 décembre 1851, puis devint empereur sous le nom de Napoléon III. Sous son règne, le préfet Haussmann transforma Paris. Il fut renversé après la défaite de Sedan, en 1870.',
+    'presidents-thiers': 'Il dirigea la répression de la Commune de Paris en mai 1871, lors de la « Semaine sanglante ». Il obtint la libération du territoire occupé en payant l’indemnité de guerre plus vite que prévu. Il démissionna en 1873.',
+    'presidents-carnot': 'Le 24 juin 1894, à Lyon, il fut poignardé par un anarchiste italien et mourut dans la nuit. Il repose au Panthéon. De nombreuses rues et places de France portent son nom.',
+    'presidents-poincare': 'Après sa présidence, il redevint président du Conseil et stabilisa le franc en 1928. Son cousin, Henri Poincaré, était l’un des plus grands mathématiciens de son temps.',
+    'presidents-pompidou': 'Amateur d’art moderne, il voulut à Paris un grand centre culturel, le Centre Pompidou, inauguré après sa mort. Il mourut en fonction en 1974. Il avait publié une anthologie de la poésie française.',
+    'presidents-giscard': 'Européen convaincu, il créa avec le chancelier allemand Helmut Schmidt le Conseil européen et le système monétaire européen. Élu à l’Académie française en 2003, il mourut en 2020.',
+    'presidents-mitterrand': 'Ses « grands travaux » ont transformé Paris : la pyramide du Louvre, l’Opéra Bastille, la Bibliothèque nationale. Il signa en 1992 le traité de Maastricht, qui fonda l’Union européenne. Il mourut en 1996.',
+    'presidents-chirac': 'Il suspendit le service militaire obligatoire et fit passer le mandat présidentiel de sept à cinq ans. En 2003, il refusa d’engager la France dans la guerre en Irak. Passionné par les arts d’Afrique et d’Asie, il fit créer le musée du quai Branly. Il mourut en 2019.',
+    'herosfr-duguesclin': 'Capturé plusieurs fois, il fut libéré contre de fortes rançons ; on raconte que les femmes de France filèrent la laine pour payer la sienne. Il repose à la basilique de Saint-Denis, parmi les rois.',
+    'herosfr-bayard': 'Après la victoire de Marignan, en 1515, il aurait armé chevalier le jeune roi [[histoire:francoisier|François Ier]]. Il mourut en 1524 d’un coup d’arquebuse, entouré du respect de ses ennemis. Son surnom de chevalier « sans peur et sans reproche » est passé en proverbe.',
+    'herosfr-lafayette': 'Revenu en France, il proposa en 1789 un projet de Déclaration des droits de l’homme et commanda la garde nationale. En 2002, il devint citoyen d’honneur des États-Unis, un titre très rare. Une réplique de L’Hermione, la frégate de son second voyage, a refait la traversée en 2015.',
+    'herosfr-gouges': 'Elle défendit aussi l’abolition de l’esclavage. Opposée à la Terreur, elle fut guillotinée en 1793. Sa Déclaration le disait déjà : si la femme a le droit de monter sur l’échafaud, elle doit avoir celui de monter à la tribune.',
+    'herosfr-moulin': 'Arrêté par la Gestapo à Caluire, près de Lyon, en juin 1943, il fut torturé et mourut lors de son transfert vers l’Allemagne, sans avoir parlé. Ses cendres furent transférées au Panthéon en 1964, lors d’un discours resté célèbre d’André Malraux.',
+    'herosfr-baker': 'Elle adopta douze enfants de différentes origines, sa « tribu arc-en-ciel », et participa à la marche sur Washington aux côtés de Martin Luther King, en 1963. Elle est entrée au Panthéon en 2021.',
+    'herosfr-aubrac': 'Enceinte, elle s’enfuit avec lui jusqu’à Londres, où naquit leur fille. Après la guerre, elle témoigna inlassablement dans les écoles pour transmettre la mémoire de la Résistance.',
+    'savants-pasteur': 'En 1885, il sauva le jeune Joseph Meister, mordu par un chien enragé, grâce à son vaccin contre la rage. L’Institut Pasteur, fondé en 1887, est devenu l’un des grands centres de recherche du monde.',
+    'savants-lavoisier': 'On résume souvent sa découverte par une formule : rien ne se perd, rien ne se crée, tout se transforme. Fermier général, chargé de collecter des impôts, il fut guillotiné en 1794, sous la Terreur.',
+    'savants-pascal': 'Il posa avec Fermat les bases du calcul des probabilités. Ses Pensées, publiées après sa mort, sont un chef-d’œuvre de la littérature. L’unité de pression, le pascal, porte son nom.',
+    'savants-champollion': 'Il comprit que les hiéroglyphes notaient à la fois des sons et des idées, en lisant dans des cartouches les noms de [[pharaons:ramses|Ramsès]] et de [[pharaons:cleopatre|Cléopâtre]]. Il fonda le musée égyptien du Louvre et mourut en 1832, à 41 ans.',
+    'savants-lumiere': 'Au programme figuraient de courts films comme La Sortie de l’usine Lumière. La légende veut que les spectateurs de L’Arrivée d’un train en gare de La Ciotat aient reculé de peur. Ils inventèrent aussi l’autochrome, l’un des premiers procédés de photographie en couleurs.',
+    'savants-eiffel': 'Très critiquée par des artistes lors de sa construction, la tour ne devait durer que vingt ans. Elle fut sauvée notamment par ses antennes de radio. Eiffel conçut aussi la structure intérieure de la statue de la Liberté, à New York.',
+    'savants-germain': 'Elle fit avancer la théorie des nombres et remporta en 1816 le prix de l’Académie des sciences pour ses travaux sur l’élasticité. Certains nombres premiers portent son nom. Elle ne figure pas parmi les 72 savants dont les noms sont gravés sur la tour [[eiffel|Eiffel]], qui ne comptent aucune femme.',
+    'ecrivains-moliere': 'Il se moqua des hypocrites, des médecins et des précieuses ridicules, ce qui lui valut de nombreux ennemis. Pris d’un malaise sur scène en jouant Le Malade imaginaire, en 1673, il mourut quelques heures plus tard. On appelle le français « la langue de Molière ».',
+    'ecrivains-voltaire': 'Il prit la défense de Jean Calas, un protestant de Toulouse exécuté à tort en 1762, et obtint sa réhabilitation. Il passa ses dernières années à Ferney, près de Genève, et fut accueilli en triomphe à Paris peu avant sa mort, en 1778.',
+    'ecrivains-lafontaine': 'Il reprit souvent des récits du Grec Ésope, qu’il réécrivit en vers d’une grande liberté. Chaque fable porte une morale, comme « la raison du plus fort est toujours la meilleure ». Des générations d’écoliers les ont apprises par cœur.',
+    'ecrivains-dumas': 'Il écrivait avec des collaborateurs et publiait en feuilletons dans les journaux, que les lecteurs s’arrachaient. Il se fit bâtir près de Paris un château qu’il baptisa Monte-Cristo. Il est entré au Panthéon en 2002.',
+    'ecrivains-sand': 'Elle vécut une longue histoire avec le compositeur Frédéric Chopin et correspondit avec les plus grands écrivains de son temps. Sa maison de Nohant, dans le Berry, où elle écrivit La Mare au diable, se visite encore.',
+    'ecrivains-zola': 'En 1898, il publia « J’accuse… ! », une lettre ouverte au président de la République pour défendre le capitaine Dreyfus, condamné à tort. Il dut s’exiler en Angleterre. Il mourut en 1902, asphyxié chez lui par sa cheminée.',
+    'ecrivains-jverne': 'Il travaillait à partir d’une abondante documentation scientifique, au point que ses romans semblent annoncer le sous-marin, l’hélicoptère ou le voyage vers la Lune. Il est l’un des auteurs les plus traduits au monde. Il mourut à Amiens en 1905.',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -1159,11 +1295,11 @@ window.ATLAS = window.ATLAS || {};
     'contes-loup': 'Le loup de Perrault parle, se déguise et ruse, mais n’a pas de nom. On le retrouve dans Les Trois Petits Cochons ou Le Loup et les Sept Chevreaux. Chez Perrault, la morale vise les « loups doucereux », séducteurs plus dangereux que les bêtes.',
 
     'histoire-napoleon': 'Né à Ajaccio en 1769, il devient général à vingt-quatre ans, après le siège de Toulon. Vaincu à Waterloo en 1815, il meurt en exil à Sainte-Hélène en 1821. Ses cendres reposent aux Invalides depuis 1840.',
-    'histoire-degaulle': 'Officier de la Grande Guerre, blessé et fait prisonnier à Verdun, il défend avant 1940 l’emploi des chars. Président de 1959 à 1969, il dote la France de la dissuasion nucléaire. Il repose à Colombey-les-Deux-Églises.',
-    'histoire-jeanne': 'Elle dit entendre les voix de saint Michel, sainte Catherine et sainte Marguerite. Elle fait sacrer Charles VII à Reims, puis est capturée à Compiègne et jugée pour hérésie. Réhabilitée en 1456, elle est canonisée en 1920.',
+    'presidents-degaulle': 'Officier de la Grande Guerre, blessé et fait prisonnier à Verdun, il défend avant 1940 l’emploi des chars. Président de 1959 à 1969, il dote la France de la dissuasion nucléaire. Il repose à Colombey-les-Deux-Églises.',
+    'herosfr-jeanne': 'Elle dit entendre les voix de saint Michel, sainte Catherine et sainte Marguerite. Elle fait sacrer Charles VII à Reims, puis est capturée à Compiègne et jugée pour hérésie. Réhabilitée en 1456, elle est canonisée en 1920.',
     'histoire-louisxiv': 'Il prend le soleil pour emblème et danse lui-même dans les ballets de cour. Il révoque l’édit de Nantes en 1685. On lui prête une phrase qu’il n’a sans doute jamais prononcée : « L’État, c’est moi. »',
-    'histoire-curie': 'Première femme lauréate d’un prix Nobel, elle fut aussi la première personne à en recevoir deux. Pendant la Grande Guerre, elle équipe des voitures de radiologie, les « petites Curies ». Ses carnets de laboratoire sont encore radioactifs aujourd’hui.',
-    'histoire-hugo': 'Il publie Notre-Dame de Paris en 1831 et Les Misérables en 1862, depuis son exil à Guernesey. Député, il combat la peine de mort toute sa vie. À sa mort, en 1885, une foule immense suit son cercueil jusqu’au Panthéon.',
+    'savants-curie': 'Première femme lauréate d’un prix Nobel, elle fut aussi la première personne à en recevoir deux. Pendant la Grande Guerre, elle équipe des voitures de radiologie, les « petites Curies ». Ses carnets de laboratoire sont encore radioactifs aujourd’hui.',
+    'ecrivains-hugo': 'Il publie Notre-Dame de Paris en 1831 et Les Misérables en 1862, depuis son exil à Guernesey. Député, il combat la peine de mort toute sa vie. À sa mort, en 1885, une foule immense suit son cercueil jusqu’au Panthéon.',
     'histoire-charlemagne': 'Fils de Pépin le Bref, il gouverne depuis Aix-la-Chapelle. Il encourage les écoles et la copie des manuscrits : c’est la renaissance carolingienne, d’où vient sa réputation d’« inventeur de l’école ».',
     'histoire-vercingetorix': 'Fils de Celtillos, il est proclamé roi par les Arvernes en 52 av. J.-C. Assiégé dans Alésia, il se rend à César pour épargner ses hommes. Emmené à Rome, il y est exécuté vers 46 av. J.-C., après le triomphe de son vainqueur.',
 
@@ -1196,7 +1332,7 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans', 'presidents', 'herosfr', 'savants', 'ecrivains'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,

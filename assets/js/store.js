@@ -20,6 +20,8 @@
   /* Mode test : toutes les éditions débloquées (un exemplaire de chaque rareté pour chaque personnage). Passer à true pour tout débloquer.
      Désactivé pour éprouver la progression des collections et leurs récompenses. */
   S.UNLOCK_ALL = false;
+  /* Mode développement : affiche le nom des personnages secrets même verrouillés. Passer à false avant la mise en production. */
+  S.SHOW_SECRETS = true;
   var state = null;
   var listeners = [];
 
@@ -97,7 +99,7 @@
       'egypte-anubis-epic', 'egypte-ra-base', 'egypte-bastet-base', 'egypte-bastet-base', 'egypte-thot-rare', 'egypte-isis-base',
       'gothique-dracula-rare', 'gothique-dracula-base', 'gothique-carmilla-base', 'gothique-dorian-base',
       'merveilleux-alice-rare', 'merveilleux-alice-base', 'merveilleux-peterpan-base', 'contes-cendrillon-base', 'contes-chatbotte-legendary',
-      'histoire-napoleon-base', 'histoire-degaulle-rare', 'histoire-jeanne-base', 'histoire-curie-base',
+      'histoire-napoleon-base', 'presidents-degaulle-rare', 'herosfr-jeanne-base', 'savants-curie-base',
       'nordique-loki-base'
     ];
     seed.forEach(function (s, i) {
@@ -156,7 +158,7 @@
     fillTestCopies();
   };
   // Cartes déplacées d’une sous-collection à l’autre (Héraclès, Méduse, Alice, Peter Pan, Fenrir) : on renomme celles déjà possédées.
-  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-', 'contes-alice-': 'merveilleux-alice-', 'contes-peterpan-': 'merveilleux-peterpan-', 'nordique-fenrir-': 'creatures-fenrir-' };
+  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-', 'contes-alice-': 'merveilleux-alice-', 'contes-peterpan-': 'merveilleux-peterpan-', 'nordique-fenrir-': 'creatures-fenrir-' , 'histoire-degaulle-': 'presidents-degaulle-', 'histoire-jeanne-': 'herosfr-jeanne-', 'histoire-curie-': 'savants-curie-', 'histoire-hugo-': 'ecrivains-hugo-' };
   function moved(id) { for (var k in MOVED) if (id && id.indexOf(k) === 0) return MOVED[k] + id.slice(k.length); return id; }
   function migrateMoved() {
     var n = 0;
@@ -273,7 +275,11 @@
   var TITLES = {
     grece: ['Initié de l’Olympe', 'Maître de l’Olympe'], egypte: ['Scribe du Nil', 'Gardien des Deux Terres'],
     gothique: ['Veilleur des ombres', 'Seigneur des brumes'], contes: ['Conteur', 'Gardien des contes'],
-    histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard'],
+    histoire: ['Mémorialiste', 'Grand Historien'],
+    ecrivains: ['Lecteur assidu', 'Immortel de l’Académie'],
+    savants: ['Apprenti savant', 'Prix Nobel'],
+    herosfr: ['Résistant', 'Compagnon de la Libération'],
+    presidents: ['Électeur', 'Gardien de la République'], nordique: ['Skalde', 'Héraut d’Asgard'],
     creatures: ['Dompteur de loups', 'Maître des bêtes d’Yggdrasil'], jotnar: ['Visiteur de Jötunheim', 'Seigneur des géants'], mondes: ['Voyageur des mondes', 'Gardien de Bifröst'],
     titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra'],
     pharaons: ['Scribe royal', 'Fils de Râ'],

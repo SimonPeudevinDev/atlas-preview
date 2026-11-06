@@ -179,7 +179,7 @@
       var ready = got === n;
       return '<article class="card card-trophy card-secret is-locked" aria-label="Personnage secret, ' + got + ' fragments sur ' + n + '"><div class="card-inner">' +
         '<div class="card-art">' + art + '<div class="sp-grid" style="--cols:' + cols + '">' + tiles + '</div>' + (ready ? '<span class="card-flag is-first">Prêt à révéler</span>' : '') + '</div>' +
-        '<div class="card-body"><div class="card-row"><h3 class="card-name">? ? ?</h3><span class="card-serial">' + got + ' / ' + n + '</span></div>' +
+        '<div class="card-body"><div class="card-row"><h3 class="card-name">' + (A.store.SHOW_SECRETS ? U.esc(sc.name) : '? ? ?') + '</h3><span class="card-serial">' + got + ' / ' + n + '</span></div>' +
           '<div class="card-row card-sub"><span class="card-title">' + (ready ? 'Récupérez la récompense pour le révéler' : 'Personnage secret · ' + got + ' fragment' + (got > 1 ? 's' : '') + ' sur ' + n) + '</span></div>' +
           '<div class="card-row card-foot"><span class="card-stats"><span>ATQ<b>?</b></span><span>DÉF<b>?</b></span><span>ESP<b>?</b></span></span><span class="card-rar"><i></i>Secret</span></div></div></div></article>';
     }
@@ -374,7 +374,7 @@
         '<div class="ed-tabs" role="tablist">' + tabs + '</div>' +
         '<p class="placeholder-note">' + U.icon('sparkle') + 'Illustration provisoire — emplacement remplaçable</p>' +
       '</div>' +
-      (more && ch.lore ? loreHTML(ch, coll) :
+      (more && (ch.lore || ch.more) ? loreHTML(ch, coll) :
       '<div class="detail-info">' +
         '<p class="eyebrow">' + U.esc(coll.family) + ' · ' + U.esc(coll.name) + '</p>' +
         '<h2 class="detail-name">' + U.esc(ch.name) + '</h2>' +
@@ -402,8 +402,47 @@
   /* « Voir plus » d’un personnage qui a une chronique (lore.js) : la colonne d’infos laisse place
      au récit complet, à ses repères et à ses liens avec les autres figures. */
   var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+  /* Chronique de chaque carte : écrite à la main (lore.js) quand elle existe, sinon composée
+     à partir de sa notice, de son « Voir plus », de ses liens et de ses duels. */
+  var LINKS = null;
+  function linkIndex() {
+    if (LINKS) return LINKS;
+    LINKS = {};
+    A.CHARS.forEach(function (c) {
+      [c.story || '', c.more || ''].join(' ').replace(/\[\[([a-z0-9:]+)/g, function (m, r) {
+        var o = charRef(c, r);
+        if (!o || o.id === c.id) return m;
+        (LINKS[c.id] = LINKS[c.id] || { out: {}, inn: {} }).out[o.id] = 1;
+        (LINKS[o.id] = LINKS[o.id] || { out: {}, inn: {} }).inn[c.id] = 1;
+        return m;
+      });
+    });
+    return LINKS;
+  }
+  function autoLore(ch, coll) {
+    var g = coll.group && A.GROUP[coll.group], ix = linkIndex()[ch.id] || { out: {}, inn: {} };
+    var ids = Object.keys(ix.out).concat(Object.keys(ix.inn).filter(function (k) { return !ix.out[k]; }));
+    var duel = (A.DUELS || []).filter(function (d) { return d.hero === ch.id || d.monster === ch.id; });
+    var autres = duel.map(function (d) {
+      var other = d.hero === ch.id ? d.monster : d.hero;
+      return { c: other.replace('-', ':'), rel: d.set === 'ragnarok' ? 'Adversaire au Ragnarök' : 'Adversaire en duel', note: d.title };
+    });
+    ids.forEach(function (id) {
+      if (autres.some(function (a) { return a.c === id.replace('-', ':'); })) return;
+      var o = A.CHAR[id], same = o.coll === ch.coll;
+      autres.push({ c: id.replace('-', ':'), rel: same ? (ix.out[id] ? 'Dans son histoire' : 'Le cite') : A.COLL[o.coll].name, note: o.bio });
+    });
+    var eds = ch.editions.map(function (r) { return A.R[r].label; }).join(', ');
+    return {
+      intro: ch.bio,
+      chapitres: [{ t: 'Son histoire', p: [ch.story || ch.bio] }].concat(ch.more ? [{ t: 'Pour aller plus loin', p: [ch.more] }] : []),
+      reperes: [['Collection', coll.name]].concat(g ? [['Collection globale', g.name]] : []).concat([
+        ['Titre', ch.title], ['Éditions', eds], ['Caractéristiques', 'ATQ ' + ch.atk + ' · DÉF ' + ch.def + ' · ESP ' + ch.esp]]),
+      autres: autres, linksTitle: 'Ses liens', autresTitle: autres.length ? 'Personnages liés' : ''
+    };
+  }
   function loreHTML(ch, coll) {
-    var L = ch.lore, n = L.chapitres.length;
+    var L = ch.lore || autoLore(ch, coll), n = L.chapitres.length;
     // Chapitres découpés en pages (un paragraphe par page) pour tenir sur un écran de téléphone
     var pages = [], starts = [];
     L.chapitres.forEach(function (c, ci) {
@@ -452,7 +491,7 @@
         }).join('') + '</div></li>' +
       '</ol>';
     }
-    var autres = (L.autres || []).length ? '<p class="lore-sub">Adversaires et liens indirects</p><ul class="lore-links">' + L.autres.map(function (it) {
+    var autres = (L.autres || []).length ? '<p class="lore-sub">' + (L.autresTitle || 'Adversaires et liens indirects') + '</p><ul class="lore-links">' + L.autres.map(function (it) {
       var o = charRef(ch, it.c);
       var name = o
         ? '<button type="button" class="lore-name is-in" data-bio-char="' + o.id + '">' + U.esc(o.name) + U.icon('arrow') + '</button>'
@@ -467,8 +506,8 @@
       '<p class="detail-title">' + U.esc(ch.title) + '</p>' +
       '<p class="lore-intro">' + bioHTML(ch, L.intro) + '</p>' +
       slider +
-      '<div class="lore-block"><p class="eyebrow">Arbre généalogique</p>' +
-        '<p class="lore-legend"><span class="tn is-in is-mini">Doré</span> dans la collection, touchez pour ouvrir sa fiche</p>' + tree + autres + '</div>' +
+      (tree || autres ? '<div class="lore-block"><p class="eyebrow">' + (L.linksTitle || 'Arbre généalogique') + '</p>' +
+        '<p class="lore-legend"><span class="tn is-in is-mini">Doré</span> dans la collection, touchez pour ouvrir sa fiche</p>' + tree + autres + '</div>' : '') +
       '<div class="lore-block"><p class="eyebrow">Repères</p>' + reperes + '</div>' +
       '<button type="button" class="lore-back is-end" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
     '</div>';
@@ -636,7 +675,7 @@
             if (act === 'bio-more') {
               cur.more = !cur.more; draw();
               var A0 = A.CHAR[A.ED[cur.ed].charId];
-              if (A0.lore) {
+              if (A0.lore || A0.more) {
                 var panel = el.closest('.modal-panel') || el, info = el.querySelector('.detail-info');
                 var single = window.matchMedia('(max-width: 900px)').matches;
                 var top = single && info ? info.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop - 8 : 0;
