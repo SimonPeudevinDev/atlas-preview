@@ -227,6 +227,30 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'live', popular: 30,
       tagline: 'Les plumes qui ont fait la langue et la littérature françaises.',
       description: 'De Molière à Zola, les auteurs qui ont fait rire, rêver et réfléchir des générations de lecteurs, et donné au français ses chefs-d’œuvre.'
+    },
+    {
+      id: 'kami', name: 'Les Kami', family: 'Le Japon', group: 'japon', universe: 'Mythologies', motif: 'torii',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Les divinités du shintoïsme, du soleil aux tempêtes.',
+      description: 'Amaterasu, Susanoo, Izanagi et Izanami : les dieux qui ont créé l’archipel et dont descend, selon la tradition, la famille impériale.'
+    },
+    {
+      id: 'yokai', name: 'Les Yōkai', family: 'Le Japon', group: 'japon', universe: 'Mythologies', motif: 'torii',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Renards à neuf queues, démons et parapluies hantés.',
+      description: 'Les esprits et créatures du folklore japonais, tour à tour farceurs, effrayants ou bienveillants, qui peuplent les rivières, les montagnes et les vieilles maisons.'
+    },
+    {
+      id: 'samourais', name: 'Les Samouraïs', family: 'Le Japon', group: 'japon', universe: 'Histoire', motif: 'pagoda',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'Les plus grands guerriers et seigneurs de guerre du Japon.',
+      description: 'De la guerre de Genpei à l’unification du pays, les samouraïs, moines guerriers et daimyō dont les exploits ont fait la légende du Japon.'
+    },
+    {
+      id: 'epoques', name: 'Les Grandes Époques', family: 'Le Japon', group: 'japon', universe: 'Histoire', motif: 'pagoda',
+      edition: 'Édition I', status: 'live', popular: 30,
+      tagline: 'De la préhistoire Jōmon au Japon moderne de l’ère Meiji.',
+      description: 'Les grandes périodes de l’histoire japonaise, de la cour raffinée de Heian à la grande paix d’Edo, chacune avec ses arts, ses guerriers et ses chefs-d’œuvre.'
     }
   ];
 
@@ -316,11 +340,15 @@ window.ATLAS = window.ATLAS || {};
     tagline: 'Souverains, présidents, héros, savants et écrivains : ceux qui ont façonné la France.',
     description: 'De la Gaule à la Ve République, les femmes et les hommes qui ont gouverné, défendu, inventé et raconté la France, en cinq sous-collections.'
   });
+  A.GROUPS.push({
+    id: 'japon', name: 'Le Japon', subs: ['kami', 'yokai', 'samourais', 'epoques'], title: 'Shōgun',
+    tagline: 'Kami, yōkai, samouraïs et grandes époques : le Japon des mythes et de l’histoire.',
+    description: 'Des dieux qui ont créé l’archipel aux esprits du folklore, des samouraïs légendaires aux grandes époques de son histoire : le Japon en quatre sous-collections.'
+  });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
   A.UPCOMING = [
-    { id: 'japon',  name: 'Kami & Yōkai',       family: 'Mythologie japonaise',  motif: 'torii',  date: 'Printemps 2027', desc: 'Esprits, divinités et créatures du folklore japonais.' },
     { id: 'explo',  name: 'Grands Explorateurs', family: 'Histoire',             motif: 'fjord',  date: 'Automne 2027',   desc: 'Navigateurs et voyageurs qui ont redessiné la carte du monde.' }
   ];
 
@@ -637,6 +665,47 @@ window.ATLAS = window.ATLAS || {};
       ['jverne', 'Jules Verne', 'Le Voyageur immobile', 60, 76, 98, 'BRELMU', 'Auteur des Voyages extraordinaires.'],
       ['hugo', 'Victor Hugo', 'Le Poète de la République', 58, 72, 97, 'BRE', 'Romancier, poète et dramaturge, voix de l’exil et de la liberté.']
     ],
+    kami: [
+      ['amaterasu', 'Amaterasu', 'La Déesse du soleil', 86, 90, 96, 'BRELMU', 'Déesse du soleil, ancêtre mythique de la famille impériale.'],
+      ['susanoo', 'Susanoo', 'Le Dieu des tempêtes', 96, 80, 70, 'BRELM', 'Dieu impétueux des tempêtes et de la mer.'],
+      ['tsukuyomi', 'Tsukuyomi', 'Le Dieu de la lune', 78, 84, 90, 'BREL', 'Dieu de la lune, frère d’Amaterasu.'],
+      ['izanagi', 'Izanagi', 'Le Dieu créateur', 84, 86, 92, 'BREL', 'Dieu créateur qui fit naître les îles du Japon.'],
+      ['izanami', 'Izanami', 'La Déesse créatrice', 80, 84, 92, 'BREL', 'Déesse créatrice, devenue reine du monde des morts.'],
+      ['raijin', 'Raijin', 'Le Dieu du tonnerre', 94, 82, 72, 'BREL', 'Dieu du tonnerre qui frappe ses tambours.'],
+      ['fujin', 'Fūjin', 'Le Dieu du vent', 90, 80, 74, 'BRE', 'Dieu du vent qui porte un sac rempli de tempêtes.'],
+      ['inari', 'Inari', 'Le Kami du riz', 72, 86, 94, 'BRELM', 'Kami du riz et de la prospérité, servi par des renards.']
+    ],
+    yokai: [
+      ['kitsune', 'Kitsune', 'Le Renard aux neuf queues', 82, 80, 98, 'BRELMU', 'Renard magique qui gagne de nouvelles queues en vieillissant.'],
+      ['tanuki', 'Tanuki', 'Le Farceur ventru', 70, 84, 86, 'BREL', 'Chien viverrin farceur, maître des déguisements.'],
+      ['kappa', 'Kappa', 'Le Diable des rivières', 80, 78, 72, 'BREL', 'Créature des rivières avec une coupelle d’eau sur la tête.'],
+      ['tengu', 'Tengu', 'Le Gardien des montagnes', 88, 82, 90, 'BRELM', 'Esprit ailé des montagnes, maître des arts martiaux.'],
+      ['yukionna', 'Yuki-onna', 'La Femme des neiges', 84, 86, 88, 'BREL', 'Fantôme glacé qui apparaît dans les tempêtes de neige.'],
+      ['oni', 'Oni', 'Le Démon cornu', 96, 88, 58, 'BRELMU', 'Démon cornu armé d’une massue de fer.'],
+      ['kasaobake', 'Kasa-obake', 'Le Parapluie hanté', 58, 66, 74, 'BRE', 'Vieux parapluie devenu vivant, avec un œil et une jambe.'],
+      ['rokurokubi', 'Rokurokubi', 'La Femme au long cou', 66, 74, 84, 'BRE', 'Femme dont le cou s’allonge la nuit.']
+    ],
+    samourais: [
+      ['yoshitsune', 'Minamoto no Yoshitsune', 'Le Héros tragique', 90, 82, 88, 'BRELMU', 'Brillant général de la guerre de Genpei.'],
+      ['benkei', 'Benkei', 'Le Moine guerrier', 94, 92, 70, 'BREL', 'Moine guerrier géant, fidèle serviteur de Yoshitsune.'],
+      ['tomoe', 'Tomoe Gozen', 'La Guerrière', 88, 80, 84, 'BREL', 'Femme samouraï célèbre pour sa bravoure.'],
+      ['shingen', 'Takeda Shingen', 'Le Tigre de Kai', 90, 88, 86, 'BREL', 'Seigneur de guerre célèbre pour sa cavalerie.'],
+      ['kenshin', 'Uesugi Kenshin', 'Le Dragon d’Echigo', 92, 86, 88, 'BREL', 'Seigneur guerrier, grand rival de Takeda Shingen.'],
+      ['nobunaga', 'Oda Nobunaga', 'Le Grand Unificateur', 92, 84, 92, 'BRELMU', 'Premier des trois unificateurs du Japon.'],
+      ['hideyoshi', 'Toyotomi Hideyoshi', 'Le Paysan devenu régent', 86, 84, 94, 'BRELM', 'Fils de paysan qui acheva l’unification du Japon.'],
+      ['ieyasu', 'Tokugawa Ieyasu', 'Le Fondateur d’Edo', 84, 92, 94, 'BRELMU', 'Fondateur du shogunat Tokugawa, qui régna plus de 250 ans.'],
+      ['musashi', 'Miyamoto Musashi', 'Le Maître des deux sabres', 98, 86, 90, 'BRELMU', 'Bretteur invaincu et auteur du Traité des cinq roues.']
+    ],
+    epoques: [
+      ['jomon', 'L’Époque Jōmon', 'Les Premiers Potiers', 60, 84, 80, 'BREL', 'Préhistoire japonaise, célèbre pour ses poteries.'],
+      ['nara', 'L’Époque de Nara', 'La Première Capitale', 66, 82, 88, 'BRE', 'Première capitale permanente, au VIIIe siècle.'],
+      ['heian', 'L’Époque de Heian', 'L’Âge d’or de la cour', 62, 80, 96, 'BRELM', 'Âge d’or de la cour impériale de Kyoto.'],
+      ['kamakura', 'L’Époque de Kamakura', 'Le Temps des shōguns', 88, 84, 80, 'BREL', 'Naissance du pouvoir des samouraïs et des shōguns.'],
+      ['muromachi', 'L’Époque de Muromachi', 'Le Temps du zen', 70, 80, 92, 'BRE', 'Époque des arts zen, du thé et du théâtre nō.'],
+      ['sengoku', 'L’Époque Sengoku', 'Les Provinces en guerre', 96, 80, 82, 'BRELM', 'Siècle de guerres entre seigneurs rivaux.'],
+      ['edo', 'L’Époque d’Edo', 'La Grande Paix', 72, 94, 92, 'BRELMU', 'Deux siècles et demi de paix sous les shōguns Tokugawa.'],
+      ['meiji', 'L’Ère Meiji', 'Le Japon moderne', 82, 86, 90, 'BRELM', 'Le Japon s’ouvre au monde et se modernise à grande vitesse.']
+    ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
       ['creature', 'La Créature', 'Née de Frankenstein', 92, 88, 64, 'BRELM', 'Assemblée et animée par Victor Frankenstein, elle cherche sa place parmi les hommes.'],
@@ -944,6 +1013,39 @@ window.ATLAS = window.ATLAS || {};
     'ecrivains-sand': 'Aurore Dupin prit le nom de George Sand pour publier ses romans, qui eurent un immense succès. Elle porta souvent des vêtements d’homme pour circuler plus librement dans Paris.',
     'ecrivains-zola': 'Dans les vingt romans des Rougon-Macquart, comme Germinal ou L’Assommoir, il peignit la société de son temps, des mines du Nord aux grands magasins parisiens.',
     'ecrivains-jverne': 'Né à Nantes en 1828, il écrivit une soixantaine de Voyages extraordinaires, où l’on croise le [[verne:nemo|capitaine Nemo]] ou [[verne:fogg|Phileas Fogg]].',
+    'kami-amaterasu': 'Née de l’œil gauche d’[[izanagi]] quand il se purifia, elle règne sur la Haute Plaine du Ciel. Selon la tradition, la famille impériale du Japon descend d’elle.',
+    'kami-susanoo': 'Né du nez d’[[izanagi]], ce dieu violent et capricieux sema le chaos dans le ciel de sa sœur [[amaterasu]], qui finit par le faire chasser.',
+    'kami-tsukuyomi': 'Né de l’œil droit d’[[izanagi]], il règne sur la nuit, tandis que sa sœur [[amaterasu]] règne sur le jour.',
+    'kami-izanagi': 'Avec son épouse [[izanami]], il se tint sur le pont flottant du ciel et plongea une lance ornée de joyaux dans l’océan. Les gouttes qui en tombèrent formèrent la première île.',
+    'kami-izanami': 'Épouse d’[[izanagi]], elle donna naissance aux îles du Japon et à de nombreux dieux. Elle mourut brûlée en mettant au monde le dieu du feu.',
+    'kami-raijin': 'Entouré d’un cercle de tambours qu’il frappe pour faire gronder le tonnerre, ce dieu à l’allure de démon est souvent représenté aux côtés de son frère [[fujin]].',
+    'kami-fujin': 'Ce dieu à la peau verte porte sur ses épaules un grand sac d’où il libère les vents. Il forme avec [[raijin]] un duo redouté, qui garde l’entrée de nombreux temples.',
+    'kami-inari': 'Kami du riz, des récoltes et de la prospérité, il est honoré dans des dizaines de milliers de sanctuaires au Japon. Ses messagers sont des renards, les [[yokai:kitsune|kitsune]].',
+    'yokai-kitsune': 'Ce renard rusé maîtrise la métamorphose et prend souvent l’apparence d’une belle jeune femme. Plus il vieillit, plus il gagne de queues et de pouvoirs, jusqu’à neuf.',
+    'yokai-tanuki': 'Inspiré d’un vrai animal, le chien viverrin, ce yōkai jovial adore les farces et se transforme en objets, en moines ou en humains pour duper les passants.',
+    'yokai-kappa': 'Mi-tortue, mi-enfant, ce yōkai vit dans les rivières et les étangs, où il entraîne les imprudents. Il porte sur le crâne une coupelle remplie d’eau, qui lui donne sa force.',
+    'yokai-tengu': 'Ces esprits des montagnes ont des ailes et un long nez rouge, ou un bec d’oiseau pour les plus anciens. Fiers et redoutables, ils punissent les moines orgueilleux.',
+    'yokai-yukionna': 'Grande, pâle et vêtue de blanc, elle apparaît aux voyageurs perdus dans les tempêtes de neige. Son souffle glacé peut les geler sur place.',
+    'yokai-oni': 'Ce démon à la peau rouge ou bleue, aux cornes et aux crocs acérés, brandit une massue de fer hérissée de pointes. Il tourmente les âmes des méchants dans les enfers bouddhiques.',
+    'yokai-kasaobake': 'Selon la croyance, les objets qui atteignent cent ans prennent vie et deviennent des tsukumogami. Le plus célèbre est ce vieux parapluie de papier doté d’un œil, d’une longue langue et d’une seule jambe.',
+    'yokai-rokurokubi': 'Le jour, elle ressemble à une femme ordinaire. Mais la nuit, pendant son sommeil, son cou s’étire démesurément et sa tête part errer dans la maison.',
+    'samourais-yoshitsune': 'Ce jeune général mena le clan Minamoto à la victoire contre les Taira, lors de la bataille navale de Dan-no-ura, en 1185. Il était accompagné de son fidèle compagnon, le moine guerrier [[benkei]].',
+    'samourais-benkei': 'Selon la légende, ce moine géant désarmait chaque guerrier qui traversait le pont Gojō, à Kyoto, et avait réuni 999 sabres. Son millième adversaire, le jeune [[yoshitsune]], le vainquit : Benkei devint son serviteur.',
+    'samourais-tomoe': 'Archère et cavalière redoutable, elle combattit aux côtés du général Minamoto no Yoshinaka pendant la guerre de Genpei, à la fin du XIIe siècle.',
+    'samourais-shingen': 'Seigneur de la province de Kai, il fut l’un des plus redoutables chefs de l’époque [[epoques:sengoku|Sengoku]]. Sa bannière portait une devise tirée de Sun Tzu : rapide comme le vent, calme comme la forêt, ardent comme le feu, immobile comme la montagne.',
+    'samourais-kenshin': 'Seigneur de la province d’Echigo, ce chef de guerre bouddhiste se disait protégé du dieu de la guerre Bishamonten. Il est célèbre pour sa rivalité chevaleresque avec [[shingen]].',
+    'samourais-nobunaga': 'Seigneur ambitieux et novateur, il commença l’unification du Japon déchiré par les guerres. À la bataille de Nagashino, en 1575, ses arquebusiers tirant par salves écrasèrent la cavalerie du clan Takeda.',
+    'samourais-hideyoshi': 'Né dans une famille de paysans, il gravit tous les échelons au service de [[nobunaga]], dont il devint le meilleur général. Après sa mort, il acheva l’unification du Japon en 1590.',
+    'samourais-ieyasu': 'Patient allié puis rival des deux autres unificateurs, il remporta la bataille décisive de Sekigahara en 1600 et devint shōgun en 1603. Il installa son gouvernement à Edo, l’actuelle Tokyo.',
+    'samourais-musashi': 'Ce rōnin, un samouraï sans maître, affirma avoir remporté plus de soixante duels sans jamais perdre. Il mit au point un style de combat à deux sabres.',
+    'epoques-jomon': 'Pendant plus de dix mille ans, jusqu’au Ier millénaire av. J.-C., des chasseurs-cueilleurs peuplèrent l’archipel. Leurs poteries comptent parmi les plus anciennes du monde.',
+    'epoques-nara': 'En 710, la cour impériale s’installa à Nara, bâtie sur le modèle de la capitale chinoise. Le bouddhisme y devint une religion d’État.',
+    'epoques-heian': 'De 794 à 1185, la cour impériale siégea à Heian-kyō, l’actuelle Kyoto. Les nobles y cultivaient la poésie, la calligraphie et le raffinement.',
+    'epoques-kamakura': 'Après la victoire de [[samourais:yoshitsune|Yoshitsune]] sur les Taira, son demi-frère Minamoto no Yoritomo devint en 1192 shōgun et installa un gouvernement militaire à Kamakura.',
+    'epoques-muromachi': 'De 1336 à 1573, les shōguns Ashikaga gouvernèrent depuis le quartier de Muromachi, à Kyoto. Leur pouvoir s’affaiblit peu à peu face aux seigneurs locaux.',
+    'epoques-sengoku': 'De la fin du XVe siècle à la fin du XVIe, le Japon se déchira en guerres incessantes entre seigneurs, les daimyō, comme [[samourais:shingen|Takeda Shingen]] et [[samourais:kenshin|Uesugi Kenshin]].',
+    'epoques-edo': 'De 1603 à 1868, les shōguns Tokugawa, héritiers d’[[samourais:ieyasu|Ieyasu]], gouvernèrent depuis Edo, l’actuelle Tokyo, devenue l’une des plus grandes villes du monde. Le pays vécut en paix, presque fermé aux étrangers.',
+    'epoques-meiji': 'En 1868, le jeune empereur Meiji retrouva le pouvoir, et Edo, rebaptisée Tokyo, devint la capitale. En quelques décennies, le Japon se dota de chemins de fer, d’usines, d’une armée moderne et d’une constitution.',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -1236,6 +1338,39 @@ window.ATLAS = window.ATLAS || {};
     'ecrivains-sand': 'Elle vécut une longue histoire avec le compositeur Frédéric Chopin et correspondit avec les plus grands écrivains de son temps. Sa maison de Nohant, dans le Berry, où elle écrivit La Mare au diable, se visite encore.',
     'ecrivains-zola': 'En 1898, il publia « J’accuse… ! », une lettre ouverte au président de la République pour défendre le capitaine Dreyfus, condamné à tort. Il dut s’exiler en Angleterre. Il mourut en 1902, asphyxié chez lui par sa cheminée.',
     'ecrivains-jverne': 'Il travaillait à partir d’une abondante documentation scientifique, au point que ses romans semblent annoncer le sous-marin, l’hélicoptère ou le voyage vers la Lune. Il est l’un des auteurs les plus traduits au monde. Il mourut à Amiens en 1905.',
+    'kami-amaterasu': 'Offensée par son frère [[susanoo]], elle se cacha dans une grotte, plongeant le monde dans la nuit. Les dieux l’en firent sortir en riant et en dansant devant l’entrée, et en plaçant un miroir où elle vit son propre éclat. Ce miroir serait l’un des trois trésors sacrés de l’empereur, conservé au sanctuaire d’Ise.',
+    'kami-susanoo': 'Exilé sur terre, à Izumo, il terrassa le serpent à huit têtes Yamata no Orochi après l’avoir enivré avec du saké. Dans la queue du monstre, il trouva l’épée Kusanagi, qu’il offrit à sa sœur pour se réconcilier avec elle.',
+    'kami-tsukuyomi': 'Envoyé auprès de la déesse de la nourriture, il la tua, dégoûté de la voir produire les mets par sa bouche. Furieuse, Amaterasu refusa de le revoir : c’est pourquoi, dit-on, le soleil et la lune ne se montrent jamais ensemble.',
+    'kami-izanagi': 'Après la mort d’Izanami, il descendit la chercher au pays des morts, mais s’enfuit en voyant son corps en décomposition. En se purifiant dans une rivière à son retour, il donna naissance à [[amaterasu]], [[tsukuyomi]] et [[susanoo]].',
+    'kami-izanami': 'Furieuse d’avoir été vue dans son corps de morte, elle poursuivit Izanagi jusqu’à la sortie du Yomi, le monde des morts, qu’il ferma d’un énorme rocher. Elle jura de faire mourir mille humains chaque jour ; il répondit qu’il en ferait naître mille cinq cents.',
+    'kami-raijin': 'Les parents disaient aux enfants de cacher leur nombril pendant les orages, car Raijin aimait, paraît-il, les dévorer. Les célèbres paravents de Tawaraya Sōtatsu, au XVIIe siècle, montrent Raijin et Fūjin face à face.',
+    'kami-fujin': 'Les deux dieux montent la garde au temple Sanjūsangen-dō, à Kyoto. On raconte que des vents divins, les kamikaze, sauvèrent le Japon des invasions mongoles de 1274 et 1281.',
+    'kami-inari': 'Son grand sanctuaire, le Fushimi Inari-taisha de Kyoto, est célèbre pour ses milliers de portails torii rouges offerts par des fidèles, qui forment des tunnels sur la montagne. On dépose devant les statues de renards du tofu frit, leur mets préféré.',
+    'yokai-kitsune': 'Certains kitsune sont bienveillants, comme les messagers du kami [[kami:inari|Inari]] ; d’autres sont des farceurs ou de redoutables séducteurs. On dit qu’un kitsune déguisé se trahit par son reflet ou par l’ombre de sa queue.',
+    'yokai-tanuki': 'Ses statues, coiffées d’un chapeau de paille et tenant une bouteille de saké, accueillent les clients devant de nombreux restaurants : il porte bonheur aux commerces. Dans un conte célèbre, un tanuki se change en bouilloire qui danse.',
+    'yokai-kappa': 'Il est très poli : si on le salue, il s’incline à son tour, renverse l’eau de sa tête et perd ses forces. Il adore les concombres, d’où le nom des makis au concombre, les kappamaki.',
+    'yokai-tengu': 'Selon la légende, un roi des tengu enseigna le maniement du sabre au jeune [[samourais:yoshitsune|Minamoto no Yoshitsune]] sur le mont Kurama, près de Kyoto. On les représente souvent avec un éventail de plumes qui déclenche des tempêtes.',
+    'yokai-yukionna': 'Dans un récit recueilli par Lafcadio Hearn en 1904, elle épargne un jeune bûcheron à condition qu’il ne parle jamais d’elle. Des années plus tard, il raconte l’histoire à son épouse… qui n’est autre que Yuki-onna.',
+    'yokai-oni': 'Au festival de Setsubun, début février, les familles lancent des graines de soja en criant « Les démons dehors, le bonheur dedans ! ». Dans le conte de Momotarō, un garçon né d’une pêche part vaincre les oni avec un chien, un singe et un faisan.',
+    'yokai-kasaobake': 'Il sautille et effraie plus qu’il ne fait de mal. Ces yōkai rappelaient qu’il faut respecter les objets et ne pas les jeter sans égard. Ils figurent sur les rouleaux illustrés et les jeux de l’époque d’[[epoques:edo|Edo]].',
+    'yokai-rokurokubi': 'Souvent, elle ignore elle-même qu’elle est un yōkai. Une variante, le nukekubi, a une tête qui se détache entièrement du corps pour s’envoler. Ces récits furent popularisés en Occident par Lafcadio Hearn.',
+    'samourais-yoshitsune': 'Jaloux de sa gloire, son demi-frère Yoritomo, devenu shōgun, le fit traquer. Encerclé, Yoshitsune se donna la mort en 1189. Selon la légende, il avait appris le sabre auprès des [[yokai:tengu|tengu]] du mont Kurama.',
+    'samourais-benkei': 'Lors du dernier combat de son maître, il aurait défendu seul la porte, criblé de flèches, et serait mort debout. Au Japon, on appelle encore le tibia « l’endroit où pleure Benkei ».',
+    'samourais-tomoe': 'Le Dit des Heike la décrit comme une guerrière d’une force rare, capable d’affronter seule des cavaliers ennemis. Son existence historique reste discutée, mais elle est devenue une figure populaire du théâtre et des estampes.',
+    'samourais-shingen': 'Il affronta cinq fois son grand rival [[kenshin]] à Kawanakajima. Un jour où Shingen manquait de sel, Kenshin lui en aurait fait parvenir, disant qu’il combattait avec le sabre, non avec le sel. Shingen mourut en 1573, sans doute de maladie.',
+    'samourais-kenshin': 'Selon la légende, lors de la quatrième bataille de Kawanakajima, en 1561, il chargea seul jusqu’à la tente de Shingen, qui para son sabre avec son éventail de commandement. Il mourut en 1578.',
+    'samourais-nobunaga': 'Il accueillit les missionnaires portugais et prit à son service Yasuke, un homme venu d’Afrique. Trahi par l’un de ses généraux, il mourut en 1582 dans l’incendie du temple Honnō-ji, à Kyoto, sans avoir achevé son œuvre, que poursuivit [[hideyoshi]].',
+    'samourais-hideyoshi': 'Il fit désarmer les paysans lors de la « chasse aux sabres » et sépara strictement guerriers et paysans. Il fit bâtir le château d’Osaka. Ses invasions de la Corée, en 1592 et 1597, se soldèrent par un échec.',
+    'samourais-ieyasu': 'Ses descendants gouvernèrent le Japon pendant plus de deux siècles et demi de paix, l’époque d’[[epoques:edo|Edo]]. On résume parfois les trois unificateurs ainsi : Nobunaga a pétri le gâteau, Hideyoshi l’a cuit, et Ieyasu l’a mangé.',
+    'samourais-musashi': 'Son duel le plus célèbre l’opposa en 1612 à Sasaki Kojirō, sur l’île de Ganryūjima : arrivé en retard, il le vainquit avec un sabre de bois taillé dans une rame. À la fin de sa vie, il écrivit le Traité des cinq roues, encore lu aujourd’hui, et fut aussi un peintre réputé.',
+    'epoques-jomon': 'Leur nom, « Jōmon », signifie « marques de cordes », d’après les motifs imprimés dans l’argile. Ils façonnaient aussi d’étranges statuettes, les dogū, aux grands yeux en forme de lunettes.',
+    'epoques-nara': 'Le temple Tōdai-ji abrite un bouddha de bronze haut d’une quinzaine de mètres, fondu au VIIIe siècle. C’est aussi à cette époque que furent rédigés le Kojiki et le Nihon shoki, qui racontent les mythes d’[[kami:amaterasu|Amaterasu]] et d’[[kami:izanagi|Izanagi]].',
+    'epoques-heian': 'Une dame de la cour, Murasaki Shikibu, y écrivit vers l’an 1000 le Dit du Genji, souvent présenté comme le premier roman du monde. Les kana, l’écriture propre au japonais, se développèrent à cette époque.',
+    'epoques-kamakura': 'Les samouraïs dominèrent désormais le pays, laissant à l’empereur un rôle surtout symbolique. Le Japon repoussa deux invasions mongoles, en 1274 et 1281, aidé par des typhons que l’on appela kamikaze, les « vents divins ». Le grand bouddha de Kamakura date de cette époque.',
+    'epoques-muromachi': 'C’est pourtant une grande époque de création : le théâtre nō, la cérémonie du thé, les jardins zen et l’art floral y prirent leur forme. Le Pavillon d’or, le Kinkaku-ji, fut bâti à la fin du XIVe siècle.',
+    'epoques-sengoku': 'Les Portugais, arrivés en 1543, apportèrent les premières arquebuses, qui changèrent la guerre. Trois grands chefs, [[samourais:nobunaga|Oda Nobunaga]], [[samourais:hideyoshi|Toyotomi Hideyoshi]] et [[samourais:ieyasu|Tokugawa Ieyasu]], réunifièrent finalement le pays.',
+    'epoques-edo': 'Les villes virent fleurir le théâtre kabuki, les estampes ukiyo-e et les haïkus de Bashō. La célèbre Grande Vague de Kanagawa, d’Hokusai, date de cette époque. En 1853, les « navires noirs » du commodore américain Perry forcèrent le Japon à s’ouvrir.',
+    'epoques-meiji': 'Les samouraïs perdirent leurs privilèges et le droit de porter le sabre. La révolte de Satsuma, menée en 1877 par Saigō Takamori, fut leur dernier combat. L’ère Meiji s’acheva à la mort de l’empereur, en 1912.',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -1332,7 +1467,7 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans', 'presidents', 'herosfr', 'savants', 'ecrivains'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans', 'presidents', 'herosfr', 'savants', 'ecrivains', 'kami', 'yokai', 'samourais', 'epoques'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,

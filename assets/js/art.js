@@ -211,6 +211,17 @@
       o += poly([[cx - 160 * s, gy], [cx - 90 * s, gy - 16 * s], [cx + 20 * s, gy - 10 * s], [cx + 160 * s, gy - 18 * s], [cx + 160 * s, gy]]);
       return o;
     },
+    // Japon : château à toits superposés sur sa base de pierre
+    pagoda: function (cx, gy, s, m) {
+      var o = poly([[cx - 52 * s, gy], [cx - 44 * s, gy - 26 * s], [cx + 44 * s, gy - 26 * s], [cx + 52 * s, gy]]);
+      var y = gy - 26 * s, w = 40 * s;
+      for (var i = 0; i < 4; i++) {
+        o += rect(cx - w * 0.8, y - 14 * s, w * 1.6, 14 * s);
+        o += '<path d="M' + f(cx - w * 1.25) + ',' + f(y - 12 * s) + ' Q' + f(cx) + ',' + f(y - 26 * s) + ' ' + f(cx + w * 1.25) + ',' + f(y - 12 * s) + ' L' + f(cx + w * 0.9) + ',' + f(y - 20 * s) + ' L' + f(cx - w * 0.9) + ',' + f(y - 20 * s) + ' Z"/>';
+        y -= 20 * s; w *= 0.78;
+      }
+      return o + rect(cx - 1.5 * s, y - 12 * s, 3 * s, 12 * s);
+    },
     // Astronautes : une fusée sur son pas de tir
     rocket: function (cx, gy, s, m) {
       var o = '', b = gy - 4 * s;

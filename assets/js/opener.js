@@ -938,11 +938,26 @@
       if (!c || !c.el.contains(e.target)) return;
       sw = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now(), v: 0, c: c, shown: c.state === 'shown', moved: false, ox: c.st.x, oy: c.st.y };
       try { stack.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      // Appui long : la petite description du personnage s’affiche sur la carte
+      if (sw.shown) { var s0 = sw; s0.holdT = setTimeout(function () { if (sw === s0 && !s0.moved) { s0.held = true; showInfo(c, true); } }, 420); }
     });
+    function showInfo(c, on) {
+      var box = c.el.querySelector('.rv-info');
+      if (on && !box) {
+        var ch = A.CHAR[c.ed.charId];
+        box = document.createElement('div');
+        box.className = 'rv-info';
+        box.innerHTML = '<p class="rv-info-k">' + U.esc(A.COLL[ch.coll].name) + '</p><p class="rv-info-n">' + U.esc(ch.name) + '</p><p class="rv-info-t">' + U.esc(ch.title) + '</p><p class="rv-info-b">' + U.esc(ch.bio) + '</p>';
+        c.el.querySelector('.rv-front').appendChild(box);
+      }
+      if (box) { void box.offsetWidth; box.classList.toggle('is-on', on); }
+      if (on) A.haptic(6);
+    }
     stack.addEventListener('pointermove', function (e) {
       if (!sw) return;
       var dx = e.clientX - sw.x, dy = e.clientY - sw.y, c = sw.c;
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) sw.moved = true;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) { sw.moved = true; clearTimeout(sw.holdT); }
+      if (sw.held) return;                                // appui long en cours : la carte ne bouge pas
       if (!sw.shown || !sw.moved) return;
       if (c.state !== 'drag') unveilNext();
       c.state = 'drag';
@@ -960,13 +975,16 @@
       if (!sw) return;
       var s = sw; sw = null;
       var dx = e.clientX - s.x, c = s.c;
+      clearTimeout(s.holdT);
+      if (s.held) { showInfo(c, false); return; }          // fin de l’appui long : on cache la description
       if (!s.shown) return;
       if (Math.abs(dx) > 90 || (Math.abs(dx) > 30 && Math.abs(s.v) > 0.55)) throwOut(c, dx > 0 ? 1 : -1, s.v);
       else if (!s.moved) collect(c);
       else { c.state = 'shown'; }                        // le ressort la ramène au centre
     }
     stack.addEventListener('pointerup', endSwipe);
-    stack.addEventListener('pointercancel', function () { if (sw) { if (sw.c.state === 'drag') sw.c.state = 'shown'; sw = null; } });
+    stack.addEventListener('pointercancel', function () { if (sw) { clearTimeout(sw.holdT); if (sw.held) showInfo(sw.c, false); if (sw.c.state === 'drag') sw.c.state = 'shown'; sw = null; } });
+    stack.addEventListener('contextmenu', function (e) { if (phase === 'reveal') e.preventDefault(); });
 
     el.addEventListener('click', function (e) {
       if (e.target.closest('[data-close]')) { close(); return; }

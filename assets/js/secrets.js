@@ -143,6 +143,26 @@
       bio: 'Immense dictionnaire raisonné des sciences et des arts, dirigé par Diderot et d’Alembert au XVIIIe siècle.',
       more: 'Publiée de 1751 à 1772 en dix-sept volumes de texte et onze de planches, elle rassemblait le savoir de son temps, avec la participation de [[voltaire]]. Interdite à plusieurs reprises, elle diffusa les idées des Lumières dans toute l’Europe.'
     },
+    kami: {
+      name: 'Yamata no Orochi', title: 'Le Serpent à huit têtes', atk: 97, def: 92, esp: 66,
+      bio: 'Serpent géant à huit têtes et huit queues, si long qu’il couvrait huit vallées et huit collines.',
+      more: 'Il dévorait chaque année l’une des filles d’un vieux couple. [[susanoo]] l’enivra avec huit cuves de saké avant de le découper. Dans l’une de ses queues, il trouva l’épée Kusanagi, l’un des trois trésors sacrés du Japon.'
+    },
+    yokai: {
+      name: 'Tamamo-no-Mae', title: 'La Renarde impériale', atk: 80, def: 86, esp: 99,
+      bio: 'Courtisane d’une beauté et d’une intelligence sans égales, qui était en réalité un [[kitsune]] à neuf queues.',
+      more: 'Selon la légende, elle ensorcela l’empereur Toba au XIIe siècle, qui tomba gravement malade. Démasquée par un astrologue, elle s’enfuit et fut tuée, puis changée en une pierre empoisonnée, la Sesshō-seki. En 2022, cette pierre se fendit en deux, ce qui fit grand bruit au Japon.'
+    },
+    samourais: {
+      name: 'Les 47 Rōnin', title: 'Les Vengeurs loyaux', atk: 92, def: 90, esp: 88,
+      bio: 'Quarante-sept samouraïs devenus sans maître, qui vengèrent leur seigneur au début du XVIIIe siècle.',
+      more: 'Leur seigneur, Asano, avait été condamné à mort pour avoir blessé un haut fonctionnaire, Kira, dans le château d’Edo. Pendant près de deux ans, les rōnin feignirent la débauche pour endormir la méfiance, puis attaquèrent la demeure de Kira. Leurs tombes, au temple Sengaku-ji de Tokyo, reçoivent encore des visiteurs chaque jour.'
+    },
+    epoques: {
+      name: 'Le Mont Fuji', title: 'La Montagne sacrée', atk: 70, def: 99, esp: 90,
+      bio: 'Volcan de 3 776 mètres, plus haut sommet du Japon et symbole du pays.',
+      more: 'Montagne sacrée du shintoïsme, il est gravi par des pèlerins depuis des siècles. Hokusai lui consacra une série célèbre, les Trente-six vues du mont Fuji. Sa dernière éruption remonte à 1707, en pleine époque d’[[edo]].'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',
