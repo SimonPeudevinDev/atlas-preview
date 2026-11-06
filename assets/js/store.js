@@ -1,0 +1,376 @@
+/* ==========================================================================
+   ATLAS — Couche « serveur » simulée
+   --------------------------------------------------------------------------
+   Dans le prototype, l’état est stocké dans le navigateur (localStorage).
+   Le découpage reprend l’architecture visée en phase 2, où chaque service
+   deviendra une API serveur exécutée dans une transaction SQL atomique :
+
+     Catalog     → collections, personnages, éditions (lecture seule)
+     Mint        → stock, numéros de série (tirage côté serveur)
+     Inventory   → propriété des exemplaires + provenance
+     Wallet      → solde + grand livre (ledger) en monnaie fictive
+     Market      → annonces, séquestre (escrow), ventes
+   ========================================================================== */
+(function (A) {
+  'use strict';
+  var KEY = 'atlas-demo-v1';
+  var S = A.store = {};
+  /* Mode test : Éclats illimités (rien n’est débité, le grand livre reste tenu). Passer à false pour revenir au solde réel. */
+  S.UNLIMITED = true;
+  /* Mode test : toutes les éditions débloquées (un exemplaire de chaque rareté pour chaque personnage). Passer à false pour revenir à l’inventaire normal. */
+  S.UNLOCK_ALL = true;
+  var state = null;
+  var listeners = [];
+
+  /* ---------- Utilitaires ---------- */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  A.rng = rng;
+  var DAY = 86400000;
+  function uid(prefix) { return (prefix || 'x') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function todayKey(d) { d = d || new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+
+  function load() { try { var raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) { /* stockage indisponible */ } return null; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* mode privé : l’état reste en mémoire */ } }
+  function emit() { save(); listeners.forEach(function (fn) { try { fn(state); } catch (e) { console.error(e); } }); }
+  S.on = function (fn) { listeners.push(fn); };
+
+  /* ---------- Mint : stock et numéros ---------- */
+  function minted(ed) { var m = state.minted[ed.id]; return m == null ? ed.minted0 : m; }
+  function remaining(ed) { return ed.supply == null ? Infinity : Math.max(0, ed.supply - minted(ed)); }
+  S.minted = function (edId) { return minted(A.ED[edId]); };
+  S.remaining = function (edId) { return remaining(A.ED[edId]); };
+
+  // Attribue un numéro déjà en circulation (données de démo uniquement)
+  function takeExistingSerial(ed, r) {
+    if (ed.supply == null) return null;
+    var used = state.used[ed.id] || (state.used[ed.id] = []);
+    var max = minted(ed);
+    if (max <= used.length) return null;
+    for (var tries = 0; tries < 200; tries++) {
+      var n = 1 + Math.floor(r() * max);
+      if (used.indexOf(n) === -1) { used.push(n); return n; }
+    }
+    return null;
+  }
+  // Émet un nouvel exemplaire (tirage booster) — opération atomique côté serveur en phase 2
+  function mintNew(ed) {
+    if (remaining(ed) <= 0) throw new Error('Stock épuisé : ' + ed.id);
+    var n = minted(ed) + 1;
+    state.minted[ed.id] = n;
+    if (ed.supply == null) return null;
+    (state.used[ed.id] || (state.used[ed.id] = [])).push(n);
+    return n;
+  }
+
+  function makeItem(edId, serial, src, at, histLabel) {
+    return { uid: uid('it'), ed: edId, serial: serial, at: at, fav: false, show: false, src: src, hist: [{ at: at, t: histLabel }] };
+  }
+
+  /* ---------- État initial de la démo ---------- */
+  function fresh() {
+    var now = Date.now();
+    state = {
+      v: 1, createdAt: now, eventEndsAt: now + 12 * DAY + 7 * 3600000,
+      user: { name: 'Vous', handle: 'collectionneur', level: 4 },
+      wallet: { balance: 2500 },
+      ledger: [{ id: uid('tx'), at: now, type: 'grant', amount: 2500, label: 'Dotation de bienvenue (démo)' }],
+      minted: {}, used: {},
+      inventory: [], listings: [], sales: [], offers: [],
+      lastDaily: null
+    };
+    var r = rng(A.hash('atlas-demo'));
+
+    // Inventaire de démonstration
+    var seed = [
+      ['grece-zeus-legendary', 18], 'grece-zeus-base', 'grece-zeus-base', 'grece-athena-rare', 'grece-hades-base',
+      'grece-poseidon-base', 'grece-meduse-epic', 'grece-apollon-base', 'grece-artemis-base',
+      'egypte-anubis-epic', 'egypte-ra-base', 'egypte-bastet-base', 'egypte-bastet-base', 'egypte-thot-rare', 'egypte-isis-base',
+      'gothique-dracula-rare', 'gothique-dracula-base', 'gothique-carmilla-base', 'gothique-dorian-base',
+      'contes-alice-rare', 'contes-alice-base', 'contes-peterpan-base', 'contes-cendrillon-base', 'contes-chatbotte-legendary',
+      'histoire-napoleon-base', 'histoire-degaulle-rare', 'histoire-jeanne-base', 'histoire-curie-base',
+      'nordique-loki-base'
+    ];
+    seed.forEach(function (s, i) {
+      var edId = Array.isArray(s) ? s[0] : s;
+      var ed = A.ED[edId];
+      var serial;
+      if (Array.isArray(s)) { serial = s[1]; (state.used[edId] || (state.used[edId] = [])).push(serial); }
+      else serial = takeExistingSerial(ed, r);
+      var at = now - (i * 1.7 + r() * 2) * DAY - 5 * DAY;
+      var src = ed.rarity === 'base' ? 'Booster quotidien' : 'Booster Atlas';
+      var it = makeItem(edId, serial, 'booster', at, 'Tirage — ' + src);
+      if (edId === 'grece-zeus-legendary') { it.fav = true; it.show = true; it.hist.unshift({ at: at + 3 * DAY, t: 'Exposée en vitrine' }); }
+      if (edId === 'egypte-anubis-epic' || edId === 'contes-chatbotte-legendary') { it.fav = true; it.show = true; }
+      if (edId === 'contes-alice-rare') it.fav = true;
+      state.inventory.push(it);
+    });
+
+    // Annonces de la marketplace (joueurs fictifs)
+    var numbered = A.EDITIONS.filter(function (e) { return e.rarity !== 'base' && e.rarity !== 'unique'; });
+    var bases = A.EDITIONS.filter(function (e) { return e.rarity === 'base'; });
+    var PRICE = { base: [18, 45], rare: [110, 280], epic: [360, 720], legendary: [1150, 2500], mythic: [3400, 6200], unique: [18000, 32000] };
+    function price(rid) { var p = PRICE[rid]; return Math.round((p[0] + r() * (p[1] - p[0])) / 5) * 5; }
+    var picks = [];
+    for (var i = 0; i < 30; i++) picks.push(numbered[Math.floor(r() * numbered.length)]);
+    for (var j = 0; j < 8; j++) picks.push(bases[Math.floor(r() * bases.length)]);
+    var uq = A.EDITIONS.filter(function (e) { return e.rarity === 'unique' && e.minted0 === 1; });
+    if (uq[0]) picks.push(uq[0]);
+    picks.push(A.ED['grece-zeus-mythic'], A.ED['nordique-thor-legendary'], A.ED['egypte-anubis-legendary']);
+    picks.forEach(function (ed) {
+      var serial = takeExistingSerial(ed, r);
+      if (ed.supply != null && serial == null) return;
+      state.listings.push({
+        id: uid('ls'), ed: ed.id, serial: serial, price: price(ed.rarity),
+        seller: A.DEMO_USERS[Math.floor(r() * A.DEMO_USERS.length)], at: now - r() * 6 * DAY, mine: false
+      });
+    });
+
+    // Historique des ventes (fictif)
+    for (var k = 0; k < 14; k++) {
+      var ed2 = numbered[Math.floor(r() * numbered.length)];
+      var s2 = takeExistingSerial(ed2, r);
+      if (s2 == null) continue;
+      var a = Math.floor(r() * A.DEMO_USERS.length), b = (a + 1 + Math.floor(r() * 8)) % A.DEMO_USERS.length;
+      state.sales.push({ id: uid('sl'), ed: ed2.id, serial: s2, price: price(ed2.rarity), from: A.DEMO_USERS[a], to: A.DEMO_USERS[b], at: now - (k * 0.35 + r() * 0.3) * DAY });
+    }
+    save();
+  }
+
+  S.init = function () {
+    state = load();
+    if (!state || state.v !== 1) fresh();
+    if (S.UNLOCK_ALL) unlockAll();
+    fillTestCopies();
+  };
+  // Mode test : complète certaines éditions jusqu’à N exemplaires (pour éprouver l’interface).
+  S.TEST_COPIES = { 'grece-zeus-base': 50 };
+  function fillTestCopies() {
+    var r = rng(A.hash('atlas-copies')), now = Date.now(), added = 0;
+    Object.keys(S.TEST_COPIES).forEach(function (edId) {
+      var ed = A.ED[edId]; if (!ed) return;
+      for (var n = S.ownedOf(edId).length; n < S.TEST_COPIES[edId]; n++) {
+        var serial = ed.supply == null ? null : (remaining(ed) > 0 ? mintNew(ed) : null);
+        if (ed.supply != null && serial == null) break;
+        state.inventory.push(makeItem(edId, serial, 'test', now - Math.floor(r() * 20 * DAY), 'Ajoutée (mode test)'));
+        added++;
+      }
+    });
+    if (added) save();
+  }
+  // Ajoute un exemplaire de chaque édition manquante (mode test)
+  function unlockAll() {
+    var r = rng(A.hash('atlas-unlock')), now = Date.now(), added = 0;
+    A.EDITIONS.forEach(function (ed) {
+      if (S.ownedOf(ed.id).length) return;
+      var serial = takeExistingSerial(ed, r);
+      if (serial == null && ed.supply != null && remaining(ed) > 0) serial = mintNew(ed);
+      state.inventory.push(makeItem(ed.id, serial, 'test', now - added * 60000, 'Débloquée (mode test)'));
+      added++;
+    });
+    if (added) save();
+  }
+  S.reset = function () { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } fresh(); emit(); };
+  S.get = function () { return state; };
+  // Profil : pseudo, identifiant, e-mail, préférences (démo, stocké localement).
+  S.updateUser = function (patch) {
+    Object.keys(patch).forEach(function (k) {
+      if (k === 'prefs') state.user.prefs = Object.assign({}, state.user.prefs || {}, patch.prefs);
+      else state.user[k] = patch[k];
+    });
+    emit();
+  };
+  S.ledger = function () { return state.ledger; };
+
+  /* ---------- Catalogue / inventaire ---------- */
+  S.items = function () { return state.inventory; };
+  S.item = function (u) { return state.inventory.find(function (i) { return i.uid === u; }); };
+  S.ownedOf = function (edId) { return state.inventory.filter(function (i) { return i.ed === edId; }); };
+  S.ownsChar = function (charId) { return state.inventory.some(function (i) { return A.ED[i.ed].charId === charId; }); };
+  S.bestOwned = function (charId) {
+    var best = null;
+    state.inventory.forEach(function (i) {
+      var e = A.ED[i.ed];
+      if (e.charId !== charId) return;
+      if (!best || A.R[e.rarity].rank > A.R[A.ED[best.ed].rarity].rank) best = i;
+    });
+    return best;
+  };
+  S.collectionProgress = function (cid) {
+    var chars = A.COLL[cid].chars;
+    var owned = chars.filter(function (c) { return S.ownsChar(c); }).length;
+    var eds = A.EDITIONS.filter(function (e) { return A.CHAR[e.charId].coll === cid; });
+    var edOwned = eds.filter(function (e) { return S.ownedOf(e.id).length > 0; }).length;
+    return { owned: owned, total: chars.length, edOwned: edOwned, edTotal: eds.length, pct: chars.length ? owned / chars.length : 0 };
+  };
+  S.toggleFav = function (u) { var it = S.item(u); if (it) { it.fav = !it.fav; emit(); } return it; };
+  S.toggleShow = function (u) {
+    var it = S.item(u); if (!it) return it;
+    it.show = !it.show;
+    it.hist.unshift({ at: Date.now(), t: it.show ? 'Exposée en vitrine' : 'Retirée de la vitrine' });
+    emit(); return it;
+  };
+
+  /* ---------- Boosters : probabilités et tirage ---------- */
+  function poolFor(pack) {
+    return A.EDITIONS.filter(function (e) { return pack.collections.indexOf(A.CHAR[e.charId].coll) !== -1; });
+  }
+  /* Taux réel = taux de référence × (stock restant / tirage total) pour chaque
+     rareté limitée. La part non attribuée revient à la rareté la plus basse
+     du tableau (Base, ou Rare pour un emplacement garanti). Les probabilités
+     baissent donc à mesure que les exemplaires sont distribués. */
+  S.packOdds = function (packId, guaranteed) {
+    var pack = A.PACK[packId];
+    var pool = poolFor(pack);
+    var odds = guaranteed ? pack.guarantee.odds : pack.odds;
+    var rows = A.RARITIES.filter(function (r) { return odds[r.id]; }).map(function (r) {
+      var eds = pool.filter(function (e) { return e.rarity === r.id; });
+      var row = { rarity: r.id, ref: odds[r.id], editions: eds.length };
+      if (r.supply == null) { row.remaining = null; row.total = null; row.ratio = 1; }
+      else {
+        row.total = eds.reduce(function (s, e) { return s + e.supply; }, 0);
+        row.remaining = eds.reduce(function (s, e) { return s + remaining(e); }, 0);
+        row.ratio = row.total ? row.remaining / row.total : 0;
+      }
+      row.p = row.ref * row.ratio;
+      return row;
+    });
+    var lost = rows.reduce(function (s, x) { return s + (x.ref - x.p); }, 0);
+    if (rows.length) rows[0].p += lost;
+    return rows;
+  };
+
+  S.balance = function () { return S.UNLIMITED ? Infinity : state.wallet.balance; };
+  S.dailyAvailable = function () { return state.lastDaily !== todayKey(); };
+  S.nextDailyIn = function () { var d = new Date(); d.setHours(24, 0, 0, 0); return d - Date.now(); };
+  S.eventRemaining = function () { return Math.max(0, state.eventEndsAt - Date.now()); };
+
+  S.canOpen = function (packId) {
+    var p = A.PACK[packId];
+    if (p.daily && !S.dailyAvailable()) return { ok: false, reason: 'Déjà ouvert' };
+    if (p.event && S.eventRemaining() <= 0) return { ok: false, reason: 'Événement terminé' };
+    if (!S.UNLIMITED && state.wallet.balance < p.price) return { ok: false, reason: 'Solde insuffisant' };
+    return { ok: true };
+  };
+
+  function pick(rows, x) {
+    var sum = rows.reduce(function (s, r) { return s + r.p; }, 0);
+    var t = x * sum;
+    for (var i = 0; i < rows.length; i++) { t -= rows[i].p; if (t <= 0) return rows[i].rarity; }
+    return rows[rows.length - 1].rarity;
+  }
+  function pickEdition(pool, rarity) {
+    var eds = pool.filter(function (e) { return e.rarity === rarity && remaining(e) > 0; });
+    if (!eds.length) return null;
+    if (rarity === 'base') return eds[Math.floor(Math.random() * eds.length)];
+    var total = eds.reduce(function (s, e) { return s + remaining(e); }, 0);
+    var t = Math.random() * total;
+    for (var i = 0; i < eds.length; i++) { t -= remaining(eds[i]); if (t <= 0) return eds[i]; }
+    return eds[eds.length - 1];
+  }
+
+  /* Ouverture d’un booster : vérification → débit → tirage → émission des
+     numéros → inscription à l’inventaire → écriture au grand livre.
+     En phase 2 : une seule transaction SQL (SERIALIZABLE) côté serveur. */
+  S.openPack = function (packId) {
+    var check = S.canOpen(packId);
+    if (!check.ok) return { ok: false, error: check.reason };
+    var pack = A.PACK[packId];
+    var pool = poolFor(pack);
+    var now = Date.now();
+    var items = [], seen = {};
+    for (var i = 0; i < pack.size; i++) {
+      var guaranteed = pack.guarantee && i === pack.size - 1;
+      var rows = S.packOdds(packId, guaranteed);
+      var rid = pack.fixed ? pack.fixed[i] : pick(rows, Math.random());
+      var ed = pickEdition(pool, rid), serial = undefined;
+      if (!ed && pack.fixed) {            // pack de test : rareté imposée même si le stock est épuisé (numéro fictif)
+        var any = pool.filter(function (e) { return e.rarity === rid; });
+        ed = any[Math.floor(Math.random() * any.length)];
+        if (ed) serial = ed.supply ? 1 + Math.floor(Math.random() * ed.supply) : null;
+      }
+      if (!ed) ed = pickEdition(pool, 'base');
+      if (serial === undefined) serial = mintNew(ed);
+      var it = makeItem(ed.id, serial, 'booster', now + i, 'Tirage — ' + pack.name);
+      it.isNew = !S.ownsChar(ed.charId) && !seen[ed.charId];
+      seen[ed.charId] = true;
+      items.push(it);
+    }
+    items.forEach(function (it) { var n = it.isNew; delete it.isNew; it._new = n; state.inventory.push(it); });
+    if (pack.price) {
+      if (!S.UNLIMITED) state.wallet.balance -= pack.price;
+      state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: -pack.price, label: pack.name });
+    }
+    if (pack.daily) state.lastDaily = todayKey();
+    emit();
+    return { ok: true, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
+  };
+  S.resetDaily = function () { state.lastDaily = null; emit(); };
+  S.grant = function (n) {
+    state.wallet.balance += n;
+    state.ledger.unshift({ id: uid('tx'), at: Date.now(), type: 'grant', amount: n, label: 'Crédit de démonstration' });
+    emit();
+  };
+
+  /* ---------- Marketplace (monnaie fictive) ---------- */
+  S.listings = function () { return state.listings; };
+  S.sales = function () { return state.sales; };
+  S.floor = function (edId) {
+    var l = state.listings.filter(function (x) { return x.ed === edId; });
+    return l.length ? Math.min.apply(null, l.map(function (x) { return x.price; })) : null;
+  };
+
+  S.buy = function (listingId) {
+    var idx = state.listings.findIndex(function (l) { return l.id === listingId; });
+    if (idx === -1) return { ok: false, error: 'Annonce introuvable ou déjà vendue' };
+    var l = state.listings[idx];
+    if (l.mine) return { ok: false, error: 'Vous ne pouvez pas acheter votre propre annonce' };
+    if (!S.UNLIMITED && state.wallet.balance < l.price) return { ok: false, error: 'Solde insuffisant' };
+    var now = Date.now();
+    state.listings.splice(idx, 1);
+    if (!S.UNLIMITED) state.wallet.balance -= l.price;
+    state.ledger.unshift({ id: uid('tx'), at: now, type: 'buy', amount: -l.price, label: 'Achat — ' + A.CHAR[A.ED[l.ed].charId].name });
+    var it = makeItem(l.ed, l.serial, 'market', now, 'Achetée sur la marketplace à ' + l.seller);
+    state.inventory.push(it);
+    state.sales.unshift({ id: uid('sl'), ed: l.ed, serial: l.serial, price: l.price, from: l.seller, to: state.user.name, at: now });
+    emit();
+    return { ok: true, item: it };
+  };
+
+  // Mise en vente : l’exemplaire quitte l’inventaire et passe en séquestre
+  S.list = function (itemUid, price) {
+    var idx = state.inventory.findIndex(function (i) { return i.uid === itemUid; });
+    if (idx === -1) return { ok: false, error: 'Carte introuvable' };
+    if (!(price > 0)) return { ok: false, error: 'Prix invalide' };
+    var it = state.inventory.splice(idx, 1)[0];
+    it.hist.unshift({ at: Date.now(), t: 'Mise en vente à ' + price + ' ' + A.CURRENCY.name });
+    state.listings.unshift({ id: uid('ls'), ed: it.ed, serial: it.serial, price: Math.round(price), seller: state.user.name, at: Date.now(), mine: true, escrow: it });
+    emit();
+    return { ok: true };
+  };
+  S.unlist = function (listingId) {
+    var idx = state.listings.findIndex(function (l) { return l.id === listingId && l.mine; });
+    if (idx === -1) return { ok: false };
+    var l = state.listings.splice(idx, 1)[0];
+    var it = l.escrow; it.hist.unshift({ at: Date.now(), t: 'Annonce retirée' });
+    state.inventory.push(it);
+    emit();
+    return { ok: true };
+  };
+  S.offer = function (listingId, amount) {
+    var l = state.listings.find(function (x) { return x.id === listingId; });
+    if (!l) return { ok: false, error: 'Annonce introuvable' };
+    if (!(amount > 0)) return { ok: false, error: 'Montant invalide' };
+    if (!S.UNLIMITED && amount > state.wallet.balance) return { ok: false, error: 'Montant supérieur à votre solde' };
+    state.offers.unshift({ id: uid('of'), listing: listingId, amount: Math.round(amount), at: Date.now(), status: 'en attente' });
+    emit();
+    return { ok: true };
+  };
+})(window.ATLAS);

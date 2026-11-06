@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS — Pistes de logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #F6F2EA; --surface: #FBF9F4; --ink: #1B1814; --ink-3: #8C8273; --line: #E4DCCB; --gold: #A1803F; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, sans-serif; padding: 40px clamp(16px, 4vw, 56px) 80px; }
+  h1 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 44px; margin: 0 0 6px; }
+  .sub { color: var(--ink-3); margin: 0 0 32px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+  .item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px 18px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .big { width: 130px; height: 130px; color: var(--gold); }
+  .row { display: flex; align-items: center; gap: 22px; }
+  .small { width: 26px; height: 26px; color: var(--gold); }
+  .word { display: inline-flex; align-items: center; gap: 11px; font-family: "Cormorant Garamond", serif; font-size: 23px; font-weight: 600; letter-spacing: .32em; }
+  .dark { background: #1B1814; color: #E9DFC8; padding: 8px 12px; border-radius: 8px; }
+  .dark .small { color: #D9B872; }
+  .label { font-size: 13px; color: var(--ink-3); text-align: center; }
+  .label b { display: block; color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<h1>Rose des vents — pistes</h1>
+<p class="sub">Chaque piste est montrée en grand, à la taille du header, et avec le nom (sur fond clair et sombre). Le n° 1 est le tout premier logo, à l’identique.</p>
+<div class="grid" id="grid"></div>
+<script>
+  // Toutes les pistes sont dessinées dans un carré de 32 × 32, couleur = currentColor.
+  var C = 16;
+  function pt(r, deg) { var a = (deg - 90) * Math.PI / 180; return [(C + r * Math.cos(a)).toFixed(2), (C + r * Math.sin(a)).toFixed(2)]; }
+  function circ(r, w, op, dash) { return '<circle cx="16" cy="16" r="' + r + '" fill="none" stroke="currentColor" stroke-width="' + w + '"' + (op ? ' opacity="' + op + '"' : '') + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
+  // Étoile pleine : n branches de longueur R, creux de rayon r.
+  function star(n, R, r, rot) {
+    var p = [];
+    for (var i = 0; i < n * 2; i++) p.push(pt(i % 2 ? r : R, (rot || 0) + i * 180 / n).join(' '));
+    return '<path d="M' + p.join(' L') + 'Z" fill="currentColor"/>';
+  }
+  // Étoile à facettes : chaque branche coupée en deux, une moitié pleine, l’autre plus claire (relief).
+  function facet(n, R, r, rot, op) {
+    var s = '';
+    for (var i = 0; i < n; i++) {
+      var a = (rot || 0) + i * 360 / n, tip = pt(R, a), l = pt(r, a - 180 / n), rr = pt(r, a + 180 / n);
+      s += '<path d="M16 16L' + tip.join(' ') + 'L' + l.join(' ') + 'Z" fill="currentColor"/>';
+      s += '<path d="M16 16L' + tip.join(' ') + 'L' + rr.join(' ') + 'Z" fill="currentColor" opacity="' + (op || .45) + '"/>';
+    }
+    return s;
+  }
+  // Branches aux flancs concaves (plus élégantes).
+  function curved(n, R, r, rot) {
+    var d = '';
+    for (var i = 0; i < n; i++) {
+      var a = (rot || 0) + i * 360 / n, tip = pt(R, a), l = pt(r, a - 180 / n), rr = pt(r, a + 180 / n), cl = pt(r * 0.55, a - 90 / n), cr = pt(r * 0.55, a + 90 / n);
+      d += 'M' + l.join(' ') + 'Q' + cl.join(' ') + ' ' + tip.join(' ') + 'Q' + cr.join(' ') + ' ' + rr.join(' ');
+    }
+    return '<path d="' + d + 'Z" fill="currentColor"/>';
+  }
+  function ticks(r1, r2, n, w, skipCardinal) {
+    var s = '';
+    for (var i = 0; i < n; i++) { var a = i * 360 / n; if (skipCardinal && a % 90 === 0) continue; var p = pt(r1, a), q = pt(r2, a); s += '<path d="M' + p.join(' ') + 'L' + q.join(' ') + '" stroke="currentColor" stroke-width="' + w + '"/>'; }
+    return s;
+  }
+  function dot(r) { return '<circle cx="16" cy="16" r="' + r + '" fill="currentColor"/>'; }
+  function hole(r) { return '<circle cx="16" cy="16" r="' + r + '" fill="var(--hole, #FBF9F4)"/>'; }
+
+  var V = [
+    ['Le tout premier', 'Double cercle, étoile fine à 4 branches qui touchent le bord.',
+      circ(14.6, .9) + circ(10.6, .5, .6) + '<path d="M16 2.5 17.6 14.4 29.5 16 17.6 17.6 16 29.5 14.4 17.6 2.5 16 14.4 14.4Z" fill="currentColor"/>'],
+    ['Facettes', 'Même étoile, chaque branche en deux tons (relief de boussole).',
+      circ(14.6, .9) + circ(10.6, .5, .6) + facet(4, 13.5, 2, 0)],
+    ['8 branches', '4 grandes branches cardinales + 4 petites en diagonale.',
+      circ(14.6, .9) + star(4, 8.5, 1.6, 45).replace('fill="currentColor"', 'fill="currentColor" opacity=".55"') + star(4, 13.5, 1.8, 0)],
+    ['8 branches à facettes', 'Rose classique de carte marine.',
+      circ(14.6, .9) + circ(11.2, .45, .6) + facet(4, 8.6, 1.5, 45, .35) + facet(4, 13.4, 1.9, 0)],
+    ['Quadrant gradué', 'Cercle gradué comme un instrument, étoile au centre.',
+      circ(14.6, .9) + ticks(12.6, 14.1, 36, .35, true) + ticks(11.8, 14.1, 4, .7) + star(4, 11, 1.5, 0)],
+    ['Branches qui dépassent', 'L’étoile traverse le cercle, comme un viseur.',
+      circ(11, .8) + star(4, 15.6, 1.7, 0) + dot(1.1)],
+    ['Flancs concaves', 'Branches effilées aux bords incurvés, plus élégantes.',
+      circ(14.6, .9) + circ(10.6, .5, .6) + curved(4, 13.5, 3.2, 0) + dot(2.4)],
+    ['Concave 8 branches', 'Version incurvée avec les diagonales.',
+      circ(14.6, .9) + '<g opacity=".5">' + curved(4, 9.5, 2.6, 45) + '</g>' + curved(4, 13.5, 3, 0) + dot(2.2)],
+    ['Contour seul', 'Étoile dessinée au trait, centre plein.',
+      circ(14.6, .9) + '<path d="M16 3.4 18 14 28.6 16 18 18 16 28.6 14 18 3.4 16 14 14Z" fill="none" stroke="currentColor" stroke-width=".8" stroke-linejoin="round"/>' + dot(1.4)],
+    ['Globe', 'Méridien et équateur en fond, étoile par-dessus.',
+      circ(14.6, .9) + '<ellipse cx="16" cy="16" rx="6" ry="14.6" fill="none" stroke="currentColor" stroke-width=".45" opacity=".6"/><path d="M1.4 16h29.2" stroke="currentColor" stroke-width=".45" opacity=".6"/>' + star(4, 12.5, 1.7, 0)],
+    ['Perles', 'Double cercle, perles en diagonale, étoile à facettes.',
+      circ(14.6, .9) + circ(12.4, .45, .6) + [0, 90, 180, 270].map(function (a) { var p = pt(13.5, a + 45); return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r=".8" fill="currentColor"/>'; }).join('') + facet(4, 11.5, 1.8, 0)],
+    ['Nord marqué', 'Branche nord plus longue et pleine, les autres plus discrètes.',
+      circ(14.6, .9) + circ(10.6, .5, .6) + '<path d="M16 1.6 17.7 14.3 16 16 14.3 14.3Z" fill="currentColor"/><g opacity=".55"><path d="M16 16 17.7 17.7 16 27.5 14.3 17.7Z M16 16 17.7 14.3 27.5 16 17.7 17.7Z M16 16 14.3 17.7 4.5 16 14.3 14.3Z" fill="currentColor"/></g>'],
+  ];
+
+  document.getElementById('grid').innerHTML = V.map(function (v, i) {
+    var svg = function (cls) { return '<svg class="' + cls + '" viewBox="0 0 32 32" aria-hidden="true">' + v[2] + '</svg>'; };
+    return '<div class="item">' + svg('big') +
+      '<div class="row"><span class="word">' + svg('small') + 'ATLAS</span></div>' +
+      '<div class="row"><span class="word dark">' + svg('small') + 'ATLAS</span></div>' +
+      '<p class="label"><b>' + (i + 1) + '. ' + v[0] + '</b>' + v[1] + '</p></div>';
+  }).join('');
+</script>
+</body>
+</html>

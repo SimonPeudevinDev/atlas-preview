@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ATLAS — Le monde, en cartes</title>
+  <meta name="description" content="ATLAS, le musée numérique de cartes à collectionner : mythologies, contes, littérature et histoire.">
+  <meta name="theme-color" content="#F6F2EA">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/atlas.css?v=110">
+  <link rel="stylesheet" href="assets/css/booster.css?v=110">
+</head>
+<body>
+  <!-- Filtres partagés par toutes les illustrations SVG -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="atl-wc" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="atl-blur" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="12"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <header id="site-header" class="site-header"></header>
+  <main id="view"></main>
+  <footer id="site-footer" class="site-footer"></footer>
+  <nav id="tabbar" class="tabbar" aria-label="Navigation principale"></nav>
+
+  <div id="modal-root"></div>
+  <div id="overlay-root"></div>
+  <div id="toasts" aria-live="polite"></div>
+
+  <script src="assets/js/data.js?v=110"></script>
+  <script src="assets/js/store.js?v=110"></script>
+  <script src="assets/js/art.js?v=110"></script>
+  <script src="assets/js/art-painted.js?v=110"></script>
+  <script src="assets/js/ui.js?v=110"></script>
+  <script src="assets/js/relief.js?v=110"></script>
+  <script src="assets/js/sfx.js?v=110"></script>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/js/pack-model.js?v=110"></script>
+  <script src="assets/js/pack3d.js?v=110"></script>
+  <script src="assets/js/pack.js?v=110"></script>
+  <script src="assets/js/parallax.js?v=110"></script>
+  <script src="assets/js/pages.js?v=110"></script>
+  <script src="assets/js/opener.js?v=110"></script>
+  <script src="assets/js/app.js?v=110"></script>
+</body>
+</html>
