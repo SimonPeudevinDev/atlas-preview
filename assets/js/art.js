@@ -32,6 +32,8 @@
     geants:   { sky0: '#F3E9DF', sky1: '#DDC6B4', far: '#C2A592', mid: '#8E6E5D', near: '#6A4F42', fig: '#33241E' },
     heros:    { sky0: '#EEF0EC', sky1: '#CCD6D6', far: '#AFBDBF', mid: '#7F8E8F', near: '#5E6C6E', fig: '#2E3638' },
     monstres: { sky0: '#ECE9E3', sky1: '#C9C3B6', far: '#ABA393', mid: '#7A7263', near: '#585244', fig: '#1E1B16' },
+    planetes: { sky0: '#E6E8EE', sky1: '#B9BED0', far: '#9AA0B5', mid: '#6E7590', near: '#4E5468', fig: '#22252F' },
+    lunes:    { sky0: '#E9E9E9', sky1: '#C4C6CA', far: '#A6A8AD', mid: '#85878C', near: '#626469', fig: '#2A2B2E' },
     pharaons: { sky0: '#F6ECDA', sky1: '#E5CDA2', far: '#D2B07D', mid: '#B08A55', near: '#8C6A3C', fig: '#3A2A16' }
   };
 
@@ -181,6 +183,24 @@
       o += '<g fill="' + m.fig + '" opacity=".85"><path d="M' + f(cx - 34 * s) + ',' + f(gy) + ' C' + f(cx - 36 * s) + ',' + f(gy - 60 * s) + ' ' + f(cx + 34 * s) + ',' + f(gy - 64 * s) + ' ' + f(cx + 32 * s) + ',' + f(gy) + ' Z"/></g>';
       o += '<g fill="' + m.sun + '" opacity=".8">' + '<circle cx="' + f(cx - 8 * s) + '" cy="' + f(gy - 30 * s) + '" r="' + f(2 * s) + '"/><circle cx="' + f(cx + 6 * s) + '" cy="' + f(gy - 30 * s) + '" r="' + f(2 * s) + '"/></g>';
       return o;
+    },
+    // Planètes : une planète à anneaux suspendue au-dessus de l’horizon
+    planet: function (cx, gy, s, m) {
+      var o = '', y = gy - 86 * s, R = 34 * s;
+      o += '<ellipse cx="' + f(cx) + '" cy="' + f(y) + '" rx="' + f(R * 2.1) + '" ry="' + f(R * 0.5) + '" fill="none" stroke="' + m.line + '" stroke-width="' + f(3 * s) + '" opacity=".7" transform="rotate(-14 ' + f(cx) + ' ' + f(y) + ')"/>';
+      o += '<circle cx="' + f(cx) + '" cy="' + f(y) + '" r="' + f(R) + '"/>';
+      o += '<g fill="' + m.sky0 + '" opacity=".25">' + rect(cx - R, y - 8 * s, R * 2, 4 * s) + rect(cx - R, y + 6 * s, R * 2, 3 * s) + '</g>';
+      o += '<g fill="' + m.sun + '" opacity=".9"><circle cx="' + f(cx - 90 * s) + '" cy="' + f(gy - 120 * s) + '" r="' + f(1.6 * s) + '"/><circle cx="' + f(cx + 96 * s) + '" cy="' + f(gy - 140 * s) + '" r="' + f(1.2 * s) + '"/><circle cx="' + f(cx + 60 * s) + '" cy="' + f(gy - 30 * s) + '" r="' + f(1.4 * s) + '"/></g>';
+      return o;
+    },
+    // Lunes : un sol cratérisé, la planète mère dans le ciel
+    moon: function (cx, gy, s, m) {
+      var o = '';
+      o += '<circle cx="' + f(cx + 40 * s) + '" cy="' + f(gy - 96 * s) + '" r="' + f(30 * s) + '" opacity=".55"/>';
+      o += poly([[cx - 160 * s, gy], [cx - 150 * s, gy - 18 * s], [cx - 60 * s, gy - 24 * s], [cx + 30 * s, gy - 16 * s], [cx + 150 * s, gy - 22 * s], [cx + 160 * s, gy]]);
+      o += '<g fill="' + m.sky0 + '" opacity=".35">';
+      [[-90, 18, 14], [-20, 14, 9], [70, 19, 12]].forEach(function (c) { o += '<ellipse cx="' + f(cx + c[0] * s) + '" cy="' + f(gy - c[1] * s) + '" rx="' + f(c[2] * s) + '" ry="' + f(c[2] * 0.28 * s) + '"/>'; });
+      return o + '</g>';
     },
     // Pharaons : pylône de temple encadré de deux obélisques
     obelisk: function (cx, gy, s, m) {

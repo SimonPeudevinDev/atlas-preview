@@ -67,6 +67,18 @@ window.ATLAS = window.ATLAS || {};
       description: 'De l’unification du pays à la mort de Cléopâtre, les souverains qui ont bâti les pyramides, conquis l’Orient et défié Rome.'
     },
     {
+      id: 'planetes', name: 'Les Planètes', family: 'Système solaire', group: 'solaire', universe: 'Sciences', motif: 'planet',
+      edition: 'Édition I', status: 'live', popular: 11,
+      tagline: 'Les huit planètes qui tournent autour du Soleil.',
+      description: 'De la brûlante Mercure à la lointaine Neptune, les planètes du système solaire, leurs records et les dieux qui leur ont donné leur nom.'
+    },
+    {
+      id: 'lunes', name: 'Les Lunes', family: 'Système solaire', group: 'solaire', universe: 'Sciences', motif: 'moon',
+      edition: 'Édition I', status: 'live', popular: 12,
+      tagline: 'Volcans, océans cachés et geysers : les lunes les plus étonnantes.',
+      description: 'Notre Lune et ses cousines : des mondes de glace, de feu et de méthane, qui comptent parmi les meilleurs espoirs de trouver la vie ailleurs.'
+    },
+    {
       id: 'gothique', name: 'Nuits gothiques', family: 'Monstres gothiques', universe: 'Littérature', motif: 'castle',
       edition: 'Édition I', status: 'live', popular: 3,
       tagline: 'Les créatures nées de la littérature fantastique du XIXᵉ siècle.',
@@ -127,6 +139,11 @@ window.ATLAS = window.ATLAS || {};
     { id: 'detroit', hero: 'heros-ulysse', monster: 'monstres-scylla', title: 'Ulysse passe le détroit',
       text: 'Ulysse devait choisir entre Charybde, un tourbillon capable d’engloutir son navire, et Scylla, un monstre à six têtes. Sur le conseil de la magicienne Circé, il longea la falaise de Scylla, sacrifiant six marins pour sauver les autres. C’est l’origine de l’expression « tomber de Charybde en Scylla ».' }
   ];
+  A.GROUPS.push({
+    id: 'solaire', name: 'Système solaire', subs: ['planetes', 'lunes'], title: 'Explorateur du système solaire',
+    tagline: 'Les planètes et les lunes qui gravitent autour du Soleil.',
+    description: 'Huit planètes et leurs lunes les plus remarquables : un voyage de Mercure à Neptune, des volcans d’Io aux geysers d’Encelade.'
+  });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
@@ -211,6 +228,27 @@ window.ATLAS = window.ATLAS || {};
       ['toutankhamon', 'Toutânkhamon', 'L’Enfant-roi', 58, 76, 80, 'BRELMU', 'Pharaon mort jeune, devenu célèbre par son tombeau intact.'],
       ['ramses', 'Ramsès II', 'Le Grand', 90, 88, 88, 'BRELMU', 'Pharaon bâtisseur au règne de soixante-sept ans.'],
       ['cleopatre', 'Cléopâtre VII', 'La Dernière Reine', 70, 80, 98, 'BRELMU', 'Dernière souveraine de l’Égypte des pharaons.']
+    ],
+    planetes: [
+      ['mercure', 'Mercure', 'La Messagère pressée', 62, 70, 84, 'BREL', 'La plus petite planète et la plus proche du Soleil.'],
+      ['venus', 'Vénus', 'L’Étoile du Berger', 88, 90, 76, 'BREL', 'La planète la plus chaude, voilée de nuages acides.'],
+      ['terre', 'La Terre', 'La Planète bleue', 80, 86, 98, 'BRELMU', 'La seule planète connue à abriter la vie.'],
+      ['mars', 'Mars', 'La Planète rouge', 84, 78, 82, 'BRELM', 'Planète désertique, rouge de poussière d’oxyde de fer.'],
+      ['jupiter', 'Jupiter', 'La Géante', 98, 94, 80, 'BRELMU', 'La plus grande planète, une boule de gaz géante.'],
+      ['saturne', 'Saturne', 'La Planète aux anneaux', 90, 88, 86, 'BRELM', 'Célèbre pour ses anneaux de glace et de roche.'],
+      ['uranus', 'Uranus', 'La Planète couchée', 78, 84, 80, 'BRE', 'Géante de glace qui roule sur le côté.'],
+      ['neptune', 'Neptune', 'La Planète des vents', 92, 82, 78, 'BREL', 'La plus lointaine des planètes, balayée par des vents extrêmes.']
+    ],
+    lunes: [
+      ['lune', 'La Lune', 'L’Astre des nuits', 70, 84, 92, 'BRELMU', 'Seul satellite naturel de la Terre.'],
+      ['phobos', 'Phobos', 'La Lune condamnée', 60, 58, 70, 'BRE', 'Petite lune de Mars, qui se rapproche lentement de sa planète.'],
+      ['io', 'Io', 'La Lune volcanique', 94, 70, 74, 'BREL', 'L’astre le plus volcanique du système solaire.'],
+      ['europe', 'Europe', 'L’Océan caché', 66, 88, 96, 'BRELM', 'Lune glacée qui cache un océan sous sa surface.'],
+      ['ganymede', 'Ganymède', 'La Reine des lunes', 82, 92, 86, 'BRELM', 'La plus grande lune du système solaire.'],
+      ['titan', 'Titan', 'La Lune aux lacs de méthane', 80, 90, 92, 'BRELM', 'Seule lune dotée d’une atmosphère épaisse.'],
+      ['encelade', 'Encelade', 'Le Geyser glacé', 64, 76, 94, 'BREL', 'Petite lune de Saturne qui crache des jets d’eau.'],
+      ['miranda', 'Miranda', 'La Lune rapiécée', 58, 72, 82, 'BRE', 'Petite lune d’Uranus au relief chaotique.'],
+      ['triton', 'Triton', 'La Lune à contresens', 76, 80, 84, 'BRE', 'Grande lune de Neptune qui tourne à l’envers.']
     ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
@@ -327,6 +365,23 @@ window.ATLAS = window.ATLAS || {};
     'monstres-dragon': 'Ce serpent immense, qui ne dormait jamais, était enroulé autour du chêne où pendait la Toison d’or, dans un bois sacré d’Arès. [[heros:jason|Jason]] ne le vainquit qu’avec l’aide de la magicienne Médée.',
     'monstres-cerbere': 'Ce chien à trois têtes, à queue de serpent, gardait l’entrée du royaume d’[[grece:hades|Hadès]] : il laissait entrer les morts mais empêchait quiconque d’en sortir. La lyre d’[[heros:orphee|Orphée]] parvint pourtant à l’apaiser.',
     'monstres-scylla': 'Ancienne nymphe changée en monstre, elle vivait dans une grotte au-dessus d’un détroit, face au tourbillon de Charybde. Ses six têtes de chien happaient les marins qui passaient, comme ceux d’[[heros:ulysse|Ulysse]].',
+    'planetes-mercure': 'Elle fait le tour du Soleil en 88 jours seulement, plus vite que toute autre planète. Sans véritable atmosphère pour retenir la chaleur, sa surface passe d’environ 430 °C le jour à −180 °C la nuit.',
+    'planetes-venus': 'Presque aussi grande que la Terre, elle est enveloppée d’une épaisse atmosphère de gaz carbonique qui piège la chaleur : il y fait environ 465 °C, assez pour faire fondre le plomb. Ses nuages sont faits d’acide sulfurique.',
+    'planetes-terre': 'Troisième planète à partir du Soleil, c’est la seule où l’on connaisse de l’eau liquide en surface, qui en recouvre environ 71 %. Son atmosphère et son champ magnétique la protègent des rayonnements du Soleil. Elle a un seul satellite naturel, la [[lunes:lune|Lune]].',
+    'planetes-mars': 'Sa couleur rouge vient de l’oxyde de fer, la rouille, qui couvre son sol. Elle abrite le plus grand volcan connu du système solaire, Olympus Mons, haut d’environ 22 kilomètres, près de trois fois l’Everest.',
+    'planetes-jupiter': 'Plus de mille Terres pourraient tenir à l’intérieur. Faite surtout d’hydrogène et d’hélium, elle n’a pas de surface solide. Sa Grande Tache rouge est une tempête plus large que la Terre, observée depuis près de deux siècles.',
+    'planetes-saturne': 'Ses anneaux s’étendent sur des centaines de milliers de kilomètres, mais leur épaisseur ne dépasse souvent pas quelques dizaines de mètres. Ils sont faits de blocs de glace et de roche. Sa densité est si faible qu’elle flotterait dans une baignoire assez grande.',
+    'planetes-uranus': 'Son axe est incliné de 98 degrés : elle tourne presque couchée sur son orbite, sans doute après une collision géante dans sa jeunesse. Chacun de ses pôles connaît ainsi environ quarante-deux ans de jour, puis quarante-deux ans de nuit.',
+    'planetes-neptune': 'À environ 4,5 milliards de kilomètres du Soleil, elle met près de 165 ans à en faire le tour. Ses vents, les plus rapides du système solaire, dépassent 2 000 km/h.',
+    'lunes-lune': 'Elle s’est sans doute formée il y a environ 4,5 milliards d’années, quand un astre de la taille de Mars a percuté la jeune [[planetes:terre|Terre]]. Elle nous montre toujours la même face, car elle tourne sur elle-même au même rythme qu’autour de nous.',
+    'lunes-phobos': 'Ce bloc de roche irrégulier d’environ 22 kilomètres tourne si près de [[planetes:mars|Mars]] qu’il en fait le tour trois fois par jour. Il se rapproche de la planète d’environ deux mètres par siècle.',
+    'lunes-io': 'Prise entre l’attraction de [[planetes:jupiter|Jupiter]] et celle de ses voisines, elle est sans cesse étirée et comprimée, ce qui la chauffe de l’intérieur. Plus de 400 volcans actifs parsèment sa surface jaune et orangée de soufre.',
+    'lunes-europe': 'Sous une croûte de glace épaisse de plusieurs kilomètres, cette lune de [[planetes:jupiter|Jupiter]] cache un océan d’eau salée qui contiendrait plus d’eau que tous les océans de la Terre. C’est l’un des endroits où l’on espère trouver une forme de vie hors de la Terre.',
+    'lunes-ganymede': 'Plus grande que la planète [[planetes:mercure|Mercure]], c’est la plus grande lune du système solaire et la seule à posséder son propre champ magnétique. Elle cacherait, elle aussi, un océan sous sa glace.',
+    'lunes-titan': 'Plus grosse que Mercure, la plus grande lune de [[planetes:saturne|Saturne]] est enveloppée d’une épaisse atmosphère orangée. Il y pleut du méthane, qui remplit des lacs et des mers : c’est le seul astre connu, hors de la Terre, à porter des liquides stables à sa surface.',
+    'lunes-encelade': 'Cette petite lune de [[planetes:saturne|Saturne]], d’à peine 500 kilomètres de diamètre, est couverte d’une glace si pure qu’elle renvoie presque toute la lumière du Soleil. Près de son pôle sud, des geysers projettent dans l’espace l’eau d’un océan caché.',
+    'lunes-miranda': 'Cette petite lune d’[[planetes:uranus|Uranus]] semble faite de morceaux mal assemblés : plaines, sillons et falaises se juxtaposent sans ordre. Sa falaise de Verona Rupes, haute de plusieurs kilomètres, compte parmi les plus hautes du système solaire.',
+    'lunes-triton': 'La plus grande lune de [[planetes:neptune|Neptune]] tourne autour de sa planète dans le sens inverse de la rotation de celle-ci, un cas unique pour une lune de cette taille. C’est sans doute un astre venu de la ceinture de Kuiper, capturé par Neptune.',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -426,6 +481,23 @@ window.ATLAS = window.ATLAS || {};
     'monstres-dragon': 'Selon certains récits, il était né du sang de Typhon. Le roi de Colchide imposa aussi à Jason de semer les dents d’un autre dragon, celui de Thèbes : il en sortit des guerriers armés, que le héros dut combattre.',
     'monstres-cerbere': 'Pour son dernier travail, [[heros:heracles|Héraclès]] le captura à mains nues et le ramena un moment à la surface. Selon Ovide, la bave qui coula de ses gueules fit naître l’aconit, une plante vénéneuse. On appelle encore « cerbère » un gardien intraitable.',
     'monstres-scylla': 'Selon Ovide, la magicienne Circé, jalouse, la changea en monstre en empoisonnant l’eau de son bain. Les Anciens situaient le détroit entre l’Italie et la Sicile, à Messine. L’expression « tomber de Charybde en Scylla » signifie échapper à un danger pour tomber dans un pire.',
+    'planetes-mercure': 'Son nom vient du dieu romain du commerce et des voyageurs, messager des dieux, l’équivalent d’Hermès. Couverte de cratères, elle ressemble à notre Lune. Du lever au coucher du Soleil, un jour sur Mercure dure environ 176 jours terrestres, deux fois plus que son année.',
+    'planetes-venus': 'C’est l’astre le plus brillant du ciel après le Soleil et la Lune, visible à l’aube ou au crépuscule, d’où son surnom d’Étoile du Berger. Elle tourne sur elle-même dans le sens inverse de la plupart des planètes, et si lentement qu’un tour sur elle-même dure plus longtemps que son année.',
+    'planetes-terre': 'Elle s’est formée il y a environ 4,5 milliards d’années. Son axe, incliné d’environ 23,5 degrés, lui donne ses saisons. La première photographie de la Terre entière vue de l’espace par des humains, « La Bille bleue », fut prise en 1972 par l’équipage d’Apollo 17.',
+    'planetes-mars': 'Elle porte le nom du dieu romain de la guerre. Des robots comme Curiosity et Perseverance y roulent pour chercher des traces d’une vie passée. D’anciens lits de rivières montrent que l’eau y coulait autrefois. Ses deux petites lunes s’appellent [[lunes:phobos|Phobos]] et Déimos.',
+    'planetes-jupiter': 'Elle porte le nom du roi des dieux romains, l’équivalent de [[grece:zeus|Zeus]]. En 1610, Galilée découvrit ses quatre plus grandes lunes, [[lunes:io|Io]], [[lunes:europe|Europe]], [[lunes:ganymede|Ganymède]] et Callisto : la preuve que tout ne tourne pas autour de la Terre. On lui connaît aujourd’hui près d’une centaine de lunes.',
+    'planetes-saturne': 'Elle porte le nom du dieu romain de l’agriculture, identifié au Titan [[titans:cronos|Cronos]]. C’est la planète qui compte le plus de lunes connues, plus de 270, dont [[lunes:titan|Titan]], plus grosse que Mercure. La sonde Cassini l’a étudiée pendant treize ans, avant de plonger dans son atmosphère en 2017.',
+    'planetes-uranus': 'C’est la première planète découverte au télescope, par William Herschel en 1781. Le méthane de son atmosphère lui donne sa couleur bleu-vert. Elle porte le nom d’Ouranos, le Ciel, père des Titans. Une seule sonde l’a visitée : Voyager 2, en 1986, qui photographia aussi sa lune [[lunes:miranda|Miranda]].',
+    'planetes-neptune': 'Ce fut la première planète découverte par le calcul : en 1846, l’astronome français Urbain Le Verrier prédit sa position à partir des irrégularités de l’orbite d’Uranus, et on l’observa là où il l’avait annoncée. Elle porte le nom du dieu romain des mers, l’équivalent de [[grece:poseidon|Poséidon]]. Sa plus grande lune, [[lunes:triton|Triton]], tourne à l’envers.',
+    'lunes-lune': 'Son attraction provoque les marées des océans. Elle s’éloigne de la Terre d’environ 3,8 centimètres par an. Douze astronautes y ont marché entre 1969 et 1972, à commencer par Neil Armstrong lors de la mission Apollo 11.',
+    'lunes-phobos': 'Dans quelques dizaines de millions d’années, il sera déchiré par la gravité de Mars ou s’écrasera à sa surface, et formera peut-être un anneau. Son nom signifie « la peur » : avec Déimos, « la terreur », il accompagne le dieu de la guerre. Les deux lunes de Mars furent découvertes en 1877 par Asaph Hall.',
+    'lunes-io': 'Ses panaches volcaniques peuvent monter à plusieurs centaines de kilomètres au-dessus du sol. Dans la mythologie grecque, Io était une prêtresse aimée de [[grece:zeus|Zeus]], qui la changea en génisse pour la cacher à [[grece:hera|Héra]]. Elle fut découverte par Galilée en 1610.',
+    'lunes-europe': 'Sa surface, l’une des plus lisses du système solaire, est striée de fissures brunes. La sonde Europa Clipper, lancée en 2024, doit l’étudier à partir de 2030. Son nom vient de la princesse phénicienne qu’enleva [[grece:zeus|Zeus]] changé en taureau, celle qui a aussi donné son nom à notre continent.',
+    'lunes-ganymede': 'La sonde européenne JUICE, lancée en 2023, doit se placer en orbite autour d’elle en 2034. Dans la mythologie, Ganymède était un jeune prince troyen enlevé par [[grece:zeus|Zeus]], changé en aigle, pour devenir l’échanson des dieux.',
+    'lunes-titan': 'En 2005, la sonde européenne Huygens s’y posa : le premier atterrissage dans le système solaire extérieur. La NASA prépare Dragonfly, un drone qui doit y voler dans les années 2030. Elle doit son nom aux Titans, la famille de [[titans:cronos|Cronos]], que les Romains appelaient Saturne.',
+    'lunes-encelade': 'La sonde Cassini a traversé ces panaches et y a détecté du sel, des molécules organiques et des signes d’activité hydrothermale. Ces jets alimentent l’un des anneaux de Saturne, l’anneau E. Elle porte le nom du Géant [[geants:encelade|Encelade]], écrasé sous la Sicile par Athéna.',
+    'lunes-miranda': 'Elle fut découverte en 1948 par Gerard Kuiper. On ne la connaît que par les images de Voyager 2, prises lors de son unique passage en 1986. Contrairement aux lunes de Jupiter et de Saturne, celles d’Uranus portent des noms de personnages de Shakespeare : Miranda est l’héroïne de La Tempête.',
+    'lunes-triton': 'Il y fait environ −235 °C, l’une des températures de surface les plus basses jamais mesurées. Voyager 2 y a pourtant photographié en 1989 des geysers d’azote. Elle porte le nom de Triton, fils de [[grece:poseidon|Poséidon]], dieu marin qui soufflait dans une conque.',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -519,12 +591,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire', 'nordique'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'contes-alice-base',
-      collections: ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire'],
+      collections: ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire'],
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette

@@ -43,6 +43,16 @@
       bio: 'Architecte du roi Djéser, il conçut vers 2650 av. J.-C. la première pyramide de l’histoire, la pyramide à degrés de Saqqarah, bien avant celle de [[kheops]].',
       more: 'Vizir, médecin et grand prêtre, il fut si admiré qu’on finit par en faire un dieu, fils de Ptah, que l’on priait pour guérir. Les Grecs l’assimilèrent à leur dieu de la médecine, Asclépios. Son tombeau n’a jamais été retrouvé.'
     },
+    planetes: {
+      name: 'Pluton', title: 'La Planète déchue', atk: 70, def: 92, esp: 88,
+      bio: 'Découverte en 1930 par Clyde Tombaugh, elle fut longtemps la neuvième planète, avant d’être reclassée planète naine en 2006.',
+      more: 'Plus petite que notre Lune, elle met 248 ans à faire le tour du Soleil. En 2015, la sonde New Horizons a révélé à sa surface une immense plaine glacée en forme de cœur. Son nom, proposé par une écolière anglaise de onze ans, Venetia Burney, est celui du dieu romain des Enfers, l’équivalent d’[[grece:hades|Hadès]].'
+    },
+    lunes: {
+      name: 'Charon', title: 'Le Passeur', atk: 62, def: 86, esp: 90,
+      bio: 'Grande lune de Pluton, presque moitié aussi large qu’elle : les deux astres tournent l’un autour de l’autre comme un couple, en se montrant toujours la même face.',
+      more: 'Découverte en 1978, elle porte le nom du passeur qui, dans la mythologie grecque, faisait traverser le Styx aux âmes des morts contre une obole. En 2015, la sonde New Horizons y a photographié une calotte rougeâtre à son pôle nord, surnommée Mordor.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',

@@ -276,7 +276,8 @@
     histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard'],
     titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra'],
     pharaons: ['Scribe royal', 'Fils de Râ'],
-    heros: ['Compagnon des Argonautes', 'Héros légendaire'], monstres: ['Chasseur de monstres', 'Dompteur de chimères']
+    heros: ['Compagnon des Argonautes', 'Héros légendaire'], monstres: ['Chasseur de monstres', 'Dompteur de chimères'],
+    planetes: ['Astronome amateur', 'Maître des orbites'], lunes: ['Chasseur de lunes', 'Seigneur des satellites']
   };
   /* Collection globale : progression cumulée de ses sous-collections. */
   S.groupProgress = function (gid) {

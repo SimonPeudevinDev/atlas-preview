@@ -153,7 +153,7 @@
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
-        '<p class="lead">Onze salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
+        '<p class="lead">Treize salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
           '<div class="chips" data-f="universe">' + unis.map(function (u) { return '<button class="chip' + (cf.universe === u ? ' is-active' : '') + '" data-v="' + u + '">' + (u === 'all' ? 'Tous les univers' : u) + '</button>'; }).join('') + '</div>' +
           '<div class="toolbar-end">' +
