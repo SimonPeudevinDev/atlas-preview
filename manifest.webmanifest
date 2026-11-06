@@ -1,0 +1,17 @@
+{
+  "name": "ATLAS — Le monde, en cartes",
+  "short_name": "ATLAS",
+  "description": "Le musée numérique de cartes à collectionner : mythologies, contes, littérature et histoire.",
+  "lang": "fr",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F2EA",
+  "theme_color": "#F6F2EA",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
