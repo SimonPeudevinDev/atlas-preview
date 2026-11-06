@@ -113,7 +113,7 @@
     if (o.select) corner = '<span class="card-check">' + U.icon('check') + '</span>';
     return '<article class="' + cls + '"' + attrs + ' tabindex="0" aria-label="' + U.esc(ch.name + ', ' + R.label + (serialTxt ? ' ' + serialTxt : '')) + '">' +
       '<div class="card-inner">' +
-        '<div class="card-art">' + A.editionArt(ed, { scale: o.artScale }) + '<span class="card-glitter"></span>' + (o.missing ? '<span class="card-missing">Non possédée</span>' : '') + flags + corner + '</div>' +
+        '<div class="card-art">' + A.editionArt(ed, { scale: o.artScale, ctx: o.ctx || (o.artScale > 1 ? 'viewer' : 'card'), priority: o.priority }) + '<span class="card-glitter"></span>' + (o.missing ? '<span class="card-missing">Non possédée</span>' : '') + flags + corner + '</div>' +
         '<div class="card-body">' +
           '<div class="card-row"><h3 class="card-name' + longName + '">' + U.esc(ch.name) + '</h3>' + (serialTxt ? '<span class="card-serial">' + serialTxt + '</span>' : '') + '</div>' +
           '<div class="card-row card-sub"><span class="card-title">' + U.esc(ch.title) + '</span><span class="card-coll">' + U.esc(coll.name) + '</span></div>' +
@@ -155,7 +155,7 @@
   /* Portrait de profil débloqué par une collection : l’emblème de sa première figure */
   U.avatarArt = function (cid) {
     var ch = A.CHAR[A.COLL[cid].chars[0]], ed = A.ED[ch.id + '-legendary'] || A.ED[ch.id + '-base'];
-    return A.editionArt(ed, { w: 200, h: 200 });
+    return A.editionArt(ed, { w: 200, h: 200, ctx: 'avatar' });
   };
   U.avatarInner = function () {
     var cid = A.store.avatar();
@@ -168,8 +168,9 @@
   U.secretCard = function (cid) {
     var c = A.COLL[cid], sc = A.SECRET[cid], t = A.store.trophy(cid), n = c.chars.length;
     if (!sc) return '';
-    // sc.image : illustration définitive (sinon illustration provisoire générée)
-    var art = sc.image ? '<img class="art" src="' + sc.image + '" alt="" loading="lazy" draggable="false">' : A.artImg({ seed: 'secret-' + cid, coll: cid, rarity: 'mythic', w: 600, h: 780 });
+    // Illustration définitive (manifeste « secret-<collection> », sinon sc.image), sinon illustration provisoire générée
+    var art = A.media && A.media.has('secret-' + cid) ? A.media.picture('secret-' + cid, { sizes: '(max-width: 600px) 80vw, 360px' })
+      : sc.image ? '<img class="art" src="' + sc.image + '" alt="" loading="lazy" draggable="false">' : A.artImg({ seed: 'secret-' + cid, coll: cid, rarity: 'mythic', w: 600, h: 780 });
     if (!t) {
       var got = c.chars.filter(function (id) { return A.store.ownsChar(id); }).length, cols = n % 3 === 0 ? 3 : 4;
       var tiles = c.chars.map(function (id, i) {
@@ -211,7 +212,7 @@
     function side(id, own) {
       var ch = A.CHAR[id], best = A.store.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
       return '<button type="button" class="du-side' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + '>' +
-        '<span class="du-pic">' + A.editionArt(ed, { w: 160, h: 160 }) + '</span><span class="du-name">' + U.esc(ch.name) + '</span>' +
+        '<span class="du-pic">' + A.editionArt(ed, { w: 160, h: 160, ctx: 'duel' }) + '</span><span class="du-name">' + U.esc(ch.name) + '</span>' +
         '<span class="du-own">' + (own ? 'À vous' : 'Manquant') + '</span></button>';
     }
     return '<div class="du"><div class="rw-head"><p class="eyebrow">' + T.head + '</p><span class="rw-count">' + done + ' / ' + list.length + ' ' + T.unit + '</span></div>' +
@@ -356,13 +357,15 @@
     }).join('') + '</ol></div>' : '';
 
     var marketLink = '<a class="btn btn-ghost btn-sm market-btn" href="#/marketplace?q=' + encodeURIComponent(ch.name) + '" data-close title="Voir sur la marketplace">Marketplace' + U.icon('arrow') + '</a>';
+    // Accès direct à la collection de la carte (depuis l’inventaire, une recherche, la marketplace…)
+    var collLink = '<a class="btn btn-ghost btn-sm coll-btn" href="#/collection/' + coll.id + '" data-close title="Voir la collection ' + U.esc(coll.name) + '">' + U.icon('grid') + '<span class="btn-l">Collection</span></a>';
     var actions = item ?
       '<div class="detail-actions">' +
         // Libellés constants (l’état actif se lit à la couleur) : les boutons gardent la même largeur.
         '<button class="btn btn-ghost btn-sm' + (item.fav ? ' is-on' : '') + '" data-act="fav" aria-pressed="' + !!item.fav + '" title="' + (item.fav ? 'Retirer des favoris' : 'Ajouter aux favoris') + '">' + U.icon('star') + '<span class="btn-l">Favori</span></button>' +
         '<button class="btn btn-ghost btn-sm' + (item.show ? ' is-on' : '') + '" data-act="show" aria-pressed="' + !!item.show + '" title="' + (item.show ? 'Retirer de la vitrine' : 'Exposer en vitrine') + '">' + U.icon('eye') + '<span class="btn-l">Vitrine</span></button>' +
         '<button class="btn btn-primary btn-sm" data-act="sell">' + U.icon('tag') + 'Mettre en vente</button>' +
-        marketLink +
+        collLink + marketLink +
       '</div><div class="sell-form" hidden>' +
         '<div class="sell-row"><label class="input-unit"><span class="sell-l">Prix</span><input type="number" min="1" step="5" value="' + (floor || suggestPrice(ed.rarity)) + '" data-price aria-label="Prix de vente"><span>' + A.CURRENCY.name + '</span></label>' +
         '<button class="btn btn-ghost btn-sm" data-act="sell-cancel">Annuler</button><button class="btn btn-primary btn-sm" data-act="sell-ok" title="La carte est placée sous séquestre pendant la mise en vente">Confirmer la mise en vente</button></div>' +
@@ -370,13 +373,13 @@
 
     return '<div class="detail r-' + ed.rarity + '">' +
       '<div class="detail-visual">' +
-        '<div class="detail-card" data-act="zoom" title="Voir en grand">' + U.card(edId, { serial: shown && shown.serial, open: false, missing: !owned.length }) + '</div>' +
+        '<div class="detail-card" data-act="zoom" title="Voir en grand">' + U.card(edId, { serial: shown && shown.serial, open: false, missing: !owned.length, ctx: 'detail', priority: true }) + '</div>' +
         '<div class="ed-tabs" role="tablist">' + tabs + '</div>' +
-        '<p class="placeholder-note">' + U.icon('sparkle') + 'Illustration provisoire — emplacement remplaçable</p>' +
+        (ed.media ? '' : '<p class="placeholder-note">' + U.icon('sparkle') + 'Illustration provisoire — emplacement remplaçable</p>') +
       '</div>' +
       (more && (ch.lore || ch.more) ? loreHTML(ch, coll) :
       '<div class="detail-info">' +
-        '<p class="eyebrow">' + U.esc(coll.family) + ' · ' + U.esc(coll.name) + '</p>' +
+        '<p class="eyebrow">' + U.esc(coll.family) + ' · <a class="eyebrow-link" href="#/collection/' + coll.id + '" data-close>' + U.esc(coll.name) + '</a></p>' +
         '<h2 class="detail-name">' + U.esc(ch.name) + '</h2>' +
         '<p class="detail-title">' + U.esc(ch.title) + '</p>' +
         '<p class="detail-bio">' + bioHTML(ch, ch.story || ch.bio) +
@@ -395,7 +398,7 @@
         '</dl></div>' +
         '<div class="detail-block detail-split' + (prov ? '' : ' is-single') + '"><div class="detail-copies"><p class="eyebrow">Vos exemplaires' + (owned.length > 1 && !isBase ? ' <span class="eyebrow-count">' + owned.length + '</span>' : '') +
           '<span class="copies-nav" hidden><button class="cn-btn" data-cn="-1" aria-label="Exemplaires précédents">' + U.icon('chevL') + '</button><span class="cn-count"></span><button class="cn-btn" data-cn="1" aria-label="Exemplaires suivants">' + U.icon('chevR') + '</button></span></p><div class="copies is-row">' + copies + '</div></div>' + prov + '</div>' +
-        (item ? actions : '<div class="detail-actions">' + marketLink + '</div>') +
+        (item ? actions : '<div class="detail-actions">' + collLink + marketLink + '</div>') +
       '</div>') + '</div>';
   }
 
@@ -545,7 +548,7 @@
     var el = document.createElement('div');
     el.className = 'card-viewer';
     el.innerHTML = '<button class="cv-close" aria-label="Fermer">' + U.icon('close') + '</button>' +
-      '<div class="cv-stage"><div class="cv-card">' + U.card(edId, { serial: serial, open: false, artScale: 3 }) + '</div></div>' +
+      '<div class="cv-stage"><div class="cv-card">' + U.card(edId, { serial: serial, open: false, artScale: 3, priority: true }) + '</div></div>' +
       '<p class="cv-hint">Bougez la souris pour faire jouer la lumière · Échap pour fermer</p>';
     root.appendChild(el);
     requestAnimationFrame(function () { el.classList.add('is-in'); });

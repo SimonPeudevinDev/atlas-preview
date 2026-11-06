@@ -373,7 +373,7 @@
     var pool = packPool(p), used = {};
     return rarities.map(function (rid) {
       var eds = pool.filter(function (e) { return e.rarity === rid && !used[e.charId] && (e.supply == null || S.remaining(e.id) > 0); })
-        .sort(function (a, b) { return (preferArt ? (b.image ? 1 : 0) - (a.image ? 1 : 0) : 0) || A.hash(a.id + p.id) - A.hash(b.id + p.id); });
+        .sort(function (a, b) { return (preferArt ? (b.media || b.image ? 1 : 0) - (a.media || a.image ? 1 : 0) : 0) || A.hash(a.id + p.id) - A.hash(b.id + p.id); });
       if (eds[0]) used[eds[0].charId] = true;
       return eds[0];
     }).filter(Boolean);

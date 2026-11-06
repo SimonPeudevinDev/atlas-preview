@@ -15,7 +15,8 @@
     [/^\/inventaire$/, P.inventory, 'inventory'],
     [/^\/marketplace$/, P.market, 'market'],
     [/^\/profil$/, P.profile, 'profile'],
-    [/^\/design-system$/, P.design, '']
+    [/^\/design-system$/, P.design, ''],
+    [/^\/atelier$/, P.atelier, '']
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
@@ -284,5 +285,9 @@
     // Actualisation : on revient au même défilement et on rouvre la fiche notée dans l’URL.
     restoreAfterReload();
     onScroll();
+    // Cache longue durée des illustrations (sw.js) : HTTPS ou localhost uniquement
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    }
   });
 })(window.ATLAS);

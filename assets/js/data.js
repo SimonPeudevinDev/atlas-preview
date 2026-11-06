@@ -1453,16 +1453,9 @@ window.ATLAS = window.ATLAS || {};
   A.ED['grece-zeus-legendary'].minted0 = 31;
   A.ED['grece-zeus-unique'].minted0 = 0;
 
-  /* ---------- Illustrations définitives disponibles ---------- */
-  var ART = {
-    'grece-zeus-base': 'assets/card/zeus/Zeus_common.png',
-    'grece-zeus-rare': 'assets/card/zeus/Zeus_rare.png',
-    'grece-zeus-epic': 'assets/card/zeus/Zeus_epic.png',
-    'grece-zeus-legendary': 'assets/card/zeus/Zeus_legendary.png',
-    'grece-zeus-mythic': 'assets/card/zeus/Zeus_mythic.png',
-    'grece-zeus-unique': 'assets/card/zeus/Zeus_unique.png'
-  };
-  Object.keys(ART).forEach(function (id) { if (A.ED[id]) A.ED[id].image = ART[id]; });
+  /* ---------- Illustrations définitives ----------
+     Elles ne sont plus référencées ici : media/originals/<collection>/<personnage>/<rareté>.png
+     → tools/media/build.mjs → assets/js/media-manifest.js, raccordé au catalogue par media.js. */
 
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement

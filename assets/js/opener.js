@@ -139,6 +139,9 @@
       if (!res.ok) { U.toast(res.error, 'error'); close(); return false; }
       items = res.items.sort(function (a, b) { return rankOf(a) - rankOf(b); });
       unlocked = res.unlocked || []; newDuels = res.duels || [];
+      // Préchargement : les illustrations tirées (niveau « carte ») partent dès la déchirure,
+      // elles sont décodées avant d’être révélées une à une
+      if (A.media) A.media.preload(items.map(function (it) { return it.ed; }), 240);
       // Les cartes-témoins du sachet deviennent les vraies cartes, face visible : ce qui sort du sachet
       // est exactement ce qu’on va voir (la carte du dessus = la première présentée)
       // Seule la carte du dessus est la vraie : les autres témoins sont des leurres crédibles (cartes Base au hasard)
@@ -146,7 +149,7 @@
       [].forEach.call(ps, function (p, pi) {
         var it = items[ps.length - 1 - pi];
         if (!it) return;
-        p.innerHTML = pi === ps.length - 1 ? U.card(it.ed, { serial: it.serial, open: false, tilt: false }) : U.card(decoyFor(it), { open: false, tilt: false });
+        p.innerHTML = pi === ps.length - 1 ? U.card(it.ed, { serial: it.serial, open: false, tilt: false, ctx: 'opener', priority: true }) : U.card(decoyFor(it), { open: false, tilt: false });
       });
       // La lumière qui s’échappe du sachet trahit la meilleure carte
       var g = GLOW[A.ED[items[items.length - 1].ed].rarity];
@@ -285,7 +288,7 @@
       return '<div class="rv-card r-' + ed.rarity + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + ';z-index:' + (50 - i) + '">' +
         '<div class="rv-tilt"><div class="rv-flip">' +
           '<div class="rv-face rv-back">' + U.cardBack(pack.theme) + '</div>' +
-          '<div class="rv-face rv-front">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, newBadge: it._new, firstBadge: it.first }) +
+          '<div class="rv-face rv-front">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, newBadge: it._new, firstBadge: it.first, ctx: 'opener', priority: i < 2 }) +
             '<span class="rv-holo"></span><span class="rv-glare"></span><span class="rv-sweep"></span><span class="rv-edge"></span>' +
             (i > 0 ? '<div class="rv-decoy">' + U.card(decoyFor(it), { open: false, tilt: false }) + '</div>' : '') + '</div>' +
         '</div></div></div>';

@@ -279,6 +279,7 @@
   function loadImg(src) {
     return new Promise(function (ok) {
       var im = new Image(); im.decoding = 'async';
+      if (/^https?:/.test(src) && src.indexOf(location.origin) !== 0) im.crossOrigin = 'anonymous';   // texture WebGL depuis le CDN
       im.onload = function () { ok(im); }; im.onerror = function () { ok(null); };
       im.src = src;
     });
@@ -413,7 +414,8 @@
   function texturesFor(p) {
     if (packTex[p.id]) return packTex[p.id];
     var th = THEMES[p.theme] || THEMES.ivory, ed = A.ED[p.cover], ch = A.CHAR[ed.charId];
-    var src = ed.image || A.artURI({ seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 });
+    var src = A.editionSrc ? A.editionSrc(ed, 200, { seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 })
+      : ed.image || A.artURI({ seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 });
     return (packTex[p.id] = Promise.all([fonts(), loadImg(src)]).then(function (r) {
       return { front: tex(drawFront(p, th, r[1]), true), back: tex(drawBack(p, th), true), th: th };
     }));
