@@ -18,7 +18,7 @@
     return '<a class="coll-tile' + (opts.cls ? ' ' + opts.cls : '') + '" href="#/collection/' + c.id + '">' +
       '<div class="coll-art">' + (opts.art || A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 })) +
       (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') +
-      (S.readyCount(c.id) ? '<span class="tag tag-reward">🎁 Récompense à récupérer</span>' : '') + '</div>' +
+      (S.readyCount(c.id) ? '<span class="tag tag-reward">' + U.icon('gift') + 'Récompense à récupérer</span>' : '') + '</div>' +
       '<div class="coll-meta"><p class="eyebrow">' + c.family + ' · ' + c.edition + '</p><h3 class="coll-name">' + c.name + '</h3>' +
       '<p class="coll-tag">' + c.tagline + '</p>' +
       U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages</span><span>' + Math.round(pr.pct * 100) + ' %</span>') + nextReward(c.id) + '</div></a>';
@@ -28,7 +28,7 @@
     var s = S.rewards(cid).filter(function (x) { return x.state === 'locked'; })[0];
     if (!s) return '';
     var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
-    return '<p class="coll-next">' + U.rewardIcon(s.reward) + ' Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
+    return '<p class="coll-next">' + U.rewardIcon(s.reward) + 'Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
   }
   // Bloc d’une collection globale dans la liste : en-tête cliquable + ses sous-collections
   function groupBlock(g, subs) {
@@ -38,7 +38,7 @@
       '<div class="cgroup-copy"><p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p><h2 class="cgroup-name">' + U.esc(g.name) + '</h2>' +
         '<p class="cgroup-tag">' + U.esc(g.tagline) + '</p></div>' +
       '<div class="cgroup-prog">' + U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages · ' + pr.done + ' / ' + pr.subs + ' complètes</span><span>' + Math.round(pr.pct * 100) + ' %</span>') +
-        (ready ? '<p class="coll-next is-ready">🎁 Récompense globale à récupérer</p>' : nx ? '<p class="coll-next">' + U.rewardIcon(nx.reward) + ' Prochain palier : ' + U.esc(nx.label) + ' · ' + U.esc(U.rewardText(nx.reward)) + '</p>' : '') +
+        (ready ? '<p class="coll-next is-ready">' + U.icon('gift') + 'Récompense globale à récupérer</p>' : nx ? '<p class="coll-next">' + U.rewardIcon(nx.reward) + 'Prochain palier : ' + U.esc(nx.label) + ' · ' + U.esc(U.rewardText(nx.reward)) + '</p>' : '') +
         '<span class="link-arrow">Voir la collection globale ' + I('arrow') + '</span></div></a>' +
       '<div class="coll-grid is-full cgroup-subs">' + subs.map(function (c) { return collTile(c); }).join('') + '</div></section>';
   }
@@ -243,7 +243,7 @@
         if (!k) return;
         var res = S.claim('@' + g.id, k.getAttribute('data-claim'));
         if (!res.ok) { U.toast(res.error, 'error'); return; }
-        U.toast(U.rewardIcon(res.reward) + ' ' + res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
+        U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
       });
       this.refresh = function () {
         root.querySelector('[data-rewards]').innerHTML = U.rewardTrack('@' + g.id);
@@ -284,6 +284,7 @@
           '</div>' +
         '</div></section>' +
         '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack(c.id) + '</div></section>' +
+        '<section class="section-tight ms-sec"><div class="container" data-missions>' + U.missionsHTML(c.id) + '</div></section>' +
         (U.duelSetsFor(c.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor(c.id).map(U.duelsHTML).join('') + '</div></section>' : '') +
         '<section class="section-tight"><div class="container">' +
           '<div class="toolbar sticky-bar">' +
@@ -340,7 +341,7 @@
         if (k) {
           var res = S.claim(c.id, k.getAttribute('data-claim'));
           if (!res.ok) { U.toast(res.error, 'error'); return; }
-          U.toast(U.rewardIcon(res.reward) + ' ' + res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
+          U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
           return;
         }
         var b = e.target.closest('[data-f="view"] .chip');
@@ -351,7 +352,7 @@
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
+      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); root.querySelector('[data-missions]').innerHTML = U.missionsHTML(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
     }
   };
 
@@ -421,7 +422,7 @@
   }
   function priceHTML(p) {
     var tk = S.tokens(p.id);
-    if (tk) return '<span class="free">🎁 Offert' + (tk > 1 ? ' ×' + tk : '') + '</span>';
+    if (tk) return '<span class="free">' + U.icon('gift') + 'Offert' + (tk > 1 ? ' ×' + tk : '') + '</span>';
     return p.price ? U.price(p.price) : '<span class="free">Gratuit</span>';
   }
 
@@ -955,14 +956,14 @@
             A.COLLECTIONS.map(function (c) {
               var own = S.avatars().indexOf(c.id) !== -1;
               return '<button type="button" class="pf-av' + (own ? '' : ' is-locked') + (S.avatar() === c.id ? ' is-on' : '') + '"' + (own ? ' data-avatar-pick="' + c.id + '"' : ' disabled title="Complétez ' + U.esc(c.name) + ' pour le débloquer"') + '>' +
-                '<span class="avatar is-lg has-pic' + (S.hasFrame() && own ? ' has-frame' : '') + '">' + U.avatarArt(c.id) + (own ? '' : '<i class="pf-av-lock">🔒</i>') + '</span><small>' + U.esc(c.name) + '</small></button>';
+                '<span class="avatar is-lg has-pic' + (S.hasFrame() && own ? ' has-frame' : '') + '">' + U.avatarArt(c.id) + (own ? '' : '<i class="pf-av-lock">' + U.icon('lock') + '</i>') + '</span><small>' + U.esc(c.name) + '</small></button>';
             }).join('') + '</div>') +
           sec('Collection', 'Personnages secrets', 'Un par collection, jamais en booster : chaque personnage obtenu révèle un fragment de son portrait.',
             '<div class="pf-trophies">' + A.COLLECTIONS.map(function (c) { return '<div class="pf-trophy">' + U.secretCard(c.id) + '</div>'; }).join('') + '</div>') +
           sec('Collection', 'Titres', 'Gagnés en complétant les collections : tous les personnages, puis toutes les éditions.',
-            (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">👑 ' + U.esc(t) + '</span>'; }).join('') + '</div>'
+            (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">' + U.icon('laurel') + U.esc(t) + '</span>'; }).join('') + '</div>'
               : '<p class="muted">Aucun titre pour l’instant. Complétez une collection pour obtenir le premier.</p>') +
-            (S.readyCount() ? '<p class="pf-ready">🎁 ' + S.readyCount() + ' récompense' + (S.readyCount() > 1 ? 's' : '') + ' à récupérer dans vos <a href="#/collections">collections</a>.</p>' : '')) +
+            (S.readyCount() ? '<p class="pf-ready">' + U.icon('gift') + S.readyCount() + ' récompense' + (S.readyCount() > 1 ? 's' : '') + ' à récupérer dans vos <a href="#/collections">collections</a>.</p>' : '')) +
           sec('Identité', 'Compte', 'Votre nom public et vos coordonnées.',
             '<form class="pf-form" data-profile-form>' +
               '<label class="field"><span>Pseudo</span><input class="input" name="name" maxlength="24" value="' + U.esc(u.name) + '" required></label>' +

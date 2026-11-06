@@ -63,7 +63,16 @@
     sound: '<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
     chevL: '<path d="m14.5 6-6 6 6 6"/>',
     chevR: '<path d="m9.5 6 6 6-6 6"/>',
-    reset: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/>'
+    reset: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/>',
+    // Pictogrammes des récompenses et missions (même trait que le reste de l’interface)
+    key: '<circle cx="7.5" cy="12" r="3.8"/><circle cx="7.5" cy="12" r="1.2"/><path d="M11.3 12h9.2M17.5 12v3.2M20.5 12v2.4"/>',
+    laurel: '<path d="M9 20.5c-3.4-2.2-5.4-6.2-4.6-11"/><path d="M15 20.5c3.4-2.2 5.4-6.2 4.6-11"/><path d="M4.6 12.4c1.6 0 2.7.7 3.3 2M4.5 9.2c1.4.3 2.3 1.1 2.7 2.4M5.9 15.8c1.5-.3 2.8.1 3.7 1.2"/><path d="M19.4 12.4c-1.6 0-2.7.7-3.3 2M19.5 9.2c-1.4.3-2.3 1.1-2.7 2.4M18.1 15.8c-1.5-.3-2.8.1-3.7 1.2"/><path d="m12 4 1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5L11 6z"/>',
+    gift: '<rect x="4.5" y="10" width="15" height="10" rx="1"/><path d="M3.5 7.5h17V10h-17zM12 7.5V20"/><path d="M12 7.5C10.6 4.6 7.5 4.3 7.5 6c0 1.3 2 1.5 4.5 1.5zM12 7.5c1.4-2.9 4.5-3.2 4.5-1.5 0 1.3-2 1.5-4.5 1.5z"/>',
+    swords: '<path d="M4.5 4.5 15 15M4.5 4.5h2.8M4.5 4.5v2.8"/><path d="M19.5 4.5 9 15M19.5 4.5h-2.8M19.5 4.5v2.8"/><path d="M12.6 17.4l4.8-4.8M11.4 17.4l-4.8-4.8M16.5 16.5l3 3M7.5 16.5l-3 3"/>',
+    flame: '<path d="M12 21c-3.6 0-6-2.5-6-5.8 0-3.6 3-5.4 3.6-9.2 2.2 1.4 3.2 3.4 3.2 5.2 1-.6 1.6-1.7 1.8-3 1.9 1.6 3.4 4 3.4 6.9 0 3.4-2.4 5.9-6 5.9z"/><path d="M12 21c-1.5 0-2.6-1.1-2.6-2.6 0-1.7 1.4-2.6 2.6-4.2 1.2 1.6 2.6 2.5 2.6 4.2 0 1.5-1.1 2.6-2.6 2.6z"/>',
+    frame: '<rect x="4" y="3.5" width="16" height="17" rx="1.5"/><rect x="7.2" y="6.7" width="9.6" height="10.6" rx=".6"/>',
+    scroll: '<path d="M8 4h10.5a2 2 0 0 1 0 4H8"/><path d="M8 4a2 2 0 0 0-2 2v12.5A1.5 1.5 0 0 0 7.5 20H17a2 2 0 0 0 2-2V8"/><path d="M9.5 11.5h6M9.5 15h4"/>',
+    medal: '<circle cx="12" cy="15" r="5.2"/><path d="M8.6 3.5l2.4 6.7M15.4 3.5 13 10.2"/><path d="m12 12.6.8 1.6 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2z"/>'
   };
   U.icon = function (name, cls) {
     return '<svg class="ic ' + (cls || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[name] || '') + '</svg>';
@@ -197,7 +206,18 @@
     return out.join(' + ');
   };
   U.scopeHref = function (key) { return key.charAt(0) === '@' ? '#/saga/' + key.slice(1) : '#/collection/' + key; };
-  U.rewardIcon = function (r) { return r.trophee ? '🗝️' : r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
+  U.rewardIcon = function (r, cls) { return U.icon(r.trophee ? 'key' : r.titre ? 'laurel' : r.booster ? 'pack' : r.cadre ? 'frame' : 'coin', cls); };
+  // Récompense détaillée en pastilles (pictogramme + libellé)
+  U.rewardChips = function (r) {
+    var out = [];
+    if (r.eclats) out.push(['coin', U.num(r.eclats) + ' ' + A.CURRENCY.name]);
+    if (r.booster) out.push(['pack', A.PACK[r.booster].name]);
+    if (r.trophee) out.push(['key', 'Personnage secret']);
+    if (r.avatar) out.push(['user', 'Portrait de profil']);
+    if (r.titre) out.push(['laurel', 'Titre « ' + r.titre + ' »']);
+    if (r.cadre) out.push(['frame', 'Cadre doré']);
+    return '<ul class="rw-gifts">' + out.map(function (x) { return '<li>' + U.icon(x[0]) + '<span>' + U.esc(x[1]) + '</span></li>'; }).join('') + '</ul>';
+  };
 
   /* Portrait de profil débloqué par une collection : l’emblème de sa première figure */
   U.avatarArt = function (cid) {
@@ -241,8 +261,8 @@
   };
   /* Duels héros contre monstre : les deux cartes réunies débloquent le récit de l’exploit */
   var DUEL_SETS = {
-    grecque: { head: 'Duels · héros contre monstres', intro: 'Réunissez un héros et son monstre pour débloquer le récit de leur affrontement.', k: 'Exploit', ok: 'débloqué', x: '⚔️', unit: 'exploits' },
-    ragnarok: { head: 'Ragnarök · les combats de la fin du monde', intro: 'Réunissez les deux adversaires pour lire la prophétie de leur dernier combat.', k: 'Prophétie', ok: 'débloquée', x: '🔥', unit: 'prophéties' }
+    grecque: { head: 'Duels · héros contre monstres', intro: 'Réunissez un héros et son monstre pour débloquer le récit de leur affrontement.', k: 'Exploit', ok: 'débloqué', x: 'swords', unit: 'exploits' },
+    ragnarok: { head: 'Ragnarök · les combats de la fin du monde', intro: 'Réunissez les deux adversaires pour lire la prophétie de leur dernier combat.', k: 'Prophétie', ok: 'débloquée', x: 'flame', unit: 'prophéties' }
   };
   // Jeux de duels qui concernent une collection (ou une collection globale, « @id »)
   U.duelSetsFor = function (key) {
@@ -266,11 +286,11 @@
       '<p class="du-intro muted small">' + T.intro + '</p>' +
       '<div class="du-list">' + list.map(function (d, i) {
         return '<article class="du-item' + (d.done ? ' is-done' : '') + '">' +
-          '<div class="du-vs">' + side(d.hero, d.heroOwned) + '<span class="du-x" aria-hidden="true">' + T.x + '</span>' + side(d.monster, d.monsterOwned) + '</div>' +
+          '<div class="du-vs">' + side(d.hero, d.heroOwned) + '<span class="du-x" aria-hidden="true">' + U.icon(T.x) + '</span>' + side(d.monster, d.monsterOwned) + '</div>' +
           '<p class="du-k">' + T.k + ' ' + (i < 9 ? '0' : '') + (i + 1) + (d.done ? ' · ' + T.ok : '') + '</p>' +
           '<h3 class="du-title">' + U.esc(d.title) + '</h3>' +
           (d.done ? '<p class="du-text">' + U.esc(d.text) + '</p>'
-            : '<p class="du-lock">🔒 Il vous manque ' + U.esc([!d.heroOwned && A.CHAR[d.hero].name, !d.monsterOwned && A.CHAR[d.monster].name].filter(Boolean).join(' et ')) + '.</p>') +
+            : '<p class="du-lock">' + U.icon('lock') + 'Il vous manque ' + U.esc([!d.heroOwned && A.CHAR[d.hero].name, !d.monsterOwned && A.CHAR[d.monster].name].filter(Boolean).join(' et ')) + '.</p>') +
         '</article>';
       }).join('') + '</div></div>';
   };
@@ -297,23 +317,50 @@
     });
   };
 
-  // Piste des paliers d’une collection (page Collection)
+  // Parcours des paliers d’une collection (ou d’une collection globale « @id ») :
+  // médaillons reliés par un fil d’or, pastilles de récompense, un seul bouton quand un palier est prêt.
   U.rewardTrack = function (cid) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
-    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses de collection') + '</p><span class="rw-count">' + got + ' / ' + steps.length + ' récupérées</span></div>' +
-      '<ol class="rw-track">' + steps.map(function (s) {
-        var UNITS = { chars: ['personnage', 'personnages'], eds: ['édition', 'éditions'], started: ['collection entamée', 'collections entamées'], done: ['collection complète', 'collections complètes'] };
-        var U2 = UNITS[s.of], left = s.goal - s.have, unit = U2[s.goal > 1 ? 1 : 0];
+    var UNITS = { chars: ['personnage', 'personnages'], eds: ['édition', 'éditions'], started: ['collection entamée', 'collections entamées'], done: ['collection complète', 'collections complètes'] };
+    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses de collection') + '</p>' +
+      '<span class="rw-count">' + got + ' / ' + steps.length + '</span></div>' +
+      '<ol class="rw-path" style="--n:' + steps.length + '">' + steps.map(function (s, i) {
+        var U2 = UNITS[s.of], left = s.goal - s.have, next = steps[i + 1];
         var action = s.state === 'ready'
           ? '<button type="button" class="btn btn-gold btn-sm rw-btn" data-claim="' + s.id + '">Récupérer</button>'
-          : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Récupérée</span>'
-          : '<span class="rw-left">Encore ' + left + ' ' + U2[left > 1 ? 1 : 0] + '</span>';
-        return '<li class="rw-step is-' + s.state + '">' +
-          '<span class="rw-ico" aria-hidden="true">' + (s.state === 'claimed' ? U.icon('check') : U.rewardIcon(s.reward)) + '</span>' +
-          '<div class="rw-txt"><p class="rw-label">' + s.label + '</p><p class="rw-goal">' + s.have + ' / ' + s.goal + ' ' + unit + '</p>' +
-            '<div class="rw-bar"><span style="width:' + Math.round(s.have / Math.max(1, s.goal) * 100) + '%"></span></div>' +
-            '<p class="rw-gift">' + U.esc(U.rewardText(s.reward)) + '</p></div>' + action + '</li>';
+          : s.state === 'claimed' ? '<p class="rw-done">' + U.icon('check') + 'Récupérée</p>'
+          : '<p class="rw-left"><span class="rw-bar"><i style="width:' + Math.round(s.have / Math.max(1, s.goal) * 100) + '%"></i></span>' + s.have + ' / ' + s.goal + '<small> · encore ' + left + ' ' + U2[left > 1 ? 1 : 0] + '</small></p>';
+        return '<li class="rw-m is-' + s.state + (next && next.state !== 'locked' ? ' is-linked' : '') + '">' +
+          '<span class="rw-medal" aria-hidden="true">' + U.rewardIcon(s.reward) + (s.state === 'claimed' ? '<i class="rw-tick">' + U.icon('check') + '</i>' : '') + '</span>' +
+          '<div class="rw-body"><p class="rw-k">Palier ' + ['I', 'II', 'III', 'IV', 'V'][i] + ' · ' + s.goal + ' ' + U2[s.goal > 1 ? 1 : 0] + '</p>' +
+            '<p class="rw-label">' + s.label + '</p>' + U.rewardChips(s.reward) + action + '</div></li>';
       }).join('') + '</ol></div>';
+  };
+
+  // Missions d’une collection : réunir des personnages liés, partir à la chasse d’une rareté…
+  U.missionsHTML = function (cid) {
+    var list = A.store.missions(cid);
+    if (!list.length) return '';
+    var got = list.filter(function (m) { return m.state === 'claimed'; }).length;
+    var HICON = { rare: 'medal', epic: 'medal', legendary: 'medal', trio: 'cards', numerotes: 'tag', eventail: 'sparkle' };
+    return '<div class="ms"><div class="rw-head"><p class="eyebrow">Missions</p><span class="rw-count">' + got + ' / ' + list.length + '</span></div>' +
+      '<div class="ms-grid">' + list.map(function (m) {
+        var body = m.kind === 'set'
+          ? '<ul class="ms-chars">' + m.chars.map(function (id) {
+              var own = m.owned.indexOf(id) !== -1, best = A.store.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
+              return '<li><button type="button" class="ms-char du-side' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + '>' +
+                '<span class="du-pic">' + A.editionArt(ed, { w: 120, h: 120, ctx: 'duel' }) + '</span><span class="du-name">' + U.esc(A.CHAR[id].name) + '</span></button></li>';
+            }).join('') + '</ul>'
+          : '<div class="ms-prog"><span class="rw-bar"><i style="width:' + Math.round(m.have / m.goal * 100) + '%"></i></span><span>' + m.have + ' / ' + m.goal + '</span></div>';
+        var action = m.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + m.id + '">Récupérer</button>'
+          : m.state === 'claimed' ? '<p class="rw-done">' + U.icon('check') + 'Accomplie</p>'
+          : '<p class="ms-left">' + m.have + ' / ' + m.goal + '</p>';
+        return '<article class="ms-card is-' + m.state + ' is-' + m.kind + '">' +
+          '<div class="ms-top"><span class="ms-ico">' + U.icon(m.kind === 'set' ? 'scroll' : HICON[m.hunt]) + '</span>' +
+            '<div class="ms-head"><p class="ms-k">' + (m.kind === 'set' ? 'Réunir' : 'Chasse') + '</p><h4 class="ms-label">' + U.esc(m.label) + '</h4></div></div>' +
+          '<p class="ms-desc">' + U.esc(m.desc) + '</p>' + body +
+          '<div class="ms-foot">' + U.rewardChips(m.reward) + action + '</div></article>';
+      }).join('') + '</div></div>';
   };
 
   U.progress = function (p, label) {

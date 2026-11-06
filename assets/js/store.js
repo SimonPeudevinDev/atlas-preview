@@ -366,18 +366,61 @@
       return s;
     });
   };
+  /* ---------- Missions de collection ----------
+     Thématiques (missions.js) + missions de chasse tirées selon la collection (huntsFor) :
+     deux collections n’ont jamais exactement les mêmes. */
+  var HUNTS = {
+    rare: { label: 'Première rareté', desc: 'Obtenez une édition Rare ou plus précieuse.', min: 'rare', reward: { eclats: 200 } },
+    epic: { label: 'Pièce de musée', desc: 'Obtenez une édition Épique ou plus précieuse.', min: 'epic', reward: { eclats: 400 } },
+    legendary: { label: 'Chef-d’œuvre', desc: 'Obtenez une édition Légendaire ou plus précieuse.', min: 'legendary', reward: { booster: 'standard' } },
+    trio: { label: 'Trois visages', desc: 'Réunissez trois éditions différentes d’un même personnage.', goal: 3, reward: { eclats: 300 } },
+    numerotes: { label: 'Exemplaires numérotés', desc: 'Possédez trois exemplaires numérotés de cette collection.', goal: 3, reward: { eclats: 350 } },
+    eventail: { label: 'L’éventail des raretés', desc: 'Possédez des cartes de trois raretés différentes dans cette collection.', goal: 3, reward: { eclats: 300 } }
+  };
+  function huntsFor(cid) {
+    var h = A.hash(cid + '-missions'), c = A.COLL[cid];
+    var hasR = function (rid) { return c.chars.some(function (id) { return A.CHAR[id].editions.indexOf(rid) !== -1; }); };
+    var rar = ['rare', 'epic', 'legendary'].filter(hasR);
+    var other = ['trio', 'numerotes', 'eventail'];
+    return [rar[h % rar.length], other[(h >> 3) % other.length]].filter(Boolean);
+  }
+  S.missions = function (cid) {
+    var c = A.COLL[cid];
+    if (!c) return [];
+    var inv = state.inventory.filter(function (i) { return A.CHAR[A.ED[i.ed].charId].coll === cid; });
+    var out = (A.MISSIONS && A.MISSIONS[cid] || []).map(function (m) {
+      var own = m.chars.filter(function (id) { return A.CHAR[id] && S.ownsChar(id); });
+      return { id: 'm-' + m.id, kind: 'set', label: m.label, desc: m.desc, chars: m.chars.filter(function (id) { return A.CHAR[id]; }), owned: own, goal: m.chars.length, have: own.length, reward: m.reward };
+    });
+    huntsFor(cid).forEach(function (k) {
+      var H = HUNTS[k], have = 0, goal = H.goal || 1;
+      if (H.min) have = inv.some(function (i) { return A.R[A.ED[i.ed].rarity].rank >= A.R[H.min].rank; }) ? 1 : 0;
+      else if (k === 'trio') {
+        var per = {};
+        inv.forEach(function (i) { var e = A.ED[i.ed]; (per[e.charId] = per[e.charId] || {})[e.id] = 1; });
+        have = Object.keys(per).reduce(function (m, id) { return Math.max(m, Object.keys(per[id]).length); }, 0);
+      } else if (k === 'numerotes') have = inv.filter(function (i) { return i.serial != null; }).length;
+      else if (k === 'eventail') { var r = {}; inv.forEach(function (i) { r[A.ED[i.ed].rarity] = 1; }); have = Object.keys(r).length; }
+      out.push({ id: 'h-' + k, kind: 'hunt', hunt: k, min: H.min, label: H.label, desc: H.desc, goal: goal, have: Math.min(goal, have), reward: H.reward });
+    });
+    return out.map(function (m) {
+      m.state = state.claimed[cid + ':' + m.id] ? 'claimed' : m.have >= m.goal ? 'ready' : 'locked';
+      m.coll = cid;
+      return m;
+    });
+  };
   function readyKeys() {
     var out = [];
     A.COLLECTIONS.map(function (c) { return c.id; }).concat((A.GROUPS || []).map(function (g) { return '@' + g.id; })).forEach(function (k) {
-      S.rewards(k).forEach(function (s) { if (s.state === 'ready') out.push(k + ':' + s.id); });
+      S.rewards(k).concat(k.charAt(0) === '@' ? [] : S.missions(k)).forEach(function (s) { if (s.state === 'ready') out.push(k + ':' + s.id); });
     });
     return out;
   }
-  S.readyCount = function (cid) { return cid ? S.rewards(cid).filter(function (s) { return s.state === 'ready'; }).length : readyKeys().length; };
+  S.readyCount = function (cid) { return cid ? S.rewards(cid).concat(cid.charAt(0) === '@' ? [] : S.missions(cid)).filter(function (s) { return s.state === 'ready'; }).length : readyKeys().length; };
   S.claim = function (cid, stepId) {
-    var s = S.rewards(cid).filter(function (x) { return x.id === stepId; })[0];
+    var s = S.rewards(cid).concat(cid.charAt(0) === '@' ? [] : S.missions(cid)).filter(function (x) { return x.id === stepId; })[0];
     if (!s || s.state !== 'ready') return { ok: false, error: 'Ce palier n’est pas encore atteint.' };
-    var r = s.reward, now = Date.now(), label = 'Récompense · ' + S.scopeName(cid) + ' · ' + s.label;
+    var r = s.reward, now = Date.now(), label = (s.kind ? 'Mission' : 'Récompense') + ' · ' + S.scopeName(cid) + ' · ' + s.label;
     state.claimed[cid + ':' + stepId] = now;
     if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
     if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
