@@ -25,10 +25,22 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Collections ---------- */
   A.COLLECTIONS = [
     {
-      id: 'grece', name: 'Olympe', family: 'Mythologie grecque', universe: 'Mythologies', motif: 'temple',
+      id: 'grece', name: 'Olympe', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'temple',
       edition: 'Édition I', status: 'live', popular: 1,
       tagline: 'Les dieux, les héros et les monstres de la Grèce antique.',
       description: 'Du sommet de l’Olympe aux rives du Styx, une galerie consacrée aux divinités et aux figures héroïques qui ont façonné l’imaginaire occidental.'
+    },
+    {
+      id: 'titans', name: 'Les Titans', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'peak',
+      edition: 'Édition I', status: 'live', popular: 6,
+      tagline: 'La génération d’avant les dieux, maîtresse du monde jusqu’à sa chute.',
+      description: 'Enfants du Ciel et de la Terre, ils régnèrent avant l’Olympe. Leur guerre de dix ans contre Zeus décida du sort du monde.'
+    },
+    {
+      id: 'geants', name: 'Les Géants', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'volcano',
+      edition: 'Édition I', status: 'live', popular: 7,
+      tagline: 'Géants, Cyclopes et Hécatonchires, colosses nés de la Terre.',
+      description: 'Lancés par Gaïa contre l’Olympe ou alliés de Zeus, ces colosses ont laissé leur nom aux volcans, aux îles et aux lunes de Saturne.'
     },
     {
       id: 'egypte', name: 'Rives du Nil', family: 'Mythologie égyptienne', universe: 'Mythologies', motif: 'pyramids',
@@ -62,6 +74,19 @@ window.ATLAS = window.ATLAS || {};
     }
   ];
 
+  /* ---------- Collections globales ----------
+     Une collection globale réunit plusieurs sous-collections d’un même univers.
+     Sa progression additionne celle de ses sous-collections et elle a ses propres récompenses. */
+  A.GROUPS = [
+    {
+      id: 'grecque', name: 'Mythologie grecque', subs: ['grece', 'titans', 'geants'], title: 'Gardien du Panthéon grec',
+      tagline: 'Dieux, Titans et Géants : trois générations qui se sont disputé le monde.',
+      description: 'Des Titans qui régnaient avant l’Olympe aux Géants lancés contre lui, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en trois sous-collections.'
+    }
+  ];
+  A.GROUP = {};
+  A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
+
   A.UPCOMING = [
     { id: 'japon',  name: 'Kami & Yōkai',       family: 'Mythologie japonaise',  motif: 'torii',  date: 'Printemps 2027', desc: 'Esprits, divinités et créatures du folklore japonais.' },
     { id: 'arthur', name: 'La Table ronde',     family: 'Légendes arthuriennes', motif: 'castle', date: 'Été 2027',       desc: 'Chevaliers, enchanteurs et la quête du Graal.' },
@@ -82,6 +107,27 @@ window.ATLAS = window.ATLAS || {};
       ['artemis', 'Artémis', 'La Chasseresse', 86, 72, 80, 'BREL', 'Sœur jumelle d’Apollon, reine des forêts et de la lune.'],
       ['meduse', 'Méduse', 'La Gorgone', 81, 77, 69, 'BREL', 'Son regard change en pierre quiconque ose la contempler.'],
       ['heracles', 'Héraclès', 'Le Héros aux douze travaux', 95, 84, 62, 'BRE', 'Le plus célèbre des héros grecs, d’une force sans égale.']
+    ],
+    titans: [
+      ['cronos', 'Cronos', 'Le Titan dévoreur', 90, 82, 84, 'BRELMU', 'Le plus jeune des Titans, il détrôna son père Ouranos avant d’être renversé par son fils.'],
+      ['rhea', 'Rhéa', 'Mère des dieux', 66, 84, 90, 'BREL', 'Épouse de Cronos, elle sauva son dernier-né en trompant le Titan.'],
+      ['oceanos', 'Océan', 'Le Fleuve du monde', 72, 88, 82, 'BRE', 'Titan aîné, fleuve immense qui encercle la terre.'],
+      ['hyperion', 'Hypérion', 'Le Titan de la lumière', 84, 76, 86, 'BRE', 'Celui qui va au-dessus : père du Soleil, de la Lune et de l’Aurore.'],
+      ['themis', 'Thémis', 'La Justice divine', 62, 86, 96, 'BREL', 'Gardienne de l’ordre et des lois, conseillère de Zeus.'],
+      ['mnemosyne', 'Mnémosyne', 'La Mémoire', 54, 74, 99, 'BRE', 'Titanide de la mémoire, mère des neuf Muses.'],
+      ['japet', 'Japet', 'Le Père des audacieux', 86, 80, 78, 'BRE', 'Titan père d’Atlas et de Prométhée.'],
+      ['atlas', 'Atlas', 'Le Porteur du ciel', 94, 92, 64, 'BRELM', 'Condamné à soutenir la voûte céleste aux confins du monde.'],
+      ['promethee', 'Prométhée', 'Le Voleur de feu', 74, 80, 98, 'BRELM', 'Titan ami des hommes, il leur offrit le feu volé à l’Olympe.']
+    ],
+    geants: [
+      ['alcyonee', 'Alcyonée', 'L’Immortel de Pallène', 92, 88, 56, 'BRELMU', 'Chef des Géants, invincible tant qu’il restait sur sa terre natale.'],
+      ['porphyrion', 'Porphyrion', 'Le Roi des Géants', 95, 84, 62, 'BREL', 'Roi des Géants, il osa s’attaquer à Héra.'],
+      ['encelade', 'Encelade', 'L’Enseveli de Sicile', 90, 86, 60, 'BREL', 'Écrasé sous la Sicile par Athéna.'],
+      ['ephialtes', 'Éphialtès', 'L’Ennemi d’Apollon', 88, 80, 64, 'BRE', 'Géant aveuglé par les flèches des dieux.'],
+      ['mimas', 'Mimas', 'Le Géant du volcan', 86, 82, 60, 'BRE', 'Accablé sous le métal en fusion d’Héphaïstos.'],
+      ['polypheme', 'Polyphème', 'Le Cyclope', 93, 78, 50, 'BRELM', 'Cyclope fils de Poséidon, aveuglé par Ulysse.'],
+      ['briaree', 'Briarée', 'L’Hécatonchire', 97, 90, 58, 'BRE', 'Géant aux cent bras et aux cinquante têtes, allié de Zeus.'],
+      ['antee', 'Antée', 'Le Lutteur invincible', 94, 92, 52, 'BRE', 'Fils de la Terre, invincible tant qu’il la touchait.']
     ],
     egypte: [
       ['ra', 'Râ', 'Dieu du soleil', 90, 76, 88, 'BRELMU', 'Chaque jour, il traverse le ciel sur sa barque solaire.'],
@@ -194,6 +240,23 @@ window.ATLAS = window.ATLAS || {};
     'grece-apollon': 'Dieu de la lumière, des arts et des oracles, il parle aux hommes par la voix de la Pythie de Delphes. Fils de [[zeus]], il est le frère jumeau d’[[artemis]], née juste avant lui sur l’île de Délos.',
     'grece-artemis': 'Chasseresse des forêts et protectrice des jeunes filles, elle veille la nuit sous la lune. Jumelle d’[[apollon]], elle aurait aidé sa mère à le mettre au monde, à peine née elle-même.',
     'grece-meduse': 'Seule mortelle des trois Gorgones, elle change en pierre quiconque croise son regard. Sa malédiction lui vient d’[[athena]], offensée que [[poseidon]] l’ait séduite dans son temple.',
+    'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
+    'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
+    'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
+    'titans-hyperion': 'Son nom signifie « celui qui va au-dessus ». Avec sa sœur Théia, il eut les trois astres qui éclairent le monde : Hélios, le Soleil, Séléné, la Lune, et Éos, l’Aurore.',
+    'titans-themis': 'Titanide de la loi et de l’ordre juste, elle siégea aux côtés de [[grece:zeus|Zeus]], dont elle fut la deuxième épouse. Elle lui donna les Heures, gardiennes des saisons, et les Moires, qui filent le destin.',
+    'titans-mnemosyne': 'Elle incarne la mémoire, qui permet aux poètes de chanter le passé. Unie à [[grece:zeus|Zeus]] pendant neuf nuits, elle donna naissance aux neuf Muses.',
+    'titans-japet': 'Frère de [[cronos]], il combattit dans la guerre des Titans et fut jeté dans le Tartare. Il est surtout connu par ses fils : [[atlas]], [[promethee]], Épiméthée et Ménoetios.',
+    'titans-atlas': 'Fils de [[japet]], il mena les Titans au combat contre les Olympiens. Vaincu, il fut condamné par [[grece:zeus|Zeus]] à porter le ciel sur ses épaules, à l’extrême ouest du monde.',
+    'titans-promethee': 'Fils de [[japet]], il façonna les premiers hommes dans l’argile, puis vola le feu de l’Olympe pour le leur donner. [[grece:zeus|Zeus]] le fit enchaîner sur le Caucase, où un aigle venait lui dévorer le foie.',
+    'geants-alcyonee': 'Le plus redoutable des Géants était immortel tant qu’il restait sur la terre de Pallène, où il était né. [[grece:heracles|Héraclès]] le blessa d’une flèche puis, sur le conseil d’[[grece:athena|Athéna]], le traîna hors de ses terres, où il mourut.',
+    'geants-porphyrion': 'Roi des Géants, il se jeta sur [[grece:hera|Héra]] pendant la bataille contre les dieux. [[grece:zeus|Zeus]] le frappa de sa foudre et [[grece:heracles|Héraclès]] l’acheva d’une flèche.',
+    'geants-encelade': 'Il affronta [[grece:athena|Athéna]] pendant la guerre des Géants. Alors qu’il fuyait, la déesse jeta sur lui l’île de Sicile, qui l’écrasa.',
+    'geants-ephialtes': 'Pendant la bataille contre les dieux, [[grece:apollon|Apollon]] lui creva l’œil gauche d’une flèche, et [[grece:heracles|Héraclès]] lui perça le droit.',
+    'geants-mimas': 'Selon les récits, il fut tué par Héphaïstos, qui l’accabla de projectiles de métal en fusion, ou par [[grece:zeus|Zeus]] et sa foudre.',
+    'geants-polypheme': 'Fils de [[grece:poseidon|Poséidon]], ce cyclope à l’œil unique vivait en Sicile avec ses moutons. Il enferma Ulysse et ses compagnons dans sa grotte et en dévora plusieurs, avant que le héros ne l’enivre et lui crève l’œil.',
+    'geants-briaree': 'Fils d’Ouranos et de Gaïa, il fut enfermé dans le Tartare avec ses frères Cottos et Gygès. Libéré par [[grece:zeus|Zeus]], il l’aida à vaincre les Titans en lançant sur eux des rochers par centaines.',
+    'geants-antee': 'Fils de [[grece:poseidon|Poséidon]] et de la Terre, ce géant de Libye défiait les voyageurs à la lutte et les tuait. Chaque fois qu’il touchait le sol, sa mère lui rendait ses forces.',
     'grece-heracles': 'Fils de [[zeus]] et d’une mortelle, il accomplit douze travaux pour expier un crime commis dans la folie envoyée par [[hera]]. Le dernier le mena jusqu’au royaume d’[[hades]], d’où il ramena Cerbère.',
 
     'egypte-ra': 'Chaque jour, il traverse le ciel sur sa barque solaire, puis affronte la nuit le serpent Apophis. Lorsque les hommes se révoltèrent contre lui, il envoya son œil, sous la forme de [[sekhmet]], pour les châtier.',
@@ -253,6 +316,23 @@ window.ATLAS = window.ATLAS || {};
     'grece-apollon': 'Il tua le serpent Python à Delphes et y fonda son oracle, le plus célèbre du monde grec. Musicien, il joue de la lyre que lui offrit Hermès. Épris de la nymphe Daphné, changée en laurier pour lui échapper, il fit de cet arbre son emblème.',
     'grece-artemis': 'Elle obtint de [[zeus]] de rester à jamais libre et sans époux, entourée de nymphes chasseresses. Le chasseur Actéon, qui l’avait surprise au bain, fut changé en cerf et dévoré par ses propres chiens. Son temple d’Éphèse comptait parmi les Sept Merveilles du monde.',
     'grece-meduse': 'Le héros Persée la décapita en ne la regardant que dans le reflet de son bouclier. De son sang naquirent le cheval ailé Pégase et le géant Chrysaor. Même tranchée, sa tête gardait son pouvoir : Persée l’offrit à [[athena]], qui la fixa sur son égide.',
+    'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
+    'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
+    'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
+    'titans-hyperion': 'Les poètes grecs le confondent parfois avec son fils Hélios. Selon certains récits, il fut l’un des quatre Titans qui maintinrent Ouranos pendant que [[cronos]] le mutilait. Le poète anglais Keats lui consacra un long poème inachevé.',
+    'titans-themis': 'Avant Apollon, elle aurait tenu l’oracle de Delphes. On la représente tenant une balance, parfois les yeux bandés : c’est elle que l’on voit encore devant de nombreux palais de justice.',
+    'titans-mnemosyne': 'Dans certains rites funéraires, les initiés devaient boire aux Enfers à la source de Mnémosyne, et non à celle du Léthé, qui fait tout oublier. Le mot « mnémotechnique » vient de son nom.',
+    'titans-japet': 'Ses fils ont tous défié l’ordre des dieux, et tous en ont payé le prix. Certains auteurs anciens voyaient en lui l’ancêtre de l’humanité, par Prométhée et son fils Deucalion.',
+    'titans-atlas': 'Lors de son onzième travail, [[grece:heracles|Héraclès]] prit sa place quelques instants pour qu’il aille cueillir les pommes d’or des Hespérides. Au XVIe siècle, le géographe Mercator donna le nom d’Atlas à son recueil de cartes, et le mot est resté. Les montagnes de l’Atlas, au Maroc, portent aussi son nom.',
+    'titans-promethee': 'Son nom signifie « celui qui réfléchit avant », par opposition à son frère Épiméthée, « celui qui réfléchit après », qui accepta Pandore malgré ses avertissements. C’est [[grece:heracles|Héraclès]] qui le délivra en abattant l’aigle. Eschyle lui consacra une tragédie, Prométhée enchaîné.',
+    'geants-alcyonee': 'Il avait volé les troupeaux du Soleil avant la guerre contre les dieux. De chagrin, ses filles, les Alcyonides, se jetèrent à la mer et furent changées en martins-pêcheurs, les alcyons.',
+    'geants-porphyrion': 'Selon Apollodore, Zeus lui inspira un désir soudain pour Héra afin de le distraire au cœur de la bataille. Son nom évoque la pourpre, la couleur des flammes ou du sang. Le poète Pindare le désigne comme le roi des Géants.',
+    'geants-encelade': 'Pour les Anciens, ses mouvements sous la terre provoquaient les séismes de Sicile, et son souffle les éruptions de l’Etna. Une lune glacée de Saturne porte son nom : elle projette d’immenses geysers dans l’espace.',
+    'geants-ephialtes': 'Son nom désignait aussi, chez les Grecs, le démon du cauchemar qui pèse sur la poitrine des dormeurs. Il ne faut pas le confondre avec Éphialtès l’Aloade, qui tenta avec son frère Otos d’empiler des montagnes pour escalader le ciel.',
+    'geants-mimas': 'Le mont Mimas, en Asie Mineure, porte son nom, comme une petite lune de Saturne reconnaissable à son immense cratère, qui lui donne l’air d’un grand œil.',
+    'geants-polypheme': 'Ulysse lui avait dit s’appeler « Personne » : quand Polyphème hurla que Personne l’attaquait, les autres Cyclopes ne vinrent pas l’aider. Sa colère, transmise à son père Poséidon, poursuivit Ulysse pendant dix ans. D’autres récits le montrent soupirant pour la nymphe Galatée.',
+    'geants-briaree': 'Il devint ensuite le gardien des Titans prisonniers. Dans l’Iliade, la déesse Thétis l’appelle au secours de [[grece:zeus|Zeus]] quand les autres dieux veulent l’enchaîner : sa seule présence suffit à les faire renoncer.',
+    'geants-antee': '[[grece:heracles|Héraclès]] devina son secret : il le souleva de terre et l’étouffa dans ses bras. Antée bâtissait un temple à son père avec les crânes de ses victimes.',
     'grece-heracles': 'Encore au berceau, il étrangla les deux serpents envoyés par [[hera]]. Parmi ses travaux : le lion de Némée, l’hydre de Lerne aux têtes qui repoussent, les écuries d’Augias. À sa mort, il fut accueilli sur l’Olympe et devint immortel.',
 
     'egypte-ra': 'On le représente avec une tête de faucon coiffée du disque solaire. Si puissant que [[isis]] dut ruser pour lui arracher son nom secret, il fut plus tard uni à Amon pour devenir Amon-Rê, roi des dieux, honoré à Karnak.',
@@ -320,12 +400,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'egypte', 'gothique', 'contes', 'histoire', 'nordique'];
+  var ALL = ['grece', 'titans', 'geants', 'egypte', 'gothique', 'contes', 'histoire', 'nordique'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'contes-alice-base',
-      collections: ['grece', 'egypte', 'gothique', 'contes', 'histoire'],
+      collections: ['grece', 'titans', 'geants', 'egypte', 'gothique', 'contes', 'histoire'],
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette

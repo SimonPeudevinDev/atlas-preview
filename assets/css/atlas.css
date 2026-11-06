@@ -1435,3 +1435,22 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .sp-t.is-on { background: transparent; box-shadow: inset 0 0 0 .5px rgba(251, 249, 244, .22); }
 .card-secret:not(.is-locked) { cursor: pointer; }
 .secret-detail .detail-more-p { margin: 0; max-width: 620px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+
+/* Collections globales (ex. Mythologie grecque) */
+.cgroup { margin: 0 0 48px; }
+.cgroup-head { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px 40px; align-items: end; padding: 22px 24px; margin: 0 0 22px; border: 1px solid var(--line-2); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--surface), var(--bg-2)); transition: border-color .25s; }
+.cgroup-head:hover { border-color: var(--gold-2); }
+.cgroup-head .eyebrow { margin-bottom: 6px; color: var(--gold); }
+.cgroup-name { font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 4vw, 42px); line-height: 1.05; margin: 0 0 6px; text-wrap: balance; }
+.cgroup-tag { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 46ch; }
+.cgroup-prog { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.cgroup-prog .progress-label { margin: 0; }
+.cgroup-prog .coll-next { margin: 0; }
+.cgroup-prog .link-arrow { align-self: flex-start; }
+.coll-next.is-ready { color: var(--ink); font-weight: 600; }
+.cgroup-subs { padding-left: 18px; border-left: 1px solid var(--gold-2); }
+.cgroup-rest { margin: 8px 0 18px; }
+@media (max-width: 760px) {
+  .cgroup-head { grid-template-columns: 1fr; padding: 18px; }
+  .cgroup-subs { padding-left: 12px; }
+}

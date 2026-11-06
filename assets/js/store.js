@@ -262,9 +262,39 @@
   var TITLES = {
     grece: ['Initié de l’Olympe', 'Maître de l’Olympe'], egypte: ['Scribe du Nil', 'Gardien des Deux Terres'],
     gothique: ['Veilleur des ombres', 'Seigneur des brumes'], contes: ['Conteur', 'Gardien des contes'],
-    histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard']
+    histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard'],
+    titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra']
   };
+  /* Collection globale : progression cumulée de ses sous-collections. */
+  S.groupProgress = function (gid) {
+    var g = A.GROUP[gid], o = { owned: 0, total: 0, started: 0, done: 0, subs: g.subs.length };
+    g.subs.forEach(function (cid) {
+      var p = S.collectionProgress(cid);
+      o.owned += p.owned; o.total += p.total;
+      if (p.owned) o.started++;
+      if (p.pct >= 1) o.done++;
+    });
+    o.pct = o.total ? o.owned / o.total : 0;
+    return o;
+  };
+  // Une portée de récompense est une collection (« grece ») ou une collection globale (« @grecque »).
+  S.scopeName = function (key) { return key.charAt(0) === '@' ? A.GROUP[key.slice(1)].name : A.COLL[key].name; };
+  function groupRewards(key) {
+    var g = A.GROUP[key.slice(1)], pr = S.groupProgress(g.id), n = g.subs.length;
+    var steps = [
+      { id: 'explorateur', goal: n, of: 'started', label: 'Explorateur', reward: { eclats: 300 } },
+      { id: 'premiere', goal: 1, of: 'done', label: 'Première sous-collection', reward: { booster: 'standard' } },
+      { id: 'pantheon', goal: n, of: 'done', label: 'Panthéon complet', reward: { eclats: 3000, booster: 'conservateur', titre: g.title } }
+    ];
+    return steps.map(function (s) {
+      s.have = Math.min(s.goal, pr[s.of]);
+      s.state = state.claimed[key + ':' + s.id] ? 'claimed' : s.have >= s.goal ? 'ready' : 'locked';
+      s.coll = key;
+      return s;
+    });
+  }
   S.rewards = function (cid) {
+    if (cid.charAt(0) === '@') return groupRewards(cid);
     var c = A.COLL[cid], pr = S.collectionProgress(cid), n = pr.total, t = TITLES[cid] || ['Collectionneur', 'Maître collectionneur'];
     var steps = [
       { id: 'debut', goal: Math.min(3, n), of: 'chars', label: 'Premiers pas', reward: { eclats: 150 } },
@@ -281,14 +311,16 @@
   };
   function readyKeys() {
     var out = [];
-    A.COLLECTIONS.forEach(function (c) { S.rewards(c.id).forEach(function (s) { if (s.state === 'ready') out.push(c.id + ':' + s.id); }); });
+    A.COLLECTIONS.map(function (c) { return c.id; }).concat((A.GROUPS || []).map(function (g) { return '@' + g.id; })).forEach(function (k) {
+      S.rewards(k).forEach(function (s) { if (s.state === 'ready') out.push(k + ':' + s.id); });
+    });
     return out;
   }
   S.readyCount = function (cid) { return cid ? S.rewards(cid).filter(function (s) { return s.state === 'ready'; }).length : readyKeys().length; };
   S.claim = function (cid, stepId) {
     var s = S.rewards(cid).filter(function (x) { return x.id === stepId; })[0];
     if (!s || s.state !== 'ready') return { ok: false, error: 'Ce palier n’est pas encore atteint.' };
-    var r = s.reward, now = Date.now(), label = 'Récompense · ' + A.COLL[cid].name + ' · ' + s.label;
+    var r = s.reward, now = Date.now(), label = 'Récompense · ' + S.scopeName(cid) + ' · ' + s.label;
     state.claimed[cid + ':' + stepId] = now;
     if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
     if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;

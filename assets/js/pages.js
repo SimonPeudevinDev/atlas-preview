@@ -30,6 +30,19 @@
     var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
     return '<p class="coll-next">' + U.rewardIcon(s.reward) + ' Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
   }
+  // Bloc d’une collection globale dans la liste : en-tête cliquable + ses sous-collections
+  function groupBlock(g, subs) {
+    var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id);
+    var nx = S.rewards('@' + g.id).filter(function (x) { return x.state === 'locked'; })[0];
+    return '<section class="cgroup"><a class="cgroup-head" href="#/saga/' + g.id + '">' +
+      '<div class="cgroup-copy"><p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p><h2 class="cgroup-name">' + U.esc(g.name) + '</h2>' +
+        '<p class="cgroup-tag">' + U.esc(g.tagline) + '</p></div>' +
+      '<div class="cgroup-prog">' + U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages · ' + pr.done + ' / ' + pr.subs + ' complètes</span><span>' + Math.round(pr.pct * 100) + ' %</span>') +
+        (ready ? '<p class="coll-next is-ready">🎁 Récompense globale à récupérer</p>' : nx ? '<p class="coll-next">' + U.rewardIcon(nx.reward) + ' Prochain palier : ' + U.esc(nx.label) + ' · ' + U.esc(U.rewardText(nx.reward)) + '</p>' : '') +
+        '<span class="link-arrow">Voir la collection globale ' + I('arrow') + '</span></div></a>' +
+      '<div class="coll-grid is-full cgroup-subs">' + subs.map(function (c) { return collTile(c); }).join('') + '</div></section>';
+  }
+
   function globe() {
     var o = '<svg class="globe" viewBox="0 0 600 600" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width=".7">';
     o += '<circle cx="300" cy="300" r="280"/>';
@@ -140,7 +153,7 @@
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
-        '<p class="lead">Six salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
+        '<p class="lead">Huit salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
           '<div class="chips" data-f="universe">' + unis.map(function (u) { return '<button class="chip' + (cf.universe === u ? ' is-active' : '') + '" data-v="' + u + '">' + (u === 'all' ? 'Tous les univers' : u) + '</button>'; }).join('') + '</div>' +
           '<div class="toolbar-end">' +
@@ -173,7 +186,15 @@
               return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) + '</div>';
             }).join('') + '</div>' : '<div class="empty">Aucun personnage ne correspond à « ' + U.esc(cf.q) + ' ».</div>');
         } else {
-          html = (list.length ? '<div class="coll-grid is-full">' + list.map(function (c) { return collTile(c); }).join('') + '</div>' : '<div class="empty">Toutes les collections de cet univers sont complètes. Bravo !</div>');
+          var shown = {};
+          html = (A.GROUPS || []).map(function (g) {
+            var subs = list.filter(function (c) { return c.group === g.id; });
+            subs.forEach(function (c) { shown[c.id] = true; });
+            return subs.length ? groupBlock(g, subs) : '';
+          }).join('');
+          var rest = list.filter(function (c) { return !shown[c.id]; });
+          if (rest.length) html += (html ? '<p class="eyebrow cgroup-rest">Autres collections</p>' : '') + '<div class="coll-grid is-full">' + rest.map(function (c) { return collTile(c); }).join('') + '</div>';
+          if (!list.length) html = '<div class="empty">Toutes les collections de cet univers sont complètes. Bravo !</div>';
         }
         res.innerHTML = html;
       }
@@ -192,6 +213,51 @@
   };
 
   /* ======================================================================
+     COLLECTION GLOBALE (ex. Mythologie grecque = Olympe + Titans + Géants)
+     ====================================================================== */
+  P.saga = {
+    title: 'Collection globale',
+    render: function (ctx) {
+      var g = A.GROUP[ctx.params[0]];
+      if (!g) return '<section class="page-head"><div class="container"><h1 class="h1">Collection introuvable</h1><a class="link-arrow" href="#/collections">Retour aux collections ' + I('arrow') + '</a></div></section>';
+      this.title = g.name;
+      var pr = S.groupProgress(g.id);
+      return '<section class="coll-hero">' +
+        '<div class="coll-hero-art">' + A.artImg({ seed: g.id + '-saga', coll: g.subs[0], rarity: 'legendary', w: 1400, h: 520 }) + '</div>' +
+        '<div class="container coll-hero-copy">' +
+          '<a class="back" href="#/collections">← Collections</a>' +
+          '<p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p>' +
+          '<h1 class="h1">' + U.esc(g.name) + '</h1><p class="lead">' + U.esc(g.description) + '</p>' +
+          '<div class="coll-stats" data-saga-stats>' + sagaStats(pr) + '</div>' +
+        '</div></section>' +
+        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack('@' + g.id) + '</div></section>' +
+        '<section class="section-tight"><div class="container"><p class="eyebrow">Sous-collections</p>' +
+          '<div class="coll-grid is-full" data-subs>' + g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('') + '</div></div></section>';
+    },
+    mount: function (root, ctx) {
+      var g = A.GROUP[ctx.params[0]];
+      if (!g) return;
+      root.addEventListener('click', function (e) {
+        var k = e.target.closest('[data-claim]');
+        if (!k) return;
+        var res = S.claim('@' + g.id, k.getAttribute('data-claim'));
+        if (!res.ok) { U.toast(res.error, 'error'); return; }
+        U.toast(U.rewardIcon(res.reward) + ' ' + res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
+      });
+      this.refresh = function () {
+        root.querySelector('[data-rewards]').innerHTML = U.rewardTrack('@' + g.id);
+        root.querySelector('[data-saga-stats]').innerHTML = sagaStats(S.groupProgress(g.id));
+        root.querySelector('[data-subs]').innerHTML = g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('');
+      };
+    }
+  };
+  function sagaStats(pr) {
+    return '<div><span>Personnages</span><b>' + pr.owned + '<small> / ' + pr.total + '</small></b></div>' +
+      '<div><span>Sous-collections complètes</span><b>' + pr.done + '<small> / ' + pr.subs + '</small></b></div>' +
+      '<div class="coll-stats-bar">' + U.progress(pr.pct, 'Progression globale ' + Math.round(pr.pct * 100) + ' %') + '</div>';
+  }
+
+  /* ======================================================================
      COLLECTION (détail)
      ====================================================================== */
   var cd = { view: 'chars', missing: false, q: '' };
@@ -206,8 +272,8 @@
       return '<section class="coll-hero">' +
         '<div class="coll-hero-art">' + A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 1400, h: 520 }) + '</div>' +
         '<div class="container coll-hero-copy">' +
-          '<a class="back" href="#/collections">← Collections</a>' +
-          '<p class="eyebrow">' + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +
+          (c.group ? '<a class="back" href="#/saga/' + c.group + '">← ' + A.GROUP[c.group].name + '</a>' : '<a class="back" href="#/collections">← Collections</a>') +
+          '<p class="eyebrow">' + (c.group ? 'Sous-collection · ' : '') + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +
           '<h1 class="h1">' + c.name + '</h1><p class="lead">' + c.description + '</p>' +
           '<div class="coll-stats">' +
             '<div><span>Personnages</span><b>' + pr.owned + '<small> / ' + pr.total + '</small></b></div>' +

@@ -27,7 +27,9 @@
     gothique: { sky0: '#ECE8E0', sky1: '#CFC8BD', far: '#B9B1A4', mid: '#8F877B', near: '#6E675D', fig: '#3C3832' },
     contes:   { sky1: '#DCDDC7', far: '#C3C6A8', mid: '#A2A785', near: '#7F8766' },
     histoire: { sky0: '#F2ECE3', sky1: '#DCD0BE' },
-    nordique: { sky0: '#EEF1F0', sky1: '#CFD9DA', far: '#B3C1C4', mid: '#8D9EA3', near: '#6B7D82', fig: '#34404A' }
+    nordique: { sky0: '#EEF1F0', sky1: '#CFD9DA', far: '#B3C1C4', mid: '#8D9EA3', near: '#6B7D82', fig: '#34404A' },
+    titans:   { sky0: '#F1EDE6', sky1: '#D8D0C3', far: '#BFB5A5', mid: '#8F8473', near: '#6E6455', fig: '#3A342C' },
+    geants:   { sky0: '#F3E9DF', sky1: '#DDC6B4', far: '#C2A592', mid: '#8E6E5D', near: '#6A4F42', fig: '#33241E' }
   };
 
   function moodFor(coll, rarity) {
@@ -133,6 +135,29 @@
         snow += poly([[p[0], p[1]], [p[0] + (b[0] - p[0]) * k, p[1] + (b[1] - p[1]) * k], [p[0] + (b[0] - p[0]) * k * 0.4, p[1] + (b[1] - p[1]) * k * 0.7], [p[0] + (a[0] - p[0]) * k * 0.5, p[1] + (a[1] - p[1]) * k * 0.9], [p[0] + (a[0] - p[0]) * k, p[1] + (a[1] - p[1]) * k]]);
       }
       o += '<g fill="' + m.sky0 + '" opacity=".75">' + snow + '</g>';
+      return o;
+    },
+    // Titans : le mont Othrys, sommet escarpé couronné d’un trône taillé dans la roche
+    peak: function (cx, gy, s, m, r) {
+      var o = '';
+      o += '<g opacity=".5">' + poly([[cx - 170 * s, gy], [cx - 105 * s, gy - 58 * s], [cx - 70 * s, gy - 40 * s], [cx - 30 * s, gy]]) + '</g>';
+      o += poly([[cx - 92 * s, gy], [cx - 46 * s, gy - 70 * s], [cx - 30 * s, gy - 62 * s], [cx - 12 * s, gy - 112 * s], [cx + 4 * s, gy - 104 * s], [cx + 22 * s, gy - 126 * s], [cx + 46 * s, gy - 82 * s], [cx + 62 * s, gy - 90 * s], [cx + 110 * s, gy]]);
+      o += '<g fill="' + m.sky0 + '" opacity=".5">' + poly([[cx + 22 * s, gy - 126 * s], [cx + 46 * s, gy - 82 * s], [cx + 30 * s, gy - 92 * s], [cx + 20 * s, gy - 84 * s]]) + '</g>';
+      // trône au sommet
+      o += rect(cx + 12 * s, gy - 138 * s, 20 * s, 12 * s) + rect(cx + 12 * s, gy - 156 * s, 5 * s, 20 * s) + rect(cx + 27 * s, gy - 156 * s, 5 * s, 20 * s) + rect(cx + 12 * s, gy - 160 * s, 20 * s, 5 * s);
+      return o;
+    },
+    // Géants : un volcan fumant (l’Etna, sous lequel dorment Encelade et Typhon)
+    volcano: function (cx, gy, s, m, r) {
+      var o = '';
+      o += poly([[cx - 130 * s, gy], [cx - 26 * s, gy - 96 * s], [cx - 14 * s, gy - 90 * s], [cx - 4 * s, gy - 98 * s], [cx + 8 * s, gy - 90 * s], [cx + 22 * s, gy - 97 * s], [cx + 132 * s, gy]]);
+      o += '<g fill="' + m.sun + '" opacity=".75">' + poly([[cx - 14 * s, gy - 90 * s], [cx - 4 * s, gy - 98 * s], [cx + 8 * s, gy - 90 * s], [cx + 2 * s, gy - 70 * s]]) + '</g>';
+      var smoke = '';
+      for (var i = 0; i < 5; i++) {
+        var y = gy - (112 + i * 22) * s, x = cx + (i * 9 + r() * 8 - 4) * s, rr = (10 + i * 5) * s;
+        smoke += '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(rr) + '"/>';
+      }
+      o += '<g fill="' + m.far + '" opacity=".55">' + smoke + '</g>';
       return o;
     },
     torii: function (cx, gy, s) {

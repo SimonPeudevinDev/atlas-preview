@@ -9,9 +9,19 @@
 (function (A) {
   A.SECRET = {
     grece: {
-      name: 'Prométhée', title: 'Le Voleur de feu', atk: 74, def: 80, esp: 98,
-      bio: 'Titan qui prit le parti des hommes : il déroba le feu de l’Olympe pour le leur offrir, et [[zeus]] le fit enchaîner sur le Caucase.',
-      more: 'Son nom signifie « celui qui réfléchit avant ». On lui attribue la création des premiers hommes, façonnés dans l’argile. Lors du premier sacrifice, il trompa [[zeus]] en lui laissant les os enrobés de graisse et la viande aux hommes. Des siècles plus tard, [[heracles]] abattit l’aigle qui le torturait et le libéra.'
+      name: 'Dionysos', title: 'Le Dernier Olympien', atk: 78, def: 72, esp: 92,
+      bio: 'Fils de [[zeus]] et de la mortelle Sémélé, il fut le dernier à rejoindre les dieux de l’Olympe.',
+      more: 'Sa mère mourut foudroyée en voyant Zeus dans toute sa gloire : Zeus cousit l’enfant dans sa cuisse jusqu’à sa naissance. Dieu de la vigne, du vin et de l’ivresse, il est aussi celui du théâtre : les tragédies et les comédies d’Athènes étaient jouées pendant ses fêtes, les Dionysies.'
+    },
+    titans: {
+      name: 'Gaïa', title: 'La Terre mère', atk: 80, def: 98, esp: 94,
+      bio: 'Née aux origines du monde, la Terre enfanta seule Ouranos, le Ciel, puis lui donna les Titans, dont [[cronos]], les Cyclopes et les Hécatonchires.',
+      more: 'Quand Ouranos enferma ses enfants dans ses profondeurs, elle forgea la faucille avec laquelle [[cronos]] le renversa. Plus tard, furieuse du sort des Titans, elle lança contre l’Olympe les Géants puis Typhon. C’est aussi elle qui parlait, à l’origine, par l’oracle de Delphes.'
+    },
+    geants: {
+      name: 'Typhon', title: 'Le Père des monstres', atk: 99, def: 90, esp: 66,
+      bio: 'Dernier enfant de Gaïa, ce monstre aux cent têtes de serpent fut le plus terrible adversaire de [[grece:zeus|Zeus]].',
+      more: 'Sa tête touchait les étoiles et ses yeux lançaient des flammes. Avec Échidna, il engendra les pires monstres de la mythologie : Cerbère, l’hydre de Lerne, la Chimère. Vaincu par la foudre de Zeus, il fut enseveli sous l’Etna. Le mot « typhon » viendrait en partie de son nom.'
     },
     egypte: {
       name: 'Apophis', title: 'Le Serpent du chaos', atk: 94, def: 82, esp: 70,

@@ -149,6 +149,7 @@
     if (r.cadre) out.push('Cadre doré');
     return out.join(' + ');
   };
+  U.scopeHref = function (key) { return key.charAt(0) === '@' ? '#/saga/' + key.slice(1) : '#/collection/' + key; };
   U.rewardIcon = function (r) { return r.trophee ? '🗝️' : r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
 
   /* Portrait de profil débloqué par une collection : l’emblème de sa première figure */
@@ -216,13 +217,14 @@
   // Piste des paliers d’une collection (page Collection)
   U.rewardTrack = function (cid) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
-    return '<div class="rw"><div class="rw-head"><p class="eyebrow">Récompenses de collection</p><span class="rw-count">' + got + ' / ' + steps.length + ' récupérées</span></div>' +
+    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses de collection') + '</p><span class="rw-count">' + got + ' / ' + steps.length + ' récupérées</span></div>' +
       '<ol class="rw-track">' + steps.map(function (s) {
-        var unit = s.of === 'chars' ? (s.goal > 1 ? 'personnages' : 'personnage') : 'éditions';
+        var UNITS = { chars: ['personnage', 'personnages'], eds: ['édition', 'éditions'], started: ['collection entamée', 'collections entamées'], done: ['collection complète', 'collections complètes'] };
+        var U2 = UNITS[s.of], left = s.goal - s.have, unit = U2[s.goal > 1 ? 1 : 0];
         var action = s.state === 'ready'
           ? '<button type="button" class="btn btn-gold btn-sm rw-btn" data-claim="' + s.id + '">Récupérer</button>'
           : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Récupérée</span>'
-          : '<span class="rw-left">Encore ' + (s.goal - s.have) + ' ' + (s.of === 'chars' ? (s.goal - s.have > 1 ? 'personnages' : 'personnage') : (s.goal - s.have > 1 ? 'éditions' : 'édition')) + '</span>';
+          : '<span class="rw-left">Encore ' + left + ' ' + U2[left > 1 ? 1 : 0] + '</span>';
         return '<li class="rw-step is-' + s.state + '">' +
           '<span class="rw-ico" aria-hidden="true">' + (s.state === 'claimed' ? U.icon('check') : U.rewardIcon(s.reward)) + '</span>' +
           '<div class="rw-txt"><p class="rw-label">' + s.label + '</p><p class="rw-goal">' + s.have + ' / ' + s.goal + ' ' + unit + '</p>' +
@@ -397,7 +399,7 @@
 
     // Arbre généalogique : une colonne de générations reliées par un fil doré
     function node(x, cls) {
-      var o = x.c && A.CHAR[ch.coll + '-' + x.c];
+      var o = charRef(ch, x.c);
       var tag = x.tag ? '<small>' + U.esc(x.tag) + '</small>' : '';
       if (o) return '<button type="button" class="tn is-in' + (cls ? ' ' + cls : '') + '" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + U.esc(o.name) + tag + U.icon('arrow') + '</button>';
       return '<span class="tn' + (cls ? ' ' + cls : '') + '">' + U.esc(x.n || x.c) + tag + '</span>';
@@ -409,13 +411,14 @@
         '<li class="tg is-self"><p class="tg-k">Ses frères et sœurs</p><div class="tg-row">' +
           '<span class="tn is-self">' + U.esc(ch.name) + '</span>' + T.fratrie.map(function (x) { return node(x); }).join('') + '</div></li>' +
         '<li class="tg"><p class="tg-k">Ses enfants, selon leur mère</p><div class="tg-kids">' + T.enfants.map(function (g) {
-          return '<div class="tk"><p class="tk-m">avec ' + (g.mere.c && A.CHAR[ch.coll + '-' + g.mere.c] ? '<button type="button" class="tk-link" data-bio-char="' + ch.coll + '-' + g.mere.c + '">' + U.esc(A.CHAR[ch.coll + '-' + g.mere.c].name) + '</button>' : U.esc(g.mere.n)) +
+          var mo = charRef(ch, g.mere.c);
+          return '<div class="tk"><p class="tk-m">avec ' + (mo ? '<button type="button" class="tk-link" data-bio-char="' + mo.id + '">' + U.esc(mo.name) + '</button>' : U.esc(g.mere.n)) +
             (g.mortelle ? ' <span class="tk-mortal">mortelle</span>' : '') + '</p><div class="tg-row">' + g.enf.map(function (x) { return node(x); }).join('') + '</div></div>';
         }).join('') + '</div></li>' +
       '</ol>';
     }
     var autres = (L.autres || []).length ? '<p class="lore-sub">Adversaires et liens indirects</p><ul class="lore-links">' + L.autres.map(function (it) {
-      var o = it.c && A.CHAR[ch.coll + '-' + it.c];
+      var o = charRef(ch, it.c);
       var name = o
         ? '<button type="button" class="lore-name is-in" data-bio-char="' + o.id + '">' + U.esc(o.name) + U.icon('arrow') + '</button>'
         : '<span class="lore-name">' + U.esc(it.n) + '</span>';
@@ -492,9 +495,12 @@
     try { history.replaceState(history.state, '', '#' + parts[0] + (qs ? '?' + qs : '')); } catch (e) { /* file:// restreint */ }
   }
   /* Notice : [[slug]] ou [[slug|texte]] → lien vers la fiche d’un autre personnage de la collection */
+  // Personnage désigné par « slug » (même collection) ou « coll:slug » (autre collection)
+  function charRef(ch, ref) { return ref && (ref.indexOf(':') !== -1 ? A.CHAR[ref.replace(':', '-')] : A.CHAR[ch.coll + '-' + ref]); }
+  U.charRef = charRef;
   function bioHTML(ch, text) {
-    return U.esc(text).replace(/\[\[([a-z0-9]+)(?:\|([^\]]+))?\]\]/g, function (m, slug, label) {
-      var o = A.CHAR[ch.coll + '-' + slug];
+    return U.esc(text).replace(/\[\[([a-z0-9:]+)(?:\|([^\]]+))?\]\]/g, function (m, slug, label) {
+      var o = charRef(ch, slug);
       if (!o) return label || slug;
       return '<button type="button" class="bio-link" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + (label || U.esc(o.name)) + '</button>';
     });

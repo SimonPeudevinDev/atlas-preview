@@ -10,6 +10,7 @@
     [/^\/$/, P.home, 'home'],
     [/^\/collections$/, P.collections, 'collections'],
     [/^\/collection\/([\w-]+)$/, P.collection, 'collections'],
+    [/^\/saga\/([\w-]+)$/, P.saga, 'collections'],
     [/^\/boutique$/, P.shop, 'shop'],
     [/^\/inventaire$/, P.inventory, 'inventory'],
     [/^\/marketplace$/, P.market, 'market'],

@@ -724,7 +724,7 @@
           }).join('');
         })() +
         unlocked.map(function (u) {
-          return '<a class="sum-reward" href="#/collection/' + u.coll + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(A.COLL[u.coll].name) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
+          return '<a class="sum-reward" href="' + U.scopeHref(u.coll) + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(S.scopeName(u.coll)) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
         }).join('') +
         '<div class="sum-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed], R = A.R[ed.rarity];
