@@ -516,3 +516,4 @@
 .sum-reward b { display: block; font-weight: 600; color: #F3D38A; }
 .sum-reward .ic { width: 16px; height: 16px; flex: none; color: #F3D38A; }
 .sum-reward:hover { background: rgba(243, 211, 138, .14); }
+.sum-frag { margin: 10px auto 0; max-width: 520px; font-size: 13.5px; color: #D9CDB3; }

@@ -715,6 +715,14 @@
         '<p class="eyebrow">Booster ouvert</p><h2 class="op-title">' + items.length + ' cartes obtenues</h2>' +
         '<p class="sum-sub">' + (newCount ? newCount + (newCount > 1 ? ' nouveaux personnages' : ' nouveau personnage') + ' · ' : '') + 'Meilleure carte : ' + bestR.label + '</p>' +
         (firsts ? '<p class="sum-first">🌍 ' + (firsts > 1 ? firsts + ' cartes que personne n’avait encore trouvées' : 'Une carte que personne n’avait encore trouvée') + ' : vous êtes le premier découvreur.</p>' : '') +
+        (function () {
+          var by = {};
+          items.forEach(function (it) { if (it._new) { var cc = A.CHAR[A.ED[it.ed].charId].coll; by[cc] = (by[cc] || 0) + 1; } });
+          return Object.keys(by).filter(function (cc) { return A.SECRET && A.SECRET[cc] && !S.trophy(cc); }).map(function (cc) {
+            var pr = S.collectionProgress(cc);
+            return '<p class="sum-frag">🧩 ' + U.esc(A.COLL[cc].name) + ' : ' + (by[cc] > 1 ? by[cc] + ' fragments révélés' : 'un fragment révélé') + ' du personnage secret (' + pr.owned + ' / ' + pr.total + ')</p>';
+          }).join('');
+        })() +
         unlocked.map(function (u) {
           return '<a class="sum-reward" href="#/collection/' + u.coll + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(A.COLL[u.coll].name) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
         }).join('') +

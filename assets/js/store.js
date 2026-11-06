@@ -293,7 +293,7 @@
     if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
     if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
     if (r.titre && state.titles.indexOf(r.titre) === -1) state.titles.push(r.titre);
-    // Carte de fin de collection : numérotée dans l’ordre des collectionneurs qui l’ont obtenue (fictif en démo)
+    // Personnage secret : numéroté dans l’ordre des collectionneurs qui l’ont révélé (fictif en démo)
     if (r.trophee && !state.trophies[cid]) state.trophies[cid] = { at: now, no: 3 + A.hash(cid + state.user.handle) % 57 };
     if (r.avatar && state.avatars.indexOf(cid) === -1) { state.avatars.push(cid); if (!state.avatar) state.avatar = cid; }
     if (r.cadre) state.frame = true;

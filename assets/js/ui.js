@@ -143,13 +143,13 @@
     var out = [];
     if (r.eclats) out.push(U.num(r.eclats) + ' ' + A.CURRENCY.name);
     if (r.booster) out.push('1 ' + A.PACK[r.booster].name + ' offert');
-    if (r.trophee) out.push('Carte de fin de collection');
+    if (r.trophee) out.push('Personnage secret');
     if (r.avatar) out.push('Photo de profil');
     if (r.titre) out.push('Titre « ' + r.titre + ' »');
     if (r.cadre) out.push('Cadre doré');
     return out.join(' + ');
   };
-  U.rewardIcon = function (r) { return r.trophee ? '🏆' : r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
+  U.rewardIcon = function (r) { return r.trophee ? '🗝️' : r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
 
   /* Portrait de profil débloqué par une collection : l’emblème de sa première figure */
   U.avatarArt = function (cid) {
@@ -162,23 +162,57 @@
   };
   U.avatarCls = function () { return (A.store.avatar() ? ' has-pic' : '') + (A.store.hasFrame() ? ' has-frame' : ''); };
 
-  /* Carte de fin de collection : hors boosters, remise quand tous les personnages sont réunis */
-  U.trophyCard = function (cid) {
-    var c = A.COLL[cid], t = A.store.trophy(cid), n = c.chars.length;
-    if (!t) return '<article class="card card-trophy is-locked" aria-label="Carte de fin de collection, verrouillée"><div class="card-inner">' +
-      '<div class="card-art"><span class="ct-lock" aria-hidden="true">🏆</span><span class="cu-k">Carte de fin de collection</span></div>' +
-      '<div class="card-body"><div class="card-row"><h3 class="card-name">' + U.esc(c.name) + '</h3></div>' +
-        '<div class="card-row card-sub"><span class="card-title">Réunissez les ' + n + ' personnages</span></div>' +
-        '<div class="card-row card-foot"><span class="card-stats"><span>Hors booster</span></span><span class="card-rar"><i></i>Trophée</span></div></div></div></article>';
+  /* Personnage secret de fin de collection : jamais en booster. Son illustration se révèle
+     fragment par fragment (un fragment par personnage obtenu), il est remis quand la collection est complète. */
+  U.secretCard = function (cid) {
+    var c = A.COLL[cid], sc = A.SECRET[cid], t = A.store.trophy(cid), n = c.chars.length;
+    if (!sc) return '';
+    // sc.image : illustration définitive (sinon illustration provisoire générée)
+    var art = sc.image ? '<img class="art" src="' + sc.image + '" alt="" loading="lazy" draggable="false">' : A.artImg({ seed: 'secret-' + cid, coll: cid, rarity: 'mythic', w: 600, h: 780 });
+    if (!t) {
+      var got = c.chars.filter(function (id) { return A.store.ownsChar(id); }).length, cols = n % 3 === 0 ? 3 : 4;
+      var tiles = c.chars.map(function (id, i) {
+        var on = A.store.ownsChar(id);
+        return '<i class="sp-t' + (on ? ' is-on' : '') + '" style="--d:' + (i * 0.04).toFixed(2) + 's" title="' + (on ? 'Fragment révélé par ' : 'Obtenez ') + U.esc(A.CHAR[id].name) + '">' + (on ? '' : '?') + '</i>';
+      }).join('');
+      var ready = got === n;
+      return '<article class="card card-trophy card-secret is-locked" aria-label="Personnage secret, ' + got + ' fragments sur ' + n + '"><div class="card-inner">' +
+        '<div class="card-art">' + art + '<div class="sp-grid" style="--cols:' + cols + '">' + tiles + '</div>' + (ready ? '<span class="card-flag is-first">Prêt à révéler</span>' : '') + '</div>' +
+        '<div class="card-body"><div class="card-row"><h3 class="card-name">? ? ?</h3><span class="card-serial">' + got + ' / ' + n + '</span></div>' +
+          '<div class="card-row card-sub"><span class="card-title">' + (ready ? 'Récupérez la récompense pour le révéler' : 'Personnage secret · ' + got + ' fragment' + (got > 1 ? 's' : '') + ' sur ' + n) + '</span></div>' +
+          '<div class="card-row card-foot"><span class="card-stats"><span>ATQ<b>?</b></span><span>DÉF<b>?</b></span><span>ESP<b>?</b></span></span><span class="card-rar"><i></i>Secret</span></div></div></div></article>';
+    }
     var no = (t.no < 10 ? '00' : '0') + t.no;
-    return '<article class="card card-trophy" tabindex="0" aria-label="Carte de fin de collection ' + U.esc(c.name) + ', numéro ' + no + '"><div class="card-inner">' +
-      '<div class="card-art">' + A.artImg({ seed: cid + '-trophee', coll: cid, rarity: 'legendary', w: 600, h: 780 }) +
-        '<span class="ct-seal" aria-hidden="true">' + U.mark('ct-mark') + '</span><span class="card-flag is-first">Collection complète</span></div>' +
-      '<div class="card-body"><div class="card-row"><h3 class="card-name">' + U.esc(c.name) + '</h3><span class="card-serial">N° ' + no + '</span></div>' +
-        '<div class="card-row card-sub"><span class="card-title">Carte de fin de collection</span><span class="card-coll">' + U.esc(c.family) + '</span></div>' +
-        '<div class="card-row card-foot"><span class="card-stats"><span>Obtenue le<b>' + U.date(t.at) + '</b></span></span><span class="card-rar"><i></i>Trophée</span></div></div>' +
+    return '<article class="card card-trophy card-secret" data-secret="' + cid + '" tabindex="0" aria-label="' + U.esc(sc.name) + ', personnage secret de ' + U.esc(c.name) + '"><div class="card-inner">' +
+      '<div class="card-art">' + art + '<span class="ct-seal" aria-hidden="true">' + U.mark('ct-mark') + '</span><span class="card-flag is-first">Personnage secret</span></div>' +
+      '<div class="card-body"><div class="card-row"><h3 class="card-name">' + U.esc(sc.name) + '</h3><span class="card-serial">N° ' + no + '</span></div>' +
+        '<div class="card-row card-sub"><span class="card-title">' + U.esc(sc.title) + '</span><span class="card-coll">' + U.esc(c.name) + '</span></div>' +
+        '<div class="card-row card-foot"><span class="card-stats"><span>ATQ<b>' + sc.atk + '</b></span><span>DÉF<b>' + sc.def + '</b></span><span>ESP<b>' + sc.esp + '</b></span></span><span class="card-rar"><i></i>Secret</span></div></div>' +
       '<span class="card-holo"></span><span class="card-sheen"></span><span class="card-shine"></span></div></article>';
   };
+  // Fiche du personnage secret (une fois révélé)
+  U.openSecret = function (cid) {
+    var c = A.COLL[cid], sc = A.SECRET[cid], t = A.store.trophy(cid);
+    if (!sc || !t) return;
+    var ref = { coll: cid };
+    U.modal('<div class="detail secret-detail"><div class="detail-visual"><div class="detail-card">' + U.secretCard(cid) + '</div>' +
+      '<p class="placeholder-note">Remis le ' + U.date(t.at) + ' · hors booster</p></div>' +
+      '<div class="detail-info"><p class="eyebrow">Personnage secret · ' + U.esc(c.name) + '</p>' +
+        '<h2 class="detail-name">' + U.esc(sc.name) + '</h2><p class="detail-title">' + U.esc(sc.title) + '</p>' +
+        '<p class="detail-bio">' + bioHTML(ref, sc.bio) + '</p>' +
+        '<div class="detail-block"><p class="detail-more-p">' + bioHTML(ref, sc.more) + '</p></div>' +
+        '<div class="detail-block"><div class="stats">' + statRow('Attaque', sc.atk) + statRow('Défense', sc.def) + statRow('Esprit', sc.esp) + '</div></div>' +
+      '</div></div>', {
+      cls: 'is-detail',
+      mount: function (el, close) {
+        el.addEventListener('click', function (e) {
+          var b = e.target.closest('[data-bio-char]');
+          if (b) { close(true); var best = A.store.bestOwned(b.getAttribute('data-bio-char')); U.openCard(best ? best.ed : b.getAttribute('data-bio-char') + '-base', best && best.uid); }
+        });
+      }
+    });
+  };
+
   // Piste des paliers d’une collection (page Collection)
   U.rewardTrack = function (cid) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
@@ -590,6 +624,8 @@
   U.bindGlobal = function () {
     // Ouverture de la fiche
     document.addEventListener('click', function (e) {
+      var sc = e.target.closest('.card[data-secret]');
+      if (sc && !e.target.closest('.secret-detail')) { U.openSecret(sc.getAttribute('data-secret')); return; }
       var c = e.target.closest('.card[data-open]');
       if (!c || e.target.closest('[data-stop]')) return;
       U.openCard(c.getAttribute('data-ed'), c.getAttribute('data-uid'));

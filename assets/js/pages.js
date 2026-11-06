@@ -243,7 +243,7 @@
             cells.push('<div class="cg-item' + (best ? '' : ' is-missing') + '">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) +
               '<p class="cg-no">N° ' + (no < 10 ? '0' : '') + no + ' · ' + (best ? 'À vous' : 'Manquant') + '</p></div>');
           });
-          if (!q && !cd.missing) cells.push('<div class="cg-item is-trophy">' + U.trophyCard(c.id) + '<p class="cg-no">★ · ' + (S.trophy(c.id) ? 'Obtenue' : 'Fin de collection') + '</p></div>');
+          if (!q && !cd.missing && A.SECRET[c.id]) cells.push('<div class="cg-item is-trophy">' + U.secretCard(c.id) + '<p class="cg-no">★ · ' + (S.trophy(c.id) ? 'Révélé' : 'Personnage secret') + '</p></div>');
         } else {
           var rids = cd.view === 'all' ? A.RARITIES.map(function (r) { return r.id; }) : [cd.view];
           chars.forEach(function (ch) {
@@ -856,8 +856,8 @@
               return '<button type="button" class="pf-av' + (own ? '' : ' is-locked') + (S.avatar() === c.id ? ' is-on' : '') + '"' + (own ? ' data-avatar-pick="' + c.id + '"' : ' disabled title="Complétez ' + U.esc(c.name) + ' pour le débloquer"') + '>' +
                 '<span class="avatar is-lg has-pic' + (S.hasFrame() && own ? ' has-frame' : '') + '">' + U.avatarArt(c.id) + (own ? '' : '<i class="pf-av-lock">🔒</i>') + '</span><small>' + U.esc(c.name) + '</small></button>';
             }).join('') + '</div>') +
-          sec('Collection', 'Cartes de fin de collection', 'Remises quand une collection est complète. Elles ne sortent jamais des boosters.',
-            '<div class="pf-trophies">' + A.COLLECTIONS.map(function (c) { return '<div class="pf-trophy">' + U.trophyCard(c.id) + '</div>'; }).join('') + '</div>') +
+          sec('Collection', 'Personnages secrets', 'Un par collection, jamais en booster : chaque personnage obtenu révèle un fragment de son portrait.',
+            '<div class="pf-trophies">' + A.COLLECTIONS.map(function (c) { return '<div class="pf-trophy">' + U.secretCard(c.id) + '</div>'; }).join('') + '</div>') +
           sec('Collection', 'Titres', 'Gagnés en complétant les collections : tous les personnages, puis toutes les éditions.',
             (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">👑 ' + U.esc(t) + '</span>'; }).join('') + '</div>'
               : '<p class="muted">Aucun titre pour l’instant. Complétez une collection pour obtenir le premier.</p>') +

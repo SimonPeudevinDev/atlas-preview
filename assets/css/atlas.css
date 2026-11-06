@@ -1420,3 +1420,18 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .pf-trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px; }
 .pf-trophy { min-width: 0; }
 @media (max-width: 480px) { .pf-trophies { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
+
+/* Personnage secret : portrait découpé en fragments, un par personnage de la collection */
+.card-secret .card-art .art { filter: saturate(.85); }
+.card-secret.is-locked .card-inner { background: linear-gradient(160deg, #2A251D, var(--night)); box-shadow: inset 0 0 0 1px rgba(232, 220, 194, .28), var(--shadow-sm); }
+.card-secret.is-locked .card-art { display: block; background: var(--night-2); }
+.card-secret.is-locked .card-name { color: #8E826C; letter-spacing: .1em; }
+.card-secret.is-locked .card-serial { color: var(--gold-2); }
+.card-secret.is-locked .card-title, .card-secret.is-locked .card-stats { color: #8E826C; }
+.card-secret.is-locked .card-rar { color: var(--gold-2); }
+.card-secret.is-locked .card-rar i { background: var(--gold-2); }
+.sp-grid { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); grid-auto-rows: 1fr; }
+.sp-t { display: grid; place-items: center; font-style: normal; font-family: var(--serif); font-size: 9cqw; color: rgba(232, 220, 194, .35); background: repeating-linear-gradient(135deg, #24201A 0 5px, #1C1915 5px 10px); box-shadow: inset 0 0 0 .5px rgba(232, 220, 194, .14); transition: opacity .6s var(--ease) var(--d, 0s), transform .6s var(--ease) var(--d, 0s); }
+.sp-t.is-on { background: transparent; box-shadow: inset 0 0 0 .5px rgba(251, 249, 244, .22); }
+.card-secret:not(.is-locked) { cursor: pointer; }
+.secret-detail .detail-more-p { margin: 0; max-width: 620px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
