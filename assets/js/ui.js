@@ -279,9 +279,7 @@
       return '<button type="button" class="lore-dot' + (i ? '' : ' is-on') + '" data-lore-to="' + i + '" aria-label="Chapitre ' + (i + 1) + ' : ' + U.esc(c.t) + '"></button>';
     }).join('');
     var slider = '<div class="lore-slider">' +
-      '<div class="lore-bar"><div class="lore-dots">' + dots + '</div>' +
-        '<div class="lore-arrows"><button type="button" class="cn-btn" data-lore-go="-1" aria-label="Chapitre précédent" disabled>' + U.icon('chevL') + '</button>' +
-        '<button type="button" class="cn-btn" data-lore-go="1" aria-label="Chapitre suivant">' + U.icon('chevR') + '</button></div></div>' +
+      '<div class="lore-bar"><div class="lore-dots">' + dots + '</div></div>' +
       '<div class="lore-track">' + slides + '</div></div>';
 
     var reperes = '<dl class="lore-facts">' + L.reperes.map(function (r) {
@@ -328,15 +326,12 @@
       '<button type="button" class="lore-back is-end" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
     '</div>';
   }
-  // Glissière des chapitres : points, flèches et hauteur suivent le chapitre affiché
+  // Glissière des chapitres : la barre de progression suit le chapitre affiché
   function loreSync(root) {
     var track = root.querySelector('.lore-track'); if (!track) return;
     var slides = track.children, i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
     i = Math.max(0, Math.min(slides.length - 1, i));
     [].forEach.call(root.querySelectorAll('.lore-dot'), function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-current', k === i ? 'step' : 'false'); });
-    var arrows = root.querySelectorAll('[data-lore-go]');
-    arrows[0].disabled = i === 0; arrows[1].disabled = i === slides.length - 1;
-    track.style.height = slides[i].offsetHeight + 'px';
   }
   function loreGo(root, i) {
     var track = root.querySelector('.lore-track'); if (!track) return;
