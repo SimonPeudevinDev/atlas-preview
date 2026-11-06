@@ -714,22 +714,8 @@
       summaryEl.innerHTML =
         '<p class="eyebrow">Booster ouvert</p><h2 class="op-title">' + items.length + ' cartes obtenues</h2>' +
         '<p class="sum-sub">' + (newCount ? newCount + (newCount > 1 ? ' nouveaux personnages' : ' nouveau personnage') + ' · ' : '') + 'Meilleure carte : ' + bestR.label + '</p>' +
-        (firsts ? '<p class="sum-first">🌍 ' + (firsts > 1 ? firsts + ' cartes que personne n’avait encore trouvées' : 'Une carte que personne n’avait encore trouvée') + ' : vous êtes le premier découvreur.</p>' : '') +
-        (function () {
-          var by = {};
-          items.forEach(function (it) { if (it._new) { var cc = A.CHAR[A.ED[it.ed].charId].coll; by[cc] = (by[cc] || 0) + 1; } });
-          return Object.keys(by).filter(function (cc) { return A.SECRET && A.SECRET[cc] && !S.trophy(cc); }).map(function (cc) {
-            var pr = S.collectionProgress(cc);
-            return '<p class="sum-frag">🧩 ' + U.esc(A.COLL[cc].name) + ' : ' + (by[cc] > 1 ? by[cc] + ' fragments révélés' : 'un fragment révélé') + ' du personnage secret (' + pr.owned + ' / ' + pr.total + ')</p>';
-          }).join('');
-        })() +
-        newDuels.map(function (d) {
-          var rg = d.set === 'ragnarok';
-          return '<a class="sum-reward" href="#/collection/' + A.CHAR[d.hero].coll + '" data-close>' + (rg ? '🔥' : '⚔️') + ' <span><b>' + (rg ? 'Nouvelle prophétie du Ragnarök' : 'Nouvel exploit débloqué') + '</b>' + U.esc(d.title) + '</span>' + U.icon('arrow') + '</a>';
-        }).join('') +
-        unlocked.map(function (u) {
-          return '<a class="sum-reward" href="' + U.scopeHref(u.coll) + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(S.scopeName(u.coll)) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
-        }).join('') +
+        // Pas de bandeaux d’objectifs (fragments, récompenses, exploits) pendant l’ouverture : la progression se consulte dans les collections
+
         '<div class="sum-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed], R = A.R[ed.rarity];
           return '<div class="sum-item r-' + ed.rarity + (i === items.length - 1 && R.rank >= 1 ? ' is-best' : '') + (unseen[i] ? ' is-down' : '') + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + '">' +
