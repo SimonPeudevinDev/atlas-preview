@@ -153,7 +153,7 @@
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
-        '<p class="lead">Neuf salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
+        '<p class="lead">Onze salles ouvertes, des centaines d’œuvres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
           '<div class="chips" data-f="universe">' + unis.map(function (u) { return '<button class="chip' + (cf.universe === u ? ' is-active' : '') + '" data-v="' + u + '">' + (u === 'all' ? 'Tous les univers' : u) + '</button>'; }).join('') + '</div>' +
           '<div class="toolbar-end">' +
@@ -232,7 +232,8 @@
         '</div></section>' +
         '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack('@' + g.id) + '</div></section>' +
         '<section class="section-tight"><div class="container"><p class="eyebrow">Sous-collections</p>' +
-          '<div class="coll-grid is-full" data-subs>' + g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('') + '</div></div></section>';
+          '<div class="coll-grid is-full" data-subs>' + g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('') + '</div></div></section>' +
+        (g.subs.indexOf('heros') !== -1 ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelsHTML() + '</div></section>' : '');
     },
     mount: function (root, ctx) {
       var g = A.GROUP[ctx.params[0]];
@@ -248,6 +249,7 @@
         root.querySelector('[data-rewards]').innerHTML = U.rewardTrack('@' + g.id);
         root.querySelector('[data-saga-stats]').innerHTML = sagaStats(S.groupProgress(g.id));
         root.querySelector('[data-subs]').innerHTML = g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('');
+        var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelsHTML();
       };
     }
   };
@@ -282,6 +284,7 @@
           '</div>' +
         '</div></section>' +
         '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack(c.id) + '</div></section>' +
+        (c.id === 'heros' || c.id === 'monstres' ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelsHTML() + '</div></section>' : '') +
         '<section class="section-tight"><div class="container">' +
           '<div class="toolbar sticky-bar">' +
             '<div class="chips scroll-x" data-f="view">' + views.map(function (v) {
@@ -348,7 +351,7 @@
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); };
+      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelsHTML(); };
     }
   };
 

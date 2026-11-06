@@ -24,13 +24,13 @@
         ] },
         { t: 'Le partage du monde', p: [
           'Une fois la victoire acquise, il fallut répartir le pouvoir. Chez Homère, les trois frères tirent au sort : Zeus reçoit le ciel, [[poseidon]] la mer et [[hades]] le monde souterrain, tandis que la terre et l’Olympe restent communs. C’est pourtant Zeus que tous reconnaissent comme roi : il tranche les querelles des dieux, et même ses frères lui doivent obéissance.',
-          'Ce pouvoir fut vite contesté. Gaïa, furieuse que ses enfants les Titans soient enfermés, souleva contre l’Olympe les Géants, nés de la Terre et menés par [[geants:porphyrion|Porphyrion]]. Un oracle avait annoncé que les dieux ne pourraient pas les vaincre sans l’aide d’un mortel. Zeus fit donc appel à son fils [[heracles]], dont les flèches achevèrent les Géants que les dieux avaient terrassés.',
+          'Ce pouvoir fut vite contesté. Gaïa, furieuse que ses enfants les Titans soient enfermés, souleva contre l’Olympe les Géants, nés de la Terre et menés par [[geants:porphyrion|Porphyrion]]. Un oracle avait annoncé que les dieux ne pourraient pas les vaincre sans l’aide d’un mortel. Zeus fit donc appel à son fils [[heros:heracles]], dont les flèches achevèrent les Géants que les dieux avaient terrassés.',
           'La dernière menace fut la plus terrible. Gaïa donna naissance à Typhon, un monstre si grand que sa tête touchait les étoiles, avec cent têtes de serpent qui crachaient le feu. Plusieurs dieux s’enfuirent devant lui. Zeus l’affronta seul, le foudroya sans relâche et l’ensevelit sous l’Etna, en Sicile. Pour les Grecs, les éruptions du volcan étaient les soubresauts du monstre prisonnier.'
         ] },
         { t: 'Épouses, amours et enfants', p: [
           'Les unions de Zeus ne sont pas de simples aventures : elles organisent le monde. Sa première épouse, Métis, incarnait l’intelligence et la ruse. Quand il apprit qu’elle lui donnerait un fils capable de le détrôner, Zeus l’avala, et s’appropria du même coup sa sagesse. Plus tard, pris d’un mal de tête insupportable, il se fit fendre le crâne d’un coup de hache : [[athena]] en sortit, adulte et en armes.',
           'Ses épouses suivantes lui donnèrent les puissances qui règlent l’univers. Avec [[titans:themis|Thémis]], la Justice, il eut les Heures, qui veillent sur les saisons, et les Moires, qui filent le destin de chacun. Avec [[titans:mnemosyne|Mnémosyne]], la Mémoire, il eut les neuf Muses, qui inspirent les arts. Avec Léto, les jumeaux [[apollon]] et [[artemis]]. Enfin, il épousa sa sœur [[hera]], qui devint reine de l’Olympe et lui donna Arès, Hébé et Ilithyie.',
-          'Zeus s’unit aussi à de nombreuses mortelles, souvent sous une forme trompeuse : une pluie d’or pour entrer dans la prison de Danaé, un cygne pour approcher Léda, un taureau blanc pour enlever Europe. Ces récits permettaient aux grandes familles grecques de se donner un ancêtre divin. Ils expliquent aussi la colère d’[[hera]], qui s’acharna sur ces femmes et sur leurs enfants, à commencer par [[heracles]].'
+          'Zeus s’unit aussi à de nombreuses mortelles, souvent sous une forme trompeuse : une pluie d’or pour entrer dans la prison de Danaé, un cygne pour approcher Léda, un taureau blanc pour enlever Europe. Ces récits permettaient aux grandes familles grecques de se donner un ancêtre divin. Ils expliquent aussi la colère d’[[hera]], qui s’acharna sur ces femmes et sur leurs enfants, à commencer par [[heros:heracles]].'
         ] },
         { t: 'Le gardien de l’ordre', p: [
           'Plus qu’un dieu de l’orage, Zeus est le garant de l’ordre du monde. On l’invoquait sous de nombreux surnoms : Zeus Xénios protège les étrangers et les hôtes, Zeus Horkios veille sur les serments, Zeus Hikésios défend ceux qui viennent implorer de l’aide. Accueillir un voyageur, tenir parole, épargner celui qui demande grâce : tout cela se faisait sous son regard.',
@@ -60,13 +60,13 @@
           { mere: { n: 'Métis' }, enf: [{ c: 'athena' }] },
           { mere: { n: 'Léto' }, enf: [{ c: 'apollon' }, { c: 'artemis' }] },
           { mere: { n: 'Maïa' }, enf: [{ n: 'Hermès' }] },
-          { mere: { n: 'Alcmène' }, mortelle: true, enf: [{ c: 'heracles' }] },
+          { mere: { n: 'Alcmène' }, mortelle: true, enf: [{ c: 'heros:heracles' }] },
           { mere: { n: 'Sémélé' }, mortelle: true, enf: [{ n: 'Dionysos' }] },
-          { mere: { n: 'Danaé' }, mortelle: true, enf: [{ n: 'Persée' }] }
+          { mere: { n: 'Danaé' }, mortelle: true, enf: [{ c: 'heros:persee' }] }
         ]
       },
       autres: [
-        { c: 'meduse', rel: 'Victime de son fils', note: 'Persée la décapita ; sa tête orne l’égide d’Athéna.' },
+        { c: 'monstres:meduse', rel: 'Victime de son fils', note: 'Persée la décapita ; sa tête orne l’égide d’Athéna.' },
         { c: 'titans:promethee', rel: 'Rival', note: 'Puni pour avoir donné le feu aux hommes.' },
         { n: 'Typhon', rel: 'Ennemi', note: 'Dernier monstre lancé contre son règne.' }
       ]

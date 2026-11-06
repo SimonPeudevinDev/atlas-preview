@@ -88,7 +88,7 @@
 
     var phase = 'pack', entering = !reduce, items = null, closed = false;
     var tp = 0, dir = 0, lastGrain = 0, drag = null;
-    var unlocked = [];
+    var unlocked = [], newDuels = [];
 
     function setHint(t) { hint.textContent = t; hint.classList.toggle('is-empty', !t); }
     function flash(a) {
@@ -138,7 +138,7 @@
       var res = S.openPack(packId);
       if (!res.ok) { U.toast(res.error, 'error'); close(); return false; }
       items = res.items.sort(function (a, b) { return rankOf(a) - rankOf(b); });
-      unlocked = res.unlocked || [];
+      unlocked = res.unlocked || []; newDuels = res.duels || [];
       // Les cartes-témoins du sachet deviennent les vraies cartes, face visible : ce qui sort du sachet
       // est exactement ce qu’on va voir (la carte du dessus = la première présentée)
       // Seule la carte du dessus est la vraie : les autres témoins sont des leurres crédibles (cartes Base au hasard)
@@ -723,6 +723,9 @@
             return '<p class="sum-frag">🧩 ' + U.esc(A.COLL[cc].name) + ' : ' + (by[cc] > 1 ? by[cc] + ' fragments révélés' : 'un fragment révélé') + ' du personnage secret (' + pr.owned + ' / ' + pr.total + ')</p>';
           }).join('');
         })() +
+        newDuels.map(function (d) {
+          return '<a class="sum-reward" href="#/collection/heros" data-close>⚔️ <span><b>Nouvel exploit débloqué</b>' + U.esc(d.title) + '</span>' + U.icon('arrow') + '</a>';
+        }).join('') +
         unlocked.map(function (u) {
           return '<a class="sum-reward" href="' + U.scopeHref(u.coll) + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(S.scopeName(u.coll)) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';
         }).join('') +

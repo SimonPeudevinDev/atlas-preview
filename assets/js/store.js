@@ -93,7 +93,7 @@
     // Inventaire de démonstration
     var seed = [
       ['grece-zeus-legendary', 18], 'grece-zeus-base', 'grece-zeus-base', 'grece-athena-rare', 'grece-hades-base',
-      'grece-poseidon-base', 'grece-meduse-epic', 'grece-apollon-base', 'grece-artemis-base',
+      'grece-poseidon-base', 'monstres-meduse-epic', 'grece-apollon-base', 'grece-artemis-base',
       'egypte-anubis-epic', 'egypte-ra-base', 'egypte-bastet-base', 'egypte-bastet-base', 'egypte-thot-rare', 'egypte-isis-base',
       'gothique-dracula-rare', 'gothique-dracula-base', 'gothique-carmilla-base', 'gothique-dorian-base',
       'contes-alice-rare', 'contes-alice-base', 'contes-peterpan-base', 'contes-cendrillon-base', 'contes-chatbotte-legendary',
@@ -150,10 +150,21 @@
     state = load();
     if (!state || state.v !== 1) fresh();
     state.claimed = state.claimed || {}; state.tokens = state.tokens || {}; state.titles = state.titles || [];
+    migrateMoved();
     state.trophies = state.trophies || {}; state.avatars = state.avatars || [];
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
   };
+  // Héraclès et Méduse ont rejoint les sous-collections Héros et Monstres : on renomme leurs cartes déjà possédées.
+  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-' };
+  function moved(id) { for (var k in MOVED) if (id && id.indexOf(k) === 0) return MOVED[k] + id.slice(k.length); return id; }
+  function migrateMoved() {
+    var n = 0;
+    [state.inventory, state.listings, state.sales].forEach(function (list) { (list || []).forEach(function (x) { var m = moved(x.ed); if (m !== x.ed) { x.ed = m; n++; } }); });
+    ['minted', 'used'].forEach(function (k) { Object.keys(state[k] || {}).forEach(function (id) { var m = moved(id); if (m !== id) { state[k][m] = state[k][id]; delete state[k][id]; n++; } }); });
+    state.inventory = state.inventory.filter(function (i) { return A.ED[i.ed]; });
+    if (n) save();
+  }
   // Mode test : complète certaines éditions jusqu’à N exemplaires (pour éprouver l’interface).
   S.TEST_COPIES = { 'grece-zeus-base': 50 };
   function fillTestCopies() {
@@ -264,7 +275,8 @@
     gothique: ['Veilleur des ombres', 'Seigneur des brumes'], contes: ['Conteur', 'Gardien des contes'],
     histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard'],
     titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra'],
-    pharaons: ['Scribe royal', 'Fils de Râ']
+    pharaons: ['Scribe royal', 'Fils de Râ'],
+    heros: ['Compagnon des Argonautes', 'Héros légendaire'], monstres: ['Chasseur de monstres', 'Dompteur de chimères']
   };
   /* Collection globale : progression cumulée de ses sous-collections. */
   S.groupProgress = function (gid) {
@@ -333,6 +345,12 @@
     emit();
     return { ok: true, reward: r, step: s };
   };
+  S.duels = function () {
+    return (A.DUELS || []).map(function (d) {
+      var h = S.ownsChar(d.hero), m = S.ownsChar(d.monster);
+      return Object.assign({ heroOwned: h, monsterOwned: m, done: h && m }, d);
+    });
+  };
   S.trophy = function (cid) { return state.trophies[cid] || null; };
   S.avatars = function () { return state.avatars || []; };
   S.avatar = function () { return state.avatar && state.avatars.indexOf(state.avatar) !== -1 ? state.avatar : null; };
@@ -375,6 +393,7 @@
     var pack = A.PACK[packId];
     var pool = poolFor(pack);
     var readyBefore = readyKeys();
+    var duelsBefore = S.duels().filter(function (d) { return d.done; }).map(function (d) { return d.id; });
     var now = Date.now();
     var items = [], seen = {};
     for (var i = 0; i < pack.size; i++) {
@@ -410,7 +429,8 @@
     var unlocked = readyKeys().filter(function (k) { return readyBefore.indexOf(k) === -1; }).map(function (k) {
       var p = k.split(':'); return { coll: p[0], step: S.rewards(p[0]).filter(function (r) { return r.id === p[1]; })[0] };
     });
-    return { ok: true, unlocked: unlocked, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
+    var duels = S.duels().filter(function (d) { return d.done && duelsBefore.indexOf(d.id) === -1; });
+    return { ok: true, unlocked: unlocked, duels: duels, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
   };
   S.resetDaily = function () { state.lastDaily = null; emit(); };
   S.grant = function (n) {

@@ -30,6 +30,8 @@
     nordique: { sky0: '#EEF1F0', sky1: '#CFD9DA', far: '#B3C1C4', mid: '#8D9EA3', near: '#6B7D82', fig: '#34404A' },
     titans:   { sky0: '#F1EDE6', sky1: '#D8D0C3', far: '#BFB5A5', mid: '#8F8473', near: '#6E6455', fig: '#3A342C' },
     geants:   { sky0: '#F3E9DF', sky1: '#DDC6B4', far: '#C2A592', mid: '#8E6E5D', near: '#6A4F42', fig: '#33241E' },
+    heros:    { sky0: '#EEF0EC', sky1: '#CCD6D6', far: '#AFBDBF', mid: '#7F8E8F', near: '#5E6C6E', fig: '#2E3638' },
+    monstres: { sky0: '#ECE9E3', sky1: '#C9C3B6', far: '#ABA393', mid: '#7A7263', near: '#585244', fig: '#1E1B16' },
     pharaons: { sky0: '#F6ECDA', sky1: '#E5CDA2', far: '#D2B07D', mid: '#B08A55', near: '#8C6A3C', fig: '#3A2A16' }
   };
 
@@ -159,6 +161,25 @@
         smoke += '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(rr) + '"/>';
       }
       o += '<g fill="' + m.far + '" opacity=".55">' + smoke + '</g>';
+      return o;
+    },
+    // Héros : le navire Argo, voile gonflée
+    ship: function (cx, gy, s, m) {
+      var o = '', y = gy - 6 * s;
+      o += poly([[cx - 70 * s, y - 14 * s], [cx + 70 * s, y - 14 * s], [cx + 52 * s, y + 6 * s], [cx - 54 * s, y + 6 * s]]);
+      o += poly([[cx + 62 * s, y - 14 * s], [cx + 80 * s, y - 34 * s], [cx + 72 * s, y - 14 * s]]);
+      o += rect(cx - 2 * s, y - 92 * s, 4 * s, 78 * s);
+      o += poly([[cx - 40 * s, y - 86 * s], [cx + 40 * s, y - 86 * s], [cx + 34 * s, y - 34 * s], [cx - 34 * s, y - 34 * s]]);
+      o += '<g fill="' + m.sun + '" opacity=".55">' + rect(cx - 40 * s, y - 64 * s, 80 * s, 5 * s) + '</g>';
+      for (var i = 0; i < 7; i++) o += '<path d="M' + f(cx - 44 * s + i * 13 * s) + ',' + f(y) + ' l-8,' + f(16 * s) + '" stroke-width="' + f(1.4 * s) + '"/>';
+      return o;
+    },
+    // Monstres : l’entrée d’une grotte dans une falaise
+    cave: function (cx, gy, s, m) {
+      var o = '';
+      o += poly([[cx - 150 * s, gy], [cx - 120 * s, gy - 70 * s], [cx - 70 * s, gy - 104 * s], [cx - 10 * s, gy - 116 * s], [cx + 60 * s, gy - 98 * s], [cx + 120 * s, gy - 64 * s], [cx + 150 * s, gy]]);
+      o += '<g fill="' + m.fig + '" opacity=".85"><path d="M' + f(cx - 34 * s) + ',' + f(gy) + ' C' + f(cx - 36 * s) + ',' + f(gy - 60 * s) + ' ' + f(cx + 34 * s) + ',' + f(gy - 64 * s) + ' ' + f(cx + 32 * s) + ',' + f(gy) + ' Z"/></g>';
+      o += '<g fill="' + m.sun + '" opacity=".8">' + '<circle cx="' + f(cx - 8 * s) + '" cy="' + f(gy - 30 * s) + '" r="' + f(2 * s) + '"/><circle cx="' + f(cx + 6 * s) + '" cy="' + f(gy - 30 * s) + '" r="' + f(2 * s) + '"/></g>';
       return o;
     },
     // Pharaons : pylône de temple encadré de deux obélisques

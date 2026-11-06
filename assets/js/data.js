@@ -27,8 +27,8 @@ window.ATLAS = window.ATLAS || {};
     {
       id: 'grece', name: 'Olympe', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'temple',
       edition: 'Édition I', status: 'live', popular: 1,
-      tagline: 'Les dieux, les héros et les monstres de la Grèce antique.',
-      description: 'Du sommet de l’Olympe aux rives du Styx, une galerie consacrée aux divinités et aux figures héroïques qui ont façonné l’imaginaire occidental.'
+      tagline: 'Les dieux qui règnent sur le monde depuis le sommet de l’Olympe.',
+      description: 'Du sommet de l’Olympe aux rives du Styx, une galerie consacrée aux grandes divinités grecques et à leurs querelles de famille.'
     },
     {
       id: 'titans', name: 'Les Titans', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'peak',
@@ -41,6 +41,18 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'live', popular: 7,
       tagline: 'Géants, Cyclopes et Hécatonchires, colosses nés de la Terre.',
       description: 'Lancés par Gaïa contre l’Olympe ou alliés de Zeus, ces colosses ont laissé leur nom aux volcans, aux îles et aux lunes de Saturne.'
+    },
+    {
+      id: 'heros', name: 'Les Héros', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'ship',
+      edition: 'Édition I', status: 'live', popular: 9,
+      tagline: 'Les héros grecs et les exploits qui les ont rendus immortels.',
+      description: 'Demi-dieux, rois et aventuriers : chacun a son monstre. Réunissez le héros et son adversaire pour débloquer le récit de leur duel.'
+    },
+    {
+      id: 'monstres', name: 'Les Monstres', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'cave',
+      edition: 'Édition I', status: 'live', popular: 10,
+      tagline: 'Gorgones, hydres et chimères : les créatures que les héros ont dû affronter.',
+      description: 'Gardiens, fléaux et énigmes vivantes. Chaque monstre a son héros : réunissez-les pour débloquer le récit de leur duel.'
     },
     {
       id: 'egypte', name: 'Rives du Nil', family: 'Mythologie égyptienne', group: 'egyptienne', universe: 'Mythologies', motif: 'pyramids',
@@ -85,9 +97,9 @@ window.ATLAS = window.ATLAS || {};
      Sa progression additionne celle de ses sous-collections et elle a ses propres récompenses. */
   A.GROUPS = [
     {
-      id: 'grecque', name: 'Mythologie grecque', subs: ['grece', 'titans', 'geants'], title: 'Gardien du Panthéon grec',
-      tagline: 'Dieux, Titans et Géants : trois générations qui se sont disputé le monde.',
-      description: 'Des Titans qui régnaient avant l’Olympe aux Géants lancés contre lui, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en trois sous-collections.'
+      id: 'grecque', name: 'Mythologie grecque', subs: ['grece', 'titans', 'geants', 'heros', 'monstres'], title: 'Gardien du Panthéon grec',
+      tagline: 'Dieux, Titans, Géants, héros et monstres : tout l’univers des mythes grecs.',
+      description: 'Des Titans qui régnaient avant l’Olympe aux héros qui ont affronté les monstres, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en cinq sous-collections.'
     }
   ];
   A.GROUPS.push({
@@ -95,6 +107,26 @@ window.ATLAS = window.ATLAS || {};
     tagline: 'Les dieux du Nil et les rois qui ont gouverné en leur nom.',
     description: 'Des dieux qui guident le soleil et pèsent les cœurs aux pharaons qui ont bâti les pyramides : trois mille ans d’Égypte en deux sous-collections.'
   });
+  /* ---------- Duels : un héros, son monstre ----------
+     Posséder les deux cartes d’un duel débloque le récit de leur affrontement (un « exploit »). */
+  A.DUELS = [
+    { id: 'gorgone', hero: 'heros-persee', monster: 'monstres-meduse', title: 'Persée tranche la tête de Méduse',
+      text: 'Pour éviter son regard qui change en pierre, Persée ne la regarde que dans le reflet de son bouclier poli, offert par Athéna. Il lui tranche la tête pendant son sommeil et la glisse dans une besace magique. Du cou de la Gorgone jaillissent le cheval ailé Pégase et Chrysaor, le guerrier à l’épée d’or.' },
+    { id: 'labyrinthe', hero: 'heros-thesee', monster: 'monstres-minotaure', title: 'Thésée entre dans le Labyrinthe',
+      text: 'Athènes devait livrer régulièrement sept jeunes gens et sept jeunes filles au Minotaure, enfermé dans le Labyrinthe de Crète. Thésée se joignit à eux. La princesse Ariane lui confia une pelote de fil : il la déroula en avançant, tua le monstre au cœur du dédale, puis suivit le fil pour retrouver la sortie.' },
+    { id: 'lerne', hero: 'heros-heracles', monster: 'monstres-hydre', title: 'Héraclès affronte l’Hydre',
+      text: 'Pour chaque tête tranchée, deux autres repoussaient. Son neveu Iolaos eut l’idée de brûler chaque cou avec une torche pour empêcher la repousse. Héraclès enterra la dernière tête, immortelle, sous un énorme rocher, puis trempa ses flèches dans le sang empoisonné du monstre.' },
+    { id: 'lycie', hero: 'heros-bellerophon', monster: 'monstres-chimere', title: 'Bellérophon abat la Chimère',
+      text: 'Monté sur Pégase, Bellérophon attaqua la Chimère depuis le ciel, hors de portée de ses flammes. Selon un récit, il lui enfonça dans la gueule une lance garnie de plomb : le souffle brûlant du monstre fit fondre le métal, qui lui coula dans la gorge.' },
+    { id: 'enigme', hero: 'heros-oedipe', monster: 'monstres-sphinx', title: 'Œdipe résout l’énigme',
+      text: 'Le Sphinx demandait : quel être marche à quatre pattes le matin, sur deux à midi et sur trois le soir ? Œdipe répondit : l’homme, qui rampe enfant, marche debout adulte et s’aide d’un bâton dans sa vieillesse. Vaincu, le Sphinx se jeta du haut de son rocher, et Thèbes fut délivrée.' },
+    { id: 'toison', hero: 'heros-jason', monster: 'monstres-dragon', title: 'Jason s’empare de la Toison d’or',
+      text: 'Le dragon qui gardait la Toison ne dormait jamais. La magicienne Médée l’endormit avec un philtre et des incantations, pendant que Jason décrochait la toison d’or de l’arbre sacré. Les deux s’enfuirent aussitôt à bord du navire Argo, poursuivis par le roi de Colchide.' },
+    { id: 'enfers', hero: 'heros-orphee', monster: 'monstres-cerbere', title: 'Orphée apaise Cerbère',
+      text: 'Pour ramener son épouse Eurydice, morte d’une morsure de serpent, Orphée descendit aux Enfers. Au son de sa lyre, le chien à trois têtes se coucha, apaisé. Hadès accepta de rendre Eurydice, à condition qu’Orphée ne se retourne pas avant la sortie. Au dernier pas, il se retourna, et la perdit à jamais.' },
+    { id: 'detroit', hero: 'heros-ulysse', monster: 'monstres-scylla', title: 'Ulysse passe le détroit',
+      text: 'Ulysse devait choisir entre Charybde, un tourbillon capable d’engloutir son navire, et Scylla, un monstre à six têtes. Sur le conseil de la magicienne Circé, il longea la falaise de Scylla, sacrifiant six marins pour sauver les autres. C’est l’origine de l’expression « tomber de Charybde en Scylla ».' }
+  ];
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
@@ -115,9 +147,28 @@ window.ATLAS = window.ATLAS || {};
       ['hades', 'Hadès', 'Maître des Enfers', 84, 90, 86, 'BRELMU', 'Souverain du monde souterrain, gardien silencieux des âmes.'],
       ['athena', 'Athéna', 'Déesse de la sagesse', 80, 88, 97, 'BRELM', 'Stratège née tout armée du front de Zeus, protectrice d’Athènes.'],
       ['apollon', 'Apollon', 'Dieu de la lumière', 82, 70, 88, 'BRE', 'Dieu des arts, de la musique et des oracles de Delphes.'],
-      ['artemis', 'Artémis', 'La Chasseresse', 86, 72, 80, 'BREL', 'Sœur jumelle d’Apollon, reine des forêts et de la lune.'],
-      ['meduse', 'Méduse', 'La Gorgone', 81, 77, 69, 'BREL', 'Son regard change en pierre quiconque ose la contempler.'],
-      ['heracles', 'Héraclès', 'Le Héros aux douze travaux', 95, 84, 62, 'BRE', 'Le plus célèbre des héros grecs, d’une force sans égale.']
+      ['artemis', 'Artémis', 'La Chasseresse', 86, 72, 80, 'BREL', 'Sœur jumelle d’Apollon, reine des forêts et de la lune.']
+
+    ],
+    heros: [
+      ['heracles', 'Héraclès', 'Le Héros aux douze travaux', 95, 84, 62, 'BRELM', 'Le plus célèbre des héros grecs, d’une force sans égale.'],
+      ['persee', 'Persée', 'Le Vainqueur de la Gorgone', 86, 78, 84, 'BRELM', 'Fils de Zeus et de Danaé, il trancha la tête de Méduse.'],
+      ['thesee', 'Thésée', 'Le Héros d’Athènes', 88, 82, 84, 'BRELM', 'Prince d’Athènes, vainqueur du Minotaure.'],
+      ['bellerophon', 'Bellérophon', 'Le Cavalier de Pégase', 84, 76, 78, 'BRE', 'Héros de Corinthe qui dompta Pégase.'],
+      ['oedipe', 'Œdipe', 'Le Roi de Thèbes', 70, 72, 96, 'BREL', 'Il résolut l’énigme du Sphinx et devint roi de Thèbes.'],
+      ['jason', 'Jason', 'Le Chef des Argonautes', 82, 80, 82, 'BREL', 'Chef de l’expédition des Argonautes, il conquit la Toison d’or.'],
+      ['orphee', 'Orphée', 'Le Chantre de Thrace', 58, 70, 98, 'BREL', 'Musicien dont le chant charmait les bêtes et les pierres.'],
+      ['ulysse', 'Ulysse', 'Le Rusé', 80, 82, 99, 'BRELMU', 'Roi d’Ithaque, héros de l’Odyssée.']
+    ],
+    monstres: [
+      ['meduse', 'Méduse', 'La Gorgone', 81, 77, 69, 'BRELM', 'Son regard change en pierre quiconque ose la contempler.'],
+      ['minotaure', 'Le Minotaure', 'Le Taureau de Crète', 94, 86, 48, 'BRELM', 'Mi-homme mi-taureau, enfermé dans le Labyrinthe.'],
+      ['hydre', 'L’Hydre de Lerne', 'Le Serpent aux neuf têtes', 92, 90, 52, 'BREL', 'Serpent dont chaque tête tranchée repoussait en double.'],
+      ['chimere', 'La Chimère', 'Le Monstre à trois natures', 90, 78, 58, 'BRE', 'Lion, chèvre et serpent à la fois, elle crachait le feu.'],
+      ['sphinx', 'Le Sphinx', 'Le Gardien de Thèbes', 78, 80, 96, 'BREL', 'Monstre ailé qui posait une énigme aux voyageurs.'],
+      ['dragon', 'Le Dragon de Colchide', 'Le Gardien de la Toison', 92, 94, 60, 'BRE', 'Serpent géant qui veillait sur la Toison d’or.'],
+      ['cerbere', 'Cerbère', 'Le Chien des Enfers', 90, 92, 56, 'BRELMU', 'Chien à trois têtes, gardien de la porte des Enfers.'],
+      ['scylla', 'Scylla', 'Le Monstre du détroit', 91, 80, 62, 'BRE', 'Monstre à six têtes tapi dans un détroit.']
     ],
     titans: [
       ['cronos', 'Cronos', 'Le Titan dévoreur', 90, 82, 84, 'BRELMU', 'Le plus jeune des Titans, il détrôna son père Ouranos avant d’être renversé par son fils.'],
@@ -255,13 +306,27 @@ window.ATLAS = window.ATLAS || {};
      [[slug|texte]] = même lien avec un texte libre. Rendu dans la fiche détaillée (ui.js → bioHTML). */
   var STORIES = {
     'grece-zeus': 'Maître du ciel et de la foudre, il règne sur l’Olympe aux côtés de son épouse [[hera]]. Après la victoire sur les Titans, il partagea le monde avec ses frères : les mers à [[poseidon]], les Enfers à [[hades]].',
-    'grece-hera': 'Reine des dieux et protectrice du mariage, elle ne pardonne jamais les infidélités de [[zeus]]. Sa jalousie poursuivit [[heracles]], fils de son époux, depuis le berceau jusqu’à ses douze travaux.',
+    'grece-hera': 'Reine des dieux et protectrice du mariage, elle ne pardonne jamais les infidélités de [[zeus]]. Sa jalousie poursuivit [[heros:heracles]], fils de son époux, depuis le berceau jusqu’à ses douze travaux.',
     'grece-poseidon': 'Frère de [[zeus]], il reçut les mers en partage : son trident soulève les tempêtes et fait trembler la terre. Il disputa à [[athena]] la protection d’Athènes, et perdit : la cité préféra son olivier.',
-    'grece-hades': 'Frère aîné de [[zeus]] et de [[poseidon]], il règne sur le monde souterrain, gardien silencieux des âmes. Rares sont les vivants à en être revenus : [[heracles]] y descendit pour capturer Cerbère.',
-    'grece-athena': 'Née tout armée du front de [[zeus]], elle est la déesse de la sagesse et de la stratégie. Elle guida [[heracles]] dans ses travaux et offrit à Persée le bouclier poli qui lui permit de vaincre [[meduse]].',
+    'grece-hades': 'Frère aîné de [[zeus]] et de [[poseidon]], il règne sur le monde souterrain, gardien silencieux des âmes. Rares sont les vivants à en être revenus : [[heros:heracles]] y descendit pour capturer Cerbère.',
+    'grece-athena': 'Née tout armée du front de [[zeus]], elle est la déesse de la sagesse et de la stratégie. Elle guida [[heros:heracles]] dans ses travaux et offrit à Persée le bouclier poli qui lui permit de vaincre [[monstres:meduse]].',
     'grece-apollon': 'Dieu de la lumière, des arts et des oracles, il parle aux hommes par la voix de la Pythie de Delphes. Fils de [[zeus]], il est le frère jumeau d’[[artemis]], née juste avant lui sur l’île de Délos.',
     'grece-artemis': 'Chasseresse des forêts et protectrice des jeunes filles, elle veille la nuit sous la lune. Jumelle d’[[apollon]], elle aurait aidé sa mère à le mettre au monde, à peine née elle-même.',
-    'grece-meduse': 'Seule mortelle des trois Gorgones, elle change en pierre quiconque croise son regard. Sa malédiction lui vient d’[[athena]], offensée que [[poseidon]] l’ait séduite dans son temple.',
+    'monstres-meduse': 'Seule mortelle des trois Gorgones, elle change en pierre quiconque croise son regard. Sa malédiction lui vient d’[[grece:athena]], offensée que [[grece:poseidon]] l’ait séduite dans son temple.',
+    'heros-persee': 'Fils de [[grece:zeus|Zeus]] et de Danaé, il fut envoyé par un roi jaloux chercher la tête de [[monstres:meduse|Méduse]]. Avec les sandales ailées d’Hermès, le casque d’Hadès et le bouclier d’[[grece:athena|Athéna]], il réussit l’exploit.',
+    'heros-thesee': 'Fils du roi d’Athènes Égée, il partit pour la Crète avec les jeunes gens livrés au [[monstres:minotaure|Minotaure]]. Guidé par le fil d’Ariane, il tua le monstre et sortit du Labyrinthe.',
+    'heros-bellerophon': 'Héros de Corinthe, il dompta le cheval ailé Pégase grâce à une bride d’or offerte par [[grece:athena|Athéna]], puis abattit la [[monstres:chimere|Chimère]] depuis les airs.',
+    'heros-oedipe': 'Abandonné à sa naissance, il grandit loin de Thèbes sans connaître ses vrais parents. En résolvant l’énigme du [[monstres:sphinx|Sphinx]], il délivra la ville et en devint le roi.',
+    'heros-jason': 'Pour reprendre le trône de son père, il dut rapporter la Toison d’or, gardée en Colchide par un [[monstres:dragon|dragon]]. Il réunit pour cela les plus grands héros de son temps à bord du navire Argo, dont [[heracles]] et [[orphee]].',
+    'heros-orphee': 'Fils de la muse Calliope, il jouait de la lyre si merveilleusement que les animaux, les arbres et les pierres le suivaient. Il descendit aux Enfers chercher son épouse Eurydice, et sa musique apaisa même [[monstres:cerbere|Cerbère]].',
+    'heros-ulysse': 'Roi d’Ithaque, il imagina le cheval de bois qui permit aux Grecs de prendre Troie. Son retour chez lui dura dix ans : il affronta le cyclope [[geants:polypheme|Polyphème]], la magicienne Circé, les Sirènes et [[monstres:scylla|Scylla]].',
+    'monstres-minotaure': 'Né des amours de la reine Pasiphaé et d’un taureau envoyé par [[grece:poseidon|Poséidon]], il avait un corps d’homme et une tête de taureau. Le roi Minos l’enferma dans le Labyrinthe construit par Dédale, où il dévorait les jeunes Athéniens livrés en tribut.',
+    'monstres-hydre': 'Ce serpent d’eau vivait dans les marais de Lerne, près d’Argos. Son haleine était mortelle, et chaque tête coupée repoussait en double. L’affronter fut le deuxième des douze travaux d’[[heros:heracles|Héraclès]].',
+    'monstres-chimere': 'Elle avait la tête d’un lion, le corps d’une chèvre et la queue d’un serpent, et soufflait des flammes. Elle ravageait la Lycie jusqu’à ce que [[heros:bellerophon|Bellérophon]] l’abatte du haut de Pégase.',
+    'monstres-sphinx': 'Ce monstre à corps de lion, ailes d’oiseau et visage de femme avait été envoyé contre Thèbes. Il dévorait ceux qui ne trouvaient pas la réponse à son énigme, jusqu’à ce qu’[[heros:oedipe|Œdipe]] la résolve.',
+    'monstres-dragon': 'Ce serpent immense, qui ne dormait jamais, était enroulé autour du chêne où pendait la Toison d’or, dans un bois sacré d’Arès. [[heros:jason|Jason]] ne le vainquit qu’avec l’aide de la magicienne Médée.',
+    'monstres-cerbere': 'Ce chien à trois têtes, à queue de serpent, gardait l’entrée du royaume d’[[grece:hades|Hadès]] : il laissait entrer les morts mais empêchait quiconque d’en sortir. La lyre d’[[heros:orphee|Orphée]] parvint pourtant à l’apaiser.',
+    'monstres-scylla': 'Ancienne nymphe changée en monstre, elle vivait dans une grotte au-dessus d’un détroit, face au tourbillon de Charybde. Ses six têtes de chien happaient les marins qui passaient, comme ceux d’[[heros:ulysse|Ulysse]].',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -271,10 +336,10 @@ window.ATLAS = window.ATLAS || {};
     'titans-japet': 'Frère de [[cronos]], il combattit dans la guerre des Titans et fut jeté dans le Tartare. Il est surtout connu par ses fils : [[atlas]], [[promethee]], Épiméthée et Ménoetios.',
     'titans-atlas': 'Fils de [[japet]], il mena les Titans au combat contre les Olympiens. Vaincu, il fut condamné par [[grece:zeus|Zeus]] à porter le ciel sur ses épaules, à l’extrême ouest du monde.',
     'titans-promethee': 'Fils de [[japet]], il façonna les premiers hommes dans l’argile, puis vola le feu de l’Olympe pour le leur donner. [[grece:zeus|Zeus]] le fit enchaîner sur le Caucase, où un aigle venait lui dévorer le foie.',
-    'geants-alcyonee': 'Le plus redoutable des Géants était immortel tant qu’il restait sur la terre de Pallène, où il était né. [[grece:heracles|Héraclès]] le blessa d’une flèche puis, sur le conseil d’[[grece:athena|Athéna]], le traîna hors de ses terres, où il mourut.',
-    'geants-porphyrion': 'Roi des Géants, il se jeta sur [[grece:hera|Héra]] pendant la bataille contre les dieux. [[grece:zeus|Zeus]] le frappa de sa foudre et [[grece:heracles|Héraclès]] l’acheva d’une flèche.',
+    'geants-alcyonee': 'Le plus redoutable des Géants était immortel tant qu’il restait sur la terre de Pallène, où il était né. [[heros:heracles|Héraclès]] le blessa d’une flèche puis, sur le conseil d’[[grece:athena|Athéna]], le traîna hors de ses terres, où il mourut.',
+    'geants-porphyrion': 'Roi des Géants, il se jeta sur [[grece:hera|Héra]] pendant la bataille contre les dieux. [[grece:zeus|Zeus]] le frappa de sa foudre et [[heros:heracles|Héraclès]] l’acheva d’une flèche.',
     'geants-encelade': 'Il affronta [[grece:athena|Athéna]] pendant la guerre des Géants. Alors qu’il fuyait, la déesse jeta sur lui l’île de Sicile, qui l’écrasa.',
-    'geants-ephialtes': 'Pendant la bataille contre les dieux, [[grece:apollon|Apollon]] lui creva l’œil gauche d’une flèche, et [[grece:heracles|Héraclès]] lui perça le droit.',
+    'geants-ephialtes': 'Pendant la bataille contre les dieux, [[grece:apollon|Apollon]] lui creva l’œil gauche d’une flèche, et [[heros:heracles|Héraclès]] lui perça le droit.',
     'geants-mimas': 'Selon les récits, il fut tué par Héphaïstos, qui l’accabla de projectiles de métal en fusion, ou par [[grece:zeus|Zeus]] et sa foudre.',
     'geants-polypheme': 'Fils de [[grece:poseidon|Poséidon]], ce cyclope à l’œil unique vivait en Sicile avec ses moutons. Il enferma Ulysse et ses compagnons dans sa grotte et en dévora plusieurs, avant que le héros ne l’enivre et lui crève l’œil.',
     'geants-briaree': 'Fils d’Ouranos et de Gaïa, il fut enfermé dans le Tartare avec ses frères Cottos et Gygès. Libéré par [[grece:zeus|Zeus]], il l’aida à vaincre les Titans en lançant sur eux des rochers par centaines.',
@@ -288,7 +353,7 @@ window.ATLAS = window.ATLAS || {};
     'pharaons-toutankhamon': 'Monté sur le trône vers neuf ans, il rétablit le culte des anciens dieux abandonnés par [[akhenaton]], et mourut vers dix-neuf ans. Son règne fut court et modeste.',
     'pharaons-ramses': 'Il régna environ soixante-sept ans, de 1279 à 1213 av. J.-C. Il fit graver partout le récit de la bataille de Qadesh contre les Hittites, présentée comme une victoire, puis signa avec eux l’un des plus anciens traités de paix connus.',
     'pharaons-cleopatre': 'Dernière reine de la dynastie des Ptolémées, descendants d’un général d’Alexandre le Grand, elle fut la seule de sa famille à parler égyptien. Alliée de Jules César puis de Marc Antoine, elle tenta de préserver l’indépendance de l’Égypte face à Rome.',
-    'grece-heracles': 'Fils de [[zeus]] et d’une mortelle, il accomplit douze travaux pour expier un crime commis dans la folie envoyée par [[hera]]. Le dernier le mena jusqu’au royaume d’[[hades]], d’où il ramena Cerbère.',
+    'heros-heracles': 'Fils de [[grece:zeus]] et d’une mortelle, il accomplit douze travaux pour expier un crime commis dans la folie envoyée par [[grece:hera]]. Le dernier le mena jusqu’au royaume d’[[grece:hades]], d’où il ramena Cerbère.',
 
     'egypte-ra': 'Chaque jour, il traverse le ciel sur sa barque solaire, puis affronte la nuit le serpent Apophis. Lorsque les hommes se révoltèrent contre lui, il envoya son œil, sous la forme de [[sekhmet]], pour les châtier.',
     'egypte-anubis': 'Le dieu à tête de chacal guide les défunts et pèse leur cœur contre la plume de Maât, sous le regard d’[[osiris]]. Le verdict est consigné par [[thot]], le scribe des dieux.',
@@ -343,10 +408,24 @@ window.ATLAS = window.ATLAS || {};
     'grece-hera': 'Fille de Cronos et de Rhéa, elle est à la fois la sœur et l’épouse de [[zeus]]. Le paon lui est consacré : elle orna sa queue des cent yeux du géant Argos, son fidèle gardien. Ses sanctuaires d’Argos et de Samos comptaient parmi les plus vénérés de Grèce.',
     'grece-poseidon': 'On lui attribue la création du cheval, qu’il aurait fait jaillir d’un rocher d’un coup de trident. Rancunier, il poursuivit Ulysse dix ans durant pour venger son fils, le cyclope Polyphème. Les Grecs le surnommaient « l’Ébranleur de la terre ».',
     'grece-hades': 'Il enleva Perséphone pour en faire sa reine ; pour avoir goûté quelques grains de grenade, la jeune déesse dut passer chaque année une partie de l’année sous terre. Son casque le rendait invisible. Les Grecs évitaient de prononcer son nom et l’appelaient Ploutos, « le Riche ».',
-    'grece-athena': 'Elle porte l’égide, ornée de la tête de [[meduse]], et la chouette est son oiseau. Le Parthénon, sur l’Acropole d’Athènes, lui est dédié. Protectrice des artisans autant que des guerriers, elle passait pour avoir inventé le métier à tisser.',
+    'grece-athena': 'Elle porte l’égide, ornée de la tête de [[monstres:meduse]], et la chouette est son oiseau. Le Parthénon, sur l’Acropole d’Athènes, lui est dédié. Protectrice des artisans autant que des guerriers, elle passait pour avoir inventé le métier à tisser.',
     'grece-apollon': 'Il tua le serpent Python à Delphes et y fonda son oracle, le plus célèbre du monde grec. Musicien, il joue de la lyre que lui offrit Hermès. Épris de la nymphe Daphné, changée en laurier pour lui échapper, il fit de cet arbre son emblème.',
     'grece-artemis': 'Elle obtint de [[zeus]] de rester à jamais libre et sans époux, entourée de nymphes chasseresses. Le chasseur Actéon, qui l’avait surprise au bain, fut changé en cerf et dévoré par ses propres chiens. Son temple d’Éphèse comptait parmi les Sept Merveilles du monde.',
-    'grece-meduse': 'Le héros Persée la décapita en ne la regardant que dans le reflet de son bouclier. De son sang naquirent le cheval ailé Pégase et le géant Chrysaor. Même tranchée, sa tête gardait son pouvoir : Persée l’offrit à [[athena]], qui la fixa sur son égide.',
+    'monstres-meduse': 'Le héros Persée la décapita en ne la regardant que dans le reflet de son bouclier. De son sang naquirent le cheval ailé Pégase et le géant Chrysaor. Même tranchée, sa tête gardait son pouvoir : Persée l’offrit à [[grece:athena]], qui la fixa sur son égide.',
+    'heros-persee': 'Sur le chemin du retour, il délivra la princesse Andromède, enchaînée à un rocher pour être livrée à un monstre marin, et l’épousa. Il changea en pierre le roi Polydectès en lui montrant la tête de la Gorgone. Une constellation porte son nom, à côté de celle d’Andromède.',
+    'heros-thesee': 'Au retour, il oublia de remplacer les voiles noires de son navire par des voiles blanches, signe de victoire. Croyant son fils mort, Égée se jeta dans la mer, qui porte depuis son nom. Devenu roi, Thésée passe pour avoir réuni les villages de l’Attique autour d’Athènes.',
+    'heros-bellerophon': 'Grisé par ses victoires, il voulut monter jusqu’à l’Olympe sur le dos de Pégase. Zeus envoya un taon piquer le cheval, qui désarçonna son cavalier. Bellérophon finit sa vie seul, boiteux et errant.',
+    'heros-oedipe': 'Un oracle avait annoncé qu’il tuerait son père et épouserait sa mère. Sans le savoir, il accomplit les deux. Quand il découvrit la vérité, il se creva les yeux. Sa tragédie, mise en scène par Sophocle, a inspiré à Freud le nom du « complexe d’Œdipe ».',
+    'heros-jason': 'La magicienne Médée, éprise de lui, l’aida à surmonter toutes les épreuves du roi de Colchide. Jason l’abandonna plus tard pour une princesse de Corinthe, et Médée se vengea terriblement. Le héros mourut, dit-on, écrasé par une poutre de son vieux navire.',
+    'heros-orphee': 'Il perdit Eurydice pour toujours en se retournant trop tôt vers elle. Inconsolable, il fut mis en pièces par les Ménades, suivantes de Dionysos. Sa tête, jetée dans un fleuve, continuait de chanter. Sa lyre devint une constellation.',
+    'heros-ulysse': 'Pour écouter le chant des Sirènes sans y succomber, il se fit attacher au mât et boucha de cire les oreilles de ses marins. De retour à Ithaque, déguisé en mendiant, il fut reconnu par son vieux chien Argos, puis chassa les prétendants qui entouraient son épouse Pénélope.',
+    'monstres-minotaure': 'Son vrai nom était Astérion, « l’étoilé ». Le palais de Cnossos, en Crète, avec ses innombrables salles et ses fresques de taureaux, a peut-être inspiré la légende du Labyrinthe. Il fut tué par [[heros:thesee|Thésée]].',
+    'monstres-hydre': 'Selon Hésiode, elle était la fille de Typhon et d’Échidna, et [[grece:hera|Héra]] l’aurait élevée pour perdre Héraclès. Le nombre de ses têtes varie selon les auteurs, de cinq à cent. On appelle aujourd’hui « hydre » un minuscule animal d’eau douce capable de régénérer son corps.',
+    'monstres-chimere': 'La Chimère d’Arezzo, grande statue de bronze étrusque, la montre blessée, la tête de chèvre pendante. Son nom est devenu un mot courant : une chimère est une idée irréaliste, et, en biologie, un être formé de cellules d’origines différentes.',
+    'monstres-sphinx': 'Chez les Grecs, le Sphinx est une créature féminine et cruelle. Le mot vient pourtant d’Égypte, où le sphinx, comme celui de Gizeh, est un gardien à tête de roi. Vaincu, le Sphinx de Thèbes se jeta du haut de son rocher.',
+    'monstres-dragon': 'Selon certains récits, il était né du sang de Typhon. Le roi de Colchide imposa aussi à Jason de semer les dents d’un autre dragon, celui de Thèbes : il en sortit des guerriers armés, que le héros dut combattre.',
+    'monstres-cerbere': 'Pour son dernier travail, [[heros:heracles|Héraclès]] le captura à mains nues et le ramena un moment à la surface. Selon Ovide, la bave qui coula de ses gueules fit naître l’aconit, une plante vénéneuse. On appelle encore « cerbère » un gardien intraitable.',
+    'monstres-scylla': 'Selon Ovide, la magicienne Circé, jalouse, la changea en monstre en empoisonnant l’eau de son bain. Les Anciens situaient le détroit entre l’Italie et la Sicile, à Messine. L’expression « tomber de Charybde en Scylla » signifie échapper à un danger pour tomber dans un pire.',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -354,8 +433,8 @@ window.ATLAS = window.ATLAS || {};
     'titans-themis': 'Avant Apollon, elle aurait tenu l’oracle de Delphes. On la représente tenant une balance, parfois les yeux bandés : c’est elle que l’on voit encore devant de nombreux palais de justice.',
     'titans-mnemosyne': 'Dans certains rites funéraires, les initiés devaient boire aux Enfers à la source de Mnémosyne, et non à celle du Léthé, qui fait tout oublier. Le mot « mnémotechnique » vient de son nom.',
     'titans-japet': 'Ses fils ont tous défié l’ordre des dieux, et tous en ont payé le prix. Certains auteurs anciens voyaient en lui l’ancêtre de l’humanité, par Prométhée et son fils Deucalion.',
-    'titans-atlas': 'Lors de son onzième travail, [[grece:heracles|Héraclès]] prit sa place quelques instants pour qu’il aille cueillir les pommes d’or des Hespérides. Au XVIe siècle, le géographe Mercator donna le nom d’Atlas à son recueil de cartes, et le mot est resté. Les montagnes de l’Atlas, au Maroc, portent aussi son nom.',
-    'titans-promethee': 'Son nom signifie « celui qui réfléchit avant », par opposition à son frère Épiméthée, « celui qui réfléchit après », qui accepta Pandore malgré ses avertissements. C’est [[grece:heracles|Héraclès]] qui le délivra en abattant l’aigle. Eschyle lui consacra une tragédie, Prométhée enchaîné.',
+    'titans-atlas': 'Lors de son onzième travail, [[heros:heracles|Héraclès]] prit sa place quelques instants pour qu’il aille cueillir les pommes d’or des Hespérides. Au XVIe siècle, le géographe Mercator donna le nom d’Atlas à son recueil de cartes, et le mot est resté. Les montagnes de l’Atlas, au Maroc, portent aussi son nom.',
+    'titans-promethee': 'Son nom signifie « celui qui réfléchit avant », par opposition à son frère Épiméthée, « celui qui réfléchit après », qui accepta Pandore malgré ses avertissements. C’est [[heros:heracles|Héraclès]] qui le délivra en abattant l’aigle. Eschyle lui consacra une tragédie, Prométhée enchaîné.',
     'geants-alcyonee': 'Il avait volé les troupeaux du Soleil avant la guerre contre les dieux. De chagrin, ses filles, les Alcyonides, se jetèrent à la mer et furent changées en martins-pêcheurs, les alcyons.',
     'geants-porphyrion': 'Selon Apollodore, Zeus lui inspira un désir soudain pour Héra afin de le distraire au cœur de la bataille. Son nom évoque la pourpre, la couleur des flammes ou du sang. Le poète Pindare le désigne comme le roi des Géants.',
     'geants-encelade': 'Pour les Anciens, ses mouvements sous la terre provoquaient les séismes de Sicile, et son souffle les éruptions de l’Etna. Une lune glacée de Saturne porte son nom : elle projette d’immenses geysers dans l’espace.',
@@ -363,7 +442,7 @@ window.ATLAS = window.ATLAS || {};
     'geants-mimas': 'Le mont Mimas, en Asie Mineure, porte son nom, comme une petite lune de Saturne reconnaissable à son immense cratère, qui lui donne l’air d’un grand œil.',
     'geants-polypheme': 'Ulysse lui avait dit s’appeler « Personne » : quand Polyphème hurla que Personne l’attaquait, les autres Cyclopes ne vinrent pas l’aider. Sa colère, transmise à son père Poséidon, poursuivit Ulysse pendant dix ans. D’autres récits le montrent soupirant pour la nymphe Galatée.',
     'geants-briaree': 'Il devint ensuite le gardien des Titans prisonniers. Dans l’Iliade, la déesse Thétis l’appelle au secours de [[grece:zeus|Zeus]] quand les autres dieux veulent l’enchaîner : sa seule présence suffit à les faire renoncer.',
-    'geants-antee': '[[grece:heracles|Héraclès]] devina son secret : il le souleva de terre et l’étouffa dans ses bras. Antée bâtissait un temple à son père avec les crânes de ses victimes.',
+    'geants-antee': '[[heros:heracles|Héraclès]] devina son secret : il le souleva de terre et l’étouffa dans ses bras. Antée bâtissait un temple à son père avec les crânes de ses victimes.',
     'pharaons-narmer': 'La palette de Narmer, une plaque de schiste sculptée découverte à Hiérakonpolis, le montre coiffé tour à tour de la couronne blanche du Sud et de la couronne rouge du Nord. Elle est conservée au musée du Caire. Les Grecs attribuaient cette unification à un roi nommé Ménès, peut-être le même homme.',
     'pharaons-kheops': 'C’est la seule des Sept Merveilles du monde antique encore debout. Ironie de l’histoire, le seul portrait sûr de son bâtisseur est une statuette d’ivoire de quelques centimètres. Au pied de la pyramide, on a retrouvé une grande barque démontée, destinée à son voyage dans l’au-delà.',
     'pharaons-hatchepsout': 'Son règne fut prospère : elle envoya une grande expédition au pays de Pount, d’où l’on rapporta de l’encens et des arbres à myrrhe. Son temple funéraire de Deir el-Bahari, étagé contre la falaise, compte parmi les plus beaux d’Égypte. Après sa mort, son nom fut martelé sur de nombreux monuments.',
@@ -373,7 +452,7 @@ window.ATLAS = window.ATLAS || {};
     'pharaons-toutankhamon': 'En 1922, l’archéologue Howard Carter découvrit son tombeau presque intact dans la Vallée des Rois. On y trouva plus de cinq mille objets, dont le célèbre masque funéraire en or. La légende d’une malédiction naquit de la mort de lord Carnarvon, qui finançait les fouilles, quelques mois plus tard.',
     'pharaons-ramses': 'Il couvrit l’Égypte de monuments, dont les temples d’Abou Simbel, taillés dans la falaise et déplacés bloc par bloc dans les années 1960 pour échapper aux eaux du lac Nasser. En 1976, sa momie fut accueillie à Paris avec les honneurs militaires, pour y être soignée contre des champignons.',
     'pharaons-cleopatre': 'Vaincue avec Antoine à la bataille d’Actium en 31 av. J.-C., elle se donna la mort l’année suivante, selon la tradition par la morsure d’un aspic. L’Égypte devint alors une province romaine. Elle a vécu plus près de nous dans le temps que de la construction de la pyramide de [[kheops]].',
-    'grece-heracles': 'Encore au berceau, il étrangla les deux serpents envoyés par [[hera]]. Parmi ses travaux : le lion de Némée, l’hydre de Lerne aux têtes qui repoussent, les écuries d’Augias. À sa mort, il fut accueilli sur l’Olympe et devint immortel.',
+    'heros-heracles': 'Encore au berceau, il étrangla les deux serpents envoyés par [[grece:hera]]. Parmi ses travaux : le lion de Némée, l’hydre de Lerne aux têtes qui repoussent, les écuries d’Augias. À sa mort, il fut accueilli sur l’Olympe et devint immortel.',
 
     'egypte-ra': 'On le représente avec une tête de faucon coiffée du disque solaire. Si puissant que [[isis]] dut ruser pour lui arracher son nom secret, il fut plus tard uni à Amon pour devenir Amon-Rê, roi des dieux, honoré à Karnak.',
     'egypte-anubis': 'Avant l’essor du culte d’[[osiris]], il était le grand dieu des morts. On lui attribue l’invention de l’embaumement, et les prêtres portaient son masque de chacal pendant la momification. Le chacal rôdant près des tombes, il devint le protecteur des nécropoles.',
@@ -440,12 +519,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire', 'nordique'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire', 'nordique'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'contes-alice-base',
-      collections: ['grece', 'titans', 'geants', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire'],
+      collections: ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire'],
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette

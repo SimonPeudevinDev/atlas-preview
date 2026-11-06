@@ -1454,3 +1454,32 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .cgroup-head { grid-template-columns: 1fr; padding: 18px; }
   .cgroup-subs { padding-left: 12px; }
 }
+
+/* Duels héros contre monstres */
+.du-sec { padding-top: 0; }
+.du { padding: 22px 0 8px; border-bottom: 1px solid var(--line); }
+.du-intro { margin: -6px 0 16px; }
+.du-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.du-item { display: flex; flex-direction: column; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.du-item.is-done { border-color: var(--gold-2); background: linear-gradient(180deg, var(--surface), var(--gold-3)); }
+.du-vs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; margin: 0 0 12px; }
+.du-side { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 0; cursor: pointer; }
+.du-pic { position: relative; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; background: var(--bg-2); box-shadow: 0 0 0 1px var(--line-2); transition: transform .25s var(--ease); }
+.du-pic img, .du-pic svg { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+.du-side:not(.is-own) .du-pic img, .du-side:not(.is-own) .du-pic svg { filter: grayscale(1) brightness(1.12); opacity: .4; }
+.du-side.is-own .du-pic { box-shadow: 0 0 0 2px var(--gold-2); }
+.du-side:hover .du-pic { transform: translateY(-2px); }
+.du-name { font-family: var(--serif); font-size: 17px; font-weight: 500; line-height: 1.15; text-align: center; color: var(--ink); }
+.du-own { font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-4); }
+.du-side.is-own .du-own { color: var(--gold); }
+.du-x { font-size: 20px; }
+.du-k { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin: 0 0 4px; }
+.du-title { font-family: var(--serif); font-weight: 500; font-size: 22px; line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+.du-text { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.du-lock { margin: 0; font-size: 13.5px; color: var(--ink-3); }
+.du-item:not(.is-done) .du-title { color: var(--ink-3); }
+@media (max-width: 600px) {
+  .du-list { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 86%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-right: 16px; align-items: stretch; }
+  .du-list::-webkit-scrollbar { display: none; }
+  .du-item { scroll-snap-align: start; }
+}

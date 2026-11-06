@@ -13,6 +13,16 @@
       bio: 'Fils de [[zeus]] et de la mortelle Sémélé, il fut le dernier à rejoindre les dieux de l’Olympe.',
       more: 'Sa mère mourut foudroyée en voyant Zeus dans toute sa gloire : Zeus cousit l’enfant dans sa cuisse jusqu’à sa naissance. Dieu de la vigne, du vin et de l’ivresse, il est aussi celui du théâtre : les tragédies et les comédies d’Athènes étaient jouées pendant ses fêtes, les Dionysies.'
     },
+    heros: {
+      name: 'Achille', title: 'Le Héros invulnérable', atk: 98, def: 88, esp: 70,
+      bio: 'Fils de la nymphe Thétis, il était invulnérable sauf au talon, par lequel sa mère l’avait tenu pour le plonger dans le Styx.',
+      more: 'Il fut le plus grand guerrier grec de la guerre de Troie, où il tua le prince troyen Hector. Il mourut d’une flèche de Pâris, guidée par Apollon, en plein talon. On parle encore du « talon d’Achille » pour désigner un point faible.'
+    },
+    monstres: {
+      name: 'Échidna', title: 'La Mère des monstres', atk: 88, def: 84, esp: 76,
+      bio: 'Mi-femme mi-serpent, elle donna naissance avec Typhon aux plus terribles monstres grecs, dont [[cerbere]], l’[[hydre]] et la [[chimere]].',
+      more: 'Hésiode la décrit comme une nymphe au beau visage dont le corps se termine en serpent tacheté. Elle vivait dans une grotte, loin des dieux et des hommes. Selon certains récits, Argos aux cent yeux, le gardien d’Héra, la tua pendant son sommeil.'
+    },
     titans: {
       name: 'Gaïa', title: 'La Terre mère', atk: 80, def: 98, esp: 94,
       bio: 'Née aux origines du monde, la Terre enfanta seule Ouranos, le Ciel, puis lui donna les Titans, dont [[cronos]], les Cyclopes et les Hécatonchires.',
