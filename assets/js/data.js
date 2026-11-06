@@ -25,7 +25,7 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Collections ---------- */
   A.COLLECTIONS = [
     {
-      id: 'grece', name: 'Olympe', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'temple',
+      id: 'grece', name: 'Les Olympiens', family: 'Mythologie grecque', group: 'grecque', universe: 'Mythologies', motif: 'temple',
       edition: 'Édition I', status: 'live', popular: 1,
       tagline: 'Les dieux qui règnent sur le monde depuis le sommet de l’Olympe.',
       description: 'Du sommet de l’Olympe aux rives du Styx, une galerie consacrée aux grandes divinités grecques et à leurs querelles de famille.'
@@ -55,7 +55,7 @@ window.ATLAS = window.ATLAS || {};
       description: 'Gardiens, fléaux et énigmes vivantes. Chaque monstre a son héros : réunissez-les pour débloquer le récit de leur duel.'
     },
     {
-      id: 'egypte', name: 'Rives du Nil', family: 'Mythologie égyptienne', group: 'egyptienne', universe: 'Mythologies', motif: 'pyramids',
+      id: 'egypte', name: 'Les Dieux du Nil', family: 'Égypte ancienne', group: 'egyptienne', universe: 'Mythologies', motif: 'pyramids',
       edition: 'Édition I', status: 'live', popular: 2,
       tagline: 'Les divinités solaires et funéraires de l’Égypte ancienne.',
       description: 'Entre le désert et le fleuve, les dieux de l’Égypte veillent sur le soleil, les vivants et le long voyage des âmes.'
@@ -67,28 +67,28 @@ window.ATLAS = window.ATLAS || {};
       description: 'De l’unification du pays à la mort de Cléopâtre, les souverains qui ont bâti les pyramides, conquis l’Orient et défié Rome.'
     },
     {
-      id: 'planetes', name: 'Les Planètes', family: 'Système solaire', group: 'solaire', universe: 'Sciences', motif: 'planet',
+      id: 'planetes', name: 'Les Planètes', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'planet',
       edition: 'Édition I', status: 'live', popular: 11,
       tagline: 'Les huit planètes qui tournent autour du Soleil.',
       description: 'De la brûlante Mercure à la lointaine Neptune, les planètes du système solaire, leurs records et les dieux qui leur ont donné leur nom.'
     },
     {
-      id: 'lunes', name: 'Les Lunes', family: 'Système solaire', group: 'solaire', universe: 'Sciences', motif: 'moon',
+      id: 'lunes', name: 'Les Lunes', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'moon',
       edition: 'Édition I', status: 'live', popular: 12,
       tagline: 'Volcans, océans cachés et geysers : les lunes les plus étonnantes.',
       description: 'Notre Lune et ses cousines : des mondes de glace, de feu et de méthane, qui comptent parmi les meilleurs espoirs de trouver la vie ailleurs.'
     },
     {
-      id: 'gothique', name: 'Nuits gothiques', family: 'Monstres gothiques', group: 'fantastique', universe: 'Littérature', motif: 'castle',
+      id: 'gothique', name: 'Nuits gothiques', family: 'Récits fantastiques', group: 'fantastique', universe: 'Littérature', motif: 'castle',
       edition: 'Édition I', status: 'live', popular: 3,
       tagline: 'Les créatures nées de la littérature fantastique du XIXᵉ siècle.',
       description: 'Châteaux battus par les vents, laboratoires clandestins et salons d’opéra : les grandes figures du roman gothique.'
     },
     {
-      id: 'contes', name: 'Il était une fois', family: 'Contes classiques', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
+      id: 'contes', name: 'Contes de fées', family: 'Contes et merveilles', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
       edition: 'Édition I', status: 'live', popular: 4,
-      tagline: 'Les héroïnes et les héros des contes de Perrault, Grimm, Carroll et Barrie.',
-      description: 'Forêts profondes, tours oubliées et pays des merveilles : les personnages qui ont bercé des générations de lecteurs.'
+      tagline: 'Les héroïnes, les héros et les ogres des contes de Perrault et des frères Grimm.',
+      description: 'Forêts profondes, châteaux endormis et ogres affamés : les contes de fées qui ont bercé des générations d’enfants.'
     },
     {
       id: 'histoire', name: 'Figures de France', family: 'Histoire', universe: 'Histoire', motif: 'dome',
@@ -103,61 +103,61 @@ window.ATLAS = window.ATLAS || {};
       description: 'Nouvelle collection. Entre fjords et neiges éternelles, les dieux nordiques et les êtres qui annoncent la fin des temps.'
     },
     {
-      id: 'astronautes', name: 'Les Astronautes', family: 'Conquête spatiale', group: 'solaire', universe: 'Sciences', motif: 'rocket',
+      id: 'astronautes', name: 'Les Astronautes', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'rocket',
       edition: 'Édition I', status: 'live', popular: 14,
       tagline: 'Les pionniers qui ont quitté la Terre, de Gagarine à Pesquet.',
       description: 'Pilotes, ingénieurs et scientifiques : celles et ceux qui ont franchi les premiers la frontière de l’espace.'
     },
     {
-      id: 'missions', name: 'Les Missions', family: 'Conquête spatiale', group: 'solaire', universe: 'Sciences', motif: 'planet',
+      id: 'missions', name: 'Les Missions', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'planet',
       edition: 'Édition I', status: 'live', popular: 15,
       tagline: 'Satellites, sondes et télescopes qui ont changé notre regard sur l’Univers.',
       description: 'Du premier « bip-bip » de Spoutnik aux galaxies lointaines de James Webb : les grandes missions de l’histoire spatiale.'
     },
     {
-      id: 'detectives', name: 'Les Détectives', family: 'Romans policiers', group: 'aventure', universe: 'Littérature', motif: 'dome',
+      id: 'detectives', name: 'Romans policiers', family: 'Romans d’aventure', group: 'aventure', universe: 'Littérature', motif: 'dome',
       edition: 'Édition I', status: 'live', popular: 16,
       tagline: 'Détectives de génie, gentlemen cambrioleurs et cerveaux du crime.',
       description: 'De Baker Street aux salons parisiens, les enquêteurs et les criminels qui ont inventé le roman policier.'
     },
     {
-      id: 'verne', name: 'Jules Verne', family: 'Voyages extraordinaires', group: 'aventure', universe: 'Littérature', motif: 'ship',
+      id: 'verne', name: 'Voyages extraordinaires', family: 'Romans d’aventure', group: 'aventure', universe: 'Littérature', motif: 'ship',
       edition: 'Édition I', status: 'live', popular: 17,
       tagline: 'Sous les mers, au centre de la Terre, vers la Lune : les héros des Voyages extraordinaires.',
       description: 'Savants, capitaines et aventuriers imaginés par Jules Verne, qui annonçaient le sous-marin, l’avion et la fusée.'
     },
     {
-      id: 'mousquetaires', name: 'Cape et épée', family: 'Romans de cape et d’épée', group: 'aventure', universe: 'Littérature', motif: 'castle',
+      id: 'mousquetaires', name: 'Cape et épée', family: 'Romans d’aventure', group: 'aventure', universe: 'Littérature', motif: 'castle',
       edition: 'Édition I', status: 'live', popular: 18,
       tagline: 'Mousquetaires, vengeurs et bretteurs : le panache à la française.',
       description: 'Les héros de Dumas et de Rostand, entre duels, complots de cour et vengeances implacables.'
     },
     {
-      id: 'nuits', name: 'Les Mille et Une Nuits', family: 'Contes orientaux', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
+      id: 'nuits', name: 'Les Mille et Une Nuits', family: 'Contes et merveilles', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
       edition: 'Édition I', status: 'live', popular: 19,
       tagline: 'Lampes magiques, cavernes au trésor et tapis volants.',
       description: 'Les contes que Shéhérazade raconta, nuit après nuit, pour sauver sa vie : Aladdin, Ali Baba, Sinbad et leurs merveilles.'
     },
     {
-      id: 'merveilleux', name: 'Pays merveilleux', family: 'Contes modernes', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
+      id: 'merveilleux', name: 'Pays merveilleux', family: 'Contes et merveilles', group: 'contesmonde', universe: 'Littérature', motif: 'tower',
       edition: 'Édition I', status: 'live', popular: 20,
-      tagline: 'La route de briques jaunes et le pantin qui voulait devenir un garçon.',
-      description: 'Le pays d’Oz de L. Frank Baum et l’Italie de Carlo Collodi : deux grands contes modernes, tels que leurs auteurs les ont écrits.'
+      tagline: 'Le pays des merveilles, le Pays imaginaire, Oz et le pantin qui voulait devenir un garçon.',
+      description: 'Lewis Carroll, J. M. Barrie, L. Frank Baum et Carlo Collodi : les grands contes modernes et leurs mondes merveilleux, tels que leurs auteurs les ont écrits.'
     },
     {
-      id: 'jungle', name: 'Le Livre de la jungle', family: 'Récits de Kipling', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
+      id: 'jungle', name: 'Le Livre de la jungle', family: 'Contes et merveilles', group: 'contesmonde', universe: 'Littérature', motif: 'palms',
       edition: 'Édition I', status: 'live', popular: 21,
       tagline: 'Mowgli et les peuples de la jungle indienne, tels que Kipling les a imaginés.',
       description: 'Loups, ours, panthère et tigre : les héros des récits de Rudyard Kipling et la Loi de la jungle.'
     },
     {
-      id: 'arthur', name: 'La Table ronde', family: 'Légendes arthuriennes', group: 'medieval', universe: 'Littérature', motif: 'castle',
+      id: 'arthur', name: 'La Table ronde', family: 'Légendes médiévales', group: 'medieval', universe: 'Littérature', motif: 'castle',
       edition: 'Édition I', status: 'live', popular: 22,
       tagline: 'Le roi Arthur, Merlin et les chevaliers de Camelot.',
       description: 'Épées magiques, enchanteurs et quête du Graal : la grande légende du Moyen Âge, de Brocéliande à Avalon.'
     },
     {
-      id: 'robin', name: 'Robin des Bois', family: 'Légendes anglaises', group: 'medieval', universe: 'Littérature', motif: 'forest',
+      id: 'robin', name: 'Robin des Bois', family: 'Légendes médiévales', group: 'medieval', universe: 'Littérature', motif: 'forest',
       edition: 'Édition I', status: 'live', popular: 23,
       tagline: 'Le hors-la-loi de Sherwood et sa joyeuse bande.',
       description: 'Archers, moines bagarreurs et shérif cruel : la légende du voleur qui prenait aux riches pour donner aux pauvres.'
@@ -169,13 +169,13 @@ window.ATLAS = window.ATLAS || {};
       description: 'Les créatures et les êtres à part nés des légendes et des grands récits fantastiques du XIXe siècle.'
     },
     {
-      id: 'flibustiers', name: 'Pirates et corsaires', family: 'Âge d’or de la piraterie', group: 'pirates', universe: 'Histoire', motif: 'ship',
+      id: 'flibustiers', name: 'Pirates de l’histoire', family: 'L’Âge des pirates', group: 'pirates', universe: 'Histoire', motif: 'ship',
       edition: 'Édition I', status: 'live', popular: 25,
       tagline: 'Les vrais pirates et corsaires qui ont terrorisé les mers.',
       description: 'De Barbe-Noire à Surcouf, les flibustiers et corsaires bien réels, avec leurs trésors, leurs codes et leurs fins souvent tragiques.'
     },
     {
-      id: 'forbans', name: 'Pirates de roman', family: 'Romans de pirates', group: 'pirates', universe: 'Littérature', motif: 'palms',
+      id: 'forbans', name: 'Pirates de roman', family: 'L’Âge des pirates', group: 'pirates', universe: 'Littérature', motif: 'palms',
       edition: 'Édition I', status: 'live', popular: 26,
       tagline: 'Jambes de bois, cartes au trésor et capitaines au crochet.',
       description: 'Les pirates nés de la plume de Stevenson, de Barrie et de Sabatini, qui ont fixé pour toujours l’image du pirate.'
@@ -218,8 +218,8 @@ window.ATLAS = window.ATLAS || {};
       text: 'Ulysse devait choisir entre Charybde, un tourbillon capable d’engloutir son navire, et Scylla, un monstre à six têtes. Sur le conseil de la magicienne Circé, il longea la falaise de Scylla, sacrifiant six marins pour sauver les autres. C’est l’origine de l’expression « tomber de Charybde en Scylla ».' }
   ];
   A.GROUPS.push({
-    id: 'solaire', name: 'Système solaire', subs: ['planetes', 'lunes', 'astronautes', 'missions'], title: 'Explorateur du système solaire',
-    tagline: 'Planètes, lunes, astronautes et missions : l’aventure spatiale.',
+    id: 'solaire', name: 'L’Espace', subs: ['planetes', 'lunes', 'astronautes', 'missions'], title: 'Explorateur de l’espace',
+    tagline: 'Planètes, lunes, astronautes et missions : le ciel et ceux qui l’ont exploré.',
     description: 'Les planètes et leurs lunes les plus remarquables, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : quatre sous-collections, de Mercure à Voyager.'
   });
   A.GROUPS.push({
@@ -413,6 +413,8 @@ window.ATLAS = window.ATLAS || {};
       ['rokh', 'L’Oiseau Rokh', 'Le Géant des airs', 94, 86, 56, 'BRE', 'Oiseau gigantesque capable d’emporter un éléphant.']
     ],
     merveilleux: [
+      ['alice', 'Alice', 'Au pays des merveilles', 60, 70, 94, 'BRELMU', 'Curieuse et logique, elle suit un lapin blanc au fond d’un terrier.'],
+      ['peterpan', 'Peter Pan', 'L’Enfant qui ne grandit pas', 76, 68, 84, 'BRELM', 'Chef des Garçons perdus, il vole jusqu’au Pays imaginaire.'],
       ['dorothy', 'Dorothy', 'La Fille du Kansas', 60, 78, 86, 'BRELMU', 'Petite fille emportée par une tornade au pays d’Oz.'],
       ['epouvantail', 'L’Épouvantail', 'Celui qui voulait un cerveau', 50, 70, 88, 'BREL', 'Épouvantail de paille qui rêve d’avoir un cerveau.'],
       ['ferblanc', 'Le Bûcheron de fer-blanc', 'Celui qui voulait un cœur', 82, 90, 70, 'BREL', 'Bûcheron de métal qui rêve d’avoir un cœur.'],
@@ -494,12 +496,13 @@ window.ATLAS = window.ATLAS || {};
     ],
     contes: [
       ['cendrillon', 'Cendrillon', 'La Pantoufle de verre', 58, 72, 86, 'BRELMU', 'Avant minuit, la fille des cendres devient la reine du bal.'],
-      ['alice', 'Alice', 'Au pays des merveilles', 60, 70, 94, 'BRELMU', 'Curieuse et logique, elle suit un lapin blanc au fond d’un terrier.'],
-      ['peterpan', 'Peter Pan', 'L’Enfant qui ne grandit pas', 76, 68, 84, 'BRELM', 'Chef des Garçons perdus, il vole jusqu’au Pays imaginaire.'],
       ['chaperon', 'Le Petit Chaperon rouge', 'Promeneuse des bois', 54, 64, 80, 'BREL', 'Une galette, un petit pot de beurre et une rencontre inattendue.'],
       ['chatbotte', 'Le Chat botté', 'Le Rusé', 70, 66, 95, 'BREL', 'Par la seule force de son esprit, il fait la fortune de son maître.'],
       ['belle', 'La Belle au bois dormant', 'Endormie depuis cent ans', 50, 90, 78, 'BRE', 'Un fuseau, une malédiction, et un château gagné par les ronces.'],
       ['blancheneige', 'Blanche-Neige', 'Princesse de la forêt', 56, 74, 82, 'BREL', 'Réfugiée chez sept nains, elle échappe à la jalousie d’une reine.'],
+      ['poucet', 'Le Petit Poucet', 'Le Plus Petit des sept', 58, 70, 94, 'BREL', 'Le plus petit de sept frères, qui sauve les siens de l’ogre.'],
+      ['barbebleue', 'La Barbe bleue', 'Le Mari meurtrier', 86, 80, 82, 'BREL', 'Riche seigneur dont un petit cabinet cache un terrible secret.'],
+      ['hansel', 'Hansel et Gretel', 'Les Enfants de la forêt', 64, 72, 90, 'BREL', 'Frère et sœur qui échappent à une sorcière gourmande d’enfants.'],
       ['loup', 'Le Grand Méchant Loup', 'Ombre des sentiers', 85, 70, 72, 'BRE', 'Rôdeur des contes, il guette les imprudents.']
     ],
     histoire: [
@@ -715,7 +718,7 @@ window.ATLAS = window.ATLAS || {};
     'forbans-flint': 'Mort avant le début de L’Île au trésor, il est pourtant partout : c’est son trésor que tous cherchent, enterré sur une île dont il a dessiné la carte. Il fit tuer les six marins qui l’avaient aidé à le cacher.',
     'forbans-bengunn': 'Ancien marin de [[flint]], il fut abandonné seul sur l’île par ses compagnons pendant trois ans. À moitié fou, il rêve de fromage.',
     'forbans-billybones': 'Ce vieux marin balafré s’installe à l’auberge de l’Amiral Benbow, où il boit du rhum en chantant sa chanson de pirate. Il guette sans cesse l’arrivée d’un marin à une jambe.',
-    'forbans-crochet': 'Chef des pirates du Pays imaginaire, il porte un crochet de fer à la place de la main droite, tranchée par [[contes:peterpan|Peter Pan]] et jetée à un crocodile.',
+    'forbans-crochet': 'Chef des pirates du Pays imaginaire, il porte un crochet de fer à la place de la main droite, tranchée par [[merveilleux:peterpan|Peter Pan]] et jetée à un crocodile.',
     'forbans-smee': 'Irlandais jovial, il sert le [[crochet|capitaine Crochet]] avec une fidélité touchante, bien qu’il soit le moins effrayant des pirates.',
     'forbans-blood': 'Médecin irlandais, Peter Blood est condamné à tort pour avoir soigné un rebelle, puis vendu comme esclave à la Barbade. Il s’évade et devient le plus brillant capitaine pirate des Caraïbes.',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
@@ -765,8 +768,11 @@ window.ATLAS = window.ATLAS || {};
     'gothique-loupgarou': 'Homme le jour, créature des bois les nuits de pleine lune, il ne garde aucun souvenir de ses chasses. Il partage avec [[dracula]] la nuit et les frayeurs des campagnes d’Europe centrale.',
 
     'contes-cendrillon': 'Avant minuit, la fille des cendres devient la reine du bal, grâce à sa marraine la fée et à une citrouille changée en carrosse. Perrault la publia en 1697, dans le même recueil que le [[chaperon|Petit Chaperon rouge]] et le [[chatbotte|Chat botté]].',
-    'contes-alice': 'Curieuse et logique, elle suit un lapin blanc au fond d’un terrier et tombe dans un monde absurde. Née sous la plume de Lewis Carroll en 1865, elle partage avec [[peterpan]] le refus des règles des grandes personnes.',
-    'contes-peterpan': 'Chef des Garçons perdus, il s’envole avec Wendy jusqu’au Pays imaginaire, où l’on ne grandit jamais. Imaginé par J. M. Barrie en 1904, il est, avec [[alice]], l’un des deux enfants anglais de cette salle.',
+    'merveilleux-alice': 'Curieuse et logique, elle suit un lapin blanc au fond d’un terrier et tombe dans un monde absurde. Née sous la plume de Lewis Carroll en 1865, elle partage avec [[peterpan]] le refus des règles des grandes personnes.',
+    'merveilleux-peterpan': 'Chef des Garçons perdus, il s’envole avec Wendy jusqu’au Pays imaginaire, où l’on ne grandit jamais. Imaginé par J. M. Barrie en 1904, il est, avec [[alice]], l’un des deux enfants anglais de cette collection.',
+    'contes-poucet': 'Abandonné dans la forêt avec ses six frères par des parents trop pauvres, il sème des cailloux blancs pour retrouver le chemin. La seconde fois, les oiseaux mangent ses miettes de pain, et les enfants arrivent chez un ogre.',
+    'contes-barbebleue': 'Ce riche seigneur à la barbe bleue confie à sa jeune épouse les clés de son château, en lui interdisant d’ouvrir un seul petit cabinet. Poussée par la curiosité, elle l’ouvre et y découvre les corps de ses précédentes épouses.',
+    'contes-hansel': 'Abandonnés dans la forêt, ce frère et cette sœur découvrent une maisonnette faite de pain, couverte de gâteau et aux fenêtres de sucre. Elle appartient à une sorcière qui veut engraisser Hansel pour le manger.',
     'contes-chaperon': 'Une galette, un petit pot de beurre et une rencontre inattendue dans les bois. Chez Perrault, le [[loup|Grand Méchant Loup]] la dévore ; chez les frères Grimm, un chasseur la sauve.',
     'contes-chatbotte': 'Seul héritage d’un fils de meunier, il fait par la seule force de son esprit la fortune de son maître, devenu marquis de Carabas. Dans le recueil de Perrault, il a pour voisines [[cendrillon]] et [[belle|la Belle au bois dormant]].',
     'contes-belle': 'Un fuseau, une malédiction et un château gagné par les ronces : elle dort cent ans avant qu’un prince ne la réveille. Comme [[blancheneige]], elle passe d’un sommeil semblable à la mort à une seconde vie.',
@@ -936,7 +942,7 @@ window.ATLAS = window.ATLAS || {};
     'forbans-bengunn': 'Pendant sa solitude, il a déterré le trésor et l’a caché dans sa grotte : quand les pirates arrivent, la cachette est vide. Il aide [[jim]] et ses amis à l’emporter.',
     'forbans-billybones': 'Ancien second de [[flint]], il détient la carte du trésor. Il meurt d’une attaque après avoir reçu la « tache noire », le message de mort des pirates. [[jim]] trouve la carte dans son coffre.',
     'forbans-crochet': 'Le crocodile, qui a trouvé la main à son goût, le suit partout ; il a aussi avalé un réveil, dont le tic-tac annonce son approche. J. M. Barrie le décrit comme un ancien élève d’une grande école anglaise, obsédé par les bonnes manières.',
-    'forbans-smee': 'Barrie le décrit comme étrangement attachant : il tue sans méchanceté et coud à la machine pendant ses loisirs. Il est l’un des rares pirates à survivre au combat final contre [[contes:peterpan|Peter Pan]].',
+    'forbans-smee': 'Barrie le décrit comme étrangement attachant : il tue sans méchanceté et coud à la machine pendant ses loisirs. Il est l’un des rares pirates à survivre au combat final contre [[merveilleux:peterpan|Peter Pan]].',
     'forbans-blood': 'Rafael Sabatini publia ses aventures en 1922. Blood reste un gentleman : il épargne les prisonniers et finit nommé gouverneur de la Jamaïque. Son parcours s’inspire en partie de celui d’[[flibustiers:morgan|Henry Morgan]].',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
@@ -985,8 +991,11 @@ window.ATLAS = window.ATLAS || {};
     'gothique-loupgarou': 'Le mot garou vient du francique « homme-loup » ; loup-garou dit donc deux fois « loup ». Au XIIe siècle, Marie de France conte déjà l’histoire de Bisclavret, chevalier changé en loup. La croyance donna lieu à de vrais procès en France jusqu’au XVIIe siècle.',
 
     'contes-cendrillon': 'Chez Perrault, la pantoufle est de verre ; chez les frères Grimm, elle est d’or, et ce sont des oiseaux qui aident l’héroïne. Le conte existe sous des centaines de formes à travers le monde, jusque dans la Chine ancienne.',
-    'contes-alice': 'Le récit naquit d’une promenade en barque sur la Tamise, en 1862, pour amuser la petite Alice Liddell et ses sœurs. Elle y croise le Chapelier fou, le Chat de Cheshire et la Reine de cœur. Carroll lui offrit une suite en 1871 : De l’autre côté du miroir.',
-    'contes-peterpan': 'Accompagné de la fée Clochette, il affronte le capitaine Crochet, dont il a tranché la main pour la jeter à un crocodile. Barrie légua les droits de son œuvre au Great Ormond Street Hospital, un hôpital pour enfants de Londres.',
+    'merveilleux-alice': 'Le récit naquit d’une promenade en barque sur la Tamise, en 1862, pour amuser la petite Alice Liddell et ses sœurs. Elle y croise le Chapelier fou, le Chat de Cheshire et la Reine de cœur. Carroll lui offrit une suite en 1871 : De l’autre côté du miroir.',
+    'merveilleux-peterpan': 'Accompagné de la fée Clochette, il affronte le [[forbans:crochet|capitaine Crochet]], dont il a tranché la main pour la jeter à un crocodile. Barrie légua les droits de son œuvre au Great Ormond Street Hospital, un hôpital pour enfants de Londres.',
+    'contes-poucet': 'Par une ruse, il fait égorger par l’ogre ses propres filles à la place de ses frères. Il lui vole ensuite ses bottes de sept lieues, qui s’ajustent à la taille de celui qui les porte. Le conte clôt le recueil de Perrault, en 1697.',
+    'contes-barbebleue': 'La clé, tachée de sang, la trahit : rien ne peut la nettoyer. Alors que la Barbe bleue s’apprête à la tuer, elle appelle sa sœur, qui guette du haut d’une tour : « Anne, ma sœur Anne, ne vois-tu rien venir ? ». Ses frères arrivent juste à temps.',
+    'contes-hansel': 'Pour tromper la sorcière, presque aveugle, Hansel lui tend un petit os au lieu de son doigt. C’est finalement Gretel qui la pousse dans le four. Les frères Grimm publièrent le conte en 1812 ; la maisonnette ne deviendra que plus tard une maison de pain d’épice.',
     'contes-chaperon': 'La version de Perrault, en 1697, finit mal et se clôt sur une morale adressée aux jeunes filles. Les frères Grimm, en 1812, ajoutent le chasseur qui ouvre le ventre du [[loup|loup]]. Son chaperon est une petite coiffe rouge, cadeau de sa grand-mère.',
     'contes-chatbotte': 'Il ne demande à son maître qu’un sac et une paire de bottes, puis enchaîne les ruses : il offre du gibier au roi, fait croire à la noyade du « marquis » et pousse un ogre à se changer en souris pour le croquer. Le château de l’ogre revient à son maître, qui épouse la princesse.',
     'contes-belle': 'Chez Perrault, le conte ne s’arrête pas au réveil : la mère du prince est une ogresse qui veut dévorer la jeune reine et ses enfants. Tchaïkovski en tira en 1890 l’un des plus célèbres ballets du répertoire.',
@@ -1035,7 +1044,7 @@ window.ATLAS = window.ATLAS || {};
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
-      cover: 'contes-alice-base',
+      cover: 'merveilleux-alice-base',
       collections: ALL.filter(function (c) { return c !== 'nordique'; }),
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',

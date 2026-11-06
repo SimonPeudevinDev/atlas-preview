@@ -96,7 +96,7 @@
       'grece-poseidon-base', 'monstres-meduse-epic', 'grece-apollon-base', 'grece-artemis-base',
       'egypte-anubis-epic', 'egypte-ra-base', 'egypte-bastet-base', 'egypte-bastet-base', 'egypte-thot-rare', 'egypte-isis-base',
       'gothique-dracula-rare', 'gothique-dracula-base', 'gothique-carmilla-base', 'gothique-dorian-base',
-      'contes-alice-rare', 'contes-alice-base', 'contes-peterpan-base', 'contes-cendrillon-base', 'contes-chatbotte-legendary',
+      'merveilleux-alice-rare', 'merveilleux-alice-base', 'merveilleux-peterpan-base', 'contes-cendrillon-base', 'contes-chatbotte-legendary',
       'histoire-napoleon-base', 'histoire-degaulle-rare', 'histoire-jeanne-base', 'histoire-curie-base',
       'nordique-loki-base'
     ];
@@ -111,7 +111,7 @@
       var it = makeItem(edId, serial, 'booster', at, 'Tirage — ' + src);
       if (edId === 'grece-zeus-legendary') { it.fav = true; it.show = true; it.hist.unshift({ at: at + 3 * DAY, t: 'Exposée en vitrine' }); }
       if (edId === 'egypte-anubis-epic' || edId === 'contes-chatbotte-legendary') { it.fav = true; it.show = true; }
-      if (edId === 'contes-alice-rare') it.fav = true;
+      if (edId === 'merveilleux-alice-rare') it.fav = true;
       state.inventory.push(it);
     });
 
@@ -155,8 +155,8 @@
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
   };
-  // Héraclès et Méduse ont rejoint les sous-collections Héros et Monstres : on renomme leurs cartes déjà possédées.
-  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-' };
+  // Cartes déplacées d’une sous-collection à l’autre (Héraclès, Méduse, Alice, Peter Pan) : on renomme celles déjà possédées.
+  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-', 'contes-alice-': 'merveilleux-alice-', 'contes-peterpan-': 'merveilleux-peterpan-' };
   function moved(id) { for (var k in MOVED) if (id && id.indexOf(k) === 0) return MOVED[k] + id.slice(k.length); return id; }
   function migrateMoved() {
     var n = 0;

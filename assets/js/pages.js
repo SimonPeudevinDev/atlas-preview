@@ -80,7 +80,7 @@
           '<div class="hero-visual">' + globe() +
             '<div class="hero-stack">' +
               '<div class="hs hs-l">' + U.card('egypte-anubis-epic', { serial: 41, tilt: false }) + '</div>' +
-              '<div class="hs hs-r">' + U.card('contes-alice-rare', { serial: 112, tilt: false }) + '</div>' +
+              '<div class="hs hs-r">' + U.card('merveilleux-alice-rare', { serial: 112, tilt: false }) + '</div>' +
               '<div class="hs hs-c">' + U.card('grece-zeus-legendary', { serial: 18, uid: feat && feat.uid }) + '</div>' +
             '</div>' +
             '<p class="hero-caption"><span>Zeus, Roi de l’Olympe</span><span>Légendaire · N° 018/50</span></p>' +
