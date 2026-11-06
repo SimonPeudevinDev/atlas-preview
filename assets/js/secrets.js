@@ -163,6 +163,101 @@
       bio: 'Volcan de 3 776 mètres, plus haut sommet du Japon et symbole du pays.',
       more: 'Montagne sacrée du shintoïsme, il est gravi par des pèlerins depuis des siècles. Hokusai lui consacra une série célèbre, les Trente-six vues du mont Fuji. Sa dernière éruption remonte à 1707, en pleine époque d’[[edo]].'
     },
+    eaux: {
+      name: 'Le Cœlacanthe', title: 'Le Fossile vivant', atk: 70, def: 96, esp: 92,
+      bio: 'Poisson que l’on croyait disparu depuis 66 millions d’années, retrouvé vivant en 1938.',
+      more: 'En décembre 1938, Marjorie Courtenay-Latimer, conservatrice d’un petit musée d’Afrique du Sud, remarque un poisson bleu étrange dans la pêche d’un chalutier. Le chercheur J. L. B. Smith reconnaît un cœlacanthe, connu seulement par des fossiles. Une seconde espèce fut découverte en Indonésie en 1998. C’est le rêve de tout cryptozoologue : un « monstre » qui existe vraiment.'
+    },
+    hommessauvages: {
+      name: 'Le Gigantopithèque', title: 'Le Singe géant', atk: 96, def: 92, esp: 70,
+      bio: 'Le plus grand singe ayant jamais existé : il approchait les trois mètres.',
+      more: 'En 1935, le paléontologue Ralph von Koenigswald découvre chez un apothicaire de Hong Kong d’énormes molaires vendues comme « dents de dragon ». Elles appartenaient à un singe géant, qui vécut en Chine jusqu’il y a environ 300 000 ans. On ne le connaît que par ses dents et ses mâchoires ; certains y voient l’ancêtre rêvé du [[yeti]].'
+    },
+    betes: {
+      name: 'La Bête du Gévaudan', title: 'La Terreur de la Margeride', atk: 94, def: 84, esp: 80,
+      bio: 'Bête mystérieuse qui terrorisa le sud de la France de 1764 à 1767.',
+      more: 'Dans le Gévaudan, l’actuelle Lozère, une bête attaqua près d’une centaine de personnes, surtout des enfants et des bergères. Louis XV envoya ses meilleurs chasseurs ; l’un d’eux abattit un grand loup en 1765, mais les attaques reprirent. En juin 1767, Jean Chastel tua un animal, et la terreur cessa. Loup, hybride ou plusieurs bêtes : on en débat encore.'
+    },
+    citesperdues: {
+      name: 'Le Machu Picchu', title: 'La Cité des nuages', atk: 82, def: 98, esp: 94,
+      bio: 'Citadelle inca perchée à 2 400 mètres dans les Andes.',
+      more: 'Bâtie au XVe siècle pour l’empereur inca Pachacutec, elle fut abandonnée au moment de la conquête espagnole, et les conquistadors ne la trouvèrent jamais. Les paysans de la vallée la connaissaient, mais elle fut révélée au monde en 1911 par l’explorateur américain Hiram Bingham, guidé par eux. Ses pierres s’emboîtent si parfaitement qu’on ne peut y glisser une lame de couteau.'
+    },
+    enigmes: {
+      name: 'Göbekli Tepe', title: 'Le Premier Temple', atk: 70, def: 99, esp: 96,
+      bio: 'Sanctuaire de pierre bâti il y a plus de 11 000 ans, avant l’agriculture.',
+      more: 'Sur une colline du sud-est de la Turquie, l’archéologue Klaus Schmidt a fouillé à partir de 1995 des cercles de piliers en T, sculptés de renards, de serpents et de vautours. Ils ont été dressés vers 9600 avant notre ère, six mille ans avant [[stonehenge]], par des chasseurs-cueilleurs qui ne connaissaient ni l’agriculture ni l’écriture. Cette découverte a bousculé l’histoire de la civilisation.'
+    },
+    tresors: {
+      name: 'La Toison d’or', title: 'Le Trésor de Colchide', atk: 80, def: 90, esp: 96,
+      bio: 'Toison d’un bélier ailé, but de l’expédition des Argonautes.',
+      more: 'Pour reprendre son trône, [[heros:jason|Jason]] dut rapporter de Colchide, au bord de la mer Noire, la toison d’or d’un bélier divin, gardée par un dragon qui ne dormait jamais. Il y parvint avec les Argonautes et l’aide de la magicienne Médée. Des historiens rapprochent le mythe d’une vraie technique : dans le Caucase, on recueillait les paillettes d’or des rivières avec des peaux de mouton.'
+    },
+    dinosaures: {
+      name: 'L’Archéoptéryx', title: 'Le Dinosaure à plumes', atk: 66, def: 70, esp: 96,
+      bio: 'Le chaînon entre les dinosaures et les oiseaux.',
+      more: 'Découvert en 1861 dans les calcaires de Solnhofen, en Bavière, deux ans après la publication de L’Origine des espèces de Darwin, il avait des plumes et des ailes, mais aussi des dents et une longue queue osseuse. Il a montré que les oiseaux descendent des dinosaures : en un sens, les dinosaures ne se sont jamais tout à fait éteints.'
+    },
+    mersciel: {
+      name: 'L’Anomalocaris', title: 'La Crevette étrange', atk: 86, def: 72, esp: 80,
+      bio: 'Le premier grand prédateur de l’histoire, il y a plus de 500 millions d’années.',
+      more: 'Long d’environ un mètre, ce prédateur des mers du Cambrien saisissait ses proies avec deux appendices épineux. Ses fossiles, trouvés dans les schistes de Burgess, au Canada, ont d’abord été pris pour trois animaux différents : une crevette, une méduse et une éponge. Son nom signifie « crevette anormale ».'
+    },
+    megafaune: {
+      name: 'Lucy', title: 'Notre lointaine ancêtre', atk: 60, def: 80, esp: 99,
+      bio: 'Australopithèque vieille de 3,2 millions d’années, l’un des fossiles les plus célèbres au monde.',
+      more: 'Le 24 novembre 1974, l’équipe de Donald Johanson et d’Yves Coppens découvre en Éthiopie le squelette d’une jeune australopithèque, complet à environ 40 %. Le soir même, une chanson des Beatles qui passait au campement lui donna son nom. En Éthiopie, on l’appelle Dinknesh, « tu es merveilleuse ». Elle marchait déjà debout.'
+    },
+    navires: {
+      name: 'L’Hermione', title: 'La Frégate de la liberté', atk: 86, def: 84, esp: 94,
+      bio: 'Frégate qui emmena La Fayette en Amérique en 1780.',
+      more: 'En 1780, cette frégate française rapide transporte [[herosfr:lafayette|La Fayette]] jusqu’à Boston, avec une nouvelle décisive pour les insurgés américains : la France envoie une armée pour les soutenir. Une réplique fidèle, construite à Rochefort pendant dix-sept ans, a refait la traversée vers l’Amérique en 2015.'
+    },
+    maudits: {
+      name: 'L’Erebus et le Terror', title: 'L’Expédition perdue', atk: 74, def: 92, esp: 90,
+      bio: 'Les deux navires de l’expédition Franklin, disparus dans l’Arctique en 1845.',
+      more: 'En 1845, l’explorateur John Franklin part chercher le passage du Nord-Ouest avec deux navires et 129 hommes. Aucun ne revint. Pendant plus d’un siècle et demi, on chercha les épaves. Grâce notamment aux témoignages transmis par les Inuits, elles furent enfin retrouvées en 2014 et 2016, dans les eaux glacées du Nunavut, au Canada.'
+    },
+    alchimistes: {
+      name: 'Hermès Trismégiste', title: 'Le Trois Fois Grand', atk: 66, def: 90, esp: 99,
+      bio: 'Sage légendaire, père de l’alchimie selon la tradition.',
+      more: 'Ce personnage mythique est né de la fusion du dieu grec Hermès et du dieu égyptien [[egypte:thot|Thot]], tous deux maîtres du savoir. On lui attribuait des textes de sagesse et la Table d’émeraude, qui proclame : « ce qui est en bas est comme ce qui est en haut ». Les alchimistes du Moyen Âge en firent leur maître, et l’on parle encore d’un objet fermé « hermétiquement ».'
+    },
+    illusionnistes: {
+      name: 'Le Turc mécanique', title: 'L’Automate joueur d’échecs', atk: 70, def: 88, esp: 99,
+      bio: 'Automate qui battait aux échecs les plus grands de son temps.',
+      more: 'Présenté en 1770 à l’impératrice Marie-Thérèse par Wolfgang von Kempelen, ce mannequin en costume oriental jouait aux échecs, et gagnait. Il affronta Benjamin Franklin et, dit-on, [[histoire:napoleon|Napoléon]]. Le secret : un maître d’échecs caché dans le meuble. L’automate fut détruit par un incendie à Philadelphie en 1854.'
+    },
+    celtes: {
+      name: 'Balor', title: 'L’Œil qui tue', atk: 98, def: 86, esp: 70,
+      bio: 'Roi des Fomoires, dont l’œil unique tuait tout ce qu’il regardait.',
+      more: 'Sa paupière était si lourde qu’il fallait quatre hommes et un crochet pour la soulever. Une prophétie annonçait qu’il serait tué par son petit-fils : il enferma sa fille dans une tour, mais elle eut tout de même un enfant, [[lug]]. Lors de la grande bataille, Lug lança une pierre de fronde dans l’œil de Balor, qui ressortit par l’arrière de sa tête et foudroya sa propre armée.'
+    },
+    azteques: {
+      name: 'Tenochtitlan', title: 'La Venise des Aztèques', atk: 80, def: 98, esp: 92,
+      bio: 'Capitale aztèque bâtie sur un lac, l’une des plus grandes villes du monde.',
+      more: 'Fondée vers 1325 sur une île du lac Texcoco, là où apparut le signe de [[huitzilopochtli]], elle comptait peut-être 200 000 habitants. Chaussées, canaux, jardins flottants et pyramides : les conquistadors crurent rêver en la découvrant. Elle tomba en 1521. Mexico a été bâtie sur ses ruines, dont on dégage encore des temples.'
+    },
+    chine: {
+      name: 'Fenghuang', title: 'Le Phénix chinois', atk: 76, def: 88, esp: 99,
+      bio: 'Oiseau merveilleux qui n’apparaît qu’en temps de paix.',
+      more: 'Le fenghuang réunit les plus belles parties de nombreux oiseaux et porte les cinq couleurs. Il n’apparaît que sous le règne d’un souverain juste. Associé au dragon, symbole de l’empereur, il devint l’emblème des impératrices, brodé sur leurs robes et leurs coiffes.'
+    },
+    inde: {
+      name: 'Vishnou', title: 'Le Protecteur du monde', atk: 90, def: 98, esp: 98,
+      bio: 'Dieu qui préserve l’univers et descend sur terre sous de nombreuses formes.',
+      more: 'Quand le monde est menacé, Vishnou s’incarne sur terre : on compte dix avatars principaux, dont [[rama]] et Krishna. Il repose entre deux créations sur un serpent géant, flottant sur l’océan cosmique, porté par [[garuda]] quand il voyage. Le grand temple d’Angkor Vat, au Cambodge, lui fut d’abord dédié.'
+    },
+    slaves: {
+      name: 'Vassilissa', title: 'La Très-Belle', atk: 70, def: 84, esp: 96,
+      bio: 'Jeune fille qui affronta Baba Yaga grâce à une poupée magique.',
+      more: 'Avant de mourir, sa mère lui laissa une petite poupée qui la conseillait si on lui donnait à manger. Sa marâtre l’envoya chercher du feu chez [[babayaga]], espérant qu’elle n’en reviendrait jamais. Aidée par la poupée, Vassilissa accomplit toutes les tâches de la sorcière et rentra avec un crâne aux yeux brûlants, dont le regard réduisit en cendres sa méchante famille.'
+    },
+    afrique: {
+      name: 'Mansa Moussa', title: 'L’Empereur d’or', atk: 82, def: 94, esp: 96,
+      bio: 'Empereur du Mali, souvent présenté comme l’homme le plus riche de l’histoire.',
+      more: 'Petit-neveu de [[soundiata]], il régna sur le Mali au XIVe siècle. En 1324, il fit le pèlerinage à La Mecque avec une suite immense et tant d’or qu’il en fit baisser le cours au Caire pendant des années. En 1375, l’Atlas catalan, l’une des plus belles cartes du Moyen Âge, le représente assis sur son trône, une pépite d’or à la main.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',
