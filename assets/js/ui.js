@@ -87,13 +87,34 @@
   /* ---------- Description d’une carte (appui long pendant l’ouverture d’un booster) ----------
      Plusieurs mises en forme possibles (page #/infos) ; le choix est mémorisé sur l’appareil. */
   U.INFO_STYLES = [
+    { id: 'cartel', label: 'Le cartel', desc: 'On fait défiler la carte : l’illustration remonte et la notice apparaît en dessous, sur le même papier.' },
     { id: 'verso', label: 'Le verso', desc: 'La carte se retourne : son dos imprimé, comme une vraie carte de collection.' },
-    { id: 'cartel', label: 'Le cartel', desc: 'Une étiquette de musée glisse sur le bas de la carte ; l’illustration reste visible.' },
     { id: 'voile', label: 'Le voile', desc: 'Un voile de papier recouvre l’illustration et le texte apparaît à l’encre.' },
     { id: 'ombre', label: 'L’ombre (actuel)', desc: 'Un dégradé sombre monte sur la carte, texte clair.' }
   ];
   U.infoStyle = function (v) {
-    try { if (v) localStorage.setItem('atlas-info', v); return localStorage.getItem('atlas-info') || 'verso'; } catch (e) { return v || 'verso'; }
+    try { if (v) localStorage.setItem('atlas-info', v); return localStorage.getItem('atlas-info') || 'cartel'; } catch (e) { return v || 'cartel'; }
+  };
+  function plain(ch, text) {            // texte sans liens [[…]] (noms résolus)
+    return U.esc(text).replace(/\[\[([a-z0-9:]+)(?:\|([^\]]+))?\]\]/g, function (m, slug, label) { var o = U.charRef(ch, slug); return label || (o ? U.esc(o.name) : slug); });
+  }
+  /* Affiche ou masque la description sur une carte (face = élément qui contient la .card).
+     Style « cartel » : la notice est glissée DANS la carte (sous le cadre de rareté) et le contenu
+     de la carte remonte exactement de sa hauteur, comme si l’on faisait défiler la carte. */
+  U.infoToggle = function (face, edId, on, style) {
+    style = style || U.infoStyle();
+    var box = face.querySelector('.rv-info');
+    if (on && !box) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = U.cardInfo(edId, style);
+      box = tmp.firstChild;
+      (style === 'cartel' ? face.querySelector('.card-inner') : face).appendChild(box);
+    }
+    if (!box) return;
+    if (style === 'cartel' && on) face.style.setProperty('--rd', box.querySelector('.ri-in').offsetHeight + 'px');
+    void box.offsetWidth;
+    box.classList.toggle('is-on', on);
+    face.classList.toggle('is-reading', on && style === 'cartel');
   };
   U.cardInfo = function (edId, style) {
     var ed = A.ED[edId], ch = A.CHAR[ed.charId], R = A.R[ed.rarity];
@@ -104,6 +125,8 @@
       '<p class="rv-info-t">' + U.esc(ch.title) + '</p>' +
       '<span class="ri-rule"></span>' +
       '<p class="rv-info-b">' + U.esc(ch.bio) + '</p>' +
+      (ch.story ? '<p class="ri-story">' + plain(ch, ch.story) + '</p>' : '') +
+      '<span class="ri-bar"></span>' +
       '<p class="ri-foot"><span>ATQ <b>' + ch.atk + '</b></span><span>DÉF <b>' + ch.def + '</b></span><span>ESP <b>' + ch.esp + '</b></span><span class="ri-rar"><i></i>' + R.label + '</span></p>' +
     '</div></div>';
   };

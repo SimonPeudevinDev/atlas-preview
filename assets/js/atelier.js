@@ -131,21 +131,20 @@
         '<p class="lead">Ce qui s’affiche quand on maintient le doigt sur une carte. Touchez une carte pour rejouer l’animation, puis choisissez votre style.</p></div></section>' +
         '<section class="section-tight"><div class="container info-grid">' + U.INFO_STYLES.map(function (st) {
           return '<div class="info-opt' + (st.id === cur ? ' is-current' : '') + '" data-style="' + st.id + '">' +
-            '<div class="info-face r-' + A.ED[ed].rarity + '">' + U.card(ed, { serial: 18, open: false, tilt: false }) + U.cardInfo(ed, st.id).replace('class="rv-info ', 'class="rv-info is-on ') + '</div>' +
+            '<div class="info-face r-' + A.ED[ed].rarity + '" data-ed="' + ed + '">' + U.card(ed, { serial: 18, open: false, tilt: false }) + '</div>' +
             '<h3 class="h3">' + st.label + '</h3><p class="muted small">' + st.desc + '</p>' +
             '<button class="btn btn-sm ' + (st.id === cur ? 'btn-primary' : 'btn-ghost') + '" data-pick="' + st.id + '">' + (st.id === cur ? 'Style choisi' : 'Choisir ce style') + '</button></div>';
         }).join('') + '</div></section>';
     },
     mount: function (root) {
+      var faces = [].slice.call(root.querySelectorAll('.info-face'));
+      function show(f, on) { U.infoToggle(f, f.getAttribute('data-ed'), on, f.parentNode.getAttribute('data-style')); }
+      setTimeout(function () { faces.forEach(function (f) { show(f, true); }); }, 500);
       root.addEventListener('click', function (e) {
         var b = e.target.closest('[data-pick]');
         if (b) { U.infoStyle(b.getAttribute('data-pick')); U.toast('Style « ' + b.closest('.info-opt').querySelector('.h3').textContent + ' » choisi pour vos prochaines ouvertures'); A.app.rerender(); return; }
         var f = e.target.closest('.info-face');
-        if (f) {
-          var box = f.querySelector('.rv-info');
-          box.classList.remove('is-on');
-          setTimeout(function () { box.classList.add('is-on'); }, 450);
-        }
+        if (f) { show(f, false); setTimeout(function () { show(f, true); }, 800); }
       });
     }
   };

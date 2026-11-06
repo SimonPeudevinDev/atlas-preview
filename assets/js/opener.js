@@ -931,14 +931,7 @@
       if (sw.shown) { var s0 = sw; s0.holdT = setTimeout(function () { if (sw === s0 && !s0.moved) { s0.held = true; showInfo(c, true); } }, 420); }
     });
     function showInfo(c, on) {
-      var box = c.el.querySelector('.rv-info');
-      if (on && !box) {
-        var tmp = document.createElement('div');
-        tmp.innerHTML = U.cardInfo(c.ed.id);
-        box = tmp.firstChild;
-        c.el.querySelector('.rv-front').appendChild(box);
-      }
-      if (box) { void box.offsetWidth; box.classList.toggle('is-on', on); }
+      U.infoToggle(c.el.querySelector('.rv-front'), c.ed.id, on);
       if (on) A.haptic(6);
     }
     stack.addEventListener('pointermove', function (e) {
