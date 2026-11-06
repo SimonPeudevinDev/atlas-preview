@@ -317,51 +317,75 @@
     });
   };
 
-  // Parcours des paliers d’une collection (ou d’une collection globale « @id ») :
-  // médaillons reliés par un fil d’or, pastilles de récompense, un seul bouton quand un palier est prêt.
+  // Paliers d’une collection (ou d’une collection globale « @id ») : une ligne de médaillons
+  // reliés par un fil, et le détail d’un seul palier à la fois (le prochain, ou celui qu’on touche).
+  var UNITS = { chars: ['personnage', 'personnages'], eds: ['édition', 'éditions'], started: ['collection entamée', 'collections entamées'], done: ['collection complète', 'collections complètes'] };
+  function rewardShort(r) {
+    var out = [];
+    if (r.eclats) out.push(U.icon('coin') + U.num(r.eclats));
+    if (r.booster) out.push(U.icon('pack') + 'Booster');
+    if (r.trophee) out.push(U.icon('key') + 'Secret');
+    if (r.avatar) out.push(U.icon('user') + 'Portrait');
+    if (r.titre) out.push(U.icon('laurel') + 'Titre');
+    if (r.cadre) out.push(U.icon('frame') + 'Cadre');
+    return '<span class="rw-short">' + out.map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</span>';
+  }
   U.rewardTrack = function (cid) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
-    var UNITS = { chars: ['personnage', 'personnages'], eds: ['édition', 'éditions'], started: ['collection entamée', 'collections entamées'], done: ['collection complète', 'collections complètes'] };
-    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses de collection') + '</p>' +
+    var sel = steps.findIndex(function (s) { return s.state === 'ready'; });
+    if (sel < 0) sel = steps.findIndex(function (s) { return s.state === 'locked'; });
+    if (sel < 0) sel = steps.length - 1;
+    var reached = -1;
+    steps.forEach(function (s, i) { if (s.state !== 'locked') reached = i; });
+    var fill = steps.length > 1 ? Math.max(0, reached) / (steps.length - 1) * 100 : 0;
+    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses') + '</p>' +
       '<span class="rw-count">' + got + ' / ' + steps.length + '</span></div>' +
-      '<ol class="rw-path" style="--n:' + steps.length + '">' + steps.map(function (s, i) {
-        var U2 = UNITS[s.of], left = s.goal - s.have, next = steps[i + 1];
-        var action = s.state === 'ready'
-          ? '<button type="button" class="btn btn-gold btn-sm rw-btn" data-claim="' + s.id + '">Récupérer</button>'
-          : s.state === 'claimed' ? '<p class="rw-done">' + U.icon('check') + 'Récupérée</p>'
-          : '<p class="rw-left"><span class="rw-bar"><i style="width:' + Math.round(s.have / Math.max(1, s.goal) * 100) + '%"></i></span>' + s.have + ' / ' + s.goal + '<small> · encore ' + left + ' ' + U2[left > 1 ? 1 : 0] + '</small></p>';
-        return '<li class="rw-m is-' + s.state + (next && next.state !== 'locked' ? ' is-linked' : '') + '">' +
-          '<span class="rw-medal" aria-hidden="true">' + U.rewardIcon(s.reward) + (s.state === 'claimed' ? '<i class="rw-tick">' + U.icon('check') + '</i>' : '') + '</span>' +
-          '<div class="rw-body"><p class="rw-k">Palier ' + ['I', 'II', 'III', 'IV', 'V'][i] + ' · ' + s.goal + ' ' + U2[s.goal > 1 ? 1 : 0] + '</p>' +
-            '<p class="rw-label">' + s.label + '</p>' + U.rewardChips(s.reward) + action + '</div></li>';
-      }).join('') + '</ol></div>';
+      '<div class="rw-strip" style="--fill:' + fill.toFixed(2) + '">' + steps.map(function (s, i) {
+        return '<button type="button" class="rw-dot is-' + s.state + (i === sel ? ' is-sel' : '') + '" data-rw="' + i + '" aria-label="Palier ' + (i + 1) + ' : ' + s.label + '">' +
+          '<span class="rw-medal">' + U.rewardIcon(s.reward) + (s.state === 'claimed' ? '<i class="rw-tick">' + U.icon('check') + '</i>' : '') + '</span>' +
+          '<span class="rw-goal">' + s.goal + (s.of === 'eds' ? ' éd.' : '') + '</span></button>';
+      }).join('') + '</div>' +
+      steps.map(function (s, i) {
+        var u = UNITS[s.of], left = s.goal - s.have;
+        var action = s.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + s.id + '">Récupérer</button>'
+          : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Récupérée</span>'
+          : '<span class="rw-left">encore ' + left + ' ' + u[left > 1 ? 1 : 0] + '</span>';
+        return '<div class="rw-detail' + (i === sel ? ' is-sel' : '') + '" data-rw-d="' + i + '"><div class="rw-dl"><p class="rw-label">' + s.label + '</p>' +
+          '<p class="rw-gift">' + U.esc(U.rewardText(s.reward)) + '</p></div>' + action + '</div>';
+      }).join('') + '</div>';
   };
 
-  // Missions d’une collection : réunir des personnages liés, partir à la chasse d’une rareté…
+  // Missions d’une collection : une ligne par mission (personnages à réunir, ou chasse)
   U.missionsHTML = function (cid) {
     var list = A.store.missions(cid);
     if (!list.length) return '';
     var got = list.filter(function (m) { return m.state === 'claimed'; }).length;
     var HICON = { rare: 'medal', epic: 'medal', legendary: 'medal', trio: 'cards', numerotes: 'tag', eventail: 'sparkle' };
     return '<div class="ms"><div class="rw-head"><p class="eyebrow">Missions</p><span class="rw-count">' + got + ' / ' + list.length + '</span></div>' +
-      '<div class="ms-grid">' + list.map(function (m) {
-        var body = m.kind === 'set'
-          ? '<ul class="ms-chars">' + m.chars.map(function (id) {
+      '<ul class="ms-list">' + list.map(function (m) {
+        var sub = m.kind === 'set'
+          ? '<span class="ms-faces">' + m.chars.map(function (id) {
               var own = m.owned.indexOf(id) !== -1, best = A.store.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
-              return '<li><button type="button" class="ms-char du-side' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + '>' +
-                '<span class="du-pic">' + A.editionArt(ed, { w: 120, h: 120, ctx: 'duel' }) + '</span><span class="du-name">' + U.esc(A.CHAR[id].name) + '</span></button></li>';
-            }).join('') + '</ul>'
-          : '<div class="ms-prog"><span class="rw-bar"><i style="width:' + Math.round(m.have / m.goal * 100) + '%"></i></span><span>' + m.have + ' / ' + m.goal + '</span></div>';
-        var action = m.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + m.id + '">Récupérer</button>'
-          : m.state === 'claimed' ? '<p class="rw-done">' + U.icon('check') + 'Accomplie</p>'
-          : '<p class="ms-left">' + m.have + ' / ' + m.goal + '</p>';
-        return '<article class="ms-card is-' + m.state + ' is-' + m.kind + '">' +
-          '<div class="ms-top"><span class="ms-ico">' + U.icon(m.kind === 'set' ? 'scroll' : HICON[m.hunt]) + '</span>' +
-            '<div class="ms-head"><p class="ms-k">' + (m.kind === 'set' ? 'Réunir' : 'Chasse') + '</p><h4 class="ms-label">' + U.esc(m.label) + '</h4></div></div>' +
-          '<p class="ms-desc">' + U.esc(m.desc) + '</p>' + body +
-          '<div class="ms-foot">' + U.rewardChips(m.reward) + action + '</div></article>';
-      }).join('') + '</div></div>';
+              return '<button type="button" class="ms-face' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + ' title="' + U.esc(A.CHAR[id].name) + '">' + A.editionArt(ed, { w: 60, h: 60, ctx: 'duel' }) + '</button>';
+            }).join('') + '</span><span class="ms-n">' + m.have + '/' + m.goal + '</span>'
+          : '<span class="ms-desc">' + U.esc(m.desc) + '</span>';
+        var end = m.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + m.id + '">Récupérer</button>'
+          : m.state === 'claimed' ? '<span class="ms-ok" title="Accomplie">' + U.icon('check') + '</span>'
+          : rewardShort(m.reward);
+        return '<li class="ms-row is-' + m.state + '" title="' + U.esc(m.desc + ' · ' + U.rewardText(m.reward)) + '">' +
+          '<span class="ms-ico">' + U.icon(m.kind === 'set' ? 'scroll' : HICON[m.hunt]) + '</span>' +
+          '<div class="ms-main"><p class="ms-label">' + U.esc(m.label) + '</p><p class="ms-sub">' + sub + '</p></div>' +
+          '<div class="ms-end">' + end + '</div></li>';
+      }).join('') + '</ul></div>';
   };
+  // Choix du palier affiché
+  document.addEventListener('click', function (e) {
+    var d = e.target.closest && e.target.closest('[data-rw]');
+    if (!d) return;
+    var rw = d.closest('.rw'), i = d.getAttribute('data-rw');
+    rw.querySelectorAll('.rw-dot').forEach(function (x) { x.classList.toggle('is-sel', x === d); });
+    rw.querySelectorAll('.rw-detail').forEach(function (x) { x.classList.toggle('is-sel', x.getAttribute('data-rw-d') === i); });
+  });
 
   U.progress = function (p, label) {
     return '<div class="progress"><span style="width:' + Math.round(p * 100) + '%"></span></div>' + (label ? '<p class="progress-label">' + label + '</p>' : '');
