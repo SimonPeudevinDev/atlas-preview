@@ -63,7 +63,8 @@
       A.EDITIONS.forEach(function (e) { if (M.has(e.id)) n++; });
       var lods = (A.MEDIA_MANIFEST.lods || []).map(function (l) { return l.width + ' px'; }).join(' · ');
       return '<section class="page-head"><div class="container"><p class="eyebrow">Administration</p><h1 class="h1">Atelier</h1>' +
-        '<p class="lead">Illustrations, cartes et collections : ce qui est en place, ce qui reste à peindre.</p></div></section>' +
+        '<p class="lead">Illustrations, cartes et collections : ce qui est en place, ce qui reste à peindre.</p>' +
+        '<p><a class="btn btn-ghost btn-sm" href="#/infos">Style de la description en ouverture ' + U.icon('arrow') + '</a></p></div></section>' +
         '<section class="section-tight"><div class="container ds">' +
           '<div class="ds-block"><p class="eyebrow">Illustrations définitives</p><div class="at-stats">' +
             '<div><b>' + n + '</b><span>sur ' + U.num(total) + ' éditions</span></div>' +
@@ -117,6 +118,34 @@
       root.addEventListener('click', function (e) {
         var b = e.target.closest('[data-path]');
         if (b) copy(b.getAttribute('data-path'), 'Chemin copié : ' + b.getAttribute('data-path'));
+      });
+    }
+  };
+
+  /* ---------- #/infos : choix de la mise en forme de la description (appui long en ouverture) ---------- */
+  P.infos = {
+    title: 'Description des cartes',
+    render: function () {
+      var cur = U.infoStyle(), ed = 'grece-zeus-legendary';
+      return '<section class="page-head"><div class="container"><p class="eyebrow">Ouverture de booster</p><h1 class="h1">Description des cartes</h1>' +
+        '<p class="lead">Ce qui s’affiche quand on maintient le doigt sur une carte. Touchez une carte pour rejouer l’animation, puis choisissez votre style.</p></div></section>' +
+        '<section class="section-tight"><div class="container info-grid">' + U.INFO_STYLES.map(function (st) {
+          return '<div class="info-opt' + (st.id === cur ? ' is-current' : '') + '" data-style="' + st.id + '">' +
+            '<div class="info-face r-' + A.ED[ed].rarity + '">' + U.card(ed, { serial: 18, open: false, tilt: false }) + U.cardInfo(ed, st.id).replace('class="rv-info ', 'class="rv-info is-on ') + '</div>' +
+            '<h3 class="h3">' + st.label + '</h3><p class="muted small">' + st.desc + '</p>' +
+            '<button class="btn btn-sm ' + (st.id === cur ? 'btn-primary' : 'btn-ghost') + '" data-pick="' + st.id + '">' + (st.id === cur ? 'Style choisi' : 'Choisir ce style') + '</button></div>';
+        }).join('') + '</div></section>';
+    },
+    mount: function (root) {
+      root.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pick]');
+        if (b) { U.infoStyle(b.getAttribute('data-pick')); U.toast('Style « ' + b.closest('.info-opt').querySelector('.h3').textContent + ' » choisi pour vos prochaines ouvertures'); A.app.rerender(); return; }
+        var f = e.target.closest('.info-face');
+        if (f) {
+          var box = f.querySelector('.rv-info');
+          box.classList.remove('is-on');
+          setTimeout(function () { box.classList.add('is-on'); }, 450);
+        }
       });
     }
   };

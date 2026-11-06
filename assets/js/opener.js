@@ -933,10 +933,9 @@
     function showInfo(c, on) {
       var box = c.el.querySelector('.rv-info');
       if (on && !box) {
-        var ch = A.CHAR[c.ed.charId];
-        box = document.createElement('div');
-        box.className = 'rv-info';
-        box.innerHTML = '<p class="rv-info-k">' + U.esc(A.COLL[ch.coll].name) + '</p><p class="rv-info-n">' + U.esc(ch.name) + '</p><p class="rv-info-t">' + U.esc(ch.title) + '</p><p class="rv-info-b">' + U.esc(ch.bio) + '</p>';
+        var tmp = document.createElement('div');
+        tmp.innerHTML = U.cardInfo(c.ed.id);
+        box = tmp.firstChild;
         c.el.querySelector('.rv-front').appendChild(box);
       }
       if (box) { void box.offsetWidth; box.classList.toggle('is-on', on); }

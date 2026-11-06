@@ -525,11 +525,69 @@
 .sum-frag { margin: 10px auto 0; max-width: 520px; font-size: 13.5px; color: #D9CDB3; }
 
 /* Appui long sur une carte pendant l’ouverture : sa petite description */
-.rv-info { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 14% 9% 11%; border-radius: inherit; background: linear-gradient(180deg, rgba(14, 12, 9, 0) 14%, rgba(14, 12, 9, .86) 44%, rgba(14, 12, 9, .98) 66%); color: #F6EEDC; opacity: 0; transform: translateY(6px); transition: opacity .25s ease, transform .3s cubic-bezier(.16, 1, .3, 1); pointer-events: none; }
-.rv-info.is-on { opacity: 1; transform: none; }
-.rv-info-k { margin: 0; font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #F3D38A; }
-.rv-info-n { margin: 0; font-family: "Cormorant Garamond", Georgia, serif; font-size: 26px; font-weight: 500; line-height: 1.05; }
-.rv-info-t { margin: 0 0 6px; font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 16px; color: #D9CDB3; }
-.rv-info-b { margin: 0; font-size: 14px; line-height: 1.45; color: #F6EEDC; }
+/* ---------- Description (appui long) — 4 mises en forme, choix dans #/infos ----------
+   Unités en cqw : tout suit la taille de la carte (.rv-face est un conteneur). */
+.rv-info { position: absolute; inset: 0; z-index: 8; border-radius: 2.6cqw; overflow: hidden; pointer-events: none; opacity: 0;
+  transition: opacity .25s ease, transform .32s cubic-bezier(.16, 1, .3, 1), clip-path .38s cubic-bezier(.16, 1, .3, 1); }
+.rv-info.is-on { opacity: 1; }
+.rv-info p { margin: 0; }
+.ri-in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.ri-mark, .ri-rule, .ri-foot { display: none; }
+.rv-info-k { font-size: 2.9cqw; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.rv-info-n { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; font-size: 9.5cqw; line-height: 1; letter-spacing: -.005em; }
+.rv-info-t { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 5.6cqw; line-height: 1.15; }
+.rv-info-b { font-size: 4.9cqw; line-height: 1.5; }
+.ri-foot { font-size: 2.9cqw; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3, #8A8173); gap: 3.4cqw; align-items: center; }
+.ri-foot b { font-family: "Cormorant Garamond", Georgia, serif; font-size: 4.6cqw; letter-spacing: 0; color: var(--ink, #1B1814); margin-left: .6cqw; }
+.ri-rar { margin-left: auto; display: inline-flex; align-items: center; gap: 1.4cqw; color: var(--rc); font-weight: 600; }
+.ri-rar i { width: 1.8cqw; height: 1.8cqw; border-radius: 50%; background: var(--rc); }
+
+/* 1. Le verso : la carte se retourne sur son dos imprimé (papier, filet de rareté, emblème) */
+.rv-info.v-verso { background: #FBF8F1; transform: scaleX(.04); transform-origin: 50% 50%; }
+.rv-info.v-verso.is-on { transform: none; }
+.v-verso .ri-in { inset: 3.4cqw; padding: 7cqw 6.5cqw 5.5cqw; border: 1px solid #DDD3C1; border-radius: 1.4cqw; align-items: center; text-align: center; gap: 1.6cqw;
+  background: radial-gradient(120% 70% at 50% 0%, #FFFDF8 0%, #F6F0E3 100%); box-shadow: inset 0 0 0 1.4cqw #FBF8F1, inset 0 0 0 calc(1.4cqw + 1px) color-mix(in srgb, var(--rc) 55%, transparent); }
+.v-verso .ri-mark { display: block; width: 11cqw; height: 11cqw; color: var(--gold, #A88A55); margin-bottom: 1.6cqw; }
+.v-verso .ri-mark .mark { width: 100%; height: 100%; }
+.v-verso .rv-info-k { color: var(--rc); }
+.v-verso .rv-info-n { color: var(--ink, #1B1814); font-size: 10.5cqw; }
+.v-verso .rv-info-t { color: var(--ink-3, #8A8173); }
+.v-verso .ri-rule { display: block; width: 14cqw; height: 1px; background: var(--rc); margin: 2.4cqw 0 2cqw; }
+.v-verso .rv-info-b { color: var(--ink-2, #4B453C); flex: 1; min-height: 0; }
+.v-verso .ri-foot { display: flex; align-self: stretch; padding-top: 3cqw; border-top: 1px solid #E6DECF; }
+
+/* 2. Le cartel : étiquette de musée qui glisse sur le bas de la carte */
+.rv-info.v-cartel { background: linear-gradient(180deg, rgba(20, 16, 10, 0) 30%, rgba(20, 16, 10, .28) 48%); }
+.v-cartel .ri-in { top: auto; left: 3.4cqw; right: 3.4cqw; bottom: 3.4cqw; padding: 5.5cqw 6cqw 4.5cqw; gap: 1.2cqw; background: #FBF8F1; border: 1px solid #DDD3C1; border-top: 2px solid var(--rc);
+  border-radius: 1.2cqw; box-shadow: 0 -1cqw 5cqw rgba(30, 22, 10, .22); transform: translateY(110%); transition: transform .38s cubic-bezier(.16, 1, .3, 1); }
+.rv-info.v-cartel.is-on .ri-in { transform: none; }
+.v-cartel .rv-info-k { color: var(--rc); }
+.v-cartel .rv-info-n { color: var(--ink, #1B1814); }
+.v-cartel .rv-info-t { color: var(--ink-3, #8A8173); margin-bottom: 1.4cqw; }
+.v-cartel .rv-info-b { color: var(--ink-2, #4B453C); font-size: 4.6cqw; }
+.v-cartel .ri-foot { display: flex; margin-top: 2.6cqw; padding-top: 2.6cqw; border-top: 1px solid #E6DECF; }
+
+/* 3. Le voile : l’illustration s’efface sous un voile de papier, le texte paraît à l’encre */
+.rv-info.v-voile { background: rgba(251, 248, 241, .92); -webkit-backdrop-filter: blur(5px) sepia(.25); backdrop-filter: blur(5px) sepia(.25); }
+.v-voile .ri-in { padding: 9cqw 8cqw 7cqw; align-items: center; justify-content: center; text-align: center; gap: 1.6cqw; }
+.v-voile .ri-mark { display: block; width: 9cqw; height: 9cqw; color: var(--rc); opacity: .9; margin-bottom: 1cqw; }
+.v-voile .ri-mark .mark { width: 100%; height: 100%; }
+.v-voile .rv-info-k { color: var(--ink-3, #8A8173); }
+.v-voile .rv-info-n { color: var(--ink, #1B1814); font-size: 11cqw; }
+.v-voile .rv-info-t { color: var(--ink-2, #4B453C); }
+.v-voile .ri-rule { display: block; width: 30cqw; height: 1px; margin: 2.6cqw 0; background: linear-gradient(90deg, transparent, var(--rc), transparent); }
+.v-voile .rv-info-b { color: var(--ink, #1B1814); }
+.v-voile .rv-info-n, .v-voile .rv-info-t, .v-voile .rv-info-b { opacity: 0; transform: translateY(1.5cqw); transition: opacity .4s ease, transform .5s cubic-bezier(.16, 1, .3, 1); }
+.v-voile.is-on .rv-info-n { opacity: 1; transform: none; transition-delay: .05s; }
+.v-voile.is-on .rv-info-t { opacity: 1; transform: none; transition-delay: .12s; }
+.v-voile.is-on .rv-info-b { opacity: 1; transform: none; transition-delay: .2s; }
+
+/* 4. L’ombre (premier modèle) */
+.rv-info.v-ombre { background: linear-gradient(180deg, rgba(14, 12, 9, 0) 14%, rgba(14, 12, 9, .86) 44%, rgba(14, 12, 9, .98) 66%); color: #F6EEDC; transform: translateY(6px); }
+.rv-info.v-ombre.is-on { transform: none; }
+.v-ombre .ri-in { justify-content: flex-end; gap: 1.2cqw; padding: 14% 9% 11%; }
+.v-ombre .rv-info-k { color: #F3D38A; }
+.v-ombre .rv-info-t { color: #D9CDB3; margin-bottom: 1.6cqw; }
+
 .rv-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-@media (prefers-reduced-motion: reduce) { .rv-info { transition: opacity .2s ease; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rv-info, .rv-info .ri-in { transition: opacity .2s ease; } }

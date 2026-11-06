@@ -84,6 +84,30 @@
     return '<span class="price ' + (cls || '') + '">' + U.icon('coin', 'coin') + '<span>' + U.num(n) + '</span></span>';
   };
 
+  /* ---------- Description d’une carte (appui long pendant l’ouverture d’un booster) ----------
+     Plusieurs mises en forme possibles (page #/infos) ; le choix est mémorisé sur l’appareil. */
+  U.INFO_STYLES = [
+    { id: 'verso', label: 'Le verso', desc: 'La carte se retourne : son dos imprimé, comme une vraie carte de collection.' },
+    { id: 'cartel', label: 'Le cartel', desc: 'Une étiquette de musée glisse sur le bas de la carte ; l’illustration reste visible.' },
+    { id: 'voile', label: 'Le voile', desc: 'Un voile de papier recouvre l’illustration et le texte apparaît à l’encre.' },
+    { id: 'ombre', label: 'L’ombre (actuel)', desc: 'Un dégradé sombre monte sur la carte, texte clair.' }
+  ];
+  U.infoStyle = function (v) {
+    try { if (v) localStorage.setItem('atlas-info', v); return localStorage.getItem('atlas-info') || 'verso'; } catch (e) { return v || 'verso'; }
+  };
+  U.cardInfo = function (edId, style) {
+    var ed = A.ED[edId], ch = A.CHAR[ed.charId], R = A.R[ed.rarity];
+    return '<div class="rv-info v-' + (style || U.infoStyle()) + '"><div class="ri-in">' +
+      '<span class="ri-mark">' + U.mark() + '</span>' +
+      '<p class="rv-info-k">' + U.esc(A.COLL[ch.coll].name) + '</p>' +
+      '<p class="rv-info-n">' + U.esc(ch.name) + '</p>' +
+      '<p class="rv-info-t">' + U.esc(ch.title) + '</p>' +
+      '<span class="ri-rule"></span>' +
+      '<p class="rv-info-b">' + U.esc(ch.bio) + '</p>' +
+      '<p class="ri-foot"><span>ATQ <b>' + ch.atk + '</b></span><span>DÉF <b>' + ch.def + '</b></span><span>ESP <b>' + ch.esp + '</b></span><span class="ri-rar"><i></i>' + R.label + '</span></p>' +
+    '</div></div>';
+  };
+
   /* ---------- Carte ---------- */
   /**
    * @param {string} edId

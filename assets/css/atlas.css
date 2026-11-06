@@ -1542,3 +1542,12 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .cg-item.is-stack.is-stack-3::after { translate: 9px 9px; rotate: 3deg; z-index: -1; }
 .cg-item.is-stack:not(.is-stack-3)::after { display: none; }
 .cg-item.is-stack > .card { z-index: 1; }
+
+/* ---------- #/infos : choix du style de description ---------- */
+.info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 40px 28px; }
+.info-opt { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.info-face { position: relative; width: 100%; max-width: 300px; aspect-ratio: 63 / 88; container-type: inline-size; cursor: pointer; margin-bottom: 8px; }
+.info-face .card { position: absolute; inset: 0; }
+.info-opt.is-current .info-face { outline: 2px solid var(--gold); outline-offset: 6px; border-radius: 10px; }
+.info-opt .h3 { margin: 4px 0 0; }
+@media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; justify-items: center; } .info-opt { max-width: 300px; width: 100%; } }

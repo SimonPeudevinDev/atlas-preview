@@ -16,7 +16,8 @@
     [/^\/marketplace$/, P.market, 'market'],
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
-    [/^\/atelier$/, P.atelier, '']
+    [/^\/atelier$/, P.atelier, ''],
+    [/^\/infos$/, P.infos, '']
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
