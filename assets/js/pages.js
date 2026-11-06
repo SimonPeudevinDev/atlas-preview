@@ -243,6 +243,7 @@
             cells.push('<div class="cg-item' + (best ? '' : ' is-missing') + '">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) +
               '<p class="cg-no">N° ' + (no < 10 ? '0' : '') + no + ' · ' + (best ? 'À vous' : 'Manquant') + '</p></div>');
           });
+          if (!q && !cd.missing) cells.push('<div class="cg-item is-trophy">' + U.trophyCard(c.id) + '<p class="cg-no">★ · ' + (S.trophy(c.id) ? 'Obtenue' : 'Fin de collection') + '</p></div>');
         } else {
           var rids = cd.view === 'all' ? A.RARITIES.map(function (r) { return r.id; }) : [cd.view];
           chars.forEach(function (ch) {
@@ -837,7 +838,7 @@
         return '<li><span>' + U.esc(t.label) + '</span><time>' + U.ago(t.at) + '</time><b class="' + (t.amount < 0 ? 'neg' : 'pos') + '">' + (t.amount > 0 ? '+' : '−') + U.num(Math.abs(t.amount)) + '</b></li>';
       }).join('');
       return '<section class="page-head"><div class="container">' +
-        '<div class="pf-head"><span class="avatar is-xl">' + A.app.initial() + '</span><div>' +
+        '<div class="pf-head"><span class="avatar is-xl' + U.avatarCls() + '">' + U.avatarInner() + '</span><div>' +
           '<p class="eyebrow">Mon profil</p><h1 class="h1">' + U.esc(u.name) + '</h1>' +
           '<p class="lead">@' + U.esc(u.handle) + ' · Membre depuis le ' + U.date(st.createdAt) + '</p></div></div>' +
         // Mêmes statistiques que sur une page Collection.
@@ -848,6 +849,15 @@
           '<div class="coll-stats-bar">' + U.progress(xp / 25, 'Niveau ' + u.level + ' · encore ' + (25 - xp) + ' cartes avant le niveau ' + (u.level + 1)) + '</div>' +
         '</div></div></section>' +
         '<div class="container pf-body">' +
+          sec('Collection', 'Photo de profil', 'Chaque collection complétée débloque un portrait.',
+            '<div class="pf-avatars"><button type="button" class="pf-av' + (S.avatar() ? '' : ' is-on') + '" data-avatar-pick=""><span class="avatar is-lg">' + A.app.initial() + '</span><small>Initiale</small></button>' +
+            A.COLLECTIONS.map(function (c) {
+              var own = S.avatars().indexOf(c.id) !== -1;
+              return '<button type="button" class="pf-av' + (own ? '' : ' is-locked') + (S.avatar() === c.id ? ' is-on' : '') + '"' + (own ? ' data-avatar-pick="' + c.id + '"' : ' disabled title="Complétez ' + U.esc(c.name) + ' pour le débloquer"') + '>' +
+                '<span class="avatar is-lg has-pic' + (S.hasFrame() && own ? ' has-frame' : '') + '">' + U.avatarArt(c.id) + (own ? '' : '<i class="pf-av-lock">🔒</i>') + '</span><small>' + U.esc(c.name) + '</small></button>';
+            }).join('') + '</div>') +
+          sec('Collection', 'Cartes de fin de collection', 'Remises quand une collection est complète. Elles ne sortent jamais des boosters.',
+            '<div class="pf-trophies">' + A.COLLECTIONS.map(function (c) { return '<div class="pf-trophy">' + U.trophyCard(c.id) + '</div>'; }).join('') + '</div>') +
           sec('Collection', 'Titres', 'Gagnés en complétant les collections : tous les personnages, puis toutes les éditions.',
             (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">👑 ' + U.esc(t) + '</span>'; }).join('') + '</div>'
               : '<p class="muted">Aucun titre pour l’instant. Complétez une collection pour obtenir le premier.</p>') +
@@ -889,6 +899,8 @@
         var p = {}; p[k] = t.checked; S.updateUser({ prefs: p });
       });
       root.addEventListener('click', function (e) {
+        var av = e.target.closest('[data-avatar-pick]');
+        if (av) { S.setAvatar(av.getAttribute('data-avatar-pick') || null); A.app.rerender(); U.toast('Photo de profil mise à jour'); return; }
         if (!e.target.closest('[data-reset-demo]')) return;
         U.confirm({ title: 'Réinitialiser la démo ?', body: '<p class="muted">L’inventaire, le solde et les annonces reviennent à leur état initial.</p>', ok: 'Réinitialiser', onOk: function () { S.reset(); U.toast('Démo réinitialisée'); A.app.rerender(); } });
       });

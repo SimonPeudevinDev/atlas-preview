@@ -86,7 +86,7 @@
       minted: {}, used: {},
       inventory: [], listings: [], sales: [], offers: [],
       lastDaily: null,
-      claimed: {}, tokens: {}, titles: []
+      claimed: {}, tokens: {}, titles: [], trophies: {}, avatars: [], avatar: null, frame: false
     };
     var r = rng(A.hash('atlas-demo'));
 
@@ -150,6 +150,7 @@
     state = load();
     if (!state || state.v !== 1) fresh();
     state.claimed = state.claimed || {}; state.tokens = state.tokens || {}; state.titles = state.titles || [];
+    state.trophies = state.trophies || {}; state.avatars = state.avatars || [];
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
   };
@@ -268,8 +269,8 @@
     var steps = [
       { id: 'debut', goal: Math.min(3, n), of: 'chars', label: 'Premiers pas', reward: { eclats: 150 } },
       { id: 'moitie', goal: Math.ceil(n / 2), of: 'chars', label: 'À mi-chemin', reward: { booster: 'standard' } },
-      { id: 'complet', goal: n, of: 'chars', label: 'Collection complète', reward: { eclats: 1000, titre: t[0] } },
-      { id: 'maitrise', goal: pr.edTotal, of: 'eds', label: 'Maîtrise', reward: { eclats: 5000, titre: t[1] } }
+      { id: 'complet', goal: n, of: 'chars', label: 'Collection complète', reward: { trophee: true, avatar: true, titre: t[0] } },
+      { id: 'maitrise', goal: pr.edTotal, of: 'eds', label: 'Maîtrise', reward: { eclats: 5000, titre: t[1], cadre: true } }
     ];
     return steps.map(function (s) {
       s.have = Math.min(s.goal, s.of === 'chars' ? pr.owned : pr.edOwned);
@@ -292,9 +293,18 @@
     if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
     if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
     if (r.titre && state.titles.indexOf(r.titre) === -1) state.titles.push(r.titre);
+    // Carte de fin de collection : numérotée dans l’ordre des collectionneurs qui l’ont obtenue (fictif en démo)
+    if (r.trophee && !state.trophies[cid]) state.trophies[cid] = { at: now, no: 3 + A.hash(cid + state.user.handle) % 57 };
+    if (r.avatar && state.avatars.indexOf(cid) === -1) { state.avatars.push(cid); if (!state.avatar) state.avatar = cid; }
+    if (r.cadre) state.frame = true;
     emit();
     return { ok: true, reward: r, step: s };
   };
+  S.trophy = function (cid) { return state.trophies[cid] || null; };
+  S.avatars = function () { return state.avatars || []; };
+  S.avatar = function () { return state.avatar && state.avatars.indexOf(state.avatar) !== -1 ? state.avatar : null; };
+  S.setAvatar = function (cid) { state.avatar = cid && state.avatars.indexOf(cid) !== -1 ? cid : null; emit(); };
+  S.hasFrame = function () { return !!state.frame; };
   S.tokens = function (packId) { return (state.tokens && state.tokens[packId]) || 0; };
   S.titles = function () { return state.titles || []; };
 

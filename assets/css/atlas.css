@@ -1321,7 +1321,7 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .card-unknown { cursor: default; }
 .card-unknown .card-art { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw; background: repeating-linear-gradient(135deg, var(--bg-2) 0 6px, var(--surface-2) 6px 12px); }
 .card-unknown .cu-mark { display: grid; place-items: center; width: 26cqw; height: 26cqw; border-radius: 50%; border: 1px dashed var(--ink-4); font-family: var(--serif); font-size: 16cqw; line-height: 1; color: var(--ink-4); }
-.card-unknown .cu-k { font-size: 2.9cqw; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3); }
+.card-unknown .cu-k, .card-trophy.is-locked .cu-k { text-align: center; padding: 0 4cqw; font-size: 2.9cqw; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3); }
 .card-unknown .card-body { opacity: .6; }
 .card-unknown .card-name { letter-spacing: .1em; color: var(--ink-3); }
 .card-flag.is-first { background: var(--gold); color: var(--night); text-transform: uppercase; letter-spacing: .12em; }
@@ -1380,3 +1380,40 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .pf-title { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--gold-2); border-radius: 999px; background: var(--surface); font-family: var(--serif); font-size: 18px; color: var(--ink); }
 .pf-ready { margin: 14px 0 0; font-size: 14px; color: var(--ink-2); }
 .pf-ready a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--gold-2); text-underline-offset: 3px; }
+
+/* Carte de fin de collection (trophée) */
+.card-trophy { cursor: default; --card-art-line: rgba(161, 128, 63, .5); }
+.card-trophy .card-inner { background: linear-gradient(160deg, #2A251D, var(--night)); box-shadow: inset 0 0 0 1px rgba(232, 220, 194, .35), var(--shadow-lg); }
+.card-trophy .card-name, .card-trophy .card-serial { color: var(--gold-3); }
+.card-trophy .card-title, .card-trophy .card-coll, .card-trophy .card-stats { color: #B8AC95; }
+.card-trophy .card-stats b { color: var(--gold-3); }
+.card-trophy .card-rar { color: var(--gold-2); }
+.card-trophy .card-rar i { background: var(--gold-2); }
+.card-trophy .ct-seal { position: absolute; right: 4cqw; bottom: 4cqw; z-index: 2; display: grid; place-items: center; width: 17cqw; height: 17cqw; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #F3D38A, #A1803F 70%); box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .35); color: var(--night); }
+.card-trophy .ct-seal .ct-mark { width: 60%; height: 60%; }
+.card-trophy.is-locked .card-inner { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); }
+.card-trophy.is-locked .card-art { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw; background: repeating-linear-gradient(135deg, var(--bg-2) 0 6px, var(--surface-2) 6px 12px); }
+.card-trophy.is-locked .ct-lock { font-size: 16cqw; filter: grayscale(1); opacity: .45; }
+.card-trophy.is-locked .card-name { color: var(--ink-3); }
+.card-trophy.is-locked .card-title, .card-trophy.is-locked .card-stats, .card-trophy.is-locked .card-rar { color: var(--ink-4); }
+.card-trophy.is-locked .card-rar i { background: var(--ink-4); }
+
+/* Photos de profil débloquées */
+.avatar { overflow: hidden; }
+.avatar.has-pic { background: var(--bg-2); }
+.avatar.has-pic img, .avatar.has-pic svg { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; border-radius: 50%; }
+.avatar.has-frame { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--gold); }
+.pf-avatars { display: flex; flex-wrap: wrap; gap: 14px; }
+.pf-av { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 76px; padding: 6px 0; border-radius: var(--radius-lg); cursor: pointer; }
+.pf-av .avatar { position: relative; transition: transform .25s var(--ease); }
+.pf-av small { font-size: 12px; color: var(--ink-2); text-align: center; line-height: 1.25; }
+.pf-av.is-on .avatar { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.pf-av.is-on small { color: var(--ink); font-weight: 600; }
+.pf-av:not(.is-locked):hover .avatar { transform: translateY(-2px); }
+.pf-av.is-locked { cursor: not-allowed; }
+.pf-av.is-locked .avatar img, .pf-av.is-locked .avatar svg { filter: grayscale(1) brightness(1.1); opacity: .35; }
+.pf-av.is-locked small { color: var(--ink-4); }
+.pf-av-lock { position: absolute; inset: 0; display: grid; place-items: center; font-style: normal; font-size: 16px; }
+.pf-trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px; }
+.pf-trophy { min-width: 0; }
+@media (max-width: 480px) { .pf-trophies { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }

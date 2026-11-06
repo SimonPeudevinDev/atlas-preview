@@ -132,7 +132,7 @@
       d.setAttribute('href', ready ? '#/boutique?open=daily' : '#/boutique');
     }
     var av = document.querySelector('[data-avatar]');
-    if (av) av.textContent = app.initial();
+    if (av) { av.innerHTML = U.avatarInner(); av.className = 'avatar' + U.avatarCls(); }
   };
 
   /* ---------- Profil : menu de l’avatar, déconnexion simulée ---------- */
@@ -153,7 +153,7 @@
   function profileMenuHTML() {
     var u = S.get().user, items = S.items();
     var muted = A.sfx && A.sfx.muted;
-    return '<div class="pm-head"><span class="avatar is-lg">' + app.initial() + '</span><div><b>' + U.esc(u.name) + '</b><small>@' + U.esc(u.handle) + ' · Niveau ' + u.level + '</small></div></div>' +
+    return '<div class="pm-head"><span class="avatar is-lg' + U.avatarCls() + '">' + U.avatarInner() + '</span><div><b>' + U.esc(u.name) + '</b><small>@' + U.esc(u.handle) + ' · Niveau ' + u.level + '</small></div></div>' +
       '<div class="pm-stats"><a href="#/inventaire"><b>' + U.num(items.length) + '</b><span>Cartes</span></a><a href="#/profil"><b>' + U.num(S.balance()) + '</b><span>Éclats</span></a></div>' +
       '<nav class="pm-links">' +
         '<a href="#/profil" role="menuitem">' + U.icon('user') + 'Mon profil</a>' +

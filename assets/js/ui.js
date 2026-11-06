@@ -143,10 +143,42 @@
     var out = [];
     if (r.eclats) out.push(U.num(r.eclats) + ' ' + A.CURRENCY.name);
     if (r.booster) out.push('1 ' + A.PACK[r.booster].name + ' offert');
+    if (r.trophee) out.push('Carte de fin de collection');
+    if (r.avatar) out.push('Photo de profil');
     if (r.titre) out.push('Titre « ' + r.titre + ' »');
+    if (r.cadre) out.push('Cadre doré');
     return out.join(' + ');
   };
-  U.rewardIcon = function (r) { return r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
+  U.rewardIcon = function (r) { return r.trophee ? '🏆' : r.titre ? '👑' : r.booster ? '🎁' : '✨'; };
+
+  /* Portrait de profil débloqué par une collection : l’emblème de sa première figure */
+  U.avatarArt = function (cid) {
+    var ch = A.CHAR[A.COLL[cid].chars[0]], ed = A.ED[ch.id + '-legendary'] || A.ED[ch.id + '-base'];
+    return A.editionArt(ed, { w: 200, h: 200 });
+  };
+  U.avatarInner = function () {
+    var cid = A.store.avatar();
+    return cid ? U.avatarArt(cid) : A.app.initial();
+  };
+  U.avatarCls = function () { return (A.store.avatar() ? ' has-pic' : '') + (A.store.hasFrame() ? ' has-frame' : ''); };
+
+  /* Carte de fin de collection : hors boosters, remise quand tous les personnages sont réunis */
+  U.trophyCard = function (cid) {
+    var c = A.COLL[cid], t = A.store.trophy(cid), n = c.chars.length;
+    if (!t) return '<article class="card card-trophy is-locked" aria-label="Carte de fin de collection, verrouillée"><div class="card-inner">' +
+      '<div class="card-art"><span class="ct-lock" aria-hidden="true">🏆</span><span class="cu-k">Carte de fin de collection</span></div>' +
+      '<div class="card-body"><div class="card-row"><h3 class="card-name">' + U.esc(c.name) + '</h3></div>' +
+        '<div class="card-row card-sub"><span class="card-title">Réunissez les ' + n + ' personnages</span></div>' +
+        '<div class="card-row card-foot"><span class="card-stats"><span>Hors booster</span></span><span class="card-rar"><i></i>Trophée</span></div></div></div></article>';
+    var no = (t.no < 10 ? '00' : '0') + t.no;
+    return '<article class="card card-trophy" tabindex="0" aria-label="Carte de fin de collection ' + U.esc(c.name) + ', numéro ' + no + '"><div class="card-inner">' +
+      '<div class="card-art">' + A.artImg({ seed: cid + '-trophee', coll: cid, rarity: 'legendary', w: 600, h: 780 }) +
+        '<span class="ct-seal" aria-hidden="true">' + U.mark('ct-mark') + '</span><span class="card-flag is-first">Collection complète</span></div>' +
+      '<div class="card-body"><div class="card-row"><h3 class="card-name">' + U.esc(c.name) + '</h3><span class="card-serial">N° ' + no + '</span></div>' +
+        '<div class="card-row card-sub"><span class="card-title">Carte de fin de collection</span><span class="card-coll">' + U.esc(c.family) + '</span></div>' +
+        '<div class="card-row card-foot"><span class="card-stats"><span>Obtenue le<b>' + U.date(t.at) + '</b></span></span><span class="card-rar"><i></i>Trophée</span></div></div>' +
+      '<span class="card-holo"></span><span class="card-sheen"></span><span class="card-shine"></span></div></article>';
+  };
   // Piste des paliers d’une collection (page Collection)
   U.rewardTrack = function (cid) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
