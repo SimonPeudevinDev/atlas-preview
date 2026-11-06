@@ -97,10 +97,10 @@ window.ATLAS = window.ATLAS || {};
       description: 'De la Gaule à la Ve République, un panthéon de personnalités dont l’empreinte traverse les siècles.'
     },
     {
-      id: 'nordique', name: 'Saga du Nord', family: 'Mythologie nordique', universe: 'Mythologies', motif: 'fjord',
+      id: 'nordique', name: 'Les Dieux d’Asgard', family: 'Mythologie nordique', group: 'norrois', universe: 'Mythologies', motif: 'fjord',
       edition: 'Édition I', status: 'event', popular: 0,
-      tagline: 'Les dieux d’Asgard et les créatures du Ragnarök.',
-      description: 'Nouvelle collection. Entre fjords et neiges éternelles, les dieux nordiques et les êtres qui annoncent la fin des temps.'
+      tagline: 'Odin le borgne, Thor le tonnerre, Loki le rusé : les dieux d’Asgard.',
+      description: 'Nouvelle collection. Entre fjords et neiges éternelles, les Ases et les Vanes, dieux de la guerre, de la sagesse et de la fertilité, qui savent tous comment le monde finira.'
     },
     {
       id: 'astronautes', name: 'Les Astronautes', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'rocket',
@@ -113,6 +113,12 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'live', popular: 15,
       tagline: 'Satellites, sondes et télescopes qui ont changé notre regard sur l’Univers.',
       description: 'Du premier « bip-bip » de Spoutnik aux galaxies lointaines de James Webb : les grandes missions de l’histoire spatiale.'
+    },
+    {
+      id: 'cosmos', name: 'Les Merveilles du cosmos', family: 'L’Espace', group: 'solaire', universe: 'Sciences', motif: 'blackhole',
+      edition: 'Édition I', status: 'live', popular: 27,
+      tagline: 'Trous noirs, étoiles géantes et vides cosmiques : les records de l’Univers.',
+      description: 'Les objets les plus extrêmes jamais observés : des trous noirs de milliards de soleils, des étoiles plus grandes que notre système solaire et un visiteur venu d’ailleurs.'
     },
     {
       id: 'detectives', name: 'Romans policiers', family: 'Romans d’aventure', group: 'aventure', universe: 'Littérature', motif: 'dome',
@@ -179,6 +185,24 @@ window.ATLAS = window.ATLAS || {};
       edition: 'Édition I', status: 'live', popular: 26,
       tagline: 'Jambes de bois, cartes au trésor et capitaines au crochet.',
       description: 'Les pirates nés de la plume de Stevenson, de Barrie et de Sabatini, qui ont fixé pour toujours l’image du pirate.'
+    },
+    {
+      id: 'creatures', name: 'Les Créatures', family: 'Mythologie nordique', group: 'norrois', universe: 'Mythologies', motif: 'fjord',
+      edition: 'Édition I', status: 'event', popular: 0,
+      tagline: 'Le serpent du monde, le loup du Ragnarök et le cheval à huit jambes.',
+      description: 'Loups, serpents, dragons et corbeaux : les créatures qui peuplent l’arbre du monde et qui annoncent la fin des temps.'
+    },
+    {
+      id: 'jotnar', name: 'Les Jötnar', family: 'Mythologie nordique', group: 'norrois', universe: 'Mythologies', motif: 'volcano',
+      edition: 'Édition I', status: 'event', popular: 0,
+      tagline: 'Géants de feu, de glace et de pierre, éternels rivaux des dieux.',
+      description: 'Les géants du Nord, tour à tour ennemis, rivaux et parents des dieux : du géant de feu Surt à Hel, la reine des morts.'
+    },
+    {
+      id: 'mondes', name: 'Les Neuf Mondes', family: 'Mythologie nordique', group: 'norrois', universe: 'Mythologies', motif: 'fjord',
+      edition: 'Édition I', status: 'event', popular: 0,
+      tagline: 'Asgard, Midgard, Helheim : les mondes reliés par l’arbre Yggdrasil.',
+      description: 'Le cosmos des Vikings : neuf mondes suspendus aux branches et aux racines du frêne Yggdrasil, du royaume des dieux à celui des morts.'
     }
   ];
 
@@ -218,9 +242,9 @@ window.ATLAS = window.ATLAS || {};
       text: 'Ulysse devait choisir entre Charybde, un tourbillon capable d’engloutir son navire, et Scylla, un monstre à six têtes. Sur le conseil de la magicienne Circé, il longea la falaise de Scylla, sacrifiant six marins pour sauver les autres. C’est l’origine de l’expression « tomber de Charybde en Scylla ».' }
   ];
   A.GROUPS.push({
-    id: 'solaire', name: 'L’Espace', subs: ['planetes', 'lunes', 'astronautes', 'missions'], title: 'Explorateur de l’espace',
-    tagline: 'Planètes, lunes, astronautes et missions : le ciel et ceux qui l’ont exploré.',
-    description: 'Les planètes et leurs lunes les plus remarquables, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : quatre sous-collections, de Mercure à Voyager.'
+    id: 'solaire', name: 'L’Espace', subs: ['planetes', 'lunes', 'cosmos', 'astronautes', 'missions'], title: 'Explorateur de l’espace',
+    tagline: 'Planètes, lunes, trous noirs, astronautes et missions : le ciel et ceux qui l’ont exploré.',
+    description: 'Les planètes et leurs lunes, les objets les plus extrêmes de l’Univers, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : cinq sous-collections, de Mercure aux trous noirs.'
   });
   A.GROUPS.push({
     id: 'aventure', name: 'Romans d’aventure', subs: ['detectives', 'verne', 'mousquetaires'], title: 'Grand Aventurier',
@@ -246,6 +270,22 @@ window.ATLAS = window.ATLAS || {};
     id: 'pirates', name: 'L’Âge des pirates', subs: ['flibustiers', 'forbans'], title: 'Seigneur des sept mers',
     tagline: 'Les vrais pirates des Caraïbes et ceux des grands romans.',
     description: 'Barbe-Noire, Anne Bonny et Surcouf d’un côté, Long John Silver et le capitaine Crochet de l’autre : la piraterie, de l’histoire à la légende.'
+  });
+  /* Ragnarök : les affrontements de la fin du monde, débloqués en réunissant les deux adversaires */
+  A.DUELS.push({ id: 'fin-odin', set: 'ragnarok', hero: 'nordique-odin', monster: 'creatures-fenrir', title: 'Odin affronte Fenrir',
+    text: 'Au Ragnarök, Odin s’avancera le premier, coiffé d’or et armé de sa lance, contre le loup Fenrir enfin libéré. Le loup ouvrira une gueule qui touchera le ciel et la terre, et avalera le père des dieux. Son fils Vidar le vengera en lui déchirant la mâchoire.' });
+  A.DUELS.push({ id: 'fin-thor', set: 'ragnarok', hero: 'nordique-thor', monster: 'creatures-jormungandr', title: 'Thor contre le serpent du monde',
+    text: 'Le serpent de Midgard sortira de l’océan en crachant son venin sur le ciel et la mer. Thor l’abattra d’un coup de son marteau, mais fera neuf pas avant de tomber mort, empoisonné par son souffle.' });
+  A.DUELS.push({ id: 'fin-freyr', set: 'ragnarok', hero: 'nordique-freyr', monster: 'jotnar-surt', title: 'Freyr face à Surt',
+    text: 'Le géant de feu chevauchera à la tête des fils de Muspell. Freyr, qui avait donné son épée pour épouser Gerd, le combattra avec un simple bois de cerf, et tombera. Surt embrasera alors le monde entier.' });
+  A.DUELS.push({ id: 'fin-tyr', set: 'ragnarok', hero: 'nordique-tyr', monster: 'creatures-garm', title: 'Týr contre Garm',
+    text: 'Le chien Garm, libéré de ses chaînes, se jettera sur Týr, le dieu manchot qui avait sacrifié sa main pour enchaîner Fenrir. Les deux adversaires s’entretueront.' });
+  A.DUELS.push({ id: 'fin-heimdall', set: 'ragnarok', hero: 'nordique-heimdall', monster: 'nordique-loki', title: 'Heimdall contre Loki',
+    text: 'Heimdall soufflera dans son cor, Gjallarhorn, pour réveiller les dieux. Dans la bataille, il affrontera Loki, son vieil ennemi, venu à bord d’un navire chargé de morts : les deux s’entretueront.' });
+  A.GROUPS.push({
+    id: 'norrois', name: 'Mythologie nordique', subs: ['nordique', 'creatures', 'jotnar', 'mondes'], title: 'Survivant du Ragnarök',
+    tagline: 'Dieux, créatures, géants et neuf mondes, jusqu’au Ragnarök.',
+    description: 'D’Odin au serpent de Midgard, des géants de feu aux neuf mondes suspendus à l’arbre Yggdrasil : toute la mythologie des Vikings, en quatre sous-collections.'
   });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
@@ -484,6 +524,49 @@ window.ATLAS = window.ATLAS || {};
       ['smee', 'Smee', 'Le Maître d’équipage', 60, 70, 66, 'BRE', 'Maître d’équipage débonnaire du capitaine Crochet.'],
       ['blood', 'Capitaine Blood', 'Le Médecin pirate', 88, 84, 92, 'BRELM', 'Médecin injustement déporté devenu capitaine pirate.']
     ],
+    cosmos: [
+      ['sgra', 'Sagittarius A*', 'Le Cœur de la Voie lactée', 96, 94, 90, 'BRELMU', 'Trou noir géant au centre de notre galaxie.'],
+      ['m87', 'M87*', 'Le Premier Trou noir photographié', 98, 92, 88, 'BRELM', 'Premier trou noir dont on ait obtenu une image, en 2019.'],
+      ['ton618', 'TON 618', 'Le Monstre ultramassif', 99, 96, 80, 'BRELMU', 'L’un des trous noirs les plus massifs connus.'],
+      ['stephenson', 'Stephenson 2-18', 'L’Étoile démesurée', 90, 88, 76, 'BREL', 'L’une des plus grandes étoiles connues.'],
+      ['betelgeuse', 'Bételgeuse', 'L’Épaule d’Orion', 88, 80, 82, 'BRELM', 'Supergéante rouge qui explosera un jour en supernova.'],
+      ['r136a1', 'R136a1', 'La Plus Massive', 94, 84, 80, 'BREL', 'L’étoile la plus massive connue.'],
+      ['magnetar', 'SGR 1806-20', 'Le Magnétar', 97, 90, 70, 'BREL', 'Étoile morte au champ magnétique monstrueux.'],
+      ['crabe', 'La Nébuleuse du Crabe', 'La Supernova de l’an 1054', 80, 86, 90, 'BRELM', 'Reste d’une étoile dont l’explosion fut vue en 1054.'],
+      ['bouvier', 'Le Grand Vide du Bouvier', 'Le Désert cosmique', 60, 99, 88, 'BRE', 'Immense région presque vide de galaxies.'],
+      ['oumuamua', 'ʻOumuamua', 'Le Messager venu d’ailleurs', 70, 76, 94, 'BREL', 'Premier objet venu d’un autre système stellaire, repéré en 2017.']
+    ],
+    creatures: [
+      ['jormungandr', 'Jörmungandr', 'Le Serpent de Midgard', 97, 96, 62, 'BRELMU', 'Serpent si long qu’il entoure le monde et se mord la queue.'],
+      ['fenrir', 'Fenrir', 'Le Loup colossal', 96, 84, 56, 'BREL', 'Enchaîné par les dieux, il attend le Ragnarök.'],
+      ['sleipnir', 'Sleipnir', 'Le Cheval à huit jambes', 88, 84, 80, 'BRELM', 'Cheval à huit jambes, monture d’Odin.'],
+      ['nidhogg', 'Nidhögg', 'Le Dragon des racines', 94, 88, 70, 'BREL', 'Dragon qui ronge les racines de l’arbre du monde.'],
+      ['ratatosk', 'Ratatosk', 'Le Messager d’Yggdrasil', 50, 62, 86, 'BRE', 'Écureuil qui sème la discorde le long de l’arbre du monde.'],
+      ['huginmunin', 'Hugin et Munin', 'Les Corbeaux d’Odin', 60, 70, 98, 'BREL', 'Les deux corbeaux qui rapportent à Odin les nouvelles du monde.'],
+      ['garm', 'Garm', 'Le Chien des enfers', 90, 86, 52, 'BRE', 'Chien monstrueux qui garde l’entrée du royaume des morts.'],
+      ['audhumla', 'Audhumla', 'La Vache primordiale', 40, 90, 80, 'BRE', 'Vache des origines qui nourrit le premier géant.']
+    ],
+    jotnar: [
+      ['surt', 'Surt', 'Le Géant de feu', 98, 88, 74, 'BRELMU', 'Seigneur de Muspellheim, qui embrasera le monde au Ragnarök.'],
+      ['hel', 'Hel', 'La Reine des morts', 80, 92, 90, 'BRELM', 'Fille de Loki, souveraine du royaume des morts.'],
+      ['angrboda', 'Angrboda', 'La Mère des monstres', 72, 80, 92, 'BREL', 'Géante, mère du loup Fenrir, du serpent du monde et de Hel.'],
+      ['skadi', 'Skadi', 'La Chasseresse des neiges', 84, 84, 82, 'BREL', 'Géante des montagnes, déesse de l’hiver et de la chasse à ski.'],
+      ['thrym', 'Thrym', 'Le Voleur du marteau', 90, 82, 58, 'BRE', 'Roi des géants qui vola le marteau de Thor.'],
+      ['utgardaloki', 'Útgarda-Loki', 'Le Roi des illusions', 78, 84, 98, 'BREL', 'Roi géant qui trompa Thor par la magie.'],
+      ['hrungnir', 'Hrungnir', 'Le Géant de pierre', 96, 98, 50, 'BRE', 'Géant au cœur et à la tête de pierre, défié par Thor.'],
+      ['aegir', 'Ægir', 'Le Seigneur des vagues', 82, 90, 84, 'BRE', 'Géant de la mer, qui brasse la bière des dieux.']
+    ],
+    mondes: [
+      ['asgard', 'Asgard', 'La Citadelle des dieux', 90, 98, 92, 'BRELMU', 'Le monde des dieux Ases, perché au sommet de l’arbre du monde.'],
+      ['midgard', 'Midgard', 'Le Monde des hommes', 70, 80, 86, 'BRELM', 'Le monde des humains, au centre des neuf mondes.'],
+      ['jotunheim', 'Jötunheim', 'Le Pays des géants', 88, 86, 74, 'BREL', 'Monde montagneux et glacé des géants.'],
+      ['vanaheim', 'Vanaheim', 'Le Monde des Vanes', 72, 84, 90, 'BRE', 'Monde des Vanes, dieux de la fertilité.'],
+      ['alfheim', 'Alfheim', 'Le Pays des elfes', 66, 80, 94, 'BRE', 'Monde lumineux des elfes de lumière.'],
+      ['nidavellir', 'Nidavellir', 'Les Forges des nains', 84, 92, 82, 'BREL', 'Monde souterrain où les nains forgent les trésors des dieux.'],
+      ['muspellheim', 'Muspellheim', 'Le Monde du feu', 96, 80, 70, 'BREL', 'Monde de flammes, au sud du gouffre originel.'],
+      ['niflheim', 'Niflheim', 'Le Monde des brumes', 60, 96, 80, 'BRE', 'Monde de glace et de brouillard, au nord du gouffre originel.'],
+      ['helheim', 'Helheim', 'Le Royaume des morts', 78, 94, 84, 'BREL', 'Royaume froid où vont les morts qui ne périssent pas au combat.']
+    ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
       ['creature', 'La Créature', 'Née de Frankenstein', 92, 88, 64, 'BRELM', 'Assemblée et animée par Victor Frankenstein, elle cherche sa place parmi les hommes.'],
@@ -521,7 +604,8 @@ window.ATLAS = window.ATLAS || {};
       ['loki', 'Loki', 'Le Dieu de la ruse', 76, 70, 97, 'BRELM', 'Métamorphe imprévisible, allié et ennemi des dieux.'],
       ['freyja', 'Freyja', 'Amour et guerre', 82, 76, 88, 'BREL', 'Elle accueille la moitié des guerriers tombés au combat.'],
       ['frigg', 'Frigg', 'Reine d’Asgard', 66, 84, 92, 'BRE', 'Épouse d’Odin, elle connaît le destin de chacun sans le dévoiler.'],
-      ['fenrir', 'Fenrir', 'Le Loup colossal', 96, 84, 56, 'BREL', 'Enchaîné par les dieux, il attend le Ragnarök.'],
+      ['baldr', 'Baldr', 'Le Dieu lumineux', 72, 90, 92, 'BRELM', 'Le plus beau et le plus aimé des dieux, dont la mort annonce le Ragnarök.'],
+      ['freyr', 'Freyr', 'Le Seigneur des moissons', 84, 82, 84, 'BREL', 'Dieu de la fertilité, du soleil et de la paix.'],
       ['heimdall', 'Heimdall', 'Gardien de Bifröst', 80, 92, 84, 'BRE', 'Il veille sur le pont arc-en-ciel et entend pousser l’herbe.'],
       ['tyr', 'Týr', 'Dieu du serment', 88, 85, 76, 'BRE', 'Il offrit sa main pour enchaîner Fenrir.']
     ]
@@ -721,6 +805,42 @@ window.ATLAS = window.ATLAS || {};
     'forbans-crochet': 'Chef des pirates du Pays imaginaire, il porte un crochet de fer à la place de la main droite, tranchée par [[merveilleux:peterpan|Peter Pan]] et jetée à un crocodile.',
     'forbans-smee': 'Irlandais jovial, il sert le [[crochet|capitaine Crochet]] avec une fidélité touchante, bien qu’il soit le moins effrayant des pirates.',
     'forbans-blood': 'Médecin irlandais, Peter Blood est condamné à tort pour avoir soigné un rebelle, puis vendu comme esclave à la Barbade. Il s’évade et devient le plus brillant capitaine pirate des Caraïbes.',
+    'cosmos-sgra': 'Au centre de la Voie lactée, à environ 27 000 années-lumière de nous, se cache un trou noir de quatre millions de fois la masse du Soleil. On le repère grâce aux étoiles qui tournent autour de lui à des vitesses folles.',
+    'cosmos-m87': 'Au cœur de la galaxie M87, à 55 millions d’années-lumière, ce trou noir pèse environ 6,5 milliards de fois la masse du Soleil. En avril 2019, il est devenu le premier trou noir jamais « photographié » : un anneau orangé autour d’une ombre noire.',
+    'cosmos-ton618': 'Ce quasar lointain abrite un trou noir estimé à environ 60 milliards de fois la masse du Soleil, quinze mille fois plus que [[sgra]]. Sa lumière a voyagé pendant près de onze milliards d’années avant de nous parvenir.',
+    'cosmos-stephenson': 'Cette supergéante rouge, à environ 19 000 années-lumière, aurait un rayon de plus de 2 000 fois celui du Soleil. Placée au centre de notre système, elle engloutirait l’orbite de [[planetes:saturne|Saturne]].',
+    'cosmos-betelgeuse': 'Cette supergéante rouge marque l’épaule de la constellation d’Orion, à quelque 550 à 700 années-lumière. Si elle était à la place du Soleil, elle s’étendrait au-delà de l’orbite de [[planetes:mars|Mars]].',
+    'cosmos-r136a1': 'Dans le Grand Nuage de Magellan, une galaxie voisine, cette étoile pèserait environ 200 fois la masse du Soleil et brillerait des millions de fois plus que lui.',
+    'cosmos-magnetar': 'Ce magnétar est le cadavre ultra-dense d’une étoile : une boule d’une vingtaine de kilomètres plus lourde que le Soleil, dont le champ magnétique est des millions de milliards de fois plus intense que celui de la Terre.',
+    'cosmos-crabe': 'En 1054, des astronomes chinois notèrent une « étoile invitée » si brillante qu’on la voyait en plein jour pendant plus de trois semaines. C’était l’explosion d’une étoile, dont les débris forment aujourd’hui la nébuleuse du Crabe.',
+    'cosmos-bouvier': 'Dans la direction de la constellation du Bouvier s’étend une bulle d’environ 330 millions d’années-lumière de diamètre, où l’on ne compte que quelques dizaines de galaxies, là où il devrait y en avoir des milliers.',
+    'cosmos-oumuamua': 'En octobre 2017, un télescope d’Hawaï repéra un objet filant trop vite pour appartenir au système solaire : le premier visiteur interstellaire jamais observé. Son nom hawaïen évoque un éclaireur venu de loin.',
+    'nordique-baldr': 'Fils d’[[odin]] et de [[frigg]], il était si aimé que sa mère fit jurer à toutes choses de ne jamais le blesser. Seul le gui, jugé trop jeune, fut oublié.',
+    'nordique-freyr': 'Frère de [[freyja]], ce dieu Vane veille sur les récoltes, la pluie et le soleil. Il possède un navire, Skidbladnir, qui se plie comme un mouchoir, et un sanglier aux soies d’or.',
+    'creatures-jormungandr': 'Fils de [[nordique:loki|Loki]] et de la géante [[jotnar:angrboda|Angrboda]], il fut jeté dans l’océan par [[nordique:odin|Odin]]. Il y grandit tant qu’il fait le tour de Midgard, le monde des hommes, et se mord la queue.',
+    'creatures-sleipnir': 'Monture d’[[nordique:odin|Odin]], ce cheval gris à huit jambes galope sur terre, dans les airs et jusqu’au royaume des morts.',
+    'creatures-nidhogg': 'Tapi sous les racines d’Yggdrasil, l’arbre du monde, ce dragon les ronge sans relâche. Il dévore aussi les cadavres des parjures et des meurtriers.',
+    'creatures-ratatosk': 'Cet écureuil court sans cesse le long du tronc d’Yggdrasil pour porter les insultes échangées entre l’aigle du sommet et le dragon [[nidhogg]], tapi sous les racines.',
+    'creatures-huginmunin': 'Chaque matin, ces deux corbeaux s’envolent pour parcourir le monde, puis reviennent se poser sur les épaules d’[[nordique:odin|Odin]] pour lui murmurer tout ce qu’ils ont vu.',
+    'creatures-garm': 'Enchaîné devant une grotte, le poitrail couvert de sang, ce chien garde l’entrée du royaume de [[jotnar:hel|Hel]]. Ses hurlements annonceront le début du Ragnarök.',
+    'creatures-audhumla': 'Née de la glace qui fondait au commencement du monde, cette vache nourrit de son lait le géant Ymir, le premier de tous les êtres.',
+    'jotnar-surt': 'Gardien de [[mondes:muspellheim|Muspellheim]], le monde du feu, il brandit une épée plus éclatante que le soleil. Au Ragnarök, il mènera les fils de Muspell à l’assaut des dieux.',
+    'jotnar-hel': 'Fille de [[nordique:loki|Loki]] et d’[[angrboda]], elle a, dit-on, un visage mi-vivant, mi-cadavre. [[nordique:odin|Odin]] lui confia [[mondes:helheim|Helheim]], où vont ceux qui meurent de maladie ou de vieillesse.',
+    'jotnar-angrboda': 'Avec [[nordique:loki|Loki]], cette géante du Bois-de-Fer eut trois enfants qui firent trembler les dieux : le loup [[creatures:fenrir|Fenrir]], le serpent [[creatures:jormungandr|Jörmungandr]] et [[hel]].',
+    'jotnar-skadi': 'Fille d’un géant tué par les dieux, elle vint à Asgard en armes pour se venger. Les dieux lui offrirent un mari, à choisir en ne voyant que ses pieds : elle désigna Njörd, le dieu de la mer.',
+    'jotnar-thrym': 'Ce roi des géants vola le marteau de [[nordique:thor|Thor]] et exigea en échange la main de [[nordique:freyja|Freyja]]. Furieuse, la déesse refusa.',
+    'jotnar-utgardaloki': 'Ce roi géant reçut [[nordique:thor|Thor]] et ses compagnons dans sa forteresse et leur imposa des épreuves impossibles : vider une corne à boire, soulever un chat, lutter contre une vieille femme.',
+    'jotnar-hrungnir': 'Le plus fort des géants avait un cœur et une tête de pierre. Après avoir défié [[nordique:odin|Odin]] à la course à cheval, il affronta [[nordique:thor|Thor]] en duel.',
+    'jotnar-aegir': 'Géant de la haute mer, il vit sous les vagues avec son épouse Rán, qui attrape les noyés dans son filet. Leurs neuf filles sont les vagues.',
+    'mondes-asgard': 'Demeure des dieux Ases, elle est entourée d’une muraille bâtie par un géant et reliée au monde des hommes par Bifröst, le pont arc-en-ciel gardé par [[nordique:heimdall|Heimdall]].',
+    'mondes-midgard': 'Les dieux façonnèrent ce monde à partir du corps du géant Ymir, et l’entourèrent d’un rempart fait de ses sourcils pour le protéger des géants.',
+    'mondes-jotunheim': 'Terre de montagnes, de forêts et de glaces, c’est le domaine des géants, éternels rivaux des dieux. [[nordique:thor|Thor]] s’y rend souvent pour les combattre.',
+    'mondes-vanaheim': 'C’est le monde des Vanes, une famille de dieux liés à la fertilité, à la mer et à la prospérité. [[nordique:freyja|Freyja]], [[nordique:freyr|Freyr]] et leur père Njörd en sont issus.',
+    'mondes-alfheim': 'Les elfes lumineux, plus beaux que le soleil, habitent ce monde. Les dieux en firent cadeau à [[nordique:freyr|Freyr]] quand il perça sa première dent.',
+    'mondes-nidavellir': 'Sous les montagnes, les nains forgent les trésors des dieux : la lance d’[[nordique:odin|Odin]], le collier de [[nordique:freyja|Freyja]] et le marteau de [[nordique:thor|Thor]].',
+    'mondes-muspellheim': 'Au commencement, au sud du grand vide Ginnungagap, s’étendait ce monde de feu, si brûlant que seuls ses habitants peuvent y vivre. Il est gardé par le géant [[jotnar:surt|Surt]].',
+    'mondes-niflheim': 'Au nord du gouffre originel, ce monde de glace, de froid et de brume est l’un des deux premiers mondes. De sa source, Hvergelmir, naissent tous les fleuves.',
+    'mondes-helheim': 'Gouverné par [[jotnar:hel|Hel]], ce monde sombre accueille ceux qui meurent de maladie ou de vieillesse. On y parvient après neuf nuits de route, par le pont Gjallarbrú qui enjambe un fleuve glacé.',
     'titans-cronos': 'Fils d’Ouranos et de Gaïa, il mutila son père d’un coup de faucille et devint roi du monde. Averti qu’un de ses enfants le détrônerait, il les avala tous, sauf [[grece:zeus|Zeus]], que [[rhea]] parvint à cacher.',
     'titans-rhea': 'Sœur et épouse de [[cronos]], elle vit disparaître ses cinq premiers enfants, avalés par leur père. Pour sauver le sixième, [[grece:zeus|Zeus]], elle accoucha en secret en Crète et tendit à Cronos une pierre emmaillotée.',
     'titans-oceanos': 'Aîné des Titans, il est le fleuve sans fin qui entoure le disque de la terre, source de toutes les eaux. Il resta à l’écart de la guerre contre [[grece:zeus|Zeus]], qui le laissa régner sur ses eaux.',
@@ -788,14 +908,14 @@ window.ATLAS = window.ATLAS || {};
     'histoire-charlemagne': 'Roi des Francs couronné empereur à Rome le jour de Noël de l’an 800, il unifie une grande partie de l’Europe occidentale. Mille ans plus tard, [[napoleon]] se réclamera de son héritage.',
     'histoire-vercingetorix': 'Chef des Arvernes, il fédère les peuples gaulois contre les légions de César et triomphe à Gergovie en 52 av. J.-C. Vaincu à Alésia, il reste le plus ancien héros de l’histoire de France, bien avant [[jeanne]].',
 
-    'nordique-odin': 'Le Père de tout sacrifia un œil pour boire à la source de la sagesse et resta pendu neuf nuits à l’arbre-monde pour découvrir les runes. Il sait qu’au Ragnarök, [[fenrir]] le dévorera.',
+    'nordique-odin': 'Le Père de tout sacrifia un œil pour boire à la source de la sagesse et resta pendu neuf nuits à l’arbre-monde pour découvrir les runes. Il sait qu’au Ragnarök, [[creatures:fenrir]] le dévorera.',
     'nordique-thor': 'Fils d’[[odin]], il protège Asgard et Midgard avec Mjöllnir, un marteau forgé par des nains à la suite d’une ruse de [[loki]].',
-    'nordique-loki': 'Métamorphe imprévisible, tour à tour allié et ennemi des dieux. Père de [[fenrir]], c’est lui qui causera la mort de Baldr, le fils bien-aimé d’[[odin]] et de [[frigg]].',
+    'nordique-loki': 'Métamorphe imprévisible, tour à tour allié et ennemi des dieux. Père de [[creatures:fenrir]], c’est lui qui causera la mort de Baldr, le fils bien-aimé d’[[odin]] et de [[frigg]].',
     'nordique-freyja': 'Déesse de l’amour et de la guerre, elle parcourt le ciel sur un char tiré par des chats. Elle accueille la moitié des guerriers tombés au combat ; l’autre moitié rejoint [[odin]] au Valhalla.',
     'nordique-frigg': 'Épouse d’[[odin]] et reine d’Asgard, elle connaît le destin de chacun sans jamais le dévoiler. Elle fit jurer à toutes choses d’épargner son fils Baldr, mais oublia le gui, ce dont [[loki]] sut profiter.',
-    'nordique-fenrir': 'Fils de [[loki]], le loup grandit si vite que les dieux prirent peur. Ils l’enchaînèrent par la ruse, au prix de la main de [[tyr]] ; depuis, il attend le Ragnarök.',
+    'creatures-fenrir': 'Fils de [[nordique:loki]], le loup grandit si vite que les dieux prirent peur. Ils l’enchaînèrent par la ruse, au prix de la main de [[nordique:tyr]] ; depuis, il attend le Ragnarök.',
     'nordique-heimdall': 'Gardien du pont arc-en-ciel Bifröst, il voit à cent lieues et entend pousser l’herbe. Au Ragnarök, il sonnera du cor et affrontera [[loki]] : ils périront l’un par l’autre.',
-    'nordique-tyr': 'Dieu du serment et du courage, il fut le seul à oser nourrir le jeune [[fenrir]]. Pour que le loup accepte la chaîne magique, il plaça sa main dans sa gueule, et la perdit.'
+    'nordique-tyr': 'Dieu du serment et du courage, il fut le seul à oser nourrir le jeune [[creatures:fenrir]]. Pour que le loup accepte la chaîne magique, il plaça sa main dans sa gueule, et la perdit.'
   };
   Object.keys(STORIES).forEach(function (id) { if (A.CHAR[id]) A.CHAR[id].story = STORIES[id]; });
 
@@ -944,6 +1064,42 @@ window.ATLAS = window.ATLAS || {};
     'forbans-crochet': 'Le crocodile, qui a trouvé la main à son goût, le suit partout ; il a aussi avalé un réveil, dont le tic-tac annonce son approche. J. M. Barrie le décrit comme un ancien élève d’une grande école anglaise, obsédé par les bonnes manières.',
     'forbans-smee': 'Barrie le décrit comme étrangement attachant : il tue sans méchanceté et coud à la machine pendant ses loisirs. Il est l’un des rares pirates à survivre au combat final contre [[merveilleux:peterpan|Peter Pan]].',
     'forbans-blood': 'Rafael Sabatini publia ses aventures en 1922. Blood reste un gentleman : il épargne les prisonniers et finit nommé gouverneur de la Jamaïque. Son parcours s’inspire en partie de celui d’[[flibustiers:morgan|Henry Morgan]].',
+    'cosmos-sgra': 'Le suivi de ces étoiles a valu le prix Nobel de physique 2020 à Reinhard Genzel et Andrea Ghez. En 2022, le réseau de radiotélescopes Event Horizon Telescope a publié la première image de son ombre, entourée d’un anneau de gaz brûlant, trois ans après celle de [[m87]].',
+    'cosmos-m87': 'L’image a été obtenue en combinant huit radiotélescopes répartis sur la planète, qui ont formé un télescope virtuel aussi grand que la Terre. M87* projette aussi un jet de matière long de plusieurs milliers d’années-lumière.',
+    'cosmos-ton618': 'Le gaz qui tourbillonne autour de lui chauffe tant qu’il brille des milliers de fois plus que toute notre galaxie. Son horizon serait si vaste que notre système solaire y tiendrait des dizaines de fois. Son nom vient du catalogue de l’observatoire de Tonantzintla, au Mexique.',
+    'cosmos-stephenson': 'Ces mesures restent incertaines : la taille des étoiles géantes est difficile à estimer, et le titre de plus grande étoile change régulièrement de mains, comme avec UY Scuti avant elle. La lumière mettrait près de neuf heures à faire le tour de sa surface.',
+    'cosmos-betelgeuse': 'Fin 2019, son éclat a brusquement baissé : on a cru à une explosion imminente, mais il s’agissait d’un nuage de poussière qu’elle avait expulsé. Elle deviendra bien une supernova, d’ici moins de cent mille ans, et brillera alors en plein jour, comme celle qui donna naissance à la [[crabe|nébuleuse du Crabe]].',
+    'cosmos-r136a1': 'Les premières estimations lui donnaient plus de 300 masses solaires ; elles ont été revues à la baisse en 2022 grâce à des images plus nettes. Une étoile aussi massive vit très vite : quelques millions d’années à peine, contre une dizaine de milliards pour le Soleil.',
+    'cosmos-magnetar': 'Le 27 décembre 2004, il libéra en un dixième de seconde plus d’énergie que le Soleil en cent mille ans. Bien qu’il se trouve à des dizaines de milliers d’années-lumière, ce sursaut perturba la haute atmosphère de la Terre. C’est un proche parent du pulsar de la [[crabe|nébuleuse du Crabe]].',
+    'cosmos-crabe': 'En son cœur tourne un pulsar, une étoile à neutrons qui pivote sur elle-même trente fois par seconde et balaie l’espace de ses faisceaux comme un phare. La nébuleuse, située à environ 6 500 années-lumière, s’étend encore à plus de 1 500 kilomètres par seconde.',
+    'cosmos-bouvier': 'Découvert en 1981, ce vide révèle la structure de l’Univers : de longs filaments de galaxies entourant d’immenses bulles vides. Si notre galaxie s’y trouvait, on aurait mis bien plus longtemps à découvrir qu’il existe d’autres galaxies que la nôtre.',
+    'cosmos-oumuamua': 'Très allongé ou aplati, sans queue de comète visible, il accéléra légèrement en s’éloignant du Soleil, ce qui fit beaucoup débattre. On pense aujourd’hui qu’il pourrait s’agir d’un fragment de glace dégazant de façon invisible. Il est reparti vers l’espace interstellaire.',
+    'nordique-baldr': 'Les dieux s’amusaient à lui lancer des armes qui ne le touchaient pas. [[loki]] fit lancer une branche de gui par le dieu aveugle Höd, qui tua Baldr. Sa mort plongea les dieux dans le deuil : il ne reviendra qu’après le Ragnarök, dans un monde renouvelé.',
+    'nordique-freyr': 'Pour épouser la géante Gerd, il donna son épée, qui combattait seule. Au Ragnarök, il affrontera le géant de feu [[jotnar:surt|Surt]] armé d’un simple bois de cerf, et périra.',
+    'creatures-jormungandr': 'Un jour, [[nordique:thor|Thor]], parti pêcher avec le géant Hymir, le ferra avec une tête de bœuf pour appât et le hissa hors de l’eau, avant que le géant, terrifié, ne coupe la ligne. Au Ragnarök, ils s’entretueront : Thor l’abattra mais succombera à son venin après neuf pas.',
+    'creatures-sleipnir': 'Il est né de [[nordique:loki|Loki]], changé en jument pour détourner l’étalon d’un géant qui bâtissait les remparts d’Asgard. C’est sur Sleipnir que Hermod descendit chez [[jotnar:hel|Hel]] pour tenter de ramener [[nordique:baldr|Baldr]].',
+    'creatures-nidhogg': 'Il échange des insultes avec l’aigle perché au sommet de l’arbre, grâce à l’écureuil [[ratatosk]] qui court porter leurs messages. Selon la Völuspá, le grand poème de la fin du monde, il survolera encore la terre après le Ragnarök.',
+    'creatures-ratatosk': 'Son nom signifierait « dent qui perce ». Il n’apparaît que dans quelques lignes de l’Edda, mais il est devenu l’une des figures les plus attachantes de la mythologie nordique.',
+    'creatures-huginmunin': 'Leurs noms signifient « Pensée » et « Mémoire ». Dans un poème de l’Edda, Odin dit craindre de ne pas voir revenir Hugin, mais plus encore Munin. Le corbeau figurait sur certaines bannières des Vikings.',
+    'creatures-garm': 'Comme [[monstres:cerbere|Cerbère]] chez les Grecs, il veille sur le monde des morts. Au Ragnarök, il brisera ses chaînes et affrontera le dieu [[nordique:tyr|Týr]] : les deux s’entretueront.',
+    'creatures-audhumla': 'Elle-même se nourrissait en léchant des blocs de glace salée. En trois jours, elle en dégagea un homme, Buri, le grand-père d’[[nordique:odin|Odin]] : ainsi apparut la lignée des dieux.',
+    'jotnar-surt': 'Il tuera [[nordique:freyr|Freyr]], puis embrasera les neuf mondes, qui sombreront dans les flammes. En Islande, une grande grotte de lave, Surtshellir, porte son nom, comme l’île de Surtsey, née d’une éruption sous-marine en 1963.',
+    'jotnar-hel': 'Quand les dieux la supplièrent de rendre [[nordique:baldr|Baldr]], elle accepta à une condition : que toutes les choses du monde le pleurent. Une seule géante refusa, sans doute Loki déguisé, et Baldr resta chez elle.',
+    'jotnar-angrboda': 'Son nom signifie « celle qui annonce le malheur ». Certains auteurs voient en elle la voyante qu’Odin réveille d’entre les morts dans les poèmes de l’Edda. Son rôle rappelle celui d’Échidna, la mère des monstres grecs.',
+    'jotnar-skadi': 'Elle aimait les montagnes enneigées, lui la mer : ils finirent par vivre séparés. Chasseresse à skis et à l’arc, elle est l’une des rares géantes accueillies parmi les dieux. Certains rapprochent son nom de celui de la Scandinavie.',
+    'jotnar-thrym': 'Thor dut se déguiser en mariée, accompagné de [[nordique:loki|Loki]] en demoiselle d’honneur. Au festin, la fausse fiancée dévora un bœuf entier et huit saumons. Quand le marteau fut posé sur ses genoux pour bénir l’union, Thor le saisit et terrassa les géants.',
+    'jotnar-utgardaloki': 'Thor échoua à chaque fois, avant d’apprendre la vérité : la corne plongeait dans l’océan, le chat était le serpent [[creatures:jormungandr|Jörmungandr]] et la vieille femme, la Vieillesse elle-même. Il n’a aucun lien avec le dieu [[nordique:loki|Loki]].',
+    'jotnar-hrungnir': 'Le marteau de Thor brisa sa pierre à aiguiser, dont un éclat se ficha dans le front du dieu, qui le garda toute sa vie. Selon Snorri Sturluson, les autres éclats sont à l’origine de toutes les pierres à aiguiser du monde.',
+    'jotnar-aegir': 'Il reçoit les dieux dans sa grande salle et leur brasse de la bière dans un chaudron immense, que [[nordique:thor|Thor]] rapporta de chez le géant Hymir. Les marins disaient d’une mer démontée qu’Ægir ouvrait la gueule.',
+    'mondes-asgard': 'On y trouve le Valhalla, la halle d’[[nordique:odin|Odin]] aux cinq cent quarante portes, où les guerriers morts au combat festoient en attendant le Ragnarök. Les Valkyries y conduisent les plus braves.',
+    'mondes-midgard': 'Il est cerné par l’océan, où vit le serpent [[creatures:jormungandr|Jörmungandr]]. Son nom signifie « l’enclos du milieu » ; par l’anglais ancien, il a inspiré à Tolkien le nom de la « Terre du Milieu ».',
+    'mondes-jotunheim': 'On y trouve la forteresse d’[[jotnar:utgardaloki|Útgarda-Loki]] et le puits de Mímir, où [[nordique:odin|Odin]] sacrifia un œil pour boire la sagesse. En Norvège, le massif du Jotunheimen, qui porte les plus hauts sommets du pays, lui doit son nom.',
+    'mondes-vanaheim': 'Les Vanes firent autrefois la guerre aux Ases, la première guerre du monde. Pour sceller la paix, les deux camps échangèrent des otages : c’est ainsi que Njörd et ses enfants vinrent vivre à Asgard. Les textes ne disent presque rien de Vanaheim lui-même.',
+    'mondes-alfheim': 'Les Scandinaves rendaient un culte aux elfes, des êtres proches des ancêtres et de la fertilité. Les elfes de Tolkien, grands et lumineux, s’inspirent en partie de ceux-là, bien loin des petits lutins des contes.',
+    'mondes-nidavellir': 'On l’associe à Svartalfheim, le monde des elfes noirs, que les textes confondent souvent avec les nains. C’est là que fut fabriqué Gleipnir, le lien qui retient le loup [[creatures:fenrir|Fenrir]].',
+    'mondes-muspellheim': 'Les étincelles jaillies de Muspellheim devinrent le soleil, la lune et les étoiles, placés dans le ciel par les dieux. C’est la rencontre de son feu avec la glace de [[niflheim]] qui fit naître la vie.',
+    'mondes-niflheim': 'Ses glaces, fondues au contact du feu de [[muspellheim]], donnèrent naissance au géant Ymir et à la vache [[creatures:audhumla|Audhumla]]. Le dragon [[creatures:nidhogg|Nidhögg]] ronge la racine d’Yggdrasil qui plonge jusqu’ici.',
+    'mondes-helheim': 'L’entrée est gardée par le chien [[creatures:garm|Garm]]. Contrairement à l’enfer chrétien, ce n’est pas un lieu de châtiment. Le mot anglais « hell » partage pourtant la même origine que le nom de Hel.',
     'titans-cronos': 'Son règne fut plus tard décrit comme un âge d’or, où les hommes vivaient sans travail ni vieillesse. Les Romains l’identifièrent à Saturne, dont les fêtes, les Saturnales, renversaient l’ordre social pendant quelques jours. La faucille reste son attribut.',
     'titans-rhea': 'Elle est souvent rapprochée de Cybèle, la grande déesse mère venue d’Asie Mineure, représentée sur un char tiré par des lions. On l’honorait au son des tambourins et des cymbales, en souvenir des Courètes qui avaient couvert les pleurs de l’enfant.',
     'titans-oceanos': 'Avec son épouse Téthys, il eut trois mille fils, les fleuves, et trois mille filles, les Océanides. Parmi elles, Métis, la première épouse de Zeus. Sur les cartes anciennes, son cours marque la limite du monde connu.',
@@ -1016,7 +1172,7 @@ window.ATLAS = window.ATLAS || {};
     'nordique-loki': 'Fils d’un géant, il est pourtant admis parmi les dieux et devient le frère de sang d’[[odin]]. Changé en jument, il donna naissance à Sleipnir, le cheval d’Odin. Après la mort de Baldr, les dieux l’enchaînent sous un serpent dont le venin lui coule sur le visage.',
     'nordique-freyja': 'Elle possède un manteau de plumes de faucon qui permet de voler, et le collier Brísingamen, forgé par quatre nains. Elle pleure des larmes d’or rouge en cherchant son époux disparu. Maîtresse du seiðr, elle enseigna cette magie à [[odin]].',
     'nordique-frigg': 'Elle file les nuages sur son rouet et partage avec [[odin]] le haut siège d’où l’on voit tous les mondes. Baldr pouvait revenir des enfers si toutes choses le pleuraient ; une seule géante refusa, sans doute [[loki]] déguisé. En anglais, le vendredi lui doit son nom : Friday.',
-    'nordique-fenrir': 'Les dieux brisèrent deux chaînes avant de lui passer Gleipnir, fine comme un ruban, faite du bruit des pas d’un chat, de la barbe d’une femme et des racines d’une montagne. Au Ragnarök, il se libérera et avalera [[odin]].',
+    'creatures-fenrir': 'Les dieux brisèrent deux chaînes avant de lui passer Gleipnir, fine comme un ruban, faite du bruit des pas d’un chat, de la barbe d’une femme et des racines d’une montagne. Au Ragnarök, il se libérera et avalera [[nordique:odin]].',
     'nordique-heimdall': 'On le dit né de neuf mères. Il a besoin de moins de sommeil qu’un oiseau et ses dents sont d’or. Un poème ancien, la Rígsþula, lui attribue l’origine des différentes classes de la société humaine.',
     'nordique-tyr': 'Ancien dieu germanique de la guerre, il fut peu à peu éclipsé par [[odin]]. Au Ragnarök, il affrontera Garm, le chien des enfers, et ils s’entretueront. En anglais, le mardi lui doit son nom : Tuesday.'
   };
@@ -1040,12 +1196,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'astronautes', 'missions', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans'];
+  var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'merveilleux-alice-base',
-      collections: ALL.filter(function (c) { return c !== 'nordique'; }),
+      collections: ALL.filter(function (c) { return ['nordique', 'creatures', 'jotnar', 'mondes'].indexOf(c) === -1; }),
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette
@@ -1074,10 +1230,10 @@ window.ATLAS = window.ATLAS || {};
     {
       id: 'saga', name: 'Saga du Nord', kicker: 'Événement · durée limitée', price: 250, size: 5, theme: 'night', event: true,
       cover: 'nordique-odin-legendary',
-      collections: ['nordique'],
+      collections: ['nordique', 'creatures', 'jotnar', 'mondes'],
       odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
       guarantee: { odds: { rare: 0.8, epic: 0.15, legendary: 0.035, mythic: 0.012, unique: 0.003 } },
-      desc: 'Booster de lancement de la nouvelle collection nordique. Une carte numérotée garantie.',
+      desc: 'Booster de lancement de la nouvelle collection Mythologie nordique : dieux, créatures, géants et neuf mondes. Une carte numérotée garantie.',
       lure: 'legendary',
       hook: 'Odin, Thor, Freyja… La nouvelle salle nordique ouvre ses portes, pour un temps seulement. Une carte numérotée garantie dans chaque booster.'
     }

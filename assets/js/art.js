@@ -202,6 +202,15 @@
       [[-90, 18, 14], [-20, 14, 9], [70, 19, 12]].forEach(function (c) { o += '<ellipse cx="' + f(cx + c[0] * s) + '" cy="' + f(gy - c[1] * s) + '" rx="' + f(c[2] * s) + '" ry="' + f(c[2] * 0.28 * s) + '"/>'; });
       return o + '</g>';
     },
+    // Merveilles du cosmos : un trou noir et son disque de gaz dans le ciel
+    blackhole: function (cx, gy, s, m) {
+      var y = gy - 92 * s, o = '';
+      o += '<ellipse cx="' + f(cx) + '" cy="' + f(y) + '" rx="' + f(72 * s) + '" ry="' + f(14 * s) + '" fill="' + m.sun + '" opacity=".75" transform="rotate(-10 ' + f(cx) + ' ' + f(y) + ')"/>';
+      o += '<circle cx="' + f(cx) + '" cy="' + f(y) + '" r="' + f(30 * s) + '" fill="none" stroke="' + m.sun + '" stroke-width="' + f(5 * s) + '" opacity=".6"/>';
+      o += '<circle cx="' + f(cx) + '" cy="' + f(y) + '" r="' + f(26 * s) + '" fill="' + m.fig + '"/>';
+      o += poly([[cx - 160 * s, gy], [cx - 90 * s, gy - 16 * s], [cx + 20 * s, gy - 10 * s], [cx + 160 * s, gy - 18 * s], [cx + 160 * s, gy]]);
+      return o;
+    },
     // Astronautes : une fusée sur son pas de tir
     rocket: function (cx, gy, s, m) {
       var o = '', b = gy - 4 * s;

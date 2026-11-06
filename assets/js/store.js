@@ -155,8 +155,8 @@
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
   };
-  // Cartes déplacées d’une sous-collection à l’autre (Héraclès, Méduse, Alice, Peter Pan) : on renomme celles déjà possédées.
-  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-', 'contes-alice-': 'merveilleux-alice-', 'contes-peterpan-': 'merveilleux-peterpan-' };
+  // Cartes déplacées d’une sous-collection à l’autre (Héraclès, Méduse, Alice, Peter Pan, Fenrir) : on renomme celles déjà possédées.
+  var MOVED = { 'grece-heracles-': 'heros-heracles-', 'grece-meduse-': 'monstres-meduse-', 'contes-alice-': 'merveilleux-alice-', 'contes-peterpan-': 'merveilleux-peterpan-', 'nordique-fenrir-': 'creatures-fenrir-' };
   function moved(id) { for (var k in MOVED) if (id && id.indexOf(k) === 0) return MOVED[k] + id.slice(k.length); return id; }
   function migrateMoved() {
     var n = 0;
@@ -274,10 +274,11 @@
     grece: ['Initié de l’Olympe', 'Maître de l’Olympe'], egypte: ['Scribe du Nil', 'Gardien des Deux Terres'],
     gothique: ['Veilleur des ombres', 'Seigneur des brumes'], contes: ['Conteur', 'Gardien des contes'],
     histoire: ['Mémorialiste', 'Grand Historien'], nordique: ['Skalde', 'Héraut d’Asgard'],
+    creatures: ['Dompteur de loups', 'Maître des bêtes d’Yggdrasil'], jotnar: ['Visiteur de Jötunheim', 'Seigneur des géants'], mondes: ['Voyageur des mondes', 'Gardien de Bifröst'],
     titans: ['Héritier des Titans', 'Seigneur de l’Othrys'], geants: ['Dompteur de colosses', 'Vainqueur de Phlégra'],
     pharaons: ['Scribe royal', 'Fils de Râ'],
     heros: ['Compagnon des Argonautes', 'Héros légendaire'], monstres: ['Chasseur de monstres', 'Dompteur de chimères'],
-    planetes: ['Astronome amateur', 'Maître des orbites'], lunes: ['Chasseur de lunes', 'Seigneur des satellites'],
+    planetes: ['Astronome amateur', 'Maître des orbites'], cosmos: ['Observateur du ciel profond', 'Maître du cosmos'], lunes: ['Chasseur de lunes', 'Seigneur des satellites'],
     astronautes: ['Cadet de l’espace', 'Vétéran des étoiles'],
     missions: ['Contrôleur de vol', 'Directeur de mission'],
     detectives: ['Apprenti détective', 'Maître de la déduction'],
@@ -362,7 +363,7 @@
   S.duels = function () {
     return (A.DUELS || []).map(function (d) {
       var h = S.ownsChar(d.hero), m = S.ownsChar(d.monster);
-      return Object.assign({ heroOwned: h, monsterOwned: m, done: h && m }, d);
+      return Object.assign({ heroOwned: h, monsterOwned: m, done: h && m, set: d.set || 'grecque' }, d);
     });
   };
   S.trophy = function (cid) { return state.trophies[cid] || null; };

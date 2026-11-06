@@ -118,6 +118,11 @@
       bio: 'La carte de l’île au trésor, dessinée par le capitaine [[flint]], où une croix rouge marque la cachette.',
       more: 'Stevenson eut l’idée du roman en dessinant une carte imaginaire avec son beau-fils, un jour de pluie en Écosse : c’est autour d’elle qu’il construisit toute l’histoire. L’image du trésor marqué d’une croix vient en grande partie de ce livre.'
     },
+    cosmos: {
+      name: 'Le Fond diffus cosmologique', title: 'La Première Lumière', atk: 70, def: 99, esp: 99,
+      bio: 'La plus ancienne lumière de l’Univers, émise environ 380 000 ans après le Big Bang.',
+      more: 'Elle baigne tout le ciel, refroidie aujourd’hui à 2,7 degrés au-dessus du zéro absolu. Deux ingénieurs américains la découvrirent par hasard en 1965 et crurent d’abord à des fientes de pigeon dans leur antenne. Une petite partie de la « neige » des vieilles télévisions venait de ce rayonnement.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',
@@ -134,9 +139,24 @@
       more: 'Ce prénom, très répandu au XVIIIe siècle, devient le surnom de la République pendant la Révolution. Son buste orne les mairies, son profil les timbres et les pièces de monnaie. Le tableau de Delacroix, La Liberté guidant le peuple, peint en 1830, a nourri son image de femme du peuple en marche.'
     },
     nordique: {
+      name: 'Mjöllnir', title: 'Le Marteau de Thor', atk: 99, def: 90, esp: 70,
+      bio: 'Le marteau de [[thor]], forgé par des nains, qui revient toujours dans la main de son maître.',
+      more: 'Les nains Brokk et Eitri le forgèrent à la suite d’un pari avec [[loki]], qui, changé en mouche, piqua le forgeron : le manche en sortit un peu trop court. De petits marteaux de Thor, portés en pendentif, ont été retrouvés dans de nombreuses tombes vikings.'
+    },
+    creatures: {
+      name: 'Fáfnir', title: 'Le Dragon du trésor', atk: 95, def: 92, esp: 72,
+      bio: 'Nain changé en dragon par sa cupidité, il veille sur un trésor maudit.',
+      more: 'Il tua son père pour s’emparer de l’or que [[nordique:loki|Loki]] avait dû livrer en rançon, puis se changea en dragon pour le garder. Le héros Sigurd le tua en le frappant par en dessous, caché dans une fosse. En goûtant son sang, il se mit à comprendre le langage des oiseaux.'
+    },
+    jotnar: {
       name: 'Ymir', title: 'Le Géant primordial', atk: 96, def: 90, esp: 60,
-      bio: 'Premier des géants, né de la rencontre de la glace et du feu, il fut tué par [[odin]] et ses frères, qui façonnèrent le monde à partir de son corps.',
-      more: 'Sa chair devint la terre, son sang les mers, ses os les montagnes, et son crâne la voûte du ciel, soutenue par quatre nains. Ses sourcils servirent à bâtir Midgard, le monde des hommes. Au commencement, il fut nourri par la vache Audhumla.'
-    }
+      bio: 'Premier des géants, né de la rencontre de la glace et du feu, il fut tué par [[nordique:odin|Odin]] et ses frères, qui façonnèrent le monde à partir de son corps.',
+      more: 'Sa chair devint la terre, son sang les mers, ses os les montagnes, et son crâne la voûte du ciel, soutenue par quatre nains. Ses sourcils servirent à bâtir [[mondes:midgard|Midgard]], le monde des hommes. Au commencement, il fut nourri par la vache [[creatures:audhumla|Audhumla]].'
+    },
+    mondes: {
+      name: 'Yggdrasil', title: 'L’Arbre du monde', atk: 70, def: 99, esp: 99,
+      bio: 'Frêne immense dont les branches et les racines relient les neuf mondes.',
+      more: 'Sous ses racines coulent trois sources, dont le puits de Mímir et celui d’Urd, où les Nornes tissent le destin. [[nordique:odin|Odin]] s’y pendit neuf nuits, transpercé de sa lance, pour découvrir le secret des runes. Au Ragnarök, l’arbre tremblera, mais ne tombera pas.'
+    },
   };
 })(window.ATLAS);

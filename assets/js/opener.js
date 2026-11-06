@@ -724,7 +724,8 @@
           }).join('');
         })() +
         newDuels.map(function (d) {
-          return '<a class="sum-reward" href="#/collection/heros" data-close>⚔️ <span><b>Nouvel exploit débloqué</b>' + U.esc(d.title) + '</span>' + U.icon('arrow') + '</a>';
+          var rg = d.set === 'ragnarok';
+          return '<a class="sum-reward" href="#/collection/' + A.CHAR[d.hero].coll + '" data-close>' + (rg ? '🔥' : '⚔️') + ' <span><b>' + (rg ? 'Nouvelle prophétie du Ragnarök' : 'Nouvel exploit débloqué') + '</b>' + U.esc(d.title) + '</span>' + U.icon('arrow') + '</a>';
         }).join('') +
         unlocked.map(function (u) {
           return '<a class="sum-reward" href="' + U.scopeHref(u.coll) + '" data-close>' + U.rewardIcon(u.step.reward) + ' <span><b>' + U.esc(S.scopeName(u.coll)) + ' · ' + U.esc(u.step.label) + '</b>Récompense à récupérer : ' + U.esc(U.rewardText(u.step.reward)) + '</span>' + U.icon('arrow') + '</a>';

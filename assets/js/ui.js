@@ -192,21 +192,34 @@
       '<span class="card-holo"></span><span class="card-sheen"></span><span class="card-shine"></span></div></article>';
   };
   /* Duels héros contre monstre : les deux cartes réunies débloquent le récit de l’exploit */
-  U.duelsHTML = function (opts) {
-    opts = opts || {};
-    var list = A.store.duels(), done = list.filter(function (d) { return d.done; }).length;
+  var DUEL_SETS = {
+    grecque: { head: 'Duels · héros contre monstres', intro: 'Réunissez un héros et son monstre pour débloquer le récit de leur affrontement.', k: 'Exploit', ok: 'débloqué', x: '⚔️', unit: 'exploits' },
+    ragnarok: { head: 'Ragnarök · les combats de la fin du monde', intro: 'Réunissez les deux adversaires pour lire la prophétie de leur dernier combat.', k: 'Prophétie', ok: 'débloquée', x: '🔥', unit: 'prophéties' }
+  };
+  // Jeux de duels qui concernent une collection (ou une collection globale, « @id »)
+  U.duelSetsFor = function (key) {
+    var colls = key.charAt(0) === '@' ? A.GROUP[key.slice(1)].subs : [key], out = [];
+    A.store.duels().forEach(function (d) {
+      if (out.indexOf(d.set) === -1 && (colls.indexOf(A.CHAR[d.hero].coll) !== -1 || colls.indexOf(A.CHAR[d.monster].coll) !== -1)) out.push(d.set);
+    });
+    return out;
+  };
+  U.duelsHTML = function (set) {
+    set = set || 'grecque';
+    var T = DUEL_SETS[set] || DUEL_SETS.grecque;
+    var list = A.store.duels().filter(function (d) { return d.set === set; }), done = list.filter(function (d) { return d.done; }).length;
     function side(id, own) {
       var ch = A.CHAR[id], best = A.store.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
       return '<button type="button" class="du-side' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + '>' +
         '<span class="du-pic">' + A.editionArt(ed, { w: 160, h: 160 }) + '</span><span class="du-name">' + U.esc(ch.name) + '</span>' +
         '<span class="du-own">' + (own ? 'À vous' : 'Manquant') + '</span></button>';
     }
-    return '<div class="du"><div class="rw-head"><p class="eyebrow">Duels · héros contre monstres</p><span class="rw-count">' + done + ' / ' + list.length + ' exploits</span></div>' +
-      '<p class="du-intro muted small">Réunissez un héros et son monstre pour débloquer le récit de leur affrontement.</p>' +
+    return '<div class="du"><div class="rw-head"><p class="eyebrow">' + T.head + '</p><span class="rw-count">' + done + ' / ' + list.length + ' ' + T.unit + '</span></div>' +
+      '<p class="du-intro muted small">' + T.intro + '</p>' +
       '<div class="du-list">' + list.map(function (d, i) {
         return '<article class="du-item' + (d.done ? ' is-done' : '') + '">' +
-          '<div class="du-vs">' + side(d.hero, d.heroOwned) + '<span class="du-x" aria-hidden="true">⚔️</span>' + side(d.monster, d.monsterOwned) + '</div>' +
-          '<p class="du-k">Exploit ' + (i < 9 ? '0' : '') + (i + 1) + (d.done ? ' · débloqué' : '') + '</p>' +
+          '<div class="du-vs">' + side(d.hero, d.heroOwned) + '<span class="du-x" aria-hidden="true">' + T.x + '</span>' + side(d.monster, d.monsterOwned) + '</div>' +
+          '<p class="du-k">' + T.k + ' ' + (i < 9 ? '0' : '') + (i + 1) + (d.done ? ' · ' + T.ok : '') + '</p>' +
           '<h3 class="du-title">' + U.esc(d.title) + '</h3>' +
           (d.done ? '<p class="du-text">' + U.esc(d.text) + '</p>'
             : '<p class="du-lock">🔒 Il vous manque ' + U.esc([!d.heroOwned && A.CHAR[d.hero].name, !d.monsterOwned && A.CHAR[d.monster].name].filter(Boolean).join(' et ')) + '.</p>') +

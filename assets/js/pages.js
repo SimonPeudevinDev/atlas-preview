@@ -233,7 +233,7 @@
         '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack('@' + g.id) + '</div></section>' +
         '<section class="section-tight"><div class="container"><p class="eyebrow">Sous-collections</p>' +
           '<div class="coll-grid is-full" data-subs>' + g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('') + '</div></div></section>' +
-        (g.subs.indexOf('heros') !== -1 ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelsHTML() + '</div></section>' : '');
+        (U.duelSetsFor('@' + g.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor('@' + g.id).map(U.duelsHTML).join('') + '</div></section>' : '');
     },
     mount: function (root, ctx) {
       var g = A.GROUP[ctx.params[0]];
@@ -249,7 +249,7 @@
         root.querySelector('[data-rewards]').innerHTML = U.rewardTrack('@' + g.id);
         root.querySelector('[data-saga-stats]').innerHTML = sagaStats(S.groupProgress(g.id));
         root.querySelector('[data-subs]').innerHTML = g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('');
-        var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelsHTML();
+        var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor('@' + g.id).map(U.duelsHTML).join('');
       };
     }
   };
@@ -284,7 +284,7 @@
           '</div>' +
         '</div></section>' +
         '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack(c.id) + '</div></section>' +
-        (c.id === 'heros' || c.id === 'monstres' ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelsHTML() + '</div></section>' : '') +
+        (U.duelSetsFor(c.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor(c.id).map(U.duelsHTML).join('') + '</div></section>' : '') +
         '<section class="section-tight"><div class="container">' +
           '<div class="toolbar sticky-bar">' +
             '<div class="chips scroll-x" data-f="view">' + views.map(function (v) {
@@ -351,7 +351,7 @@
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelsHTML(); };
+      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
     }
   };
 
