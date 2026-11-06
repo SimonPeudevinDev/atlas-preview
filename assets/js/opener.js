@@ -732,7 +732,10 @@
        (de la plus commune à la meilleure, qui a droit à sa révélation complète). */
     function dealSummary(fromR, unseen) {
       var els = [].slice.call(summaryEl.querySelectorAll('.sum-item'));
-      var fc = center(fromR), gap = Object.keys(unseen).length ? 105 : 85, t = 140;
+      // « Tout révéler » : on veut voir le butin vite, toute la séquence est accélérée
+      var fast = Object.keys(unseen).length > 0;
+      summaryEl.classList.toggle('is-fast', fast);
+      var fc = center(fromR), gap = fast ? 45 : 85, t = fast ? 60 : 140, dur = fast ? 380 : 640;
       els.forEach(function (node, i) {
         var r = node.getBoundingClientRect(), p = center(r);
         var dx = fc.x - p.x, dy = fc.y - p.y, s0 = fromR.width / r.width, rz = (Math.random() - 0.5) * 16;
@@ -743,7 +746,7 @@
             { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s0 + ') rotate(' + (rz * 0.3) + 'deg)', opacity: 1, offset: 0.06 },
             { transform: 'translate(' + (dx * 0.35) + 'px,' + (dy * 0.35 - 70) + 'px) scale(' + (1 + (s0 - 1) * 0.3) + ') rotate(' + rz + 'deg)', offset: 0.55 },
             { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 }
-          ], { duration: 640, delay: delay, easing: 'cubic-bezier(.25,.7,.25,1)', fill: 'backwards' });
+          ], { duration: dur, delay: delay, easing: 'cubic-bezier(.25,.7,.25,1)', fill: 'backwards' });
         }
         setTimeout(function () {
           if (closed) return;
@@ -751,21 +754,22 @@
           SFX.deal(0, 0.75); A.haptic(4);
           var c = center(node.getBoundingClientRect());
           fx.burst({ x: c.x, y: c.y + r.height * 0.45, w: r.width, n: 6, colors: ['#FFF6DE', '#D8BC80'], shape: 'dust', speed: 1.2, angle: -Math.PI / 2, spread: 1.4, grav: 0.02, life: 700, size: 0.9 });
-        }, delay + 600);
+        }, delay + dur - 40);
       });
-      var tEnd = t + els.length * gap + 650;
+      var tEnd = t + els.length * gap + dur + 10;
+      var step = fast ? 130 : 300, charge = fast ? 250 : 450;
       // retournements en cascade
       var down = els.filter(function (n) { return n.classList.contains('is-down'); });
       down.forEach(function (node, j) {
         var it = items[+node.getAttribute('data-i')], r = rankOf(it), last = j === down.length - 1;
-        var at = tEnd + 200 + j * 300 + (last && r >= 3 ? 450 : 0);
+        var at = tEnd + (fast ? 60 : 200) + j * step + (last && r >= 3 ? charge : 0);
         if (last && r >= 3) setTimeout(function () {          // la meilleure se charge avant de se retourner
           if (closed) return;
           node.classList.add('is-charging'); SFX.charge(r, 0.6); A.haptic([8, 50, 8, 50, 8]);
-        }, at - 650);
+        }, at - charge - 200);
         setTimeout(function () { if (!closed) flipSummary(node, r, last); }, at);
       });
-      var done = down.length ? tEnd + 200 + down.length * 300 + 900 : tEnd;
+      var done = down.length ? tEnd + (fast ? 60 : 200) + down.length * step + 900 : tEnd;
       if (!down.length) setTimeout(function () { if (!closed) SFX.reveal(Math.min(2, rankOf(items[items.length - 1]))); }, tEnd - 200);
       setTimeout(function () { if (!closed) summaryEl.classList.remove('is-dealing'); }, done);
     }

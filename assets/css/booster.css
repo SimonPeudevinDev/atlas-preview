@@ -344,6 +344,7 @@
 .sum-back { position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 63 / 88; transform: rotateY(180deg); }
 .sum-back .card-back { box-shadow: 0 18px 44px rgba(0,0,0,.45); }
 .sum-item.is-down .sum-flip { transform: rotateY(180deg); }
+.is-fast .sum-flip { transition-duration: .42s; }
 .sum-item.is-down .sum-cap { opacity: 0; }
 .sum-cap { transition: opacity .5s ease .25s; }
 .sum-item::after { content: ""; position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 63 / 88; border-radius: 7px; pointer-events: none; opacity: 0;
