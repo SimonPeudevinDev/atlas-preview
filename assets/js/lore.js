@@ -3,7 +3,7 @@
    Pour chaque personnage : une introduction, des chapitres dans l’ordre du récit,
    des repères et ses liens avec les autres figures.
    [[slug]] ou [[slug|texte]] = lien vers un personnage de la même collection.
-   Dans « liens » : c = slug d’un personnage de la collection (cliquable),
+   Dans « arbre » et « autres » : c = slug d’un personnage de la collection (cliquable),
    n = nom d’une figure absente de la collection (texte simple).
    Un personnage sans chronique garde le paragraphe « Voir plus » de data.js.
    ========================================================================== */
@@ -46,28 +46,24 @@
         ['Chez les Romains', 'Jupiter'],
         ['À lire', 'Hésiode, Théogonie · Homère, Iliade · Ovide, Métamorphoses']
       ],
-      liens: [
-        { g: 'Famille', items: [
-          { n: 'Cronos', rel: 'Père', note: 'Le Titan qu’il détrôna.' },
-          { n: 'Rhéa', rel: 'Mère', note: 'Elle le sauva en trompant Cronos.' },
-          { c: 'hera', rel: 'Sœur et épouse', note: 'Reine des dieux, elle ne lui pardonne aucune infidélité.' },
-          { c: 'poseidon', rel: 'Frère', note: 'Il reçut les mers lors du partage du monde.' },
-          { c: 'hades', rel: 'Frère', note: 'Il reçut le royaume des morts.' }
-        ] },
-        { g: 'Enfants', items: [
-          { c: 'athena', rel: 'Fille', note: 'Née tout armée de sa tête.' },
-          { c: 'apollon', rel: 'Fils', note: 'Né de Léto sur l’île de Délos.' },
-          { c: 'artemis', rel: 'Fille', note: 'Sœur jumelle d’Apollon.' },
-          { c: 'heracles', rel: 'Fils', note: 'Né de la mortelle Alcmène, il aida les dieux contre les Géants.' },
-          { n: 'Hermès', rel: 'Fils', note: 'Messager des dieux.' },
-          { n: 'Dionysos', rel: 'Fils', note: 'Né de sa cuisse.' },
-          { n: 'Persée', rel: 'Fils', note: 'Né de Danaé et de la pluie d’or.' }
-        ] },
-        { g: 'Adversaires et liens indirects', items: [
-          { c: 'meduse', rel: 'Victime de son fils', note: 'Persée la décapita ; sa tête orne l’égide d’Athéna.' },
-          { n: 'Prométhée', rel: 'Rival', note: 'Puni pour avoir donné le feu aux hommes.' },
-          { n: 'Typhon', rel: 'Ennemi', note: 'Dernier monstre lancé contre son règne.' }
-        ] }
+      // Arbre : parents, fratrie (le personnage y est mis en avant), enfants regroupés par mère
+      arbre: {
+        parents: { label: 'Les Titans', a: { n: 'Cronos' }, b: { n: 'Rhéa' } },
+        fratrie: [{ n: 'Hestia' }, { n: 'Déméter' }, { c: 'hades' }, { c: 'poseidon' }, { c: 'hera', tag: 'et épouse' }],
+        enfants: [
+          { mere: { c: 'hera' }, enf: [{ n: 'Arès' }, { n: 'Hébé' }] },
+          { mere: { n: 'Métis' }, enf: [{ c: 'athena' }] },
+          { mere: { n: 'Léto' }, enf: [{ c: 'apollon' }, { c: 'artemis' }] },
+          { mere: { n: 'Maïa' }, enf: [{ n: 'Hermès' }] },
+          { mere: { n: 'Alcmène' }, mortelle: true, enf: [{ c: 'heracles' }] },
+          { mere: { n: 'Sémélé' }, mortelle: true, enf: [{ n: 'Dionysos' }] },
+          { mere: { n: 'Danaé' }, mortelle: true, enf: [{ n: 'Persée' }] }
+        ]
+      },
+      autres: [
+        { c: 'meduse', rel: 'Victime de son fils', note: 'Persée la décapita ; sa tête orne l’égide d’Athéna.' },
+        { n: 'Prométhée', rel: 'Rival', note: 'Puni pour avoir donné le feu aux hommes.' },
+        { n: 'Typhon', rel: 'Ennemi', note: 'Dernier monstre lancé contre son règne.' }
       ]
     }
   };

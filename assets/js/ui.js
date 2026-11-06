@@ -265,34 +265,89 @@
      au récit complet, à ses repères et à ses liens avec les autres figures. */
   var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
   function loreHTML(ch, coll) {
-    var L = ch.lore;
-    var chapters = L.chapitres.map(function (c, i) {
-      return '<section class="lore-ch"><h3 class="lore-h"><span class="lore-num">' + ROMAN[i] + '</span>' + U.esc(c.t) + '</h3>' +
-        c.p.map(function (t) { return '<p>' + bioHTML(ch, t) + '</p>'; }).join('') + '</section>';
+    var L = ch.lore, n = L.chapitres.length;
+    // Chapitres : un par diapositive, à faire glisser sur le côté
+    var slides = L.chapitres.map(function (c, i) {
+      return '<section class="lore-ch" aria-roledescription="chapitre" aria-label="Chapitre ' + (i + 1) + ' sur ' + n + '">' +
+        '<p class="lore-num">Chapitre ' + ROMAN[i] + '<span> / ' + ROMAN[n - 1] + '</span></p>' +
+        '<h3 class="lore-h">' + U.esc(c.t) + '</h3>' +
+        c.p.map(function (t) { return '<p>' + bioHTML(ch, t) + '</p>'; }).join('') +
+        (i < n - 1 ? '<button type="button" class="lore-next" data-lore-to="' + (i + 1) + '">' + U.esc(L.chapitres[i + 1].t) + U.icon('arrow') + '</button>' : '') +
+      '</section>';
     }).join('');
+    var dots = L.chapitres.map(function (c, i) {
+      return '<button type="button" class="lore-dot' + (i ? '' : ' is-on') + '" data-lore-to="' + i + '" aria-label="Chapitre ' + (i + 1) + ' : ' + U.esc(c.t) + '"></button>';
+    }).join('');
+    var slider = '<div class="lore-slider">' +
+      '<div class="lore-bar"><div class="lore-dots">' + dots + '</div>' +
+        '<div class="lore-arrows"><button type="button" class="cn-btn" data-lore-go="-1" aria-label="Chapitre précédent" disabled>' + U.icon('chevL') + '</button>' +
+        '<button type="button" class="cn-btn" data-lore-go="1" aria-label="Chapitre suivant">' + U.icon('chevR') + '</button></div></div>' +
+      '<div class="lore-track">' + slides + '</div></div>';
+
     var reperes = '<dl class="lore-facts">' + L.reperes.map(function (r) {
       return '<div><dt>' + U.esc(r[0]) + '</dt><dd>' + U.esc(r[1]) + '</dd></div>';
     }).join('') + '</dl>';
-    var liens = L.liens.map(function (grp) {
-      return '<div class="lore-group"><p class="lore-gname">' + U.esc(grp.g) + '</p><ul class="lore-links">' + grp.items.map(function (it) {
-        var o = it.c && A.CHAR[ch.coll + '-' + it.c];
-        var name = o
-          ? '<button type="button" class="lore-name is-in" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + U.esc(o.name) + U.icon('arrow') + '</button>'
-          : '<span class="lore-name">' + U.esc(it.n || it.c) + '</span>';
-        return '<li class="' + (o ? 'is-in' : 'is-out') + '"><span class="lore-rel">' + U.esc(it.rel) + '</span>' + name + '<span class="lore-note">' + U.esc(it.note) + '</span></li>';
-      }).join('') + '</ul></div>';
-    }).join('');
+
+    // Arbre généalogique : une colonne de générations reliées par un fil doré
+    function node(x, cls) {
+      var o = x.c && A.CHAR[ch.coll + '-' + x.c];
+      var tag = x.tag ? '<small>' + U.esc(x.tag) + '</small>' : '';
+      if (o) return '<button type="button" class="tn is-in' + (cls ? ' ' + cls : '') + '" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + U.esc(o.name) + tag + U.icon('arrow') + '</button>';
+      return '<span class="tn' + (cls ? ' ' + cls : '') + '">' + U.esc(x.n || x.c) + tag + '</span>';
+    }
+    var T = L.arbre, tree = '';
+    if (T) {
+      tree = '<ol class="tree">' +
+        '<li class="tg"><p class="tg-k">' + U.esc(T.parents.label) + '</p><div class="tg-row">' + node(T.parents.a) + '<span class="tn-union" aria-label="unis à">⚭</span>' + node(T.parents.b) + '</div></li>' +
+        '<li class="tg is-self"><p class="tg-k">Ses frères et sœurs</p><div class="tg-row">' +
+          '<span class="tn is-self">' + U.esc(ch.name) + '</span>' + T.fratrie.map(function (x) { return node(x); }).join('') + '</div></li>' +
+        '<li class="tg"><p class="tg-k">Ses enfants, selon leur mère</p><div class="tg-kids">' + T.enfants.map(function (g) {
+          return '<div class="tk"><p class="tk-m">avec ' + (g.mere.c && A.CHAR[ch.coll + '-' + g.mere.c] ? '<button type="button" class="tk-link" data-bio-char="' + ch.coll + '-' + g.mere.c + '">' + U.esc(A.CHAR[ch.coll + '-' + g.mere.c].name) + '</button>' : U.esc(g.mere.n)) +
+            (g.mortelle ? ' <span class="tk-mortal">mortelle</span>' : '') + '</p><div class="tg-row">' + g.enf.map(function (x) { return node(x); }).join('') + '</div></div>';
+        }).join('') + '</div></li>' +
+      '</ol>';
+    }
+    var autres = (L.autres || []).length ? '<p class="lore-sub">Adversaires et liens indirects</p><ul class="lore-links">' + L.autres.map(function (it) {
+      var o = it.c && A.CHAR[ch.coll + '-' + it.c];
+      var name = o
+        ? '<button type="button" class="lore-name is-in" data-bio-char="' + o.id + '">' + U.esc(o.name) + U.icon('arrow') + '</button>'
+        : '<span class="lore-name">' + U.esc(it.n) + '</span>';
+      return '<li class="' + (o ? 'is-in' : 'is-out') + '"><span class="lore-rel">' + U.esc(it.rel) + '</span>' + name + '<span class="lore-note">' + U.esc(it.note) + '</span></li>';
+    }).join('') + '</ul>' : '';
+
     return '<div class="detail-info lore">' +
       '<button type="button" class="lore-back" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
       '<p class="eyebrow">Chronique · ' + U.esc(coll.family) + '</p>' +
       '<h2 class="detail-name">' + U.esc(ch.name) + '</h2>' +
       '<p class="detail-title">' + U.esc(ch.title) + '</p>' +
       '<p class="lore-intro">' + bioHTML(ch, L.intro) + '</p>' +
-      '<div class="lore-body">' + chapters + '</div>' +
+      slider +
+      '<div class="lore-block"><p class="eyebrow">Arbre généalogique</p>' +
+        '<p class="lore-legend"><span class="tn is-in is-mini">Doré</span> dans la collection, touchez pour ouvrir sa fiche</p>' + tree + autres + '</div>' +
       '<div class="lore-block"><p class="eyebrow">Repères</p>' + reperes + '</div>' +
-      '<div class="lore-block"><p class="eyebrow">Ses liens</p><p class="lore-hint muted small">Les noms soulignés d’une flèche sont dans la collection : touchez-les pour ouvrir leur fiche.</p>' + liens + '</div>' +
       '<button type="button" class="lore-back is-end" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
     '</div>';
+  }
+  // Glissière des chapitres : points, flèches et hauteur suivent le chapitre affiché
+  function loreSync(root) {
+    var track = root.querySelector('.lore-track'); if (!track) return;
+    var slides = track.children, i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    [].forEach.call(root.querySelectorAll('.lore-dot'), function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    var arrows = root.querySelectorAll('[data-lore-go]');
+    arrows[0].disabled = i === 0; arrows[1].disabled = i === slides.length - 1;
+    track.style.height = slides[i].offsetHeight + 'px';
+  }
+  function loreGo(root, i) {
+    var track = root.querySelector('.lore-track'); if (!track) return;
+    i = Math.max(0, Math.min(track.children.length - 1, i));
+    track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+    // ramène le haut du chapitre à l’écran si on a lu jusqu’en bas
+    var panel = root.closest('.modal-panel'), bar = root.querySelector('.lore-bar');
+    if (panel && bar) {
+      var dy = bar.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+      if (dy < 0) panel.scrollBy({ top: dy - 12, behavior: 'smooth' });
+    }
   }
   function suggestPrice(rid) { return { base: 30, rare: 180, epic: 520, legendary: 1600, mythic: 4500, unique: 25000 }[rid]; }
 
@@ -376,9 +431,15 @@
             }
           }
           updateNav();
+          loreSync(el);
         }
         draw();
-        el.addEventListener('scroll', function (e) { if (e.target.classList && e.target.classList.contains('is-row')) updateNav(); }, true);
+        el.addEventListener('scroll', function (e) {
+          if (!e.target.classList) return;
+          if (e.target.classList.contains('is-row')) updateNav();
+          if (e.target.classList.contains('lore-track')) { clearTimeout(e.target._t); e.target._t = setTimeout(function () { loreSync(el); }, 60); }
+        }, true);
+        window.addEventListener('resize', function () { loreSync(el); });
         // Molette verticale → défilement horizontal de la rangée d’exemplaires.
         el.addEventListener('wheel', function (e) {
           var row = e.target.closest && e.target.closest('.copies.is-row');
@@ -392,6 +453,12 @@
             var own = S.ownedOf(cur.ed);
             cur.uid = own[0] ? own[0].uid : null;
             draw(); return;
+          }
+          if ((t = e.target.closest('[data-lore-to]'))) { loreGo(el, +t.getAttribute('data-lore-to')); return; }
+          if ((t = e.target.closest('[data-lore-go]'))) {
+            var tr = el.querySelector('.lore-track');
+            loreGo(el, Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth)) + +t.getAttribute('data-lore-go'));
+            return;
           }
           if ((t = e.target.closest('[data-cn-page]'))) {
             var rp = el.querySelector('.copies.is-row'), u = rp.querySelector('.copy').offsetWidth + 8;
