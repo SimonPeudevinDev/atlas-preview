@@ -872,6 +872,46 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .detail-more p { margin: 0; max-width: 620px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); animation: moreIn .35s var(--ease-out); }
 @keyframes moreIn { from { opacity: 0; transform: translateY(4px); } }
 .detail-block { padding: 20px 0; border-top: 1px solid var(--line); }
+
+/* Chronique (« Voir plus » d’un personnage qui a une histoire complète) */
+.lore { animation: moreIn .35s var(--ease-out); }
+.lore-back { display: inline-flex; align-items: center; gap: 4px; margin: -6px 0 18px -4px; padding: 6px 8px 6px 4px; font-size: 13px; font-weight: 500; color: var(--ink-2); border-radius: var(--radius); cursor: pointer; }
+.lore-back .ic { width: 16px; height: 16px; }
+.lore-back:hover { color: var(--ink); background: var(--bg-2); }
+.lore-back.is-end { margin: 24px 0 0 -4px; }
+.lore-intro { font-family: var(--serif); font-size: 21px; line-height: 1.45; color: var(--ink); max-width: 620px; margin: 4px 0 28px; text-wrap: pretty; }
+.lore-body { max-width: 620px; }
+.lore-ch { padding: 22px 0 6px; border-top: 1px solid var(--line); }
+.lore-h { display: flex; align-items: baseline; gap: 12px; font-family: var(--serif); font-weight: 500; font-size: 25px; line-height: 1.15; margin: 0 0 12px; text-wrap: balance; }
+.lore-num { flex: none; min-width: 30px; font-size: 15px; letter-spacing: .08em; color: var(--gold); }
+.lore-ch p { margin: 0 0 14px; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.lore-block { padding: 22px 0 4px; border-top: 1px solid var(--line); max-width: 620px; }
+.lore-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 28px; margin: 0 0 12px; }
+.lore-facts div { min-width: 0; }
+.lore-facts dt { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 3px; }
+.lore-facts dd { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink); }
+.lore-hint { margin: -4px 0 16px; }
+.lore-group { margin: 0 0 18px; }
+.lore-gname { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--ink-2); margin: 0 0 8px; }
+.lore-links { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.lore-links li { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 11px 14px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.lore-links li.is-out { background: transparent; border-style: dashed; }
+.lore-rel { font-size: 10.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.lore-name { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 0; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; color: var(--ink); text-align: left; }
+.lore-name.is-in { cursor: pointer; text-decoration: underline; text-decoration-color: var(--gold-2); text-decoration-thickness: 1px; text-underline-offset: 4px; transition: color .2s; }
+.lore-name.is-in .ic { width: 14px; height: 14px; color: var(--gold); transition: transform .25s var(--ease); }
+.lore-name.is-in:hover { color: var(--gold); }
+.lore-name.is-in:hover .ic { transform: translateX(3px); }
+.lore-links li.is-out .lore-name { color: var(--ink-2); }
+.lore-note { font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+.lore-name:focus-visible, .lore-back:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 480px) {
+  .lore-intro { font-size: 19px; }
+  .lore-h { font-size: 22px; gap: 10px; }
+  .lore-num { min-width: 24px; font-size: 13px; }
+  .lore-links { grid-template-columns: 1fr; }
+  .lore-facts { gap: 12px 18px; }
+}
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-bottom: 14px; }
 .stat { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "l b" "bar bar"; align-items: baseline; gap: 6px 10px; font-size: 13px; }
 .stat-l { grid-area: l; color: var(--ink-3); }

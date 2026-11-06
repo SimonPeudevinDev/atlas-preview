@@ -236,12 +236,13 @@
         '<div class="ed-tabs" role="tablist">' + tabs + '</div>' +
         '<p class="placeholder-note">' + U.icon('sparkle') + 'Illustration provisoire — emplacement remplaçable</p>' +
       '</div>' +
+      (more && ch.lore ? loreHTML(ch, coll) :
       '<div class="detail-info">' +
         '<p class="eyebrow">' + U.esc(coll.family) + ' · ' + U.esc(coll.name) + '</p>' +
         '<h2 class="detail-name">' + U.esc(ch.name) + '</h2>' +
         '<p class="detail-title">' + U.esc(ch.title) + '</p>' +
         '<p class="detail-bio">' + bioHTML(ch, ch.story || ch.bio) +
-          (ch.more ? ' <button type="button" class="bio-more" data-act="bio-more" aria-expanded="' + !!more + '">' + (more ? 'Voir moins' : 'Voir plus') + '</button>' : '') + '</p>' +
+          (ch.more || ch.lore ? ' <button type="button" class="bio-more" data-act="bio-more" aria-expanded="' + !!more + '">' + (more ? 'Voir moins' : 'Voir plus') + '</button>' : '') + '</p>' +
         // « Voir plus » : le complément prend la place des statistiques (la fiche garde sa hauteur, sans défilement)
         (more && ch.more
           ? '<div class="detail-block detail-more"><p>' + bioHTML(ch, ch.more) + '</p></div>'
@@ -257,7 +258,41 @@
         '<div class="detail-block detail-split' + (prov ? '' : ' is-single') + '"><div class="detail-copies"><p class="eyebrow">Vos exemplaires' + (owned.length > 1 && !isBase ? ' <span class="eyebrow-count">' + owned.length + '</span>' : '') +
           '<span class="copies-nav" hidden><button class="cn-btn" data-cn="-1" aria-label="Exemplaires précédents">' + U.icon('chevL') + '</button><span class="cn-count"></span><button class="cn-btn" data-cn="1" aria-label="Exemplaires suivants">' + U.icon('chevR') + '</button></span></p><div class="copies is-row">' + copies + '</div></div>' + prov + '</div>' +
         (item ? actions : '<div class="detail-actions">' + marketLink + '</div>') +
-      '</div></div>';
+      '</div>') + '</div>';
+  }
+
+  /* « Voir plus » d’un personnage qui a une chronique (lore.js) : la colonne d’infos laisse place
+     au récit complet, à ses repères et à ses liens avec les autres figures. */
+  var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+  function loreHTML(ch, coll) {
+    var L = ch.lore;
+    var chapters = L.chapitres.map(function (c, i) {
+      return '<section class="lore-ch"><h3 class="lore-h"><span class="lore-num">' + ROMAN[i] + '</span>' + U.esc(c.t) + '</h3>' +
+        c.p.map(function (t) { return '<p>' + bioHTML(ch, t) + '</p>'; }).join('') + '</section>';
+    }).join('');
+    var reperes = '<dl class="lore-facts">' + L.reperes.map(function (r) {
+      return '<div><dt>' + U.esc(r[0]) + '</dt><dd>' + U.esc(r[1]) + '</dd></div>';
+    }).join('') + '</dl>';
+    var liens = L.liens.map(function (grp) {
+      return '<div class="lore-group"><p class="lore-gname">' + U.esc(grp.g) + '</p><ul class="lore-links">' + grp.items.map(function (it) {
+        var o = it.c && A.CHAR[ch.coll + '-' + it.c];
+        var name = o
+          ? '<button type="button" class="lore-name is-in" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + U.esc(o.name) + U.icon('arrow') + '</button>'
+          : '<span class="lore-name">' + U.esc(it.n || it.c) + '</span>';
+        return '<li class="' + (o ? 'is-in' : 'is-out') + '"><span class="lore-rel">' + U.esc(it.rel) + '</span>' + name + '<span class="lore-note">' + U.esc(it.note) + '</span></li>';
+      }).join('') + '</ul></div>';
+    }).join('');
+    return '<div class="detail-info lore">' +
+      '<button type="button" class="lore-back" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
+      '<p class="eyebrow">Chronique · ' + U.esc(coll.family) + '</p>' +
+      '<h2 class="detail-name">' + U.esc(ch.name) + '</h2>' +
+      '<p class="detail-title">' + U.esc(ch.title) + '</p>' +
+      '<p class="lore-intro">' + bioHTML(ch, L.intro) + '</p>' +
+      '<div class="lore-body">' + chapters + '</div>' +
+      '<div class="lore-block"><p class="eyebrow">Repères</p>' + reperes + '</div>' +
+      '<div class="lore-block"><p class="eyebrow">Ses liens</p><p class="lore-hint muted small">Les noms soulignés d’une flèche sont dans la collection : touchez-les pour ouvrir leur fiche.</p>' + liens + '</div>' +
+      '<button type="button" class="lore-back is-end" data-act="bio-more">' + U.icon('chevL') + 'Retour à la fiche</button>' +
+    '</div>';
   }
   function suggestPrice(rid) { return { base: 30, rare: 180, epic: 520, legendary: 1600, mythic: 4500, unique: 25000 }[rid]; }
 
@@ -381,7 +416,17 @@
           }
           if ((t = e.target.closest('[data-act]'))) {
             var act = t.getAttribute('data-act');
-            if (act === 'bio-more') { cur.more = !cur.more; draw(); return; }
+            if (act === 'bio-more') {
+              cur.more = !cur.more; draw();
+              var A0 = A.CHAR[A.ED[cur.ed].charId];
+              if (A0.lore) {
+                var panel = el.closest('.modal-panel') || el, info = el.querySelector('.detail-info');
+                var single = window.matchMedia('(max-width: 900px)').matches;
+                var top = single && info ? info.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop - 8 : 0;
+                panel.scrollTo({ top: Math.max(0, top), behavior: cur.more ? 'smooth' : 'auto' });
+              }
+              return;
+            }
             if (act === 'zoom') { var it = cur.uid && S.item(cur.uid); U.viewCard(cur.ed, it ? it.serial : null); return; }
             if (act === 'fav') { S.toggleFav(cur.uid); draw(); }
             if (act === 'show') { S.toggleShow(cur.uid); draw(); }
