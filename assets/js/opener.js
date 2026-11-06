@@ -907,6 +907,8 @@
     el.addEventListener('pointercancel', endDrag);
 
     // Pile de cartes : glisser pour lancer, toucher pour ranger (la suivante se présente aussitôt)
+    var PEEK = 0.11;                                     // décalage visible maximal, en part de la largeur de carte
+    function rubber(d, max) { return (d < 0 ? -1 : 1) * max * (1 - Math.exp(-Math.abs(d) / max)); }
     stack.addEventListener('pointerdown', function (e) {
       if (phase !== 'reveal' || busy) return;
       var c = cards[cur];
@@ -921,8 +923,11 @@
       if (!sw.shown || !sw.moved) return;
       if (c.state !== 'drag') unveilNext();
       c.state = 'drag';
-      c.st.x = sw.ox + dx; c.st.y = sw.oy + dy * 0.4; c.st.rz = dx * 0.05;
-      c.st.ty = clamp(dx * 0.09, -24, 24); c.st.tx = clamp(-dy * 0.05, -10, 10);
+      // Coup d’œil limité : la carte résiste au-delà d’un petit décalage, pour entrevoir le cadre
+      // (la rareté) de la suivante sans la dévoiler. Le lancer se juge toujours sur le geste réel.
+      var pw = c.el.offsetWidth * PEEK, vx = rubber(dx, pw), vy = rubber(dy * 0.4, pw * 0.35);
+      c.st.x = sw.ox + vx; c.st.y = sw.oy + vy; c.st.rz = vx * 0.05;
+      c.st.ty = clamp(vx * 0.09, -24, 24); c.st.tx = clamp(-vy * 0.12, -10, 10);
       draw(c);
       var now = performance.now();
       sw.v = (e.clientX - sw.lx) / Math.max(1, now - sw.lt);
