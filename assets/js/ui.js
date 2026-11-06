@@ -637,14 +637,100 @@
   /* ---------- Visionneuse plein écran ----------
      La carte s’affiche en très grand sur fond sombre ; inclinaison, reflets et
      relief suivent la souris. Fermeture : clic sur le fond, bouton ou Échap. */
+  /* ---------- Inclinaison sur téléphone ----------
+     · au doigt : on fait glisser le doigt sur la grande carte (fiche, visionneuse) ;
+     · au gyroscope : la carte suit l’inclinaison du téléphone (iOS demande une autorisation,
+       accordée d’un geste : bouton dans la visionneuse).
+     Mêmes variables CSS que l’effet de la souris : reflets, holographie et cadre réagissent pareil. */
+  function setTilt(c, x, y) {
+    x = Math.max(0, Math.min(1, x)); y = Math.max(0, Math.min(1, y));
+    c.classList.add('is-hover');
+    c.style.setProperty('--rx', ((0.5 - y) * 13).toFixed(2) + 'deg');
+    c.style.setProperty('--ry', ((x - 0.5) * 16).toFixed(2) + 'deg');
+    c.style.setProperty('--fa', (Math.atan2(y - 0.5, x - 0.5) * 180 / Math.PI + 64).toFixed(1) + 'deg');
+    c.style.setProperty('--px', (0.5 - x).toFixed(3));
+    c.style.setProperty('--py', (0.5 - y).toFixed(3));
+    c.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+    c.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+  }
+  function clearTilt(c) { if (!c) return; ['--rx', '--ry', '--px', '--py', '--fa', '--mx', '--my'].forEach(function (p) { c.style.removeProperty(p); }); c.classList.remove('is-hover'); }
+  U.setTilt = setTilt; U.clearTilt = clearTilt;
+  var BIG = '.cv-card .card, .detail-card .card';
+  var gyro = { on: false, b0: null, x: .5, y: .5, tx: .5, ty: .5, raf: 0 }, drag = null;
+  function bigCard() {
+    var all = document.querySelectorAll(BIG);
+    return all.length ? all[all.length - 1] : null;      // la visionneuse passe devant la fiche
+  }
+  function gyroStep() {
+    gyro.raf = 0;
+    var c = bigCard();
+    if (!c || drag) return;
+    gyro.x += (gyro.tx - gyro.x) * .18; gyro.y += (gyro.ty - gyro.y) * .18;
+    setTilt(c, gyro.x, gyro.y);
+    if (Math.abs(gyro.tx - gyro.x) + Math.abs(gyro.ty - gyro.y) > .002) gyro.raf = requestAnimationFrame(gyroStep);
+  }
+  function onOrient(e) {
+    if (e.beta == null || e.gamma == null) return;
+    if (gyro.b0 == null) gyro.b0 = e.beta;                   // position de départ = carte « à plat »
+    gyro.b0 += (e.beta - gyro.b0) * .01;                     // dérive lente : on suit la façon dont on tient le téléphone
+    gyro.tx = .5 + e.gamma / 50; gyro.ty = .5 + (e.beta - gyro.b0) / 40;
+    if (!gyro.raf) gyro.raf = requestAnimationFrame(gyroStep);
+  }
+  U.gyroNeedsPermission = function () { return !gyro.on && window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function'; };
+  U.enableGyro = function () {
+    if (gyro.on || !window.DeviceOrientationEvent) return Promise.resolve(gyro.on);
+    var ask = typeof DeviceOrientationEvent.requestPermission === 'function' ? DeviceOrientationEvent.requestPermission() : Promise.resolve('granted');
+    return ask.then(function (r) {
+      if (r !== 'granted') return false;
+      gyro.on = true; window.addEventListener('deviceorientation', onOrient);
+      try { sessionStorage.setItem('atlas-gyro', '1'); } catch (e) { /* */ }
+      return true;
+    }, function () { return false; });
+  };
+  function bindTouchTilt() {
+    // Android : pas d’autorisation à demander, le gyroscope est actif d’office sur les écrans tactiles
+    if (window.matchMedia('(pointer: coarse)').matches && window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') U.enableGyro();
+    var moved = 0;
+    document.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      var c = e.target.closest && e.target.closest(BIG);
+      if (!c) return;
+      drag = { c: c, x0: e.clientX, y0: e.clientY };
+      moved = 0;
+    }, { passive: true });
+    document.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerType === 'mouse') return;
+      var b = drag.c.getBoundingClientRect();
+      if (Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) > 8) moved = Date.now();
+      setTilt(drag.c, (e.clientX - b.left) / b.width, (e.clientY - b.top) / b.height);
+    }, { passive: true });
+    function end() {
+      if (!drag) return;
+      var c = drag.c; drag = null;
+      if (gyro.on) { if (!gyro.raf) gyro.raf = requestAnimationFrame(gyroStep); } else clearTilt(c);
+    }
+    document.addEventListener('pointerup', end, { passive: true });
+    document.addEventListener('pointercancel', end, { passive: true });
+    // Un glissé pour incliner ne doit pas compter comme un toucher (ouvrir la visionneuse…)
+    document.addEventListener('click', function (e) {
+      if (moved && Date.now() - moved < 400 && e.target.closest && e.target.closest('.detail-card, .cv-card')) { e.stopPropagation(); e.preventDefault(); moved = 0; }
+    }, true);
+  }
+
   U.viewCard = function (edId, serial) {
     var root = document.getElementById('overlay-root') || document.body;
     var el = document.createElement('div');
     el.className = 'card-viewer';
     el.innerHTML = '<button class="cv-close" aria-label="Fermer">' + U.icon('close') + '</button>' +
       '<div class="cv-stage"><div class="cv-card">' + U.card(edId, { serial: serial, open: false, artScale: 3, priority: true }) + '</div></div>' +
-      '<p class="cv-hint">Bougez la souris pour faire jouer la lumière · Échap pour fermer</p>';
+      '<p class="cv-hint">' + (window.matchMedia('(pointer: coarse)').matches ? 'Glissez le doigt sur la carte pour faire jouer la lumière' : 'Bougez la souris pour faire jouer la lumière · Échap pour fermer') + '</p>' +
+      (U.gyroNeedsPermission() ? '<button class="cv-gyro" type="button">' + U.icon('sparkle') + 'Incliner avec le téléphone</button>' : '');
     root.appendChild(el);
+    var gb = el.querySelector('.cv-gyro');
+    if (gb) gb.addEventListener('click', function (e) {
+      e.stopPropagation();
+      U.enableGyro().then(function (ok) { gb.remove(); if (!ok) U.toast('Inclinaison refusée : vous pouvez toujours glisser le doigt sur la carte'); });
+    });
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     function close() {
       document.removeEventListener('keydown', onKey, true);
@@ -814,6 +900,7 @@
       var c = e.target.closest && e.target.closest('.card[data-open]');
       if (c) U.openCard(c.getAttribute('data-ed'), c.getAttribute('data-uid'));
     });
+    bindTouchTilt();
     // Inclinaison douce au survol (pointeur fin uniquement)
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     // (effet déclenché par la souris : conservé même en « animations réduites », sinon il disparaît sur beaucoup de PC Windows)

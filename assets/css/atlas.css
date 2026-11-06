@@ -1600,3 +1600,10 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .ms-grid::-webkit-scrollbar { display: none; }
   .ms-card { padding: 16px; scroll-snap-align: start; }
 }
+
+/* Inclinaison au doigt : la visionneuse capte tous les gestes, la fiche laisse défiler verticalement */
+.cv-card .card { touch-action: none; }
+.detail-card .card { touch-action: pan-y; }
+.cv-gyro { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(233, 226, 212, .3); color: #EFE7D6; font-size: 13px; background: rgba(255, 255, 255, .04); }
+.cv-gyro .ic { width: 16px; height: 16px; color: var(--gold-2); }
+.cv-hint { text-align: center; padding: 0 20px; line-height: 1.6; }
