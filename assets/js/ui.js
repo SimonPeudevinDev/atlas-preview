@@ -333,17 +333,25 @@
   var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
   function loreHTML(ch, coll) {
     var L = ch.lore, n = L.chapitres.length;
-    // Chapitres : un par diapositive, à faire glisser sur le côté
-    var slides = L.chapitres.map(function (c, i) {
-      return '<section class="lore-ch" aria-roledescription="chapitre" aria-label="Chapitre ' + (i + 1) + ' sur ' + n + '">' +
-        '<p class="lore-num">Chapitre ' + ROMAN[i] + '<span> / ' + ROMAN[n - 1] + '</span></p>' +
-        '<h3 class="lore-h">' + U.esc(c.t) + '</h3>' +
-        c.p.map(function (t) { return '<p>' + bioHTML(ch, t) + '</p>'; }).join('') +
-        (i < n - 1 ? '<button type="button" class="lore-next" data-lore-to="' + (i + 1) + '">' + U.esc(L.chapitres[i + 1].t) + U.icon('arrow') + '</button>' : '') +
+    // Chapitres découpés en pages (un paragraphe par page) pour tenir sur un écran de téléphone
+    var pages = [], starts = [];
+    L.chapitres.forEach(function (c, ci) {
+      starts.push(pages.length);
+      c.p.forEach(function (t, pi) { pages.push({ ci: ci, pi: pi, pn: c.p.length, c: c, t: t }); });
+    });
+    var slides = pages.map(function (pg, k) {
+      var nx = pages[k + 1];
+      var next = !nx ? '' : nx.ci === pg.ci
+        ? '<button type="button" class="lore-next" data-lore-to="' + (k + 1) + '">Suite' + U.icon('arrow') + '</button>'
+        : '<button type="button" class="lore-next" data-lore-to="' + (k + 1) + '"><span><small>Chapitre ' + ROMAN[nx.ci] + '</small>' + U.esc(nx.c.t) + '</span>' + U.icon('arrow') + '</button>';
+      return '<section class="lore-ch" data-ci="' + pg.ci + '" data-pi="' + pg.pi + '" data-pn="' + pg.pn + '" aria-roledescription="page" aria-label="Chapitre ' + (pg.ci + 1) + ', page ' + (pg.pi + 1) + ' sur ' + pg.pn + '">' +
+        '<p class="lore-num">Chapitre ' + ROMAN[pg.ci] + '<span> / ' + ROMAN[n - 1] + '</span><em>' + (pg.pi + 1) + ' / ' + pg.pn + '</em></p>' +
+        '<h3 class="lore-h">' + U.esc(pg.c.t) + '</h3>' +
+        '<p class="lore-p">' + bioHTML(ch, pg.t) + '</p>' + next +
       '</section>';
     }).join('');
     var dots = L.chapitres.map(function (c, i) {
-      return '<button type="button" class="lore-dot' + (i ? '' : ' is-on') + '" data-lore-to="' + i + '" aria-label="Chapitre ' + (i + 1) + ' : ' + U.esc(c.t) + '"></button>';
+      return '<button type="button" class="lore-dot' + (i ? '' : ' is-on') + '" data-lore-to="' + starts[i] + '" aria-label="Chapitre ' + (i + 1) + ' : ' + U.esc(c.t) + '"><i></i></button>';
     }).join('');
     var slider = '<div class="lore-slider">' +
       '<div class="lore-bar"><div class="lore-dots">' + dots + '</div></div>' +
@@ -398,7 +406,12 @@
     var track = root.querySelector('.lore-track'); if (!track) return;
     var slides = track.children, i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
     i = Math.max(0, Math.min(slides.length - 1, i));
-    [].forEach.call(root.querySelectorAll('.lore-dot'), function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    var cur = slides[i], ci = +cur.getAttribute('data-ci'), fill = (+cur.getAttribute('data-pi') + 1) / +cur.getAttribute('data-pn');
+    [].forEach.call(root.querySelectorAll('.lore-dot'), function (d, k) {
+      d.classList.toggle('is-on', k === ci); d.classList.toggle('is-past', k < ci);
+      d.firstChild.style.width = (k < ci ? 100 : k === ci ? fill * 100 : 0) + '%';
+      d.setAttribute('aria-current', k === ci ? 'step' : 'false');
+    });
   }
   function loreGo(root, i) {
     var track = root.querySelector('.lore-track'); if (!track) return;
