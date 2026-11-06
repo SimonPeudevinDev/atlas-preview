@@ -28,6 +28,11 @@
       bio: 'Immense serpent des ténèbres, il attaque chaque nuit la barque de [[ra]] pour empêcher le soleil de se lever.',
       more: 'On ne le vénérait pas, on le combattait : les prêtres récitaient des formules contre lui et brûlaient des figurines à son image. Selon les récits, le dieu Seth, debout à la proue de la barque solaire, le repousse chaque nuit. Si Apophis l’emportait un jour, le monde retournerait au chaos des origines.'
     },
+    pharaons: {
+      name: 'Imhotep', title: 'L’Architecte divinisé', atk: 58, def: 82, esp: 99,
+      bio: 'Architecte du roi Djéser, il conçut vers 2650 av. J.-C. la première pyramide de l’histoire, la pyramide à degrés de Saqqarah, bien avant celle de [[kheops]].',
+      more: 'Vizir, médecin et grand prêtre, il fut si admiré qu’on finit par en faire un dieu, fils de Ptah, que l’on priait pour guérir. Les Grecs l’assimilèrent à leur dieu de la médecine, Asclépios. Son tombeau n’a jamais été retrouvé.'
+    },
     gothique: {
       name: 'Van Helsing', title: 'Le Chasseur de l’ombre', atk: 82, def: 84, esp: 94,
       bio: 'Professeur hollandais, médecin et savant, il mène la traque contre [[dracula]] aux côtés de Jonathan et Mina Harker.',

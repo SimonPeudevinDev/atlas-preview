@@ -29,7 +29,8 @@
     histoire: { sky0: '#F2ECE3', sky1: '#DCD0BE' },
     nordique: { sky0: '#EEF1F0', sky1: '#CFD9DA', far: '#B3C1C4', mid: '#8D9EA3', near: '#6B7D82', fig: '#34404A' },
     titans:   { sky0: '#F1EDE6', sky1: '#D8D0C3', far: '#BFB5A5', mid: '#8F8473', near: '#6E6455', fig: '#3A342C' },
-    geants:   { sky0: '#F3E9DF', sky1: '#DDC6B4', far: '#C2A592', mid: '#8E6E5D', near: '#6A4F42', fig: '#33241E' }
+    geants:   { sky0: '#F3E9DF', sky1: '#DDC6B4', far: '#C2A592', mid: '#8E6E5D', near: '#6A4F42', fig: '#33241E' },
+    pharaons: { sky0: '#F6ECDA', sky1: '#E5CDA2', far: '#D2B07D', mid: '#B08A55', near: '#8C6A3C', fig: '#3A2A16' }
   };
 
   function moodFor(coll, rarity) {
@@ -158,6 +159,19 @@
         smoke += '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(rr) + '"/>';
       }
       o += '<g fill="' + m.far + '" opacity=".55">' + smoke + '</g>';
+      return o;
+    },
+    // Pharaons : pylône de temple encadré de deux obélisques
+    obelisk: function (cx, gy, s, m) {
+      var o = '';
+      o += poly([[cx - 58 * s, gy], [cx - 52 * s, gy - 64 * s], [cx - 8 * s, gy - 64 * s], [cx - 6 * s, gy]]);
+      o += poly([[cx + 6 * s, gy], [cx + 8 * s, gy - 64 * s], [cx + 52 * s, gy - 64 * s], [cx + 58 * s, gy]]);
+      o += rect(cx - 6 * s, gy - 40 * s, 12 * s, 40 * s);
+      o += '<g fill="' + m.sun + '" opacity=".5">' + rect(cx - 4 * s, gy - 30 * s, 8 * s, 30 * s) + '</g>';
+      [[-82, 98], [82, 86]].forEach(function (b) {
+        var x = cx + b[0] * s, h = b[1] * s;
+        o += poly([[x - 6 * s, gy], [x - 4 * s, gy - h], [x, gy - h - 9 * s], [x + 4 * s, gy - h], [x + 6 * s, gy]]);
+      });
       return o;
     },
     torii: function (cx, gy, s) {

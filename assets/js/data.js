@@ -43,10 +43,16 @@ window.ATLAS = window.ATLAS || {};
       description: 'Lancés par Gaïa contre l’Olympe ou alliés de Zeus, ces colosses ont laissé leur nom aux volcans, aux îles et aux lunes de Saturne.'
     },
     {
-      id: 'egypte', name: 'Rives du Nil', family: 'Mythologie égyptienne', universe: 'Mythologies', motif: 'pyramids',
+      id: 'egypte', name: 'Rives du Nil', family: 'Mythologie égyptienne', group: 'egyptienne', universe: 'Mythologies', motif: 'pyramids',
       edition: 'Édition I', status: 'live', popular: 2,
       tagline: 'Les divinités solaires et funéraires de l’Égypte ancienne.',
       description: 'Entre le désert et le fleuve, les dieux de l’Égypte veillent sur le soleil, les vivants et le long voyage des âmes.'
+    },
+    {
+      id: 'pharaons', name: 'Les Pharaons', family: 'Égypte ancienne', group: 'egyptienne', universe: 'Histoire', motif: 'obelisk',
+      edition: 'Édition I', status: 'live', popular: 8,
+      tagline: 'Rois et reines qui ont gouverné l’Égypte pendant trois mille ans.',
+      description: 'De l’unification du pays à la mort de Cléopâtre, les souverains qui ont bâti les pyramides, conquis l’Orient et défié Rome.'
     },
     {
       id: 'gothique', name: 'Nuits gothiques', family: 'Monstres gothiques', universe: 'Littérature', motif: 'castle',
@@ -84,6 +90,11 @@ window.ATLAS = window.ATLAS || {};
       description: 'Des Titans qui régnaient avant l’Olympe aux Géants lancés contre lui, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en trois sous-collections.'
     }
   ];
+  A.GROUPS.push({
+    id: 'egyptienne', name: 'Égypte ancienne', subs: ['egypte', 'pharaons'], title: 'Grand Vizir d’Égypte',
+    tagline: 'Les dieux du Nil et les rois qui ont gouverné en leur nom.',
+    description: 'Des dieux qui guident le soleil et pèsent les cœurs aux pharaons qui ont bâti les pyramides : trois mille ans d’Égypte en deux sous-collections.'
+  });
   A.GROUP = {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
@@ -138,6 +149,17 @@ window.ATLAS = window.ATLAS || {};
       ['horus', 'Horus', 'Le Dieu faucon', 88, 80, 82, 'BREL', 'Fils d’Isis et d’Osiris, protecteur des pharaons.'],
       ['thot', 'Thot', 'Scribe des dieux', 60, 74, 98, 'BRE', 'Inventeur de l’écriture, maître du savoir et du temps.'],
       ['sekhmet', 'Sekhmet', 'La Puissante', 93, 74, 70, 'BRE', 'Déesse lionne, souffle brûlant du désert.']
+    ],
+    pharaons: [
+      ['narmer', 'Narmer', 'L’Unificateur', 84, 80, 82, 'BRE', 'Premier roi à régner sur la Haute et la Basse-Égypte réunies, vers 3100 av. J.-C.'],
+      ['kheops', 'Khéops', 'Le Bâtisseur de Gizeh', 78, 90, 84, 'BRELM', 'Pharaon de la IVe dynastie, il fit élever la Grande Pyramide.'],
+      ['hatchepsout', 'Hatchepsout', 'La Reine-pharaon', 72, 84, 94, 'BRELMU', 'L’une des rares femmes à avoir régné en pharaon.'],
+      ['thoutmosis', 'Thoutmôsis III', 'Le Conquérant', 92, 84, 82, 'BREL', 'Le plus grand chef de guerre de l’Égypte ancienne.'],
+      ['akhenaton', 'Akhenaton', 'Le Roi hérétique', 60, 72, 96, 'BREL', 'Il imposa le culte d’un dieu unique, le disque solaire Aton.'],
+      ['nefertiti', 'Néfertiti', 'La Belle est venue', 64, 78, 92, 'BRELM', 'Grande épouse royale d’Akhenaton, célèbre pour son buste.'],
+      ['toutankhamon', 'Toutânkhamon', 'L’Enfant-roi', 58, 76, 80, 'BRELMU', 'Pharaon mort jeune, devenu célèbre par son tombeau intact.'],
+      ['ramses', 'Ramsès II', 'Le Grand', 90, 88, 88, 'BRELMU', 'Pharaon bâtisseur au règne de soixante-sept ans.'],
+      ['cleopatre', 'Cléopâtre VII', 'La Dernière Reine', 70, 80, 98, 'BRELMU', 'Dernière souveraine de l’Égypte des pharaons.']
     ],
     gothique: [
       ['dracula', 'Dracula', 'Le Comte des Carpates', 86, 80, 90, 'BRELMU', 'Aristocrate immortel surgi des brumes de Transylvanie.'],
@@ -257,6 +279,15 @@ window.ATLAS = window.ATLAS || {};
     'geants-polypheme': 'Fils de [[grece:poseidon|Poséidon]], ce cyclope à l’œil unique vivait en Sicile avec ses moutons. Il enferma Ulysse et ses compagnons dans sa grotte et en dévora plusieurs, avant que le héros ne l’enivre et lui crève l’œil.',
     'geants-briaree': 'Fils d’Ouranos et de Gaïa, il fut enfermé dans le Tartare avec ses frères Cottos et Gygès. Libéré par [[grece:zeus|Zeus]], il l’aida à vaincre les Titans en lançant sur eux des rochers par centaines.',
     'geants-antee': 'Fils de [[grece:poseidon|Poséidon]] et de la Terre, ce géant de Libye défiait les voyageurs à la lutte et les tuait. Chaque fois qu’il touchait le sol, sa mère lui rendait ses forces.',
+    'pharaons-narmer': 'Vers 3100 av. J.-C., il réunit sous une même couronne la Haute-Égypte, au sud, et la Basse-Égypte, au nord. On le considère souvent comme le fondateur de la première dynastie, placé sous la protection du dieu faucon [[egypte:horus|Horus]].',
+    'pharaons-kheops': 'Vers 2560 av. J.-C., il fit bâtir à Gizeh la Grande Pyramide, haute à l’origine d’environ 146 mètres. Pendant près de quatre mille ans, elle resta le plus haut monument construit par l’homme.',
+    'pharaons-hatchepsout': 'Veuve de Thoutmôsis II, elle gouverna d’abord pour le jeune [[thoutmosis]], son neveu, avant de se proclamer pharaon vers 1478 av. J.-C. Ses statues la montrent avec tous les attributs du roi, jusqu’à la barbe postiche.',
+    'pharaons-thoutmosis': 'Longtemps resté dans l’ombre de [[hatchepsout]], il mena après elle dix-sept campagnes militaires et porta les frontières de l’Égypte jusqu’à l’Euphrate.',
+    'pharaons-akhenaton': 'Né Amenhotep IV, il délaissa les dieux traditionnels pour un seul, Aton, le disque du soleil, et changea de nom. Il fonda une nouvelle capitale, Akhetaton, aux côtés de son épouse [[nefertiti]].',
+    'pharaons-nefertiti': 'Son nom signifie « la belle est venue ». Grande épouse royale d’[[akhenaton]], elle partagea avec lui le culte d’Aton et apparaît à ses côtés sur de nombreux reliefs, parfois dans des poses réservées au roi.',
+    'pharaons-toutankhamon': 'Monté sur le trône vers neuf ans, il rétablit le culte des anciens dieux abandonnés par [[akhenaton]], et mourut vers dix-neuf ans. Son règne fut court et modeste.',
+    'pharaons-ramses': 'Il régna environ soixante-sept ans, de 1279 à 1213 av. J.-C. Il fit graver partout le récit de la bataille de Qadesh contre les Hittites, présentée comme une victoire, puis signa avec eux l’un des plus anciens traités de paix connus.',
+    'pharaons-cleopatre': 'Dernière reine de la dynastie des Ptolémées, descendants d’un général d’Alexandre le Grand, elle fut la seule de sa famille à parler égyptien. Alliée de Jules César puis de Marc Antoine, elle tenta de préserver l’indépendance de l’Égypte face à Rome.',
     'grece-heracles': 'Fils de [[zeus]] et d’une mortelle, il accomplit douze travaux pour expier un crime commis dans la folie envoyée par [[hera]]. Le dernier le mena jusqu’au royaume d’[[hades]], d’où il ramena Cerbère.',
 
     'egypte-ra': 'Chaque jour, il traverse le ciel sur sa barque solaire, puis affronte la nuit le serpent Apophis. Lorsque les hommes se révoltèrent contre lui, il envoya son œil, sous la forme de [[sekhmet]], pour les châtier.',
@@ -333,6 +364,15 @@ window.ATLAS = window.ATLAS || {};
     'geants-polypheme': 'Ulysse lui avait dit s’appeler « Personne » : quand Polyphème hurla que Personne l’attaquait, les autres Cyclopes ne vinrent pas l’aider. Sa colère, transmise à son père Poséidon, poursuivit Ulysse pendant dix ans. D’autres récits le montrent soupirant pour la nymphe Galatée.',
     'geants-briaree': 'Il devint ensuite le gardien des Titans prisonniers. Dans l’Iliade, la déesse Thétis l’appelle au secours de [[grece:zeus|Zeus]] quand les autres dieux veulent l’enchaîner : sa seule présence suffit à les faire renoncer.',
     'geants-antee': '[[grece:heracles|Héraclès]] devina son secret : il le souleva de terre et l’étouffa dans ses bras. Antée bâtissait un temple à son père avec les crânes de ses victimes.',
+    'pharaons-narmer': 'La palette de Narmer, une plaque de schiste sculptée découverte à Hiérakonpolis, le montre coiffé tour à tour de la couronne blanche du Sud et de la couronne rouge du Nord. Elle est conservée au musée du Caire. Les Grecs attribuaient cette unification à un roi nommé Ménès, peut-être le même homme.',
+    'pharaons-kheops': 'C’est la seule des Sept Merveilles du monde antique encore debout. Ironie de l’histoire, le seul portrait sûr de son bâtisseur est une statuette d’ivoire de quelques centimètres. Au pied de la pyramide, on a retrouvé une grande barque démontée, destinée à son voyage dans l’au-delà.',
+    'pharaons-hatchepsout': 'Son règne fut prospère : elle envoya une grande expédition au pays de Pount, d’où l’on rapporta de l’encens et des arbres à myrrhe. Son temple funéraire de Deir el-Bahari, étagé contre la falaise, compte parmi les plus beaux d’Égypte. Après sa mort, son nom fut martelé sur de nombreux monuments.',
+    'pharaons-thoutmosis': 'Sa victoire à Megiddo, vers 1457 av. J.-C., est l’une des premières batailles dont on connaisse le déroulement en détail, grâce aux annales gravées à Karnak. On l’a parfois surnommé le « Napoléon de l’Égypte ». L’obélisque dressé à Istanbul vient de l’un de ses monuments.',
+    'pharaons-akhenaton': 'L’art de son règne rompt avec la tradition : le roi y apparaît avec un visage allongé et un corps aux formes inhabituelles, en famille, dans des scènes intimes. Après sa mort, les anciens dieux furent rétablis, sa capitale abandonnée et son nom effacé des listes royales. Il fut probablement le père de [[toutankhamon]].',
+    'pharaons-nefertiti': 'Son buste peint, découvert en 1912 dans l’atelier du sculpteur Thoutmôsis à Amarna, est exposé au Neues Museum de Berlin. Certains historiens pensent qu’elle régna seule, sous un autre nom, après la mort de son époux. Son tombeau n’a jamais été identifié avec certitude.',
+    'pharaons-toutankhamon': 'En 1922, l’archéologue Howard Carter découvrit son tombeau presque intact dans la Vallée des Rois. On y trouva plus de cinq mille objets, dont le célèbre masque funéraire en or. La légende d’une malédiction naquit de la mort de lord Carnarvon, qui finançait les fouilles, quelques mois plus tard.',
+    'pharaons-ramses': 'Il couvrit l’Égypte de monuments, dont les temples d’Abou Simbel, taillés dans la falaise et déplacés bloc par bloc dans les années 1960 pour échapper aux eaux du lac Nasser. En 1976, sa momie fut accueillie à Paris avec les honneurs militaires, pour y être soignée contre des champignons.',
+    'pharaons-cleopatre': 'Vaincue avec Antoine à la bataille d’Actium en 31 av. J.-C., elle se donna la mort l’année suivante, selon la tradition par la morsure d’un aspic. L’Égypte devint alors une province romaine. Elle a vécu plus près de nous dans le temps que de la construction de la pyramide de [[kheops]].',
     'grece-heracles': 'Encore au berceau, il étrangla les deux serpents envoyés par [[hera]]. Parmi ses travaux : le lion de Némée, l’hydre de Lerne aux têtes qui repoussent, les écuries d’Augias. À sa mort, il fut accueilli sur l’Olympe et devint immortel.',
 
     'egypte-ra': 'On le représente avec une tête de faucon coiffée du disque solaire. Si puissant que [[isis]] dut ruser pour lui arracher son nom secret, il fut plus tard uni à Amon pour devenir Amon-Rê, roi des dieux, honoré à Karnak.',
@@ -400,12 +440,12 @@ window.ATLAS = window.ATLAS || {};
   /* ---------- Boosters ----------
      Les taux de référence (odds) sont modulés par le stock réellement
      disponible : voir store.js → packOdds(). */
-  var ALL = ['grece', 'titans', 'geants', 'egypte', 'gothique', 'contes', 'histoire', 'nordique'];
+  var ALL = ['grece', 'titans', 'geants', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire', 'nordique'];
   A.PACKS = [
     {
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
       cover: 'contes-alice-base',
-      collections: ['grece', 'titans', 'geants', 'egypte', 'gothique', 'contes', 'histoire'],
+      collections: ['grece', 'titans', 'geants', 'egypte', 'pharaons', 'gothique', 'contes', 'histoire'],
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
       desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette
