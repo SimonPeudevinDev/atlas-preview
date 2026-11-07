@@ -505,7 +505,7 @@
           if (closed) return;
           var col = s.querySelectorAll('.dg')[i]; if (col) col.classList.add('is-lock');
           if (i === digs.length - 1) { SFX.seal(c.r); A.haptic(12); s.classList.add('is-sealed'); }
-          else { SFX.tick(); SFX.snap(); A.haptic(4); }
+          else { SFX.tick(); SFX.snap(0, 0.45); A.haptic(4); }
         }, at);
       });
       var lockEnd = t0 + ((digs.length - 1) * 0.47 + 0.9) * 1000;

@@ -250,9 +250,10 @@
     tone({ f: 190, f2: 120, dur: 0.06, gain: 0.05 * k, delay: (delay || 0) + 0.045 });
   };
   // Claquement de la carte qu’on retourne / qui se présente
-  SFX.snap = function (delay) {
-    noise({ type: 'highpass', f: 2600, q: 0.7, dur: 0.035, gain: 0.12, delay: delay || 0 });
-    noise({ f: 900, q: 1.4, dur: 0.05, gain: 0.07, delay: (delay || 0) + 0.01 });
+  SFX.snap = function (delay, k) {
+    k = k == null ? 1 : k;
+    noise({ type: 'highpass', f: 2600, q: 0.7, dur: 0.035, gain: 0.12 * k, delay: delay || 0 });
+    noise({ f: 900, q: 1.4, dur: 0.05, gain: 0.07 * k, delay: (delay || 0) + 0.01 });
   };
   // Le corps du sachet tombe
   SFX.drop = function () {
@@ -266,26 +267,28 @@
     stab([1046.5, 1318.51, 1567.98], 0.28 + rank * 0.02, 0.03, 0.7, 0.01, 7000);
   };
   // Le numéro s’imprime : coup de sceau grave + éclat
+  // Sons du numéro : en retrait (NUM), ils accompagnent sans couvrir la révélation
+  var NUM = 0.45;
   SFX.seal = function (rank) {
-    tone({ f: 96, f2: 48, dur: 0.45, gain: 0.26, a: 0.003 });
-    bell([1318.5, 1318.5, 1567.98, 1760, 2093, 2093][rank] || 1318.5, 0.03, 0.05, 1.1);
+    tone({ f: 96, f2: 48, dur: 0.45, gain: 0.26 * NUM, a: 0.003 });
+    bell([1318.5, 1318.5, 1567.98, 1760, 2093, 2093][rank] || 1318.5, 0.03, 0.05 * NUM, 1.1);
   };
   SFX.land = function () { tone({ f: 120, f2: 52, dur: 0.3, gain: 0.3 }); };
-  SFX.flip = function () { SFX.snap(); swish(0, 0.035, 0.12); };
+  SFX.flip = function () { SFX.snap(); tone({ type: 'triangle', f: 520, f2: 780, dur: 0.05, gain: 0.025 }); };
   SFX.pop = function () { tone({ f: 380, f2: 1150, dur: 0.11, gain: 0.16 }); sparkle(0.04, 3, 0.03, 0.03); };
-  SFX.tick = function () { tone({ f: 2400, dur: 0.025, gain: 0.025 }); };
+  SFX.tick = function () { tone({ f: 2400, dur: 0.025, gain: 0.025 * NUM }); };
   // Annonce du tirage (« /25 exemplaires ») : coup sourd feutré + deux notes suspendues
   SFX.tease = function (rank) {
-    tone({ f: 98, f2: 70, dur: 0.6, gain: 0.14, wet: 0.5 });
-    bell(392, 0.05, 0.05, 1.4); bell(587.33, 0.2, 0.045, 1.6);
-    if (rank >= 3) noise({ f: 300, f2: 2400, q: 1, dur: 0.9, gain: 0.03, a: 0.8 });
+    tone({ f: 98, f2: 70, dur: 0.6, gain: 0.14 * NUM, wet: 0.5 });
+    bell(392, 0.05, 0.05 * NUM, 1.4); bell(587.33, 0.2, 0.045 * NUM, 1.6);
+    if (rank >= 3) noise({ f: 300, f2: 2400, q: 1, dur: 0.9, gain: 0.03 * NUM, a: 0.8 });
   };
   // Verrouillage d’un chiffre du numéro : déclic métallique de plus en plus aigu
   SFX.lock = function (i, n) {
     var f = [880, 1174.66, 1567.98, 1975.53][Math.min(3, i + (4 - n))] || 1318.5;
-    SFX.snap();
-    tone({ type: 'triangle', f: f, dur: 0.09, gain: 0.06 });
-    bell(f, 0.01, 0.035, 0.5);
+    SFX.snap(0, NUM);
+    tone({ type: 'triangle', f: f, dur: 0.09, gain: 0.06 * NUM });
+    bell(f, 0.01, 0.035 * NUM, 0.5);
   };
   // Carte qui tourne sur elle-même : souffle qui accélère
   SFX.whirl = function (d) {
@@ -316,11 +319,7 @@
      4 mythique : coup grave + arpège + grand accord
      5 unique   : idem, plus haut et plus long */
   SFX.reveal = function (rank) {
-    if (rank === 0) {                                     // « bloup » net et court
-      pluck(783.99, 0, 0.06, 0.18); pluck(1174.66, 0.06, 0.055, 0.26);
-      sparkle(0.05, 3, 0.03, 0.022);
-      return;
-    }
+    if (rank === 0) { bell(659.25, 0, 0.06, 0.7); return; }   // carte Base : le « ding » discret d’origine
     if (rank === 1) {                                     // pièce d’or : deux notes vives + paillettes
       hit(0, 0.12);
       pluck(1318.51, 0, 0.07, 0.12); pluck(1975.53, 0.08, 0.07, 0.45);
