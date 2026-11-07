@@ -44,40 +44,18 @@
   function shelf(head, subs) {
     return '<section class="shelf">' + head + '<div class="shelf-row">' + subs.map(shelfTile).join('') + '</div></section>';
   }
-  // Jauge à segments : un segment par sous-collection, large comme son nombre de personnages, rempli selon sa progression
-  function segBar(cids) {
-    return '<div class="segbar" aria-hidden="true">' + cids.map(function (cid) {
-      var pr = S.collectionProgress(cid);
-      return '<span class="seg' + (pr.pct >= 1 ? ' is-done' : '') + '" style="flex-grow:' + pr.total + ';--p:' + (pr.pct * 100).toFixed(1) + '%"></span>';
-    }).join('') + '</div>';
+  // Jauge de complétion : le pourcentage en grand chiffre doré ; un laurier à 100 %
+  function gauge(pct) {
+    var p = Math.round(pct * 100);
+    return p >= 100 ? '<span class="g-pct is-full">' + I('laurel') + '<small>Complète</small></span>'
+      : '<span class="g-pct"><b>' + p + '<em> %</em></b><small>complété</small></span>';
   }
-  /* Essai en cours : 3 jauges sur les 3 premières étagères (étoiles, médaille, pourcentage) */
-  function gauge(kind, pct) {
-    var p = Math.round(pct * 100), full = p >= 100;
-    if (kind === 'star') {
-      var n = full ? 3 : p >= 67 ? 2 : p >= 34 ? 1 : 0;
-      return '<span class="g-star"><span class="g-stars">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < n ? 'is-on' : '') + '">' + I('star') + '</i>'; }).join('') + '</span>' +
-        '<small>' + (full ? 'Complète' : p + ' %') + '</small></span>';
-    }
-    if (kind === 'medal') {
-      var t = full ? ['full', 'Complète'] : p >= 67 ? ['or', 'Or'] : p >= 34 ? ['argent', 'Argent'] : p > 0 ? ['bronze', 'Bronze'] : ['none', 'À commencer'];
-      return '<span class="g-medal is-' + t[0] + '">' + I(full ? 'laurel' : 'medal') + '<span><b>' + t[1] + '</b>' + (full || !p ? '' : '<small>' + p + ' %</small>') + '</span></span>';
-    }
-    return full ? '<span class="g-pct is-full">' + I('laurel') + '<small>Complète</small></span>' : '<span class="g-pct"><b>' + p + '<em> %</em></b><small>complété</small></span>';
-  }
-  var TRY = [['star', 'Essai · étoiles'], ['medal', 'Essai · médaille'], ['pct', 'Essai · pourcentage']];
-  function groupBlock(g, subs, k) {
+  function groupBlock(g, subs) {
     var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id) || subs.some(function (c) { return S.readyCount(c.id); });
-    var tr = TRY[k];
-    if (tr) return shelf('<p class="g-try">' + tr[1] + '</p><a class="shelf-head" href="#/saga/' + g.id + '">' +
-      '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
-        '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
-      gauge(tr[0], pr.pct) + I('chevR') + '</a>', subs);
     return shelf('<a class="shelf-head" href="#/saga/' + g.id + '">' +
       '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
         '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
-      '<span class="sh-pct' + (pr.pct >= 1 ? ' is-full' : '') + '">' + (pr.pct >= 1 ? U.icon('check') + 'Complète' : Math.round(pr.pct * 100) + '<small> %</small>') + '</span>' + I('chevR') +
-      '</a>' + segBar(g.subs), subs);
+      gauge(pr.pct) + I('chevR') + '</a>', subs);
   }
 
   function globe() {
@@ -249,7 +227,6 @@
     render: function () {
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
-        (A.pages.jauges ? '<a class="jg-banner" href="#/jauges">' + I('sparkle') + '<span><b>Choix en cours : 6 jauges de complétion</b>Touchez pour voir les propositions A à F</span>' + I('chevR') + '</a>' : '') +   // temporaire
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
         '<p class="lead">' + A.COLLECTIONS.length + ' salles ouvertes, ' + A.CHARS.length + ' figures à collectionner, et d’autres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
@@ -284,11 +261,11 @@
               return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) + '</div>';
             }).join('') + '</div>' : '<div class="empty">Aucun personnage ne correspond à « ' + U.esc(cf.q) + ' ».</div>');
         } else {
-          var shown = {}, gk = 0;
+          var shown = {};
           html = (A.GROUPS || []).map(function (g) {
             var subs = list.filter(function (c) { return c.group === g.id; });
             subs.forEach(function (c) { shown[c.id] = true; });
-            return subs.length ? groupBlock(g, subs, gk++) : '';
+            return subs.length ? groupBlock(g, subs) : '';
           }).join('');
           var rest = list.filter(function (c) { return !shown[c.id]; });
           if (rest.length) html += shelf('<div class="shelf-head"><div class="sh-copy"><h2 class="sh-name">Autres collections</h2></div></div>', rest);

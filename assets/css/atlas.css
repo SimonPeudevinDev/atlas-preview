@@ -1689,15 +1689,6 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .sh-meta { margin: 3px 0 0; font-size: 12px; color: var(--ink-3); }
 .sh-meta b { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; color: var(--gold); white-space: nowrap; }
 .sh-meta .ic { display: inline-block; width: 12px; height: 12px; }
-.shelf-head { align-items: flex-start; padding-bottom: 8px; }
-.sh-pct { flex: none; padding-top: 2px; font-family: var(--serif); font-size: 24px; font-weight: 600; line-height: 1; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.sh-pct small { font-size: 13px; font-weight: 500; color: var(--ink-3); }
-.sh-pct.is-full { display: inline-flex; align-items: center; gap: 4px; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--ok); padding-top: 6px; }
-.sh-pct.is-full .ic { width: 14px; height: 14px; }
-.shelf-head > .ic { margin-top: 4px; }
-.segbar { display: flex; gap: 3px; height: 6px; margin: 0 0 14px; }
-.seg { flex: 1 1 0; min-width: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--gold) var(--p), var(--line-2) 0); opacity: .95; }
-.seg.is-done { background: linear-gradient(90deg, #D9B871, #A9823F); box-shadow: 0 0 6px rgba(201, 162, 90, .45); }
 .shelf-head > .ic { flex: none; width: 18px; height: 18px; color: var(--ink-3); }
 .shelf-row { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
   margin: 0 calc(-1 * var(--gutter, 20px)); padding: 2px var(--gutter, 20px) 12px; scroll-padding: 0 var(--gutter, 20px); }
@@ -1721,31 +1712,8 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .shelf-tile { width: 200px; }
   .shelf-row { gap: 16px; }
 }
-/* Temporaire : lien vers #/jauges */
-.jg-banner { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 12px 14px; border-radius: var(--radius-lg); background: var(--ink); color: #F3ECDD; text-decoration: none; }
-.jg-banner > .ic { flex: none; width: 20px; height: 20px; color: var(--gold-2); }
-.jg-banner span { flex: 1; display: flex; flex-direction: column; font-size: 12px; color: #B5AC9D; }
-.jg-banner b { font-size: 14px; font-weight: 600; color: #F3ECDD; }
-/* Essai de jauges (étagères 1 à 3) */
-.g-try { margin: 0 0 4px; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
-.shelf-head:has(.g-star, .g-medal, .g-pct) { align-items: center; padding-bottom: 12px; }
-.g-star { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.g-stars { display: flex; gap: 1px; }
-.g-stars i { color: var(--line-2); display: grid; }
-.g-stars .ic { width: 20px; height: 20px; }
-.g-stars i.is-on { color: var(--gold); }
-.g-stars i.is-on .ic { fill: currentColor; filter: drop-shadow(0 1px 2px rgba(169, 130, 63, .4)); }
-.g-star small { font-size: 11px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.g-medal { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 6px; border-radius: 999px; border: 1px solid; }
-.g-medal .ic { width: 22px; height: 22px; }
-.g-medal > span { display: flex; flex-direction: column; line-height: 1.05; }
-.g-medal b { font-size: 12px; font-weight: 600; }
-.g-medal small { font-size: 10.5px; opacity: .8; font-variant-numeric: tabular-nums; }
-.g-medal.is-none { color: var(--ink-3); border-color: var(--line-2); }
-.g-medal.is-bronze { color: #9A5B2E; border-color: #D9B096; background: #FBF1EA; }
-.g-medal.is-argent { color: #6B7480; border-color: #C9CFD6; background: #F3F5F7; }
-.g-medal.is-or { color: #9A7426; border-color: #E2C887; background: #FCF5E3; }
-.g-medal.is-full { color: #fff; border-color: transparent; background: linear-gradient(135deg, #D9B871, #A9823F); box-shadow: 0 2px 8px rgba(169, 130, 63, .35); }
+/* Jauge de complétion des étagères : pourcentage */
+.shelf-head { align-items: center; padding-bottom: 12px; }
 .g-pct { flex: none; display: flex; flex-direction: column; align-items: flex-end; line-height: 1; color: var(--gold); }
 .g-pct b { font-family: var(--serif); font-size: 30px; font-weight: 600; }
 .g-pct em { font-style: normal; font-size: 16px; color: var(--ink-3); }
