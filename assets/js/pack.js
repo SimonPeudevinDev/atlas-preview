@@ -118,7 +118,8 @@
     return '<div class="pf-perf" style="top:' + G.TY + 'cqw"><span></span></div>' +
       '<div class="pf-content">' +
         '<div class="pk-top">' + U.mark('pk-mark') + '<span class="pk-brand">ATLAS</span><span class="pk-ed">Édition I</span></div>' +
-        '<div class="pk-window">' + A.editionArt(A.ED[p.cover], { ctx: 'pack' }) + '<span class="pk-wframe"></span></div>' +
+        (p.design ? '<div class="pk-window is-motif">' + U.mark('pk-motif') + '</div>'   // sachet sans illustration : le sceau en grand
+          : '<div class="pk-window">' + A.editionArt(A.ED[p.cover], { ctx: 'pack' }) + '<span class="pk-wframe"></span></div>') +
         '<div class="pk-title"><span class="pk-kicker">' + p.kicker + '</span><span class="pk-name">' + p.name + '</span></div>' +
         '<div class="pk-foot"><span>' + p.size + ' cartes</span><i></i><span>' + colls + '</span></div>' +
       '</div><div class="pf-pillow"></div>';

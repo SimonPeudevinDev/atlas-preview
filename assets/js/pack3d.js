@@ -63,6 +63,11 @@
     'c-nuit': THEMES.astro,
     'c-emeraude': dark('night', ['#1F5A47', '#0A241C', '#184A39', '#06170F', '#123D2E', '#081C14'], { ink2: '#BCD8C9', motif: ['#F6E3AE', '#E2C68A', '#9C7A43'], facet: 'rgba(5,25,18,.9)', glow: 'rgba(226,198,138,.22)' }),
     'c-bordeaux': dark('garnet', ['#8E2A3B', '#3F0A14', '#701C2C', '#2A050C', '#5B1523', '#360810'], { motif: ['#F8E6B4', '#E2C384', '#A27E3E'], facet: 'rgba(40,6,12,.9)', glow: 'rgba(226,195,132,.22)' }),
+    // Booster quotidien : tons profonds, motif Cadran
+    'd-amethyste': dark('night', ['#6B3A80', '#26102F', '#56296A', '#170A1D', '#43205A', '#1E0D27'], { ink2: '#D9C6E2', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(25,8,32,.9)', glow: 'rgba(230,199,127,.24)' }),
+    'd-petrole': dark('night', ['#1E5D6B', '#08222A', '#174C58', '#04161B', '#113D47', '#061C22'], { ink2: '#BCD9DE', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(3,22,27,.9)', glow: 'rgba(230,199,127,.24)' }),
+    'd-cognac': dark('garnet', ['#8A5228', '#3A1E0A', '#73431F', '#2A1506', '#5E3518', '#331A08'], { ink2: '#EBD3BB', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(40,20,6,.9)', glow: 'rgba(230,199,127,.24)' }),
+    'd-anthracite': dark('night', ['#4A4D53', '#16171A', '#3A3D42', '#0B0C0E', '#2B2D31', '#121315'], { ink2: '#C3C6CC', gold: '#D9DDE3', motif: ['#FFFFFF', '#D9DDE3', '#8E949D'], facet: 'rgba(8,9,11,.92)', glow: 'rgba(220,225,235,.2)', brand: ['#8E949D', '#FFFFFF', '#B9BEC6', '#FFFFFF', '#8E949D'], metal: 0.7 }),
     'c-noir': dark('night', ['#2C2925', '#0B0A09', '#211E1B', '#050505', '#181614', '#0C0B0A'], { ink: '#F6EFE0', ink2: '#B9AE99', gold: '#E6C77F', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(0,0,0,.92)', glow: 'rgba(230,199,127,.24)', metal: 0.7 })
   });
   THEMES.prism = Object.assign({}, THEMES.night, { foil: ['#3B2F5C', '#151324', '#2A3F5E', '#0D0C17', '#3A2B4E', '#111020'], holo: 0.6, metal: 0.55 });
@@ -375,6 +380,35 @@
       [-0.5, 0, 0.5].forEach(function (k) { var yy = DCY + k * (DR - 3.2); x.beginPath(); x.moveTo(DCX - DR, yy); x.lineTo(DCX + DR, yy); x.stroke(); });
       x.restore(); x.globalAlpha = 1;
       rose(x, th, DCX, DCY, DR - 4.5, th.facet || 'rgba(10,20,55,.85)');
+      x.restore();
+    },
+    // Booster quotidien : cadran solaire, un soleil rayonnant dans un limbe à douze heures
+    cadran: function (x, th) {
+      var g = gold(x, th, DCY - DR, DCY + DR);
+      x.save();
+      var halo = x.createRadialGradient(DCX, DCY, 2, DCX, DCY, DR + 8);
+      halo.addColorStop(0, th.glow || 'rgba(234,203,134,.22)'); halo.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = halo; x.fillRect(0, DCY - DR - 10, 100, DR * 2 + 20);
+      x.strokeStyle = g; x.fillStyle = g;
+      x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+      x.lineWidth = 0.25; x.beginPath(); x.arc(DCX, DCY, DR - 3.6, 0, 7); x.stroke();
+      x.beginPath(); x.arc(DCX, DCY, DR + 1.4, 0, 7); x.stroke();
+      for (var h = 0; h < 12; h++) {                    // douze heures : losange aux quarts, point ailleurs
+        var t = h * Math.PI / 6 - Math.PI / 2, rx = DCX + Math.cos(t) * (DR - 1.8), ry = DCY + Math.sin(t) * (DR - 1.8);
+        if (h % 3 === 0) { x.save(); x.translate(rx, ry); x.rotate(t + Math.PI / 4); x.fillRect(-0.9, -0.9, 1.8, 1.8); x.restore(); }
+        else { x.beginPath(); x.arc(rx, ry, 0.45, 0, 7); x.fill(); }
+      }
+      for (var k = 0; k < 32; k++) {                    // rayons alternés, longs et courts, en flammes fines
+        var a = k * Math.PI / 16, L = k % 2 ? 11.5 : 15.5, w = k % 2 ? 0.05 : 0.075;
+        x.beginPath();
+        x.moveTo(DCX + Math.cos(a - w) * 7, DCY + Math.sin(a - w) * 7);
+        x.lineTo(DCX + Math.cos(a) * L, DCY + Math.sin(a) * L);
+        x.lineTo(DCX + Math.cos(a + w) * 7, DCY + Math.sin(a + w) * 7);
+        x.closePath(); x.fillStyle = k % 2 ? th.facet || 'rgba(0,0,0,.5)' : g; x.fill();
+        if (k % 2) { x.lineWidth = 0.12; x.strokeStyle = g; x.stroke(); }
+      }
+      x.fillStyle = g; x.beginPath(); x.arc(DCX, DCY, 6.2, 0, 7); x.fill();   // disque solaire
+      x.strokeStyle = th.facet || 'rgba(0,0,0,.5)'; x.lineWidth = 0.3; x.beginPath(); x.arc(DCX, DCY, 4.6, 0, 7); x.stroke();
       x.restore();
     },
     // 2. Holographique : film irisé, éventail de trois cartes (Rare, Épique, Légendaire), étincelles

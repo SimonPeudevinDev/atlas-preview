@@ -638,3 +638,34 @@
 .sz-dots i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .22); transition: width .2s, background .2s; }
 .sz-dots i.is-on { width: 18px; background: #D8BC80; }
 .sz-hint { margin: 0; font-size: 11px; letter-spacing: .04em; color: rgba(230, 220, 200, .45); text-align: center; }
+
+/* Thèmes des sachets sans illustration (Booster Atlas, coffrets, quotidien) : version CSS de secours */
+.pk.t-c-emeraude { --pk-foil: linear-gradient(158deg, #1F5A47 0%, #0A241C 24%, #184A39 44%, #06170F 68%, #123D2E 86%, #081C14 100%); --pk-core: #06170F; --pk-ink: #F4F0E6; --pk-ink2: #BCD8C9; --pk-gold: #E2C68A; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-c-emeraude .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-c-bordeaux { --pk-foil: linear-gradient(158deg, #8E2A3B 0%, #3F0A14 24%, #701C2C 44%, #2A050C 68%, #5B1523 86%, #360810 100%); --pk-core: #2A050C; --pk-ink: #F7ECDC; --pk-ink2: #E2C4AE; --pk-gold: #E2C384; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-c-bordeaux .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-c-nuit { --pk-foil: linear-gradient(158deg, #24407F 0%, #0D1A3C 24%, #1C3366 44%, #070F26 68%, #162B58 86%, #0A1533 100%); --pk-core: #070F26; --pk-ink: #F4F0E6; --pk-ink2: #CBD5F0; --pk-gold: #EACB86; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-c-nuit .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-c-noir { --pk-foil: linear-gradient(158deg, #2C2925 0%, #0B0A09 24%, #211E1B 44%, #050505 68%, #181614 86%, #0C0B0A 100%); --pk-core: #050505; --pk-ink: #F6EFE0; --pk-ink2: #B9AE99; --pk-gold: #E6C77F; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-c-noir .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-d-amethyste { --pk-foil: linear-gradient(158deg, #6B3A80 0%, #26102F 24%, #56296A 44%, #170A1D 68%, #43205A 86%, #1E0D27 100%); --pk-core: #170A1D; --pk-ink: #EEF2F3; --pk-ink2: #D9C6E2; --pk-gold: #E6C77F; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-d-amethyste .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-d-petrole { --pk-foil: linear-gradient(158deg, #1E5D6B 0%, #08222A 24%, #174C58 44%, #04161B 68%, #113D47 86%, #061C22 100%); --pk-core: #04161B; --pk-ink: #EEF2F3; --pk-ink2: #BCD9DE; --pk-gold: #E6C77F; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-d-petrole .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-d-cognac { --pk-foil: linear-gradient(158deg, #8A5228 0%, #3A1E0A 24%, #73431F 44%, #2A1506 68%, #5E3518 86%, #331A08 100%); --pk-core: #2A1506; --pk-ink: #F7ECDC; --pk-ink2: #EBD3BB; --pk-gold: #E6C77F; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-d-cognac .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.pk.t-d-anthracite { --pk-foil: linear-gradient(158deg, #4A4D53 0%, #16171A 24%, #3A3D42 44%, #0B0C0E 68%, #2B2D31 86%, #121315 100%); --pk-core: #0B0C0E; --pk-ink: #EEF2F3; --pk-ink2: #C3C6CC; --pk-gold: #D9DDE3; --pk-holo: .45; --pk-ridge-hi: rgba(255,255,255,.26); --pk-ridge-lo: rgba(0,0,0,.45); --pk-sheen: 235,240,245; }
+.t-d-anthracite .pk-brand { background-image: linear-gradient(100deg, #7E602E 0%, #EBD49C 30%, #9C7A43 52%, #F3E1B0 72%, #8C6B35 100%); }
+.card-back.t-c-emeraude, .card-back.t-c-bordeaux, .card-back.t-c-nuit, .card-back.t-c-noir, .card-back.t-d-amethyste, .card-back.t-d-petrole, .card-back.t-d-cognac, .card-back.t-d-anthracite { background-color: #16130F; border-color: #4A3D28; background-image: repeating-linear-gradient(45deg, rgba(201, 164, 92, .12) 0 1px, transparent 1px 7px), repeating-linear-gradient(-45deg, rgba(201, 164, 92, .12) 0 1px, transparent 1px 7px); }
+.card-back.t-c-emeraude .cb-frame, .card-back.t-c-bordeaux .cb-frame, .card-back.t-c-nuit .cb-frame, .card-back.t-c-noir .cb-frame, .card-back.t-d-amethyste .cb-frame, .card-back.t-d-petrole .cb-frame, .card-back.t-d-cognac .cb-frame, .card-back.t-d-anthracite .cb-frame { background: rgba(22, 19, 15, .9); box-shadow: inset 0 0 0 3cqw rgba(22, 19, 15, .9), inset 0 0 0 calc(3cqw + 1px) rgba(201, 164, 92, .3); }
+.card-back.t-c-emeraude .cb-name, .card-back.t-c-bordeaux .cb-name, .card-back.t-c-nuit .cb-name, .card-back.t-c-noir .cb-name, .card-back.t-d-amethyste .cb-name, .card-back.t-d-petrole .cb-name, .card-back.t-d-cognac .cb-name, .card-back.t-d-anthracite .cb-name { color: #F1E8D6; }
+.card-back.t-c-emeraude { background-color: #0B1F19; }
+.card-back.t-c-bordeaux { background-color: #2A1014; }
+.card-back.t-c-nuit { background-color: #0F1D45; }
+.card-back.t-c-noir { background-color: #100E0C; }
+.card-back.t-d-amethyste { background-color: #1E0D27; }
+.card-back.t-d-petrole { background-color: #08222A; }
+.card-back.t-d-cognac { background-color: #2A1506; }
+.card-back.t-d-anthracite { background-color: #121315; }
+.pk-window.is-motif { display: grid; place-items: center; background: radial-gradient(closest-side, rgba(255,240,200,.18), transparent); box-shadow: none; }
+.pk-window.is-motif .pk-motif { width: 62%; height: auto; aspect-ratio: 1; color: var(--pk-gold); }

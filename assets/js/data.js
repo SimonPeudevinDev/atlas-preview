@@ -2056,7 +2056,7 @@ window.ATLAS = window.ATLAS || {};
       hook: 'Trois cartes offertes, chaque jour. Qui rejoindra votre collection aujourd’hui ?'
     },
     {
-      id: 'standard', name: 'Booster Atlas', kicker: 'Offert toutes les 15 min', price: 0, timer: true, size: 5, theme: 'lapis',
+      id: 'standard', name: 'Booster Atlas', kicker: 'Offert toutes les 15 min', price: 0, timer: true, size: 5, theme: 'c-emeraude', design: 'astrolabe',
       cover: 'grece-athena-rare',
       collections: ALL,
       odds: { base: 0.78, rare: 0.15, epic: 0.05, legendary: 0.015, mythic: 0.004, unique: 0.001 },
@@ -2065,7 +2065,7 @@ window.ATLAS = window.ATLAS || {};
       hook: 'Cinq cartes tirées dans toutes les salles du musée. Un nouveau booster vous attend toutes les 15 minutes.'
     },
     {
-      id: 'conservateur', name: 'Coffret du Conservateur', kicker: 'Récompense · carte numérotée garantie', price: 0, earned: true, size: 5, theme: 'garnet',
+      id: 'conservateur', name: 'Coffret du Conservateur', kicker: 'Récompense · carte numérotée garantie', price: 0, earned: true, size: 5, theme: 'c-bordeaux', design: 'astrolabe',
       cover: 'histoire-napoleon-mythic',
       collections: ALL,
       odds: { base: 0.6, rare: 0.26, epic: 0.1, legendary: 0.03, mythic: 0.008, unique: 0.002 },
@@ -2075,7 +2075,7 @@ window.ATLAS = window.ATLAS || {};
       hook: 'Le coffret des collectionneurs : cinq cartes, dont une édition numérotée garantie.'
     },
     {
-      id: 'saga', name: 'Saga du Nord', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'night', event: true,
+      id: 'saga', name: 'Saga du Nord', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'c-nuit', design: 'astrolabe', event: true,
       cover: 'nordique-odin-legendary',
       collections: ['nordique', 'creatures', 'jotnar', 'mondes'],
       odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
@@ -2088,7 +2088,7 @@ window.ATLAS = window.ATLAS || {};
   A.PACK = {};
   // TEST : une carte de chaque rareté numérotée, pour voir toutes les animations d’ouverture
   A.PACKS.push({
-    id: 'ultime', name: 'Pack Ultime', kicker: 'Test · toutes les raretés', price: 0, size: 5, theme: 'night', test: true,
+    id: 'ultime', name: 'Pack Ultime', kicker: 'Test · toutes les raretés', price: 0, size: 5, theme: 'c-noir', design: 'astrolabe', test: true,
     cover: 'grece-zeus-unique',
     collections: ALL,
     fixed: ['rare', 'epic', 'legendary', 'mythic', 'unique'],
