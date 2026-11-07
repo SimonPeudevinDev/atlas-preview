@@ -70,9 +70,6 @@
     'd-anthracite': dark('night', ['#4A4D53', '#16171A', '#3A3D42', '#0B0C0E', '#2B2D31', '#121315'], { ink2: '#C3C6CC', gold: '#D9DDE3', motif: ['#FFFFFF', '#D9DDE3', '#8E949D'], facet: 'rgba(8,9,11,.92)', glow: 'rgba(220,225,235,.2)', brand: ['#8E949D', '#FFFFFF', '#B9BEC6', '#FFFFFF', '#8E949D'], metal: 0.7 }),
     'c-noir': dark('night', ['#2C2925', '#0B0A09', '#211E1B', '#050505', '#181614', '#0C0B0A'], { ink: '#F6EFE0', ink2: '#B9AE99', gold: '#E6C77F', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(0,0,0,.92)', glow: 'rgba(230,199,127,.24)', metal: 0.7 })
   });
-  THEMES.prism = Object.assign({}, THEMES.night, { foil: ['#3B2F5C', '#151324', '#2A3F5E', '#0D0C17', '#3A2B4E', '#111020'], holo: 0.6, metal: 0.55 });
-  THEMES.sea   = Object.assign({}, THEMES.lapis, { foil: ['#2C6A72', '#0E2E36', '#225A62', '#08222A', '#1B4C55', '#0B2830'], ink2: '#BFDCDC' });
-  THEMES.deco  = Object.assign({}, THEMES.night, { foil: ['#1F4D3E', '#0B1F19', '#17402F', '#06140F', '#123528', '#08190F'], ink2: '#B9D2C4' });
   var FOIL_STOPS = [0, 0.26, 0.46, 0.70, 0.88, 1];
   var RAR = { base: '#A8997E', rare: '#5F7488', epic: '#6F5590', legendary: '#A1803F', mythic: '#7F2B35', unique: '#141210' };
   var SERIF = '"Cormorant Garamond", "Cormorant", "EB Garamond", Georgia, serif';
@@ -250,11 +247,6 @@
     return lines;
   }
   function foil(x, th) {
-    if (th === THEMES.prism) { foilBase(x, th); var hg = x.createLinearGradient(0, 0, 100, 160);
-      ['rgba(255,120,200,.22)', 'rgba(120,200,255,.22)', 'rgba(140,255,200,.18)', 'rgba(255,230,140,.22)', 'rgba(200,140,255,.22)'].forEach(function (c, i) { hg.addColorStop(i / 4, c); });
-      x.fillStyle = hg; x.fillRect(0, 0, 100, 160);
-      x.strokeStyle = 'rgba(255,255,255,.05)'; x.lineWidth = 0.6; for (var k = -160; k < 100; k += 3) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 160, 160); x.stroke(); }
-      return; }
     foilBase(x, th);
   }
   function foilBase(x, th) {
@@ -341,11 +333,6 @@
     g.addColorStop(0, m[0]); g.addColorStop(0.45, m[1]); g.addColorStop(1, m[2]);
     return g;
   }
-  function star4(x, cx, cy, r, a) {                     // petite étincelle à 4 branches
-    x.save(); x.translate(cx, cy); x.rotate(a || 0); x.beginPath();
-    for (var i = 0; i < 8; i++) { var rr2 = i % 2 ? r * 0.22 : r, t = i * Math.PI / 4; x.lineTo(Math.cos(t) * rr2, Math.sin(t) * rr2); }
-    x.closePath(); x.fill(); x.restore();
-  }
   function rose(x, th, cx, cy, R, dark) {               // rose des vents à 8 branches facettées
     for (var i = 0; i < 8; i++) {
       var t = i * Math.PI / 4 - Math.PI / 2, L = i % 2 ? R * 0.62 : R, w = i % 2 ? 0.16 : 0.13;
@@ -409,68 +396,6 @@
       }
       x.fillStyle = g; x.beginPath(); x.arc(DCX, DCY, 6.2, 0, 7); x.fill();   // disque solaire
       x.strokeStyle = th.facet || 'rgba(0,0,0,.5)'; x.lineWidth = 0.3; x.beginPath(); x.arc(DCX, DCY, 4.6, 0, 7); x.stroke();
-      x.restore();
-    },
-    // 2. Holographique : film irisé, éventail de trois cartes (Rare, Épique, Légendaire), étincelles
-    holo: function (x, th) {
-      var cw = 24, ch = 33.6, cols = [['#8FA9C4', '#5F7488'], ['#B49AD6', '#6F5590'], ['#F0D79A', '#A1803F']];
-      [-14, 0, 14].forEach(function (a, i) {
-        x.save(); x.translate(DCX + (i - 1) * 9.5, DCY + 4 + (i === 1 ? -3 : 0)); x.rotate(a * DEG);
-        x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2.4 * S; x.shadowOffsetY = 1 * S;
-        rr(x, -cw / 2, -ch / 2, cw, ch, 1.4);
-        var g = x.createLinearGradient(-cw / 2, -ch / 2, cw / 2, ch / 2); g.addColorStop(0, cols[i][0]); g.addColorStop(1, cols[i][1]);
-        x.fillStyle = g; x.fill(); x.shadowColor = 'transparent';
-        x.lineWidth = 0.35; x.strokeStyle = 'rgba(255,255,255,.75)'; rr(x, -cw / 2 + 1.4, -ch / 2 + 1.4, cw - 2.8, ch - 2.8, 0.8); x.stroke();
-        var sh = x.createLinearGradient(-cw / 2, -ch / 2, cw / 2, ch / 2);   // reflet holographique
-        sh.addColorStop(0.3, 'rgba(255,255,255,0)'); sh.addColorStop(0.48, 'rgba(255,255,255,.35)'); sh.addColorStop(0.62, 'rgba(255,255,255,0)');
-        x.fillStyle = sh; rr(x, -cw / 2, -ch / 2, cw, ch, 1.4); x.fill();
-        mark(x, 0, 0, 9, 'rgba(255,255,255,.85)');
-        x.restore();
-      });
-      x.fillStyle = '#FFF6DE';
-      [[18, 62, 2.4, .2], [83, 58, 3, .5], [80, 98, 1.8, .1], [21, 101, 2.2, .7], [36, 109, 1.3, .4]].forEach(function (s) { star4(x, s[0], s[1], s[2], s[3]); });
-    },
-    // 3. Globe : sphère quadrillée sous un ciel de constellations
-    globe: function (x, th) {
-      var g = gold(x, th, DCY - DR, DCY + DR);
-      x.save();
-      x.fillStyle = 'rgba(255,255,255,.55)';            // constellations
-      var pts = [[14, 58], [22, 54], [27, 60], [20, 66], [80, 54], [86, 61], [77, 66], [88, 70], [12, 98], [19, 104], [85, 100], [80, 107]];
-      x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 0.15;
-      [[0, 1, 2, 3], [4, 5, 7, 6], [8, 9], [10, 11]].forEach(function (c) { x.beginPath(); c.forEach(function (k, i) { x[i ? 'lineTo' : 'moveTo'](pts[k][0], pts[k][1]); }); x.stroke(); });
-      pts.forEach(function (p) { x.beginPath(); x.arc(p[0], p[1], 0.45, 0, 7); x.fill(); });
-      var sp = x.createRadialGradient(DCX - 7, DCY - 8, 2, DCX, DCY, DR);   // sphère
-      sp.addColorStop(0, 'rgba(255,255,255,.2)'); sp.addColorStop(1, 'rgba(0,0,0,.25)');
-      x.fillStyle = sp; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.fill();
-      x.save(); x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.clip();
-      x.strokeStyle = g; x.lineWidth = 0.25;
-      [0.18, 0.5, 0.78, 1].forEach(function (k) { x.beginPath(); x.ellipse(DCX, DCY, DR * k, DR, 0, 0, 7); x.stroke(); });
-      [-0.72, -0.4, 0, 0.4, 0.72].forEach(function (k) { var yy = DCY + k * DR, w = Math.sqrt(1 - k * k) * DR; x.beginPath(); x.ellipse(DCX, yy, w, w * 0.12, 0, 0, 7); x.stroke(); });
-      x.restore();
-      x.lineWidth = 0.55; x.strokeStyle = g; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
-      x.lineWidth = 0.3; x.beginPath(); x.ellipse(DCX, DCY, DR + 5, DR * 0.32, -18 * DEG, 0, 7); x.stroke();   // anneau orbital
-      x.fillStyle = g; x.beginPath(); x.arc(DCX + (DR + 5) * Math.cos(-30 * DEG) * 0.98, DCY - 9.4, 0.9, 0, 7); x.fill();
-      x.restore();
-    },
-    // 4. Art déco : soleil de rayons dorés, cadre à redans, sceau ATLAS en médaillon
-    deco: function (x, th) {
-      var g = gold(x, th, WIN.y, WIN.y + WIN.h);
-      x.save();
-      x.save(); rr(x, WIN.x, WIN.y, WIN.w, WIN.h, 0.6); x.clip();
-      x.strokeStyle = g; x.globalAlpha = 0.5;
-      for (var k = 0; k < 29; k++) { var t = Math.PI + k * Math.PI / 28; x.lineWidth = k % 2 ? 0.18 : 0.42; x.beginPath(); x.moveTo(DCX, WIN.y + WIN.h + 2); x.lineTo(DCX + Math.cos(t) * 90, WIN.y + WIN.h + 2 + Math.sin(t) * 90); x.stroke(); }
-      x.restore(); x.globalAlpha = 1;
-      x.strokeStyle = g; x.lineWidth = 0.4;              // cadre à redans
-      var X0 = WIN.x, Y0 = WIN.y, X1 = WIN.x + WIN.w, Y1 = WIN.y + WIN.h, n = 3;
-      x.beginPath();
-      x.moveTo(X0 + n, Y0); x.lineTo(X1 - n, Y0); x.lineTo(X1 - n, Y0 + n); x.lineTo(X1, Y0 + n); x.lineTo(X1, Y1 - n); x.lineTo(X1 - n, Y1 - n); x.lineTo(X1 - n, Y1);
-      x.lineTo(X0 + n, Y1); x.lineTo(X0 + n, Y1 - n); x.lineTo(X0, Y1 - n); x.lineTo(X0, Y0 + n); x.lineTo(X0 + n, Y0 + n); x.closePath(); x.stroke();
-      x.lineWidth = 0.2; rr(x, X0 + 1.6, Y0 + 1.6, WIN.w - 3.2, WIN.h - 3.2, 0.4); x.stroke();
-      x.fillStyle = th.foil[3]; x.beginPath(); x.arc(DCX, DCY, 15.5, 0, 7); x.fill();   // médaillon
-      x.lineWidth = 0.6; x.beginPath(); x.arc(DCX, DCY, 15.5, 0, 7); x.stroke();
-      x.lineWidth = 0.22; x.beginPath(); x.arc(DCX, DCY, 13.6, 0, 7); x.stroke();
-      for (var d = 0; d < 4; d++) { var a = d * Math.PI / 2 - Math.PI / 4; x.fillStyle = g; x.save(); x.translate(DCX + Math.cos(a) * 15.5, DCY + Math.sin(a) * 15.5); x.rotate(a + Math.PI / 4); x.fillRect(-1, -1, 2, 2); x.restore(); }
-      mark(x, DCX, DCY, 22, th.gold);
       x.restore();
     }
   };

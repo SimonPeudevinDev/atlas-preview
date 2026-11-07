@@ -2046,7 +2046,7 @@ window.ATLAS = window.ATLAS || {};
   var ALL = ['grece', 'titans', 'geants', 'heros', 'monstres', 'egypte', 'pharaons', 'planetes', 'lunes', 'gothique', 'contes', 'histoire', 'nordique', 'creatures', 'jotnar', 'mondes', 'astronautes', 'missions', 'cosmos', 'detectives', 'verne', 'mousquetaires', 'nuits', 'merveilleux', 'jungle', 'arthur', 'robin', 'etranges', 'flibustiers', 'forbans', 'presidents', 'herosfr', 'savants', 'ecrivains', 'kami', 'yokai', 'samourais', 'epoques', 'eaux', 'hommessauvages', 'betes', 'citesperdues', 'enigmes', 'tresors', 'dinosaures', 'mersciel', 'megafaune', 'navires', 'maudits', 'alchimistes', 'illusionnistes', 'celtes', 'azteques', 'chine', 'inde', 'slaves', 'afrique'];
   A.PACKS = [
     {
-      id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'ivory', daily: true,
+      id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'd-cognac', design: 'cadran', daily: true,
       cover: 'merveilleux-alice-base',
       collections: ALL.filter(function (c) { return ['nordique', 'creatures', 'jotnar', 'mondes'].indexOf(c) === -1; }),
       odds: { base: 0.9, rare: 0.085, epic: 0.015 },
