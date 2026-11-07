@@ -638,7 +638,7 @@
     // Sachet de la boutique : propre. Sachet qu'on ouvre (il contient les cartes) : froissé au hasard.
     var opening = !!pk.querySelector('.pk-stack');
     var d = opening ? messy() : clean();
-    v.direct = opening;
+    v.direct = opening || pk.hasAttribute('data-pk-direct');   // sachet animé en continu : affichage direct
     v.infl = d.infl;
     v.U = {
       tp: { value: 0 }, dir: { value: 1 }, guide: { value: -1 }, guideA: { value: 0 },

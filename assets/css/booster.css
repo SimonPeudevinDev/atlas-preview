@@ -684,26 +684,28 @@
 .mu-count { margin: 8px 0 0; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #CFC3AC; }
 .mu-count b { font-family: var(--serif); font-size: 26px; letter-spacing: 0; color: var(--gold-2); margin-right: 4px; vertical-align: -3px; }
 .mu-stage { flex: 1; display: grid; place-items: center; min-height: 0; touch-action: none; cursor: grab; overflow: hidden; }
-.mu-queue { --pw: min(200px, 48vw, calc((100vh - 330px) * .625)); position: relative; width: var(--pw); height: calc(var(--pw) * 1.6);
-  translate: calc(var(--pw) * -.42) 0; perspective: 1100px; transform-style: preserve-3d; }
-.mu-pack { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform, opacity;
-  transform: translateX(calc(var(--q) * 19%)) translateZ(calc(var(--q) * -70px)) rotateY(-16deg);
-  opacity: clamp(0, calc(1.25 - var(--q) * .1), 1); z-index: calc(20 - var(--q));
-  transition: transform .34s cubic-bezier(.25, .8, .25, 1), opacity .34s ease; }
-.mu-pack.is-gone { transform: translateX(-150%) translateZ(40px) rotateY(-24deg) rotateZ(-8deg); opacity: 0; transition-timing-function: cubic-bezier(.5, 0, .9, .6), ease-in; transition-duration: .3s; }
-.mu-pack i { position: absolute; inset: 0; display: block; }
-.mp-body, .mp-cap { background: var(--pk-foil, linear-gradient(158deg, #1F5A47, #06170F)); border-radius: 1.5%; }
-.mu-queue.has-face .mp-body, .mu-queue.has-face .mp-cap { background: var(--face) center / 100% 100% no-repeat; border-radius: 0; }
-.mp-body { clip-path: inset(calc(var(--ty) * 100%) 0 0 0); filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .5)); }
-.mp-cap { clip-path: inset(0 0 calc((1 - var(--ty)) * 100%) 0); transform-origin: 85% calc(var(--ty) * 100%); }
-.mp-gloss { background: linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.14) 45%, rgba(255,255,255,0) 60%); clip-path: inset(0 0 0 0); pointer-events: none; mix-blend-mode: screen; }
-.mp-line { top: calc(var(--ty) * 100%) !important; bottom: auto !important; height: 2px; left: 4% !important; right: 4% !important; transform: scaleX(0); transform-origin: left center;
-  background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--fc, #fff) 60%, #fff)); box-shadow: 0 0 10px 2px var(--fc, #fff); border-radius: 2px; }
-.mu-pack.is-tear .mp-line { transition: transform var(--tt) linear; transform: scaleX(1); }
-.mu-pack.is-torn .mp-cap { animation: mpCap .42s cubic-bezier(.2, .7, .3, 1) forwards; }
-.mu-pack.is-torn .mp-line { height: 6px; box-shadow: 0 -6px 26px 10px var(--fc, #fff); transition: box-shadow .12s, height .12s; }
-.mu-pack.is-torn.is-big .mp-line { box-shadow: 0 -10px 46px 20px var(--fc, #fff); }
-@keyframes mpCap { to { transform: translate(14%, -70%) rotate(16deg); opacity: 0; } }
+.mu-queue { --pw: min(210px, 52vw, calc((100vh - 360px) * .625)); --st: 4.2%; position: relative; width: var(--pw); height: calc(var(--pw) * 1.6); margin-top: calc(var(--pw) * 1.6 * var(--st) * 4); }
+/* Devant : le vrai sachet 3D */
+.mu-front { position: absolute; inset: 0; z-index: 30; }
+.mu-front .pk { --pk-w: var(--pw); }
+.mu-front.is-rise { animation: muRise .13s cubic-bezier(.2, .8, .3, 1); }
+.mu-front.is-empty { opacity: 0; transition: opacity .12s; }
+@keyframes muRise { from { transform: translateY(calc(var(--st) * -1)) scale(.965); filter: brightness(.9); } }
+/* Derrière : les autres sachets empilés, chacun un peu plus haut que celui de devant */
+.mu-behind .mu-pack { position: absolute; inset: 0; transform-origin: 50% 0;
+  transform: translateY(calc(var(--q) * var(--st) * -1)) scale(calc(1 - var(--q) * .035)); z-index: calc(20 - var(--q));
+  filter: brightness(calc(1 - var(--q) * .07)) drop-shadow(0 -2px 6px rgba(0, 0, 0, .35)); transition: transform .13s cubic-bezier(.2, .8, .3, 1), filter .13s; }
+.mu-pack i, .mu-gone i { position: absolute; inset: 0; display: block; }
+.mp-body { background: var(--pk-foil, linear-gradient(158deg, #1F5A47, #06170F)); border-radius: 1.5%; }
+.mu-queue.has-face .mp-body { background: var(--face) center / 100% 100% no-repeat; border-radius: 0; }
+/* Le sachet ouvert s’en va à gauche (copie plate sans son bout, la lueur de rareté au bord) */
+.mu-fly { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+.mu-gone { position: absolute; inset: 0; animation: muGone .3s cubic-bezier(.5, 0, .85, .5) forwards; }
+.mu-gone .mp-body { clip-path: inset(calc(var(--ty) * 100%) 0 0 0); }
+.mu-gone .mp-line { top: calc(var(--ty) * 100%) !important; bottom: auto !important; left: 4% !important; right: 4% !important; height: 5px; border-radius: 3px;
+  background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--fc, #fff) 60%, #fff)); box-shadow: 0 -6px 26px 10px var(--fc, #fff); }
+.mu-gone.is-big .mp-line { box-shadow: 0 -10px 46px 20px var(--fc, #fff); }
+@keyframes muGone { to { transform: translateX(-150%) rotate(-12deg); opacity: 0; } }
 .multi.t-c-emeraude .mu-queue { --pk-foil: linear-gradient(158deg, #1F5A47 0%, #0A241C 40%, #184A39 70%, #06170F 100%); }
 .multi.t-c-bordeaux .mu-queue { --pk-foil: linear-gradient(158deg, #8E2A3B 0%, #3F0A14 40%, #701C2C 70%, #2A050C 100%); }
 .multi.t-c-nuit .mu-queue { --pk-foil: linear-gradient(158deg, #24407F 0%, #0D1A3C 40%, #1C3366 70%, #070F26 100%); }

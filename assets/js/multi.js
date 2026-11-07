@@ -28,18 +28,23 @@
     var el = document.createElement('div');
     el.className = 'multi is-stage t-' + pack.theme;
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Ouverture multiple');
+    // Le sachet de devant est le vrai sachet 3D ; les autres sont empilés derrière, chacun un peu plus haut
     var q = '';
-    for (var k = 0; k < n; k++) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-body"></i><i class="mp-cap"></i><i class="mp-line"></i><i class="mp-gloss"></i></div>';
+    for (var k = n - 1; k >= 1; k--) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-body"></i></div>';
     el.innerHTML =
       '<div class="mu-top"><button class="op-icon" data-mu-close aria-label="Fermer">' + U.icon('close') + '</button></div>' +
       '<div class="mu-head"><p class="eyebrow">' + pack.kicker + '</p><h2 class="op-title">' + pack.name + '</h2>' +
         '<p class="mu-count"><b>' + n + '</b> booster' + (n > 1 ? 's' : '') + '</p></div>' +
-      '<div class="mu-stage"><div class="mu-queue" style="--ty:' + ((A.pack3d && A.pack3d.tearRatio) || 0.12).toFixed(4) + '">' + q + '</div></div>' +
+      '<div class="mu-stage"><div class="mu-queue" style="--ty:' + ((A.pack3d && A.pack3d.tearRatio) || 0.12).toFixed(4) + '">' +
+        '<div class="mu-behind">' + q + '</div><div class="mu-front">' + A.pack.html(pack, { tilt: true }) + '</div><div class="mu-fly"></div></div></div>' +
       '<p class="mu-hint">Glissez pour ouvrir les ' + n + '</p>';
     document.body.appendChild(el);
     var html = document.documentElement, prev = html.style.overflow;
     html.style.overflow = 'hidden';
-    var queue = el.querySelector('.mu-queue'), packEls = [].slice.call(el.querySelectorAll('.mu-pack'));
+    var queue = el.querySelector('.mu-queue'), front = el.querySelector('.mu-front'), pk = front.querySelector('.pk');
+    pk.setAttribute('data-pk-direct', '');
+    A.pack.mountAll(el);
+    if (pk._rig) pk._rig.idle(true);
     if (A.pack3d && A.pack3d.faceURL) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); });
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     setTimeout(function () { if (el.isConnected) SFX.land(); }, 200);
@@ -81,32 +86,62 @@
         packs.push(r.items);
       }
       if (!packs.length) { U.toast('Aucun booster à ouvrir', 'error'); close(false); return; }
-      for (var j = packs.length; j < packEls.length; j++) packEls[j].remove();   // stock épuisé entre-temps
+      [].forEach.call(el.querySelectorAll('.mu-behind .mu-pack'), function (p) {   // stock épuisé entre-temps
+        if (+p.style.getPropertyValue('--q') > packs.length - 1) p.remove();
+      });
+      if (pk._rig) pk._rig.idle(false);
       el.classList.add('is-going');
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
       tearAt(0);
     }
 
-    // Rafale : le trait de lumière file le long de la ligne, le bout s’envole, le sachet glisse à gauche
-    // et toute la file avance d’un cran ; le suivant commence déjà sa déchirure (enchaînement continu).
-    function advance(cur) { packEls.forEach(function (p, k) { p.style.setProperty('--q', Math.max(0, k - cur)); p.classList.toggle('is-gone', k < cur); }); }
+    // Rafale : sur le vrai sachet 3D, la lumière file le long de la ligne, le bout s’arrache ; le sachet ouvert
+    // part à gauche (copie plate) pendant que celui de derrière descend prendre sa place et se déchire déjà.
+    function setTp(p) { if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3)); }
+    function tear(ms, done) {
+      var t0 = performance.now();
+      (function step(now) {
+        if (closed) return;
+        var k = Math.min(1, ((now || performance.now()) - t0) / ms), e = k * k * (3 - 2 * k);
+        setTp(e);
+        if (k < 1) requestAnimationFrame(step); else done();
+      })();
+    }
     function tearAt(i) {
       if (closed) return;
-      if (i >= packs.length || skip) { advance(packs.length); setTimeout(grid, skip ? 0 : 380); return; }
-      var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), big = best >= 3, p = packEls[i];
-      var tt = reduce ? 40 : big ? 170 : 95;
-      p.style.setProperty('--fc', GLOW[A.RARITIES[best].id]);
-      p.style.setProperty('--tt', tt + 'ms');
-      p.classList.add('is-tear');
+      if (i >= packs.length || skip) { setTimeout(grid, skip ? 0 : 260); return; }
+      var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), big = best >= 3;
+      var tt = reduce ? 40 : big ? 160 : 75;
+      pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);   // la lueur de l’ouverture trahit la meilleure carte
+      pk.classList.remove('is-torn'); pk.classList.add('dir-r', 'is-tearing');
+      setTp(0);
       SFX.grain(0.2); setTimeout(function () { if (!closed) SFX.grain(0.7); }, tt * 0.55);
-      setTimeout(function () {
+      tear(tt, function () {
         if (closed) return;
-        p.classList.add('is-torn'); if (big) p.classList.add('is-big');
+        pk.classList.add('is-torn');
         SFX.rip(best); A.haptic(big ? [16, 30, 20] : 8);
         if (big) SFX.numbered(best);
         var c = el.querySelector('.mu-count b'); if (c) c.textContent = packs.length - i - 1;
-        setTimeout(function () { if (closed) return; advance(i + 1); tearAt(i + 1); }, reduce ? 30 : big ? 300 : 45);
-      }, tt);
+        setTimeout(function () {
+          if (closed) return;
+          // le sachet ouvert s’en va à gauche (copie plate, avec sa lueur)
+          var g = document.createElement('div');
+          g.className = 'mu-gone' + (big ? ' is-big' : '');
+          g.style.setProperty('--fc', GLOW[A.RARITIES[best].id]);
+          g.innerHTML = '<i class="mp-body"></i><i class="mp-line"></i>';
+          el.querySelector('.mu-fly').appendChild(g);
+          setTimeout(function () { g.remove(); }, 400);
+          if (i + 1 >= packs.length) { front.classList.add('is-empty'); tearAt(i + 1); return; }
+          // celui de derrière descend à la place du premier : le vrai sachet repart neuf depuis sa position
+          var b = el.querySelectorAll('.mu-behind .mu-pack');
+          b.forEach(function (p) { p.style.setProperty('--q', +p.style.getPropertyValue('--q') - 1); });
+          var first = [].filter.call(b, function (p) { return +p.style.getPropertyValue('--q') <= 0; })[0];
+          if (first) first.remove();
+          pk.classList.remove('is-torn', 'is-tearing', 'dir-r'); setTp(0);
+          front.classList.remove('is-rise'); void front.offsetWidth; front.classList.add('is-rise');
+          setTimeout(function () { tearAt(i + 1); }, reduce ? 20 : 45);
+        }, reduce ? 30 : big ? 260 : 25);
+      });
     }
 
     // Révélation en cascade : les cartes apparaissent face visible une à une, des plus communes aux plus rares,
