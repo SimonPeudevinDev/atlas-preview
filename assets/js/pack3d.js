@@ -87,8 +87,7 @@
       return !!(c.getContext('webgl2') || c.getContext('webgl'));
     } catch (e) { return false; }
   }
-  P3.ok = supported();
-  if (!P3.ok) return;
+  P3.ok = supported();   // sans WebGL : pas de 3D (attach refuse), mais les images plates (faceURL) restent disponibles
 
   function init() {
     if (R) return true;
@@ -856,6 +855,22 @@
 
   /* ---------- API ---------- */
   /** Remplace le rendu CSS d’un sachet par le modèle 3D (dès que ses textures sont prêtes). */
+  /* Image plate de la face d’un sachet (même dessin que la 3D), pour les files de sachets légères
+     (ouverture multiple). Mise en cache par sachet. */
+  var faceCache = {};
+  P3.tearRatio = TY / 160;
+  P3.faceURL = function (p) {
+    if (faceCache[p.id]) return faceCache[p.id];
+    var th = THEMES[p.theme] || THEMES.ivory;
+    return (faceCache[p.id] = fonts().then(function () {
+      var c = drawFront(p, th, null);
+      return new Promise(function (res) {
+        if (c.toBlob) c.toBlob(function (b) { res(b ? URL.createObjectURL(b) : c.toDataURL()); }, 'image/png');
+        else res(c.toDataURL());
+      });
+    }));
+  };
+
   P3.attach = function (pk) {
     if (!P3.ok || lost || pk._gl || pk._glPending) return null;
     var p = A.PACK[pk.getAttribute('data-pk')];
