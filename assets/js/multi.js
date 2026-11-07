@@ -34,7 +34,7 @@
       '<div class="mu-head"><p class="eyebrow">' + pack.kicker + '</p><h2 class="op-title">' + pack.name + '</h2></div>' +
       '<div class="mu-stage"><div class="mu-pile">' + '<div class="mu-ghosts">' + ghosts + '</div>' +
         '<div class="mu-pk">' + A.pack.html(pack, { tilt: true }) + '</div>' +
-        '<span class="mu-badge">×<b>' + n + '</b></span><div class="mu-flash"></div><div class="mu-shards"></div></div></div>' +
+        '<span class="mu-badge">×<b>' + n + '</b></span><div class="mu-flash"></div></div></div>' +
       '<p class="mu-hint">Glissez sur le sachet pour ouvrir les ' + n + '</p>';
     document.body.appendChild(el);
     var html = document.documentElement, prev = html.style.overflow;
@@ -84,41 +84,54 @@
       el.classList.add('is-going');
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
       if (pk && pk._rig) pk._rig.idle(false);
+      SFX.whoosh && SFX.whoosh();
       burst(0);
     }
 
-    // Un sachet qui éclate : flash à la couleur de sa meilleure carte, gerbe de cartes, compteur qui descend
+    // Chaque sachet s’ouvre comme un booster seul, en accéléré : la lumière court le long de la ligne
+    // (« tic tic » puis le « chling » de la déchirure), le bout s’arrache, le sachet s’efface et le suivant arrive.
+    function setTp(p) { if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3)); }
+    function tear(ms, done) {
+      var t0 = performance.now(), lastG = 0;
+      (function step(now) {
+        if (closed) return;
+        var k = Math.min(1, ((now || performance.now()) - t0) / ms), e = k * k * (3 - 2 * k);
+        while (e - lastG >= 0.2) { lastG += 0.2; SFX.grain(lastG); }
+        setTp(e);
+        if (k < 1) requestAnimationFrame(step); else done();
+      })();
+    }
     function burst(i) {
       if (closed) return;
       if (i >= packs.length || skip) { grid(); return; }
-      var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), rid = A.RARITIES[best].id;
-      var big = best >= 3, dur = reduce ? 120 : big ? 620 : 300;
+      var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), rid = A.RARITIES[best].id, big = best >= 3;
       var pile = el.querySelector('.mu-pile');
+      pk.setAttribute('data-glow', GLOW[rid]);            // la lumière qui s’échappe trahit la meilleure carte
       pile.style.setProperty('--fc', GLOW[rid]);
-      pile.style.setProperty('--dur', dur + 'ms');
-      pile.classList.remove('is-burst', 'is-back', 'is-big'); void pile.offsetWidth;
-      pile.classList.add('is-burst'); if (big) pile.classList.add('is-big');
-      SFX.rip(Math.min(best, 3));
-      if (big) setTimeout(function () { if (!closed) SFX.reveal(best); }, dur * 0.5);
-      A.haptic(big ? [18, 30, 24] : 8);
-      // gerbe de cartes
-      var sh = el.querySelector('.mu-shards'), frag = '';
-      items.forEach(function (it, k) {
-        var a = -90 + (k - (items.length - 1) / 2) * 26 + (Math.random() * 10 - 5);
-        frag += '<i class="r-' + A.ED[it.ed].rarity + '" style="--a:' + a + 'deg;--k:' + k + ';--c:' + GLOW[A.ED[it.ed].rarity] + '"></i>';
-      });
-      sh.innerHTML = frag;
-      // pile et compteur
-      var left = packs.length - i - 1;
-      var gh = el.querySelectorAll('.mu-ghosts i');
-      if (gh.length) gh[gh.length - 1].remove();
-      el.querySelector('.mu-badge b').textContent = left;
-      setTimeout(function () {
+      pk.classList.remove('is-torn'); pk.classList.add('dir-r', 'is-tearing');
+      setTp(0);
+      tear(reduce ? 60 : big ? 320 : 160, function () {
         if (closed) return;
-        if (left <= 0) { grid(); return; }
-        pile.classList.remove('is-burst', 'is-big'); void pile.offsetWidth; pile.classList.add('is-back');
-        setTimeout(function () { burst(i + 1); }, reduce ? 40 : 110);
-      }, dur);
+        pk.classList.add('is-torn');
+        SFX.rip(best); A.haptic(big ? [16, 30, 20] : 10);
+        if (best >= 2) SFX.numbered(best);
+        pile.classList.add('is-lit'); if (big) pile.classList.add('is-big');
+        var left = packs.length - i - 1;
+        el.querySelector('.mu-badge b').textContent = left;
+        setTimeout(function () {
+          if (closed) return;
+          if (left <= 0) { grid(); return; }
+          pile.classList.add('is-out');                   // le sachet ouvert s’efface vers la gauche
+          setTimeout(function () {
+            if (closed) return;
+            var gh = el.querySelectorAll('.mu-ghosts i'); if (gh.length) gh[gh.length - 1].remove();
+            pk.classList.remove('is-torn', 'is-tearing', 'dir-r'); setTp(0);
+            pile.classList.remove('is-out', 'is-lit', 'is-big'); void pile.offsetWidth;
+            pile.classList.add('is-next'); SFX.slide(0.25);  // le suivant glisse depuis la pile
+            setTimeout(function () { pile.classList.remove('is-next'); burst(i + 1); }, reduce ? 40 : 100);
+          }, reduce ? 40 : 110);
+        }, reduce ? 80 : big ? 520 : 150);
+      });
     }
 
     // Écran récapitulatif
@@ -140,15 +153,16 @@
           '<div class="mu-chips">' + chips + '</div></div>' +
         '<div class="mu-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed];
-          return '<button class="mu-item r-' + ed.rarity + (A.R[ed.rarity].rank >= 3 ? ' is-big' : '') + '" data-ed="' + it.ed + '" data-uid="' + it.uid + '" style="--d:' + Math.min(i * 40, 1600) + 'ms">' +
+          return '<button class="mu-item r-' + ed.rarity + (A.R[ed.rarity].rank >= 3 ? ' is-big' : '') + '" data-ed="' + it.ed + '" data-uid="' + it.uid + '" style="--d:' + (i * 22) + 'ms;--r:' + (Math.random() * 30 - 15).toFixed(1) + 'deg">' +
             U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</button>';
         }).join('') + '</div>' +
         '<div class="mu-foot"><button class="btn btn-gold btn-lg" data-mu-done>Ajouter à l’inventaire</button>' +
           (again >= 1 ? '<button class="btn btn-ghost-light btn-lg" data-mu-again>Encore ×' + again + '</button>' : '') + '</div>';
+      // Déferlement : toutes les cartes tombent d’un coup, en cascade serrée
       var deal = 0, tick = setInterval(function () {
-        if (!el.isConnected || deal > Math.min(items.length, 12)) { clearInterval(tick); return; }
-        SFX.deal(0.16, 0.7 + Math.random() * 0.4); deal++;
-      }, 70);
+        if (!el.isConnected || deal > Math.min(items.length, 22)) { clearInterval(tick); return; }
+        SFX.deal(0.12, 0.6 + Math.random() * 0.5); deal++;
+      }, 40);
       if (best >= 1 && !packs.some(function (its) { return Math.max.apply(null, its.map(rankOf)) >= 3; })) setTimeout(function () { if (!closed) SFX.reveal(best); }, 200);
     }
   };

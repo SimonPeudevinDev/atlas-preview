@@ -694,23 +694,20 @@
 .mu-badge b { font-size: 22px; }
 .mu-hint { flex: none; margin: 0; padding: 14px 20px calc(26px + env(safe-area-inset-bottom)); text-align: center; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(230,220,200,.6); }
 .mu-skip { padding: 8px 18px; border: 1px solid rgba(230,220,200,.3); border-radius: 999px; background: transparent; color: #E6DCC8; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
-/* Éclatement d’un sachet : il gonfle, se déchire vers le haut ; flash et gerbe à la couleur de la meilleure carte */
+/* Ouverture en rafale : vraie déchirure (pack3d), lueur à la couleur de la meilleure carte, puis le sachet s’efface */
 .mu-pk { position: relative; z-index: 1; }
-.mu-pile.is-burst .mu-pk { animation: muRip var(--dur) cubic-bezier(.5, 0, .7, .4) forwards; }
-.mu-pile.is-burst.is-big .mu-pk { animation-name: muRipBig; }
-.mu-pile.is-back .mu-pk { animation: muBack .16s cubic-bezier(.2, .9, .3, 1.2); }
-@keyframes muRip { 0% { transform: none; } 35% { transform: scale(1.06) rotate(-2deg); } 55% { transform: scale(1.1) translateY(-4%); opacity: 1; } 100% { transform: translateY(-75%) scale(.75) rotate(7deg); opacity: 0; } }
-@keyframes muRipBig { 0% { transform: none; } 15%, 45% { transform: scale(1.08) rotate(-1.5deg); } 25%, 55% { transform: scale(1.1) rotate(1.5deg); } 70% { transform: scale(1.16); opacity: 1; } 100% { transform: translateY(-80%) scale(.8) rotate(8deg); opacity: 0; } }
-@keyframes muBack { from { transform: translateY(14px) scale(.96); opacity: .3; } }
-.mu-flash { position: absolute; inset: -40%; z-index: 2; pointer-events: none; opacity: 0;
-  background: radial-gradient(closest-side, #fff 0%, var(--fc, #fff) 22%, color-mix(in srgb, var(--fc, #fff) 40%, transparent) 50%, transparent 72%); }
-.mu-pile.is-burst .mu-flash { animation: muFlash var(--dur) ease-out forwards; }
-.mu-pile.is-burst.is-big .mu-flash { inset: -90%; }
-@keyframes muFlash { 0%, 40% { opacity: 0; transform: scale(.4); } 58% { opacity: .95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
-.mu-shards { position: absolute; left: 50%; top: 40%; z-index: 3; pointer-events: none; }
-.mu-shards i { position: absolute; left: -11px; top: -15px; width: 22px; height: 30px; border-radius: 3px; background: linear-gradient(160deg, #fff, var(--c)); box-shadow: 0 0 12px var(--c);
-  opacity: 0; animation: muShard calc(var(--dur) * 1.1) cubic-bezier(.15, .8, .3, 1) forwards; animation-delay: calc(var(--dur) * .45 + var(--k) * 12ms); }
-@keyframes muShard { 0% { opacity: 0; transform: rotate(var(--a)) translateX(0) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(150px) rotate(220deg); } }
+.mu-flash { position: absolute; left: -30%; right: -30%; top: -22%; height: 50%; z-index: 2; pointer-events: none; opacity: 0;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--fc, #fff) 70%, #fff) 0%, color-mix(in srgb, var(--fc, #fff) 45%, transparent) 40%, transparent 72%); transition: opacity .18s ease-out; }
+.mu-pile.is-lit .mu-flash { opacity: .75; }
+.mu-pile.is-lit.is-big .mu-flash { opacity: 1; top: -40%; height: 80%; }
+.mu-pile.is-out .mu-pk { animation: muOut .11s cubic-bezier(.5, 0, .9, .5) forwards; }
+.mu-pile.is-out .mu-flash { opacity: 0; }
+.mu-pile.is-next .mu-pk { animation: muNext .12s cubic-bezier(.2, .9, .3, 1.15); }
+@keyframes muOut { to { transform: translateX(-75%) rotate(-10deg) scale(.9); opacity: 0; } }
+@keyframes muNext { from { transform: translate(10px, 14px) scale(.96); opacity: .4; } }
+/* Déferlement : les cartes tombent du haut de l’écran dans la grille */
+.multi.is-grid .mu-item { transform: translateY(-110vh) rotate(var(--r, 0deg)); animation: muFall .62s cubic-bezier(.2, .8, .25, 1.05) forwards; animation-delay: var(--d); }
+@keyframes muFall { 0% { opacity: 1; transform: translateY(-110vh) rotate(var(--r, 0deg)); } 100% { opacity: 1; transform: none; } }
 .multi.is-grid .mu-top, .multi.is-grid .mu-hint { display: none; }
 .mu-head .eyebrow { color: var(--gold-2); margin-bottom: 4px; }
 .mu-sub { margin: 6px 0 10px; font-size: 13px; color: #CFC3AC; }
