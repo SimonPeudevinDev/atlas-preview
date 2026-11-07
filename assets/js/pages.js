@@ -119,6 +119,19 @@
         var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
         dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
       }, { passive: true });
+      // Défilement automatique toutes les 4,5 s (en boucle), seulement quand il est visible ;
+      // il s’arrête dès qu’on le touche et repart 8 s plus tard
+      if (st && dots.length && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+        var visible = false, holdUntil = 0;
+        if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting && en[0].intersectionRatio > 0.6; }, { threshold: [0, 0.6, 1] }).observe(st);
+        ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { st.addEventListener(ev, function () { holdUntil = Date.now() + 8000; }, { passive: true }); });
+        var auto = setInterval(function () {
+          if (!st.isConnected) { clearInterval(auto); return; }
+          if (!visible || Date.now() < holdUntil || st.scrollWidth <= st.clientWidth + 4 || document.querySelector('.opener')) return;
+          var w = st.firstElementChild.offsetWidth + 12, atEnd = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4;
+          st.scrollTo({ left: atEnd ? 0 : Math.round(st.scrollLeft / w + 1) * w, behavior: 'smooth' });
+        }, 4500);
+      }
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {

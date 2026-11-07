@@ -1092,7 +1092,9 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .hero { padding: 28px 0 60px; }
   .hero-grid { grid-template-columns: 1fr; min-height: 0; gap: 56px; }
   .hero-visual { order: -1; padding: 10px 0 0; }
-  .hero-stack { width: min(240px, 56vw); }
+  .hero-stack { width: min(210px, 52vw); }   /* un poil plus petit : l’éventail tient dans l’écran */
+  .hs-l { transform: translate(-38%, 5%) rotate(-8deg) scale(.8); }
+  .hs-r { transform: translate(38%, 5%) rotate(7deg) scale(.8); }
   .hero-copy .lead { margin: 22px 0 28px; }
   .hero-facts { margin-top: 40px; gap: 28px; }
   .section { padding: 72px 0; }
@@ -1167,8 +1169,19 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .dialog { padding: 28px 20px; }
   .anatomy { grid-template-columns: 1fr; gap: 28px; }
   .anatomy-card { max-width: 240px; }
-  .footer-inner { grid-template-columns: 1fr; }
-  .footer-cols { grid-template-columns: 1fr 1fr; }
+  /* Pied de page mobile : centré et compact (la barre du bas fait déjà la navigation) */
+  .site-footer { margin-top: 24px; padding: 36px 0 30px; text-align: center; }
+  .footer-inner { grid-template-columns: 1fr; gap: 22px; justify-items: center; }
+  .footer-brand { display: flex; flex-direction: column; align-items: center; }
+  .footer-brand .logo { font-size: 19px; }
+  .footer-brand p { margin: 10px auto 0; font-size: 13px; line-height: 1.55; color: var(--ink-3); max-width: 32ch; }
+  .footer-cols { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 360px; }
+  .footer-cols > div { display: contents; }
+  .footer-cols .eyebrow { display: none; }
+  .footer-cols a, .footer-cols .link-btn { padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; line-height: 1; background: var(--surface); }
+  .footer-cols .link-btn { border-style: dashed; background: transparent; color: var(--ink-3); }
+  .footer-bottom { flex-direction: column-reverse; align-items: center; gap: 6px; width: 100%; padding-top: 18px; }
+  .footer-bottom em { font-size: 18px; color: var(--gold); }
 }
 @media (max-width: 480px) {
   .display { font-size: 52px; }
