@@ -745,6 +745,57 @@
       dealSummary(fromR, unseen);
     }
 
+    /* Zoom du récapitulatif : toucher une carte l’ouvre en grand ; on fait glisser pour passer
+       à la suivante, on touche la carte pour lire sa notice, on touche à côté pour revenir. */
+    var zoom = null;
+    function openZoom(i) {
+      if (zoom || !items || !items[i]) return;
+      var z = document.createElement('div');
+      z.className = 'sum-zoom';
+      z.innerHTML = '<button class="op-icon sz-x" data-zclose aria-label="Fermer">' + U.icon('close') + '</button>' +
+        '<div class="sz-card"></div><p class="sz-cap"></p><div class="sz-dots">' + items.map(function () { return '<i></i>'; }).join('') + '</div>' +
+        '<p class="sz-hint">Touchez la carte pour lire sa notice · glissez pour changer</p>';
+      el.appendChild(z);
+      zoom = { el: z, i: i, info: false };
+      showZoom(i, 0);
+      requestAnimationFrame(function () { z.classList.add('is-in'); });
+      SFX.flip();
+      var sx = null, sy = 0, moved = false;
+      z.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; moved = false; });
+      z.addEventListener('pointermove', function (e) { if (sx != null && Math.abs(e.clientX - sx) > 10) moved = true; });
+      z.addEventListener('pointerup', function (e) {
+        if (sx == null) return;
+        var dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { stepZoom(dx < 0 ? 1 : -1); return; }
+        if (moved) return;
+        if (e.target.closest('[data-zclose]')) { closeZoom(); return; }
+        var face = e.target.closest('.sz-face');
+        if (face) { zoom.info = !zoom.info; U.infoToggle(face, items[zoom.i].ed, zoom.info, 'cartel'); A.haptic(6); return; }
+        closeZoom();
+      });
+    }
+    function showZoom(i, dir) {
+      var it = items[i], ed = A.ED[it.ed], R = A.R[ed.rarity], z = zoom.el;
+      zoom.i = i; zoom.info = false;
+      var box = z.querySelector('.sz-card');
+      box.innerHTML = '<div class="sz-face r-' + ed.rarity + '" style="--cg:' + GLOW[ed.rarity] + '">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</div>';
+      box.classList.remove('from-l', 'from-r'); void box.offsetWidth;
+      if (dir) box.classList.add(dir > 0 ? 'from-r' : 'from-l');
+      z.querySelector('.sz-cap').innerHTML = '<span class="rar-chip r-' + ed.rarity + '"><i></i>' + R.label + '</span>' + (ed.supply ? '<span class="mono">' + U.serial(it.serial, ed.supply) + '</span>' : '');
+      [].forEach.call(z.querySelectorAll('.sz-dots i'), function (d, k) { d.classList.toggle('is-on', k === i); });
+    }
+    function stepZoom(d) {
+      var n = zoom.i + d;
+      if (n < 0 || n >= items.length) { A.haptic(4); return; }
+      SFX.deal(0.18, 0.7); showZoom(n, d);
+    }
+    function closeZoom() {
+      if (!zoom) return;
+      var z = zoom.el; zoom = null;
+      z.classList.remove('is-in');
+      setTimeout(function () { z.remove(); }, 260);
+    }
+
     /* Distribution du récapitulatif : chaque carte part de la pile et vole jusqu’à sa place en arc,
        se pose avec un claquement ; les cartes jamais vues se retournent ensuite une à une
        (de la plus commune à la meilleure, qui a droit à sa révélation complète). */
@@ -988,11 +1039,14 @@
         return;
       }
       if (e.target.closest('[data-done]')) { finishToInventory(); return; }
+      var si = e.target.closest('.sum-item');
+      if (si && !zoom && !si.classList.contains('is-down') && !summaryEl.classList.contains('is-dealing') && !summaryEl.classList.contains('is-collecting')) { openZoom(+si.getAttribute('data-i')); return; }
       if (e.target.closest('[data-again]')) { close(); setTimeout(function () { O.open(packId); }, 280); }
     });
 
     function onKey(e) {
-      if (e.key === 'Escape') { if (!el.classList.contains('is-locked')) close(); return; }
+      if (e.key === 'Escape') { if (zoom) { closeZoom(); return; } if (!el.classList.contains('is-locked')) close(); return; }
+      if (zoom && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { stepZoom(e.key === 'ArrowRight' ? 1 : -1); return; }
       if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowRight') return;
       if (e.target.closest && e.target.closest('button')) return;
       e.preventDefault();

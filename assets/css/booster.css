@@ -575,14 +575,14 @@
 .rv-info.v-cartel.is-on .ri-in { transform: none; }
 .v-cartel .rv-info-k, .v-cartel .rv-info-n, .v-cartel .rv-info-t, .v-cartel .ri-mark, .v-cartel .ri-foot { display: none; }   /* déjà sur la carte, juste au-dessus */
 .v-cartel .ri-rule, .v-cartel .rv-info-b { display: none; }   /* la phrase d’accroche redisait le début de la notice */
-.v-cartel .ri-story { display: block; color: var(--ink, #1B1814); font-family: "Cormorant Garamond", Georgia, serif; font-size: 6.6cqw; line-height: 1.38; text-wrap: pretty; }
+.v-cartel .ri-story { display: block; color: var(--card-ink, var(--ink, #1B1814));   /* --card-ink : texte clair sur les cartes Uniques (fond noir) */ font-family: "Cormorant Garamond", Georgia, serif; font-size: 6.6cqw; line-height: 1.38; text-wrap: pretty; }
 /* Cul-de-lampe : le sceau d’Atlas entre deux filets, puis la famille et l’édition */
 .ri-end { display: none; }
 .v-cartel .ri-end { display: flex; flex-direction: column; align-items: center; gap: 1.4cqw; margin-top: auto; padding-top: 3cqw; }
 .v-cartel .ri-orn { display: flex; align-items: center; gap: 2.6cqw; color: var(--rc); }
 .v-cartel .ri-orn::before, .v-cartel .ri-orn::after { content: ""; width: 11cqw; height: 1px; background: currentColor; opacity: .45; }
 .v-cartel .ri-orn .mark { width: 5.6cqw; height: 5.6cqw; }
-.v-cartel .ri-end-k { font-size: 2.5cqw; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3, #8A8173); }
+.v-cartel .ri-end-k { font-size: 2.5cqw; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--card-ink-2, var(--ink-3, #8A8173)); }
 .ri-story { display: none; margin: 0; }
 .v-cartel .ri-bar { display: block; position: absolute; right: 1.6cqw; top: 4%; width: .8cqw; height: 26%; border-radius: 1cqw; background: rgba(60, 45, 25, .2);
   opacity: 0; transition: top .5s cubic-bezier(.22, .9, .3, 1), opacity .3s ease .2s; z-index: 4; }
@@ -617,3 +617,24 @@
 
 .rv-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) { .rv-info, .rv-info .ri-in { transition: opacity .2s ease; } }
+
+/* Zoom d’une carte du récapitulatif */
+.sum-item:not(.is-down) { cursor: zoom-in; }
+.sum-zoom { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 60px 20px calc(24px + env(safe-area-inset-bottom)); background: rgba(10, 9, 8, .985); opacity: 0; transition: opacity .25s ease; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.sum-zoom.is-in { opacity: 1; }
+.sz-x { position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; }
+.sz-card { width: min(80vw, 380px, calc((100vh - 230px) * 63 / 88)); transform: scale(.88); transition: transform .32s cubic-bezier(.2, .9, .3, 1.15); }
+.sum-zoom.is-in .sz-card { transform: none; }
+.sz-card.from-r { animation: szR .3s cubic-bezier(.2, .9, .3, 1); }
+.sz-card.from-l { animation: szL .3s cubic-bezier(.2, .9, .3, 1); }
+@keyframes szR { from { transform: translateX(28%) rotate(3deg); opacity: 0; } }
+@keyframes szL { from { transform: translateX(-28%) rotate(-3deg); opacity: 0; } }
+.sz-face { position: relative; cursor: pointer; }
+.sz-face .card-inner { box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 0 60px var(--cg, transparent), 0 30px 70px rgba(0, 0, 0, .6); }
+.sz-cap { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font-size: 13px; color: #CFC3AC; }
+.sz-cap .rar-chip { color: #E6DCC8; }
+.sz-dots { display: flex; gap: 6px; }
+.sz-dots i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .22); transition: width .2s, background .2s; }
+.sz-dots i.is-on { width: 18px; background: #D8BC80; }
+.sz-hint { margin: 0; font-size: 11px; letter-spacing: .04em; color: rgba(230, 220, 200, .45); text-align: center; }
