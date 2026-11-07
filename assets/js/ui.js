@@ -28,6 +28,12 @@
     if (d > 0) return d + ' j ' + (h % 24) + ' h';
     return h + ' h ' + String(m).padStart(2, '0') + ' min';
   };
+  /** Compte à rebours court : « 12:05 » (ou « 1 h 03 min » au-delà d’une heure) */
+  U.clock = function (ms) {
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    if (t >= 3600) return U.duration(ms);
+    return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  };
   U.serial = function (serial, supply) {
     if (supply == null) return '';
     if (supply === 1) return '1/1';

@@ -22,7 +22,7 @@
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
     ['collections', '#/collections', 'Collections', 'grid'],
-    ['shop', '#/boutique', 'Boutique', 'pack'],
+    ['shop', '#/boutique', 'Boosters', 'pack'],
     ['inventory', '#/inventaire', 'Inventaire', 'cards'],
     ['market', '#/marketplace', 'Marketplace', 'market']
   ];

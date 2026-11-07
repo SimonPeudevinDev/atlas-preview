@@ -54,19 +54,70 @@
   /* ======================================================================
      ACCUEIL
      ====================================================================== */
+  /* ---------- Accueil : les boosters, comme dans un jeu ----------
+     Le Booster Atlas revient toutes les 15 min (10 en réserve), le quotidien chaque jour,
+     les autres se gagnent en jouant (missions, paliers, trophées). */
+  function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine' : '+1 dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
+  function playTile(p, state) {
+    var tk = S.tokens(p.id), can = S.canOpen(p.id), st;
+    if (p.daily) st = can.ok ? 'Prêt à ouvrir' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>';
+    else st = tk ? (tk > 1 ? tk + ' à ouvrir' : '1 à ouvrir') : 'À gagner : missions et paliers';
+    return '<article class="play-tile' + (can.ok ? ' is-ready' : '') + (p.event ? ' is-event' : '') + '"' + (can.ok ? ' data-open-pack="' + p.id + '"' : '') + '>' +
+      '<div class="pt-pack">' + A.pack.html(p) + (tk > 1 ? '<span class="pt-count">×' + tk + '</span>' : '') + '</div>' +
+      '<div class="pt-copy"><p class="pt-k">' + p.kicker + '</p><h3 class="pt-name">' + p.name + '</h3><p class="pt-st">' + st + '</p></div>' +
+      (can.ok ? '<span class="pt-go">' + I('chevR') + '</span>' : '') + '</article>';
+  }
+  function playHTML() {
+    var P0 = A.PACK.standard, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
+    for (var i = 0; i < ch.max; i++) pips += '<i' + (i < ch.n ? ' class="is-on"' : '') + '></i>';
+    var side = [A.PACK.daily, A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
+    return '<section class="play"><div class="container play-grid">' +
+      '<div class="play-main">' +
+        '<p class="eyebrow">Vos boosters</p>' +
+        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' +
+        '<div class="play-meter" role="img" aria-label="' + ch.n + ' boosters en réserve sur ' + ch.max + '"><span class="pm-pips">' + pips + '</span>' +
+          '<span class="pm-n"><b>' + ch.n + '</b>/' + ch.max + (tk ? ' <em>+' + tk + '</em>' : '') + '</span></div>' +
+        '<p class="play-clock">' + chargeClock(ch) + '</p>' +
+        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
+          (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
+        '<p class="play-note">5 cartes, toutes collections · un nouveau toutes les 15 min, jusqu’à ' + ch.max + ' en réserve</p>' +
+      '</div>' +
+      '<div class="play-side">' + side.map(playTile).join('') + '</div>' +
+    '</div></section>';
+  }
+
   P.home = {
     title: 'Le monde, en cartes',
+    mount: function (root) {
+      A.pack.mountAll(root);
+      var fp = root.querySelector('.play-pack .pk');
+      if (fp && fp._rig) fp._rig.idle(true);
+      root.addEventListener('click', function (e) {
+        var t = e.target.closest('[data-open-pack]');
+        if (t) A.opener.open(t.getAttribute('data-open-pack'));
+      });
+      // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
+      var n0 = S.charges().n, d0 = S.dailyAvailable();
+      var tick = setInterval(function () {
+        if (!root.isConnected || !root.querySelector('.play')) { clearInterval(tick); return; }
+        if (document.querySelector('.opener')) return;
+        var ch = S.charges();
+        if (ch.n !== n0 || S.dailyAvailable() !== d0) { clearInterval(tick); A.app.rerender(); return; }
+        root.querySelectorAll('[data-clock="charge"]').forEach(function (el) { el.textContent = U.clock(ch.next); });
+        root.querySelectorAll('[data-clock="daily"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()); });
+      }, 1000);
+    },
     render: function () {
       var feat = S.ownedOf('grece-zeus-legendary')[0];
       var steps = [
         ['I', 'Découvrir', 'Parcourez des collections consacrées aux mythologies, aux contes, à la littérature et à l’histoire. Chaque personnage possède sa notice.'],
-        ['II', 'Collectionner', 'Ouvrez un booster offert chaque jour, complétez vos collections et traquez les éditions numérotées les plus rares.'],
+        ['II', 'Collectionner', 'Ouvrez les boosters offerts toutes les 15 minutes et chaque jour, complétez vos collections et traquez les éditions numérotées les plus rares.'],
         ['III', 'Échanger', 'Négociez avec d’autres collectionneurs ou achetez sur la marketplace. Chaque exemplaire conserve sa provenance.']
       ];
       var popular = A.COLLECTIONS.filter(function (c) { return c.popular; }).sort(function (a, b) { return a.popular - b.popular; }).slice(0, 3);
       var event = A.COLLECTIONS.find(function (c) { return c.status === 'event'; });
 
-      return '' +
+      return playHTML() +
       '<section class="hero">' +
         '<div class="container hero-grid">' +
           '<div class="hero-copy reveal">' +
@@ -138,8 +189,8 @@
       '</div></section>' +
 
       '<section class="section cta"><div class="container cta-inner">' + U.mark('cta-mark') +
-        '<h2 class="h2">Votre premier booster vous attend.</h2><p class="lead">Trois cartes offertes chaque jour, sans paiement.</p>' +
-        '<a class="btn btn-primary btn-lg" href="#/boutique?open=daily">Ouvrir mon booster quotidien</a></div></section>';
+        '<h2 class="h2">Vos boosters vous attendent.</h2><p class="lead">Un Booster Atlas toutes les 15 minutes, trois cartes chaque jour, et des coffrets à gagner. Sans paiement.</p>' +
+        '<a class="btn btn-primary btn-lg" href="#/">Voir mes boosters</a></div></section>';
     }
   };
 
@@ -413,6 +464,7 @@
     return '<div class="pack-win"><span class="pack-win-label">À gagner</span><span class="pack-win-list">' + eds.map(miniCard).join('') + '</span></div>';
   }
   function packPill(p) {
+    if (p.timer) { var ch = S.charges(); return '<span class="pill pill-gold">' + I('clock') + ch.n + '/' + ch.max + (ch.n < ch.max ? ' · +1 dans ' + U.clock(ch.next) : ' · réserve pleine') + '</span>'; }
     if (p.daily) return S.dailyAvailable()
       ? '<span class="pill pill-gold">' + I('clock') + 'Encore ' + U.duration(S.nextDailyIn()) + '</span>'
       : '<span class="pill">' + I('clock') + 'Prochain dans ' + U.duration(S.nextDailyIn()) + '</span>';
@@ -421,14 +473,16 @@
   }
   function priceHTML(p) {
     var tk = S.tokens(p.id);
-    if (tk) return '<span class="free">' + U.icon('gift') + 'Offert' + (tk > 1 ? ' ×' + tk : '') + '</span>';
+    if (p.timer) return '<span class="free">' + S.charges().n + ' en réserve' + (tk ? ' +' + tk : '') + '</span>';
+    if (tk) return '<span class="free">' + U.icon('gift') + 'Gagné' + (tk > 1 ? ' ×' + tk : '') + '</span>';
+    if (p.earned) return '<span class="free is-muted">À gagner en jouant</span>';
     return p.price ? U.price(p.price) : '<span class="free">Gratuit</span>';
   }
 
   /* ---------- Booster vedette ---------- */
   function featuredPack() {
     if (S.dailyAvailable()) return A.PACK.daily;
-    if (S.eventRemaining() > 0) return A.PACK.saga;
+    if (S.eventRemaining() > 0 && S.tokens('saga')) return A.PACK.saga;
     return A.PACK.standard;
   }
   function featureHTML(p) {
@@ -513,12 +567,12 @@
   }
 
   P.shop = {
-    title: 'Boutique',
+    title: 'Boosters',
     render: function () {
       var st = S.get();
       return '<section class="page-head"><div class="container">' +
-        '<p class="eyebrow">Boutique</p><h1 class="h1">Boosters</h1>' +
-        '<p class="lead">Ouvrez un booster et découvrez qui rejoindra votre collection. Chaque carte est tirée dans le stock réel des éditions.</p>' +
+        '<p class="eyebrow">Boosters</p><h1 class="h1">Boosters</h1>' +
+        '<p class="lead">Aucun booster ne s’achète : le Booster Atlas revient toutes les 15 minutes, le quotidien chaque jour, et les coffrets se gagnent en jouant. Chaque carte est tirée dans le stock réel des éditions.</p>' +
         '</div></section>' +
         '<section class="section-tight"><div class="container">' +
         featureHTML(featuredPack()) +
@@ -547,9 +601,9 @@
           '<div class="odds-list">' + shopPacks().map(oddsItem).join('') + '</div>' +
           '<p class="odds-note muted">Probabilités par carte tirée. Le taux réel est recalculé à chaque tirage : taux de référence × part du stock encore disponible. La part non attribuée revient à la rareté la plus courante. Les quantités d’édition (250, 100, 50…) ne sont pas des probabilités.</p>' +
           '<div class="info-grid">' +
-            '<div class="info">' + I('shield') + '<h4>Booster quotidien protégé</h4><p>Un booster par compte et par jour, vérifié côté serveur. En phase 2 : compte vérifié, limitation par appareil et détection des comptes automatisés.</p></div>' +
+            '<div class="info">' + I('shield') + '<h4>Boosters gratuits protégés</h4><p>La réserve et le booster quotidien sont comptés par compte, sur l’horloge du serveur. En phase 2 : compte vérifié, limitation par appareil et détection des comptes automatisés.</p></div>' +
             '<div class="info">' + I('sparkle') + '<h4>Numérotation à la frappe</h4><p>Le numéro d’exemplaire est attribué au moment du tirage, dans une transaction atomique : aucun numéro ne peut être émis deux fois.</p></div>' +
-            '<div class="info">' + I('coin') + '<h4>Solde de démonstration</h4><p>' + (S.UNLIMITED ? 'Éclats illimités pour les tests : les ouvertures et achats ne débitent rien.' : 'Vous disposez de ' + U.num(st.wallet.balance) + ' ' + A.CURRENCY.name + '. <button class="link-btn" data-grant>Ajouter 1 000 Éclats (démo)</button>') + '</p></div>' +
+            '<div class="info">' + I('gift') + '<h4>Rien à acheter</h4><p>Les Éclats servent uniquement à la marketplace. Coffrets et boosters d’événement se gagnent avec les missions, les paliers de collection et les trophées. <button class="link-btn" data-refill>Remplir la réserve (démo)</button></p></div>' +
           '</div>' +
         '</div></section>';
     },
@@ -617,6 +671,7 @@
           return;
         }
         if (e.target.closest('[data-reset-daily]')) { S.resetDaily(); A.app.rerender(); return; }
+        if (e.target.closest('[data-refill]')) { S.refillCharges(); U.toast('Réserve remplie (démo)'); A.app.rerender(); return; }
         if (e.target.closest('[data-grant]')) { S.grant(1000); U.toast('1 000 Éclats ajoutés (démo)'); A.app.rerender(); }
       });
       if (ctx.query.open) {

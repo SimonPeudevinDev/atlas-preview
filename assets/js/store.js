@@ -88,6 +88,7 @@
       minted: {}, used: {},
       inventory: [], listings: [], sales: [], offers: [],
       lastDaily: null,
+      charge: { n: 10, at: now },
       claimed: {}, tokens: {}, titles: [], trophies: {}, avatars: [], avatar: null, frame: false
     };
     var r = rng(A.hash('atlas-demo'));
@@ -152,6 +153,7 @@
     state = load();
     if (!state || state.v !== 1) fresh();
     state.claimed = state.claimed || {}; state.tokens = state.tokens || {}; state.titles = state.titles || [];
+    if (!state.charge) state.charge = { n: S.CHARGE.max, at: Date.now() };   // réserve pleine pour les comptes existants
     migrateMoved();
     state.trophies = state.trophies || {}; state.avatars = state.avatars || [];
     if (S.UNLOCK_ALL) unlockAll();
@@ -269,6 +271,24 @@
   S.nextDailyIn = function () { var d = new Date(); d.setHours(24, 0, 0, 0); return d - Date.now(); };
   S.eventRemaining = function () { return Math.max(0, state.eventEndsAt - Date.now()); };
 
+  /* ---------- Réserve de boosters gratuits ----------
+     Un Booster Atlas revient toutes les 15 min, jusqu’à 10 en réserve. Le minuteur ne tourne
+     que si la réserve n’est pas pleine. (Phase 2 : calcul côté serveur, sur l’horloge du serveur.) */
+  S.CHARGE = { max: 10, every: 15 * 60 * 1000, pack: 'standard' };
+  function regen() {
+    var c = state.charge, now = Date.now(), E = S.CHARGE.every;
+    if (c.n >= S.CHARGE.max) { c.at = now; return c; }
+    var k = Math.floor(Math.max(0, now - c.at) / E);
+    if (k > 0) { c.n = Math.min(S.CHARGE.max, c.n + k); c.at = c.n >= S.CHARGE.max ? now : c.at + k * E; }
+    return c;
+  }
+  /** { n : boosters en réserve, max, next : ms avant le prochain (0 si réserve pleine) } */
+  S.charges = function () {
+    var c = regen();
+    return { n: c.n, max: S.CHARGE.max, next: c.n >= S.CHARGE.max ? 0 : Math.max(0, c.at + S.CHARGE.every - Date.now()) };
+  };
+  S.refillCharges = function () { state.charge = { n: S.CHARGE.max, at: Date.now() }; emit(); };   // démo
+
   /* ---------- Récompenses de collection ----------
      Chaque collection a quatre paliers : quelques personnages, la moitié, tous les personnages,
      puis toutes les éditions (maîtrise). Un palier atteint se récupère à la main. */
@@ -372,7 +392,7 @@
   var HUNTS = {
     rare: { label: 'Première rareté', desc: 'Obtenez une édition Rare ou plus précieuse.', min: 'rare', reward: { eclats: 200 } },
     epic: { label: 'Pièce de musée', desc: 'Obtenez une édition Épique ou plus précieuse.', min: 'epic', reward: { eclats: 400 } },
-    legendary: { label: 'Chef-d’œuvre', desc: 'Obtenez une édition Légendaire ou plus précieuse.', min: 'legendary', reward: { booster: 'standard' } },
+    legendary: { label: 'Chef-d’œuvre', desc: 'Obtenez une édition Légendaire ou plus précieuse.', min: 'legendary', reward: { booster: 'conservateur' } },
     trio: { label: 'Trois visages', desc: 'Réunissez trois éditions différentes d’un même personnage.', goal: 3, reward: { eclats: 300 } },
     numerotes: { label: 'Exemplaires numérotés', desc: 'Possédez trois exemplaires numérotés de cette collection.', goal: 3, reward: { eclats: 350 } },
     eventail: { label: 'L’éventail des raretés', desc: 'Possédez des cartes de trois raretés différentes dans cette collection.', goal: 3, reward: { eclats: 300 } }
@@ -450,7 +470,10 @@
     var p = A.PACK[packId];
     if (p.daily && !S.dailyAvailable()) return { ok: false, reason: 'Déjà ouvert' };
     if (p.event && S.eventRemaining() <= 0) return { ok: false, reason: 'Événement terminé' };
+    if (p.timer && S.charges().n > 0) return { ok: true, charge: true };
     if (S.tokens(packId) > 0) return { ok: true, token: true };
+    if (p.timer) return { ok: false, reason: 'Prochain dans ' + A.ui.clock(S.charges().next) };
+    if (p.earned) return { ok: false, reason: 'À gagner en jouant' };
     if (!S.UNLIMITED && state.wallet.balance < p.price) return { ok: false, reason: 'Solde insuffisant' };
     return { ok: true };
   };
@@ -503,7 +526,12 @@
       items.push(it);
     }
     items.forEach(function (it) { var n = it.isNew; delete it.isNew; it._new = n; state.inventory.push(it); });
-    if (check.token) {
+    if (check.charge) {
+      var c = regen();
+      if (c.n >= S.CHARGE.max) c.at = now;            // la réserve était pleine : le minuteur démarre maintenant
+      c.n--;
+      state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: 0, label: pack.name + ' (réserve gratuite)' });
+    } else if (check.token) {
       state.tokens[packId]--;
       state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: 0, label: pack.name + ' (offert par une récompense)' });
     } else if (pack.price) {

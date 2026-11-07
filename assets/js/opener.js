@@ -736,7 +736,7 @@
             '<p class="sum-cap"><span class="rar-chip r-' + ed.rarity + '"><i></i>' + R.label + '</span>' + (ed.supply ? '<span class="mono">' + U.serial(it.serial, ed.supply) + '</span>' : '') + '</p></div>';
         }).join('') + '</div>' +
         '<div class="sum-actions"><button class="btn btn-gold btn-lg" data-done>Ajouter à l’inventaire</button>' +
-        (again.ok ? '<button class="btn btn-ghost-light btn-lg" data-again>Ouvrir un autre' + (pack.price ? ' · ' + U.num(pack.price) + ' D' : '') + '</button>' : '') + '</div>';
+        (again.ok ? '<button class="btn btn-ghost-light btn-lg" data-again>Ouvrir un autre' + (pack.timer ? ' · ' + S.charges().n + ' en réserve' : '') + '</button>' : '') + '</div>';
       summaryEl.hidden = false;
       summaryEl.classList.add('is-dealing');
       el.classList.add('is-summary');
