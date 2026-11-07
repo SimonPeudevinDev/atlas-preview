@@ -1113,9 +1113,11 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .steps-dots i.is-on { width: 18px; background: var(--gold); }
   .coll-grid { grid-template-columns: 1fr; gap: 40px; }
   .coll-grid.is-full { grid-template-columns: 1fr; }
-  .event-banner { grid-template-columns: 1fr; }
-  .event-art { aspect-ratio: 16 / 8; }
-  .event-copy { padding: 28px; }
+  .event-banner { grid-template-columns: 1fr; margin-top: 18px; }
+  .event-art { aspect-ratio: 16 / 5; }   /* bandeau mince sur mobile */
+  .event-copy { padding: 18px 20px 20px; }
+  .event-copy .h2 { font-size: 26px; margin: 4px 0 4px; }
+  .event-copy p { font-size: 14px; margin-bottom: 10px; }
   .rarity-row { display: flex; overflow-x: auto; gap: 18px; margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter) 14px; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .rarity-row::-webkit-scrollbar { display: none; }
   .rarity-item { flex: 0 0 62vw; max-width: 240px; scroll-snap-align: center; }
@@ -1737,3 +1739,9 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .first-owner small { font-size: 12px; color: var(--ink-3); }
 .first-owner.is-you { color: var(--gold); font-weight: 600; }
 .first-owner .ic { width: 13px; height: 13px; align-self: center; fill: currentColor; }
+/* Accueil, collections populaires : grandes tuiles sur ordinateur, vignettes défilantes sur mobile */
+.shelf-row.is-mob { display: none; }
+@media (max-width: 900px) {
+  .coll-grid.is-desk { display: none; }
+  .shelf-row.is-mob { display: flex; margin-bottom: 18px; }
+}

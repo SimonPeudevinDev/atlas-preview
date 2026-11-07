@@ -185,7 +185,8 @@
 
       '<section class="section section-alt"><div class="container">' +
         sectionHead('Collections populaires', 'Les salles les plus visitées.', ['Toutes les collections', '#/collections']) +
-        '<div class="coll-grid">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
+        '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
+        '<div class="shelf-row is-mob">' + popular.map(shelfTile).join('') + '</div>' +   // mobile : petites vignettes qui défilent
         '<a class="event-banner" href="#/collection/' + event.id + '">' +
           '<div class="event-art">' + A.artImg({ seed: 'event-hero', coll: event.id, rarity: 'legendary', w: 900, h: 300 }) + '</div>' +
           '<div class="event-copy"><p class="eyebrow">Nouvelle collection · Événement</p><h3 class="h2">' + event.name + '</h3><p>' + event.tagline + '</p>' +
