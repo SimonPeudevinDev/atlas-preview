@@ -44,6 +44,27 @@
   };
   // Thèmes des propositions de Booster Atlas
   THEMES.astro = Object.assign({}, THEMES.lapis, { foil: ['#24407F', '#0D1A3C', '#1C3366', '#070F26', '#162B58', '#0A1533'] });
+  // Coloris du Booster Atlas (motif Astrolabe), du plus simple au plus chic.
+  // motif : dégradé du dessin (clair → foncé) ; facet : face sombre de la rose ; glow : halo derrière le motif.
+  var DARKBRAND = ['#1A1A1A', '#4A4A4A', '#202020', '#5A5A5A', '#1A1A1A'];
+  function light(foil, ink, ink2, motif, o) {           // film clair : texte et motif foncés
+    return Object.assign({}, THEMES.ivory, { foil: foil, ink: ink, ink2: ink2, gold: motif[1], motif: motif, facet: 'rgba(255,255,255,.55)', glow: 'rgba(255,255,255,.35)',
+      brand: [motif[2], motif[0], motif[2], motif[0], motif[2]], halo: 'rgba(255,255,255,.6)', metal: 0.35, holo: 0.1 }, o || {});
+  }
+  function dark(base, foil, o, o2) { return Object.assign({}, THEMES[base], { foil: foil }, o || {}, o2 || {}); }
+  var CREAM = { brand: ['#E9D9AE', '#FFFDF6', '#F4E6C2', '#FFFFFF', '#E9D9AE'], halo: 'rgba(0,0,0,.38)' };   // ton moyen : ATLAS crème bien lisible
+  Object.assign(THEMES, {
+    'c-ciel':  light(['#DCE8F3', '#A9C3DD', '#CFE0EF', '#91AFCD', '#BED3E8', '#9DB9D5'], '#152536', '#3F5672', ['#5D7FA6', '#2C4A70', '#162C47']),
+    'c-sauge': dark('lapis', ['#A7B89B', '#62775A', '#93A687', '#4F6348', '#829775', '#586D50'], { ink: '#FAF7EE', ink2: '#E3EBD9', gold: '#F4E3B3', motif: ['#FFF4D2', '#F1DCA0', '#C9A964'], facet: 'rgba(55,72,48,.85)', glow: 'rgba(255,244,210,.28)', lo: 'rgba(0,0,0,.3)' }, CREAM),
+    'c-lavande': dark('lapis', ['#C3B4E2', '#8572B4', '#B0A0D8', '#6E5C9E', '#9E8CCB', '#7765A8'], { ink: '#FFFBF4', ink2: '#ECE6FA', gold: '#FBE7B5', motif: ['#FFF6DA', '#F7E0A6', '#CBA868'], facet: 'rgba(80,62,120,.85)', glow: 'rgba(255,246,218,.3)', lo: 'rgba(0,0,0,.3)' }, CREAM),
+    'c-terracotta': dark('garnet', ['#D98B66', '#9A472B', '#C57352', '#7C351E', '#B0603F', '#873C24'], { ink: '#FFF7EC', ink2: '#F6DCCB', motif: ['#FFF0CF', '#F2D79B', '#C59E5C'], facet: 'rgba(100,40,22,.85)', glow: 'rgba(255,236,200,.28)' }, CREAM),
+    'c-mocha': dark('garnet', ['#A88772', '#5C4031', '#8F6F5B', '#463024', '#7A5B48', '#50382A'], { ink: '#FBF4EA', ink2: '#E8D8C8', motif: ['#FBEBC6', '#E9CF95', '#B8935A'], facet: 'rgba(60,40,30,.88)', glow: 'rgba(251,235,198,.25)' }, CREAM),
+    'c-chrome': light(['#EEF0F3', '#A3AAB4', '#DDE1E6', '#858D98', '#C7CCD3', '#959CA7'], '#15191F', '#3B434E', ['#6C7581', '#2E353F', '#151A20'], { metal: 0.85, env: 1 }),
+    'c-nuit': THEMES.astro,
+    'c-emeraude': dark('night', ['#1F5A47', '#0A241C', '#184A39', '#06170F', '#123D2E', '#081C14'], { ink2: '#BCD8C9', motif: ['#F6E3AE', '#E2C68A', '#9C7A43'], facet: 'rgba(5,25,18,.9)', glow: 'rgba(226,198,138,.22)' }),
+    'c-bordeaux': dark('garnet', ['#8E2A3B', '#3F0A14', '#701C2C', '#2A050C', '#5B1523', '#360810'], { motif: ['#F8E6B4', '#E2C384', '#A27E3E'], facet: 'rgba(40,6,12,.9)', glow: 'rgba(226,195,132,.22)' }),
+    'c-noir': dark('night', ['#2C2925', '#0B0A09', '#211E1B', '#050505', '#181614', '#0C0B0A'], { ink: '#F6EFE0', ink2: '#B9AE99', gold: '#E6C77F', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(0,0,0,.92)', glow: 'rgba(230,199,127,.24)', metal: 0.7 })
+  });
   THEMES.prism = Object.assign({}, THEMES.night, { foil: ['#3B2F5C', '#151324', '#2A3F5E', '#0D0C17', '#3A2B4E', '#111020'], holo: 0.6, metal: 0.55 });
   THEMES.sea   = Object.assign({}, THEMES.lapis, { foil: ['#2C6A72', '#0E2E36', '#225A62', '#08222A', '#1B4C55', '#0B2830'], ink2: '#BFDCDC' });
   THEMES.deco  = Object.assign({}, THEMES.night, { foil: ['#1F4D3E', '#0B1F19', '#17402F', '#06140F', '#123528', '#08190F'], ink2: '#B9D2C4' });
@@ -311,8 +332,8 @@
      en-tête ATLAS en haut, motif au centre, titre et pied en bas, mêmes marges partout. */
   var DCX = 50, DCY = WIN.y + WIN.h / 2, DR = 23;      // centre et rayon du motif
   function gold(x, th, y0, y1) {
-    var g = x.createLinearGradient(0, y0, 0, y1);
-    g.addColorStop(0, '#F6E3AE'); g.addColorStop(0.45, th.gold); g.addColorStop(1, '#9C7A43');
+    var g = x.createLinearGradient(0, y0, 0, y1), m = th.motif || ['#F6E3AE', th.gold, '#9C7A43'];
+    g.addColorStop(0, m[0]); g.addColorStop(0.45, m[1]); g.addColorStop(1, m[2]);
     return g;
   }
   function star4(x, cx, cy, r, a) {                     // petite étincelle à 4 branches
@@ -338,7 +359,7 @@
       var g = gold(x, th, DCY - DR, DCY + DR);
       x.save();
       var halo = x.createRadialGradient(DCX, DCY, 2, DCX, DCY, DR + 8);
-      halo.addColorStop(0, 'rgba(234,203,134,.22)'); halo.addColorStop(1, 'rgba(234,203,134,0)');
+      halo.addColorStop(0, th.glow || 'rgba(234,203,134,.22)'); halo.addColorStop(1, 'rgba(0,0,0,0)');
       x.fillStyle = halo; x.fillRect(0, DCY - DR - 10, 100, DR * 2 + 20);
       x.strokeStyle = g; x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
       x.lineWidth = 0.25; x.beginPath(); x.arc(DCX, DCY, DR - 3.2, 0, 7); x.stroke();
@@ -353,7 +374,7 @@
       [0.35, 0.7].forEach(function (k) { x.beginPath(); x.ellipse(DCX, DCY, (DR - 3.2) * k, DR - 3.2, 0, 0, 7); x.stroke(); });
       [-0.5, 0, 0.5].forEach(function (k) { var yy = DCY + k * (DR - 3.2); x.beginPath(); x.moveTo(DCX - DR, yy); x.lineTo(DCX + DR, yy); x.stroke(); });
       x.restore(); x.globalAlpha = 1;
-      rose(x, th, DCX, DCY, DR - 4.5, 'rgba(10,20,55,.85)');
+      rose(x, th, DCX, DCY, DR - 4.5, th.facet || 'rgba(10,20,55,.85)');
       x.restore();
     },
     // 2. Holographique : film irisé, éventail de trois cartes (Rare, Épique, Légendaire), étincelles
