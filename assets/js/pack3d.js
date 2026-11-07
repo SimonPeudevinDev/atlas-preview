@@ -42,6 +42,11 @@
     garnet: { foil: ['#A7465A', '#561522', '#8E2E3E', '#3A0B13', '#74222F', '#4C111B'], ink: '#F7ECDC', ink2: '#E2C4AE', gold: '#E2C384', hi: 'rgba(255,215,200,.3)', lo: 'rgba(0,0,0,.4)', brand: ['#7E602E', '#EBD49C', '#9C7A43', '#F3E1B0', '#8C6B35'], metal: 0.7, holo: 0.4 },
     night:  { foil: ['#4A5666', '#141920', '#36414E', '#0A0D11', '#28313C', '#11161C'], ink: '#EEF2F3', ink2: '#A3B3BF', gold: '#E2C68A', hi: 'rgba(220,235,255,.26)', lo: 'rgba(0,0,0,.45)', brand: ['#7E602E', '#EBD49C', '#9C7A43', '#F3E1B0', '#8C6B35'], metal: 0.7, holo: 0.45 }
   };
+  // Thèmes des propositions de Booster Atlas
+  THEMES.astro = Object.assign({}, THEMES.lapis, { foil: ['#24407F', '#0D1A3C', '#1C3366', '#070F26', '#162B58', '#0A1533'] });
+  THEMES.prism = Object.assign({}, THEMES.night, { foil: ['#3B2F5C', '#151324', '#2A3F5E', '#0D0C17', '#3A2B4E', '#111020'], holo: 0.6, metal: 0.55 });
+  THEMES.sea   = Object.assign({}, THEMES.lapis, { foil: ['#2C6A72', '#0E2E36', '#225A62', '#08222A', '#1B4C55', '#0B2830'], ink2: '#BFDCDC' });
+  THEMES.deco  = Object.assign({}, THEMES.night, { foil: ['#1F4D3E', '#0B1F19', '#17402F', '#06140F', '#123528', '#08190F'], ink2: '#B9D2C4' });
   var FOIL_STOPS = [0, 0.26, 0.46, 0.70, 0.88, 1];
   var RAR = { base: '#A8997E', rare: '#5F7488', epic: '#6F5590', legendary: '#A1803F', mythic: '#7F2B35', unique: '#141210' };
   var SERIF = '"Cormorant Garamond", "Cormorant", "EB Garamond", Georgia, serif';
@@ -219,6 +224,14 @@
     return lines;
   }
   function foil(x, th) {
+    if (th === THEMES.prism) { foilBase(x, th); var hg = x.createLinearGradient(0, 0, 100, 160);
+      ['rgba(255,120,200,.22)', 'rgba(120,200,255,.22)', 'rgba(140,255,200,.18)', 'rgba(255,230,140,.22)', 'rgba(200,140,255,.22)'].forEach(function (c, i) { hg.addColorStop(i / 4, c); });
+      x.fillStyle = hg; x.fillRect(0, 0, 100, 160);
+      x.strokeStyle = 'rgba(255,255,255,.05)'; x.lineWidth = 0.6; for (var k = -160; k < 100; k += 3) { x.beginPath(); x.moveTo(k, 0); x.lineTo(k + 160, 160); x.stroke(); }
+      return; }
+    foilBase(x, th);
+  }
+  function foilBase(x, th) {
     // Dégradé à 158° (comme --pk-foil), sur tout le film
     var a = 158 * DEG, dx = Math.sin(a), dy = -Math.cos(a), L = Math.abs(100 * dx) + Math.abs(160 * dy);
     var g = x.createLinearGradient(50 - dx * L / 2, 80 - dy * L / 2, 50 + dx * L / 2, 80 + dy * L / 2);
@@ -293,6 +306,120 @@
     return (fontsReady = Promise.race([all, new Promise(function (r) { setTimeout(r, 1800); })]));
   }
 
+  /* ---------- Faces « sans illustration » du Booster Atlas (toutes collections) ----------
+     Chaque motif occupe la zone de la fenêtre (WIN) et reste centré sur l’axe du sachet :
+     en-tête ATLAS en haut, motif au centre, titre et pied en bas, mêmes marges partout. */
+  var DCX = 50, DCY = WIN.y + WIN.h / 2, DR = 23;      // centre et rayon du motif
+  function gold(x, th, y0, y1) {
+    var g = x.createLinearGradient(0, y0, 0, y1);
+    g.addColorStop(0, '#F6E3AE'); g.addColorStop(0.45, th.gold); g.addColorStop(1, '#9C7A43');
+    return g;
+  }
+  function star4(x, cx, cy, r, a) {                     // petite étincelle à 4 branches
+    x.save(); x.translate(cx, cy); x.rotate(a || 0); x.beginPath();
+    for (var i = 0; i < 8; i++) { var rr2 = i % 2 ? r * 0.22 : r, t = i * Math.PI / 4; x.lineTo(Math.cos(t) * rr2, Math.sin(t) * rr2); }
+    x.closePath(); x.fill(); x.restore();
+  }
+  function rose(x, th, cx, cy, R, dark) {               // rose des vents à 8 branches facettées
+    for (var i = 0; i < 8; i++) {
+      var t = i * Math.PI / 4 - Math.PI / 2, L = i % 2 ? R * 0.62 : R, w = i % 2 ? 0.16 : 0.13;
+      [[1, gold(x, th, cy - R, cy + R)], [-1, dark]].forEach(function (s) {
+        x.beginPath(); x.moveTo(cx, cy);
+        x.lineTo(cx + Math.cos(t) * L, cy + Math.sin(t) * L);
+        x.lineTo(cx + Math.cos(t + s[0] * w) * R * 0.2, cy + Math.sin(t + s[0] * w) * R * 0.2);
+        x.closePath(); x.fillStyle = s[1]; x.fill();
+      });
+    }
+    x.fillStyle = gold(x, th, cy - 2, cy + 2); x.beginPath(); x.arc(cx, cy, R * 0.07, 0, 7); x.fill();
+  }
+  var DESIGN = {
+    // 1. Astrolabe : rose des vents gravée dans un limbe gradué, sur bleu nuit
+    astrolabe: function (x, th) {
+      var g = gold(x, th, DCY - DR, DCY + DR);
+      x.save();
+      var halo = x.createRadialGradient(DCX, DCY, 2, DCX, DCY, DR + 8);
+      halo.addColorStop(0, 'rgba(234,203,134,.22)'); halo.addColorStop(1, 'rgba(234,203,134,0)');
+      x.fillStyle = halo; x.fillRect(0, DCY - DR - 10, 100, DR * 2 + 20);
+      x.strokeStyle = g; x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+      x.lineWidth = 0.25; x.beginPath(); x.arc(DCX, DCY, DR - 3.2, 0, 7); x.stroke();
+      x.beginPath(); x.arc(DCX, DCY, DR + 1.4, 0, 7); x.stroke();
+      for (var k = 0; k < 72; k++) {                    // graduations du limbe
+        var t = k * Math.PI / 36, l = k % 6 ? 1.1 : 2.4;
+        x.lineWidth = k % 6 ? 0.18 : 0.32;
+        x.beginPath(); x.moveTo(DCX + Math.cos(t) * DR, DCY + Math.sin(t) * DR); x.lineTo(DCX + Math.cos(t) * (DR - l), DCY + Math.sin(t) * (DR - l)); x.stroke();
+      }
+      x.globalAlpha = 0.45; x.lineWidth = 0.2;          // méridiens et parallèles du globe intérieur
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 3.2, 0, 7); x.clip();
+      [0.35, 0.7].forEach(function (k) { x.beginPath(); x.ellipse(DCX, DCY, (DR - 3.2) * k, DR - 3.2, 0, 0, 7); x.stroke(); });
+      [-0.5, 0, 0.5].forEach(function (k) { var yy = DCY + k * (DR - 3.2); x.beginPath(); x.moveTo(DCX - DR, yy); x.lineTo(DCX + DR, yy); x.stroke(); });
+      x.restore(); x.globalAlpha = 1;
+      rose(x, th, DCX, DCY, DR - 4.5, 'rgba(10,20,55,.85)');
+      x.restore();
+    },
+    // 2. Holographique : film irisé, éventail de trois cartes (Rare, Épique, Légendaire), étincelles
+    holo: function (x, th) {
+      var cw = 24, ch = 33.6, cols = [['#8FA9C4', '#5F7488'], ['#B49AD6', '#6F5590'], ['#F0D79A', '#A1803F']];
+      [-14, 0, 14].forEach(function (a, i) {
+        x.save(); x.translate(DCX + (i - 1) * 9.5, DCY + 4 + (i === 1 ? -3 : 0)); x.rotate(a * DEG);
+        x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2.4 * S; x.shadowOffsetY = 1 * S;
+        rr(x, -cw / 2, -ch / 2, cw, ch, 1.4);
+        var g = x.createLinearGradient(-cw / 2, -ch / 2, cw / 2, ch / 2); g.addColorStop(0, cols[i][0]); g.addColorStop(1, cols[i][1]);
+        x.fillStyle = g; x.fill(); x.shadowColor = 'transparent';
+        x.lineWidth = 0.35; x.strokeStyle = 'rgba(255,255,255,.75)'; rr(x, -cw / 2 + 1.4, -ch / 2 + 1.4, cw - 2.8, ch - 2.8, 0.8); x.stroke();
+        var sh = x.createLinearGradient(-cw / 2, -ch / 2, cw / 2, ch / 2);   // reflet holographique
+        sh.addColorStop(0.3, 'rgba(255,255,255,0)'); sh.addColorStop(0.48, 'rgba(255,255,255,.35)'); sh.addColorStop(0.62, 'rgba(255,255,255,0)');
+        x.fillStyle = sh; rr(x, -cw / 2, -ch / 2, cw, ch, 1.4); x.fill();
+        mark(x, 0, 0, 9, 'rgba(255,255,255,.85)');
+        x.restore();
+      });
+      x.fillStyle = '#FFF6DE';
+      [[18, 62, 2.4, .2], [83, 58, 3, .5], [80, 98, 1.8, .1], [21, 101, 2.2, .7], [36, 109, 1.3, .4]].forEach(function (s) { star4(x, s[0], s[1], s[2], s[3]); });
+    },
+    // 3. Globe : sphère quadrillée sous un ciel de constellations
+    globe: function (x, th) {
+      var g = gold(x, th, DCY - DR, DCY + DR);
+      x.save();
+      x.fillStyle = 'rgba(255,255,255,.55)';            // constellations
+      var pts = [[14, 58], [22, 54], [27, 60], [20, 66], [80, 54], [86, 61], [77, 66], [88, 70], [12, 98], [19, 104], [85, 100], [80, 107]];
+      x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 0.15;
+      [[0, 1, 2, 3], [4, 5, 7, 6], [8, 9], [10, 11]].forEach(function (c) { x.beginPath(); c.forEach(function (k, i) { x[i ? 'lineTo' : 'moveTo'](pts[k][0], pts[k][1]); }); x.stroke(); });
+      pts.forEach(function (p) { x.beginPath(); x.arc(p[0], p[1], 0.45, 0, 7); x.fill(); });
+      var sp = x.createRadialGradient(DCX - 7, DCY - 8, 2, DCX, DCY, DR);   // sphère
+      sp.addColorStop(0, 'rgba(255,255,255,.2)'); sp.addColorStop(1, 'rgba(0,0,0,.25)');
+      x.fillStyle = sp; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.fill();
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.clip();
+      x.strokeStyle = g; x.lineWidth = 0.25;
+      [0.18, 0.5, 0.78, 1].forEach(function (k) { x.beginPath(); x.ellipse(DCX, DCY, DR * k, DR, 0, 0, 7); x.stroke(); });
+      [-0.72, -0.4, 0, 0.4, 0.72].forEach(function (k) { var yy = DCY + k * DR, w = Math.sqrt(1 - k * k) * DR; x.beginPath(); x.ellipse(DCX, yy, w, w * 0.12, 0, 0, 7); x.stroke(); });
+      x.restore();
+      x.lineWidth = 0.55; x.strokeStyle = g; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+      x.lineWidth = 0.3; x.beginPath(); x.ellipse(DCX, DCY, DR + 5, DR * 0.32, -18 * DEG, 0, 7); x.stroke();   // anneau orbital
+      x.fillStyle = g; x.beginPath(); x.arc(DCX + (DR + 5) * Math.cos(-30 * DEG) * 0.98, DCY - 9.4, 0.9, 0, 7); x.fill();
+      x.restore();
+    },
+    // 4. Art déco : soleil de rayons dorés, cadre à redans, sceau ATLAS en médaillon
+    deco: function (x, th) {
+      var g = gold(x, th, WIN.y, WIN.y + WIN.h);
+      x.save();
+      x.save(); rr(x, WIN.x, WIN.y, WIN.w, WIN.h, 0.6); x.clip();
+      x.strokeStyle = g; x.globalAlpha = 0.5;
+      for (var k = 0; k < 29; k++) { var t = Math.PI + k * Math.PI / 28; x.lineWidth = k % 2 ? 0.18 : 0.42; x.beginPath(); x.moveTo(DCX, WIN.y + WIN.h + 2); x.lineTo(DCX + Math.cos(t) * 90, WIN.y + WIN.h + 2 + Math.sin(t) * 90); x.stroke(); }
+      x.restore(); x.globalAlpha = 1;
+      x.strokeStyle = g; x.lineWidth = 0.4;              // cadre à redans
+      var X0 = WIN.x, Y0 = WIN.y, X1 = WIN.x + WIN.w, Y1 = WIN.y + WIN.h, n = 3;
+      x.beginPath();
+      x.moveTo(X0 + n, Y0); x.lineTo(X1 - n, Y0); x.lineTo(X1 - n, Y0 + n); x.lineTo(X1, Y0 + n); x.lineTo(X1, Y1 - n); x.lineTo(X1 - n, Y1 - n); x.lineTo(X1 - n, Y1);
+      x.lineTo(X0 + n, Y1); x.lineTo(X0 + n, Y1 - n); x.lineTo(X0, Y1 - n); x.lineTo(X0, Y0 + n); x.lineTo(X0 + n, Y0 + n); x.closePath(); x.stroke();
+      x.lineWidth = 0.2; rr(x, X0 + 1.6, Y0 + 1.6, WIN.w - 3.2, WIN.h - 3.2, 0.4); x.stroke();
+      x.fillStyle = th.foil[3]; x.beginPath(); x.arc(DCX, DCY, 15.5, 0, 7); x.fill();   // médaillon
+      x.lineWidth = 0.6; x.beginPath(); x.arc(DCX, DCY, 15.5, 0, 7); x.stroke();
+      x.lineWidth = 0.22; x.beginPath(); x.arc(DCX, DCY, 13.6, 0, 7); x.stroke();
+      for (var d = 0; d < 4; d++) { var a = d * Math.PI / 2 - Math.PI / 4; x.fillStyle = g; x.save(); x.translate(DCX + Math.cos(a) * 15.5, DCY + Math.sin(a) * 15.5); x.rotate(a + Math.PI / 4); x.fillRect(-1, -1, 2, 2); x.restore(); }
+      mark(x, DCX, DCY, 22, th.gold);
+      x.restore();
+    }
+  };
+
   function drawFront(p, th, art) {
     var c = cv(100 * S, 160 * S), x = ctxS(c);
     x.atlasStroke = th.stroke || 0;
@@ -306,7 +433,8 @@
     mark(x, 50, 32.5, 9, th.gold);
     brand(x, th, 50, 46.5, 9.6);
     x.fillStyle = th.ink2; x.font = '600 3.2px ' + SANS; spaced(x, 'ÉDITION I', 50, 51.4, 0.9);
-    // Fenêtre d’illustration
+    // Fenêtre d’illustration (ou motif du Booster Atlas, sans illustration de collection)
+    if (p.design && DESIGN[p.design]) { DESIGN[p.design](x, th); } else {
     x.save(); x.shadowColor = 'rgba(0,0,0,.25)'; x.shadowBlur = 3.4 * S; x.shadowOffsetY = 1.6 * S;
     rr(x, WIN.x, WIN.y, WIN.w, WIN.h, WIN.r); x.fillStyle = th.ink2; x.fill(); x.restore();
     x.save(); rr(x, WIN.x, WIN.y, WIN.w, WIN.h, WIN.r); x.clip();
@@ -319,6 +447,7 @@
     x.restore();
     x.lineWidth = 0.35; x.strokeStyle = th.gold; rr(x, WIN.x, WIN.y, WIN.w, WIN.h, WIN.r); x.stroke();
     x.lineWidth = 0.3; x.strokeStyle = 'rgba(255,255,255,.6)'; rr(x, WIN.x + 1.8, WIN.y + 1.8, WIN.w - 3.6, WIN.h - 3.6, 0.8); x.stroke();
+    }
     // Titre
     var y = WIN.y + WIN.h + 6.2;
     x.save(); x.shadowColor = th.halo || 'rgba(0,0,0,.45)'; x.shadowBlur = 1.2 * S; x.shadowOffsetY = 0.3 * S;      // lisibilité sur le film
@@ -418,7 +547,7 @@
     var src = A.editionSrc ? A.editionSrc(ed, 200, { seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 })
       : ed.image || A.artURI({ seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 });
     return (packTex[p.id] = Promise.all([fonts(), loadImg(src)]).then(function (r) {
-      return { front: tex(drawFront(p, th, r[1]), true), back: tex(drawBack(p, th), true), th: th };
+      return { front: tex(drawFront(p, th, r[1]), true), back: tex(drawBack(p, th), true), th: th, noWin: !!p.design };
     }));
   }
 
@@ -502,7 +631,7 @@
   function materials(t, part, side, U) {
     var sh = sharedMaps(), front = side === 'F';
     var out = new T.MeshPhysicalMaterial({
-      map: front ? t.front : t.back, roughnessMap: front ? sh.pbrF : sh.pbrB, metalnessMap: front ? sh.pbrF : sh.pbrB,
+      map: front ? t.front : t.back, roughnessMap: front && !t.noWin ? sh.pbrF : sh.pbrB, metalnessMap: front && !t.noWin ? sh.pbrF : sh.pbrB,   // motif sans fenêtre : film uniforme
       roughness: 1, metalness: t.th.metal, bumpMap: sh.bump, bumpScale: 0.45, alphaTest: 0.5,
       clearcoat: 0.55, clearcoatRoughness: 0.22, iridescence: t.th.holo * 0.5, iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 520],
       envMapIntensity: t.th.env || 1.1, side: T.FrontSide

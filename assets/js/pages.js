@@ -86,7 +86,8 @@
     var P0 = A.PACK.standard, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
     for (var i = 0; i < ch.max; i++) pips += '<i' + (i < ch.n ? ' class="is-on"' : '') + '></i>';
     var side = [A.PACK.daily, A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
-    return '<section class="play"><div class="container play-grid">' +
+    return (A.pages.sachets ? '<div class="container"><a class="sc-banner" href="#/sachets">' + I('sparkle') + '<span><b>Choix en cours : 4 designs du Booster Atlas</b>Touchez pour les voir en 3D</span>' + I('chevR') + '</a></div>' : '') +   // temporaire
+      '<section class="play"><div class="container play-grid">' +
       '<div class="play-main">' +
         '<p class="eyebrow">Vos boosters</p>' +
         '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' +

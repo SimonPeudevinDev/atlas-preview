@@ -17,7 +17,8 @@
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
     [/^\/atelier$/, P.atelier, ''],
-    [/^\/infos$/, P.infos, '']
+    [/^\/infos$/, P.infos, ''],
+    [/^\/sachets$/, P.sachets, '']   // temporaire : choix du design du Booster Atlas
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
