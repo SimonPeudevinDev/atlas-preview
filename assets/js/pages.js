@@ -115,6 +115,12 @@
         var t = e.target.closest('[data-open-pack]');
         if (t) A.opener.open(t.getAttribute('data-open-pack'));
       });
+      // Carrousel « Comment ça marche » : le point actif suit l’étape visible
+      var st = root.querySelector('.steps'), dots = root.querySelectorAll('.steps-dots i');
+      if (st && dots.length) st.addEventListener('scroll', function () {
+        var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
+        dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
+      }, { passive: true });
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {
@@ -163,6 +169,7 @@
         '<div class="steps">' + steps.map(function (s) {
           return '<article class="step"><span class="step-n">' + s[0] + '</span><h3 class="h3">' + s[1] + '</h3><p>' + s[2] + '</p></article>';
         }).join('') + '</div>' +
+        '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
       '</div></section>' +
 
       '<section class="section section-alt"><div class="container">' +

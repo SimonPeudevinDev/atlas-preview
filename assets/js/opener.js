@@ -113,8 +113,8 @@
     var rig = A.pack.rig(pk, { rx: 0, ry: 0, range: [14, 24], idle: false, stiff: 0.07, damp: 0.8 });
     function guide(on) { pk.classList.toggle('is-guide', on && !reduce); }
     if (entering) {
-      rig.enter(1050, function () { entering = false; rig.shake(5, 260); guide(true); });
-      setTimeout(function () { if (closed) return; SFX.land(); A.haptic(12); }, 720);
+      rig.enter(700, function () { entering = false; rig.shake(5, 220); guide(true); });   // arrivée plus vive (ouvrir 10 boosters d’affilée)
+      setTimeout(function () { if (closed) return; SFX.land(); A.haptic(12); }, 480);
     } else guide(true);
     function settle() { rig.release(); rig.idle(false); rig.rest(0, 0); }
 
@@ -135,6 +135,7 @@
 
     /* ---------- 2. Déchirure ---------- */
     function commit() {
+      el.classList.add('is-locked');                 // sachet ouvert : on ne peut plus quitter avant la fin
       if (items) return true;
       var res = S.openPack(packId);
       if (!res.ok) { U.toast(res.error, 'error'); close(); return false; }
@@ -245,12 +246,12 @@
         SFX.numbered(best);
       }
 
-      await wait(300);
+      await wait(180);
       if (closed) return;
       settle();
       pk.classList.add('is-emerging');
       SFX.slide(0.6);
-      await wait(reduce ? 300 : 700);                // la pile monte, le corps descend (pack3d.js : EMERGE)
+      await wait(reduce ? 300 : 440);                // la pile monte, le corps descend (pack3d.js : EMERGE)
       if (!closed) handoff();
     }
     // Faisceaux de lumière qui jaillissent de l’ouverture
@@ -581,7 +582,7 @@
         c.st.x = center(pr).x - center(rr).x; c.st.y = center(pr).y - center(rr).y;
         c.st.s = s0; c.st.z = 0;
         c.st.rz = (pi - 1.5) * 0.8;
-        c.state = 'wait'; c.t0 = now + 60 + (cards.length - 1 - c.i) * 115;   // la carte du dessus arrive en dernier
+        c.state = 'wait'; c.t0 = now + 40 + (cards.length - 1 - c.i) * 70;    // la carte du dessus arrive en dernier
       });
       layout();
       pk.querySelector('.pk-stack').style.visibility = 'hidden';
@@ -599,7 +600,7 @@
         prog.hidden = false; skipBtn.hidden = false;
         pip(0, 'is-cur');
         prepareTop();
-      }, 900 + cards.length * 115);
+      }, 520 + cards.length * 70);
     }
 
     function pip(i, cls) {
@@ -627,7 +628,7 @@
         A.haptic([8, 60, 8, 60, 8, 60]);
       } else if (c.ed.supply && !reduce) {
         c.state = 'teasing';
-        setTimeout(function () { if (!closed && c.state === 'teasing') { c.state = 'stack'; present(c); } }, 950);
+        setTimeout(function () { if (!closed && c.state === 'teasing') { c.state = 'stack'; present(c); } }, 700);
       } else present(c);
     }
     function tease(c) {
@@ -736,7 +737,7 @@
             '<p class="sum-cap"><span class="rar-chip r-' + ed.rarity + '"><i></i>' + R.label + '</span>' + (ed.supply ? '<span class="mono">' + U.serial(it.serial, ed.supply) + '</span>' : '') + '</p></div>';
         }).join('') + '</div>' +
         '<div class="sum-actions"><button class="btn btn-gold btn-lg" data-done>Ajouter à l’inventaire</button>' +
-        (again.ok ? '<button class="btn btn-ghost-light btn-lg" data-again>Ouvrir un autre' + (pack.timer ? ' · ' + S.charges().n + ' en réserve' : '') + '</button>' : '') + '</div>';
+        (again.ok ? '<button class="btn btn-ghost-light btn-lg" data-again>Ouvrir un autre' + (pack.timer ? '<small>' + S.charges().n + ' en réserve</small>' : '') + '</button>' : '') + '</div>';
       summaryEl.hidden = false;
       summaryEl.classList.add('is-dealing');
       el.classList.add('is-summary');
@@ -975,7 +976,7 @@
     stack.addEventListener('contextmenu', function (e) { if (phase === 'reveal') e.preventDefault(); });
 
     el.addEventListener('click', function (e) {
-      if (e.target.closest('[data-close]')) { close(); return; }
+      if (e.target.closest('[data-close]')) { if (!el.classList.contains('is-locked')) close(); return; }
       if (e.target.closest('[data-sound]')) {
         SFX.setMuted(!SFX.muted);
         e.target.closest('[data-sound]').innerHTML = SFX.muted ? SND_OFF : SND_ON;
@@ -987,11 +988,11 @@
         return;
       }
       if (e.target.closest('[data-done]')) { finishToInventory(); return; }
-      if (e.target.closest('[data-again]')) { close(); setTimeout(function () { O.open(packId); }, 480); }
+      if (e.target.closest('[data-again]')) { close(); setTimeout(function () { O.open(packId); }, 280); }
     });
 
     function onKey(e) {
-      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Escape') { if (!el.classList.contains('is-locked')) close(); return; }
       if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowRight') return;
       if (e.target.closest && e.target.closest('button')) return;
       e.preventDefault();

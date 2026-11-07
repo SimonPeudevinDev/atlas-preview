@@ -34,7 +34,7 @@
   var PERSP = 1400, ORIGIN_Y = 0.4;                // comme .pk { perspective: 1400px; perspective-origin: 50% 40% }
   var DEG = Math.PI / 180;
   // Sortie des cartes : le corps du sachet descend de d (unités du modèle) pendant que la pile monte (booster.css)
-  var EMERGE = { ms: 640, d: 0.8 };
+  var EMERGE = { ms: 420, d: 0.8 };
 
   var THEMES = {
     ivory:   { foil: ['#FFFCF6', '#E9DDC6', '#FBF6EC', '#D3C2A2', '#F3EADA', '#E2D4BA'], ink: '#0E0B07', ink2: '#2E261A', gold: '#3E2E14', hi: 'rgba(255,255,255,.7)', lo: 'rgba(110,85,45,.22)', brand: ['#0E0B07', '#3A2C16', '#17120B', '#4A3A20', '#0E0B07'], metal: 0.3, holo: 0.08, env: 0.75, stroke: 0.04, halo: 'rgba(255,250,240,.75)' },

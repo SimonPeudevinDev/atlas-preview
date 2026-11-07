@@ -538,6 +538,7 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .step + .step { padding-left: 36px; border-left: 1px solid var(--line); }
 .step-n { display: block; font-family: var(--serif); font-size: 64px; line-height: 1; color: var(--gold); font-weight: 400; margin-bottom: 18px; }
 .step p { color: var(--ink-2); max-width: 340px; }
+.steps-dots { display: none; }
 
 .coll-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
 .coll-grid.is-full { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 44px 32px; }
@@ -1097,9 +1098,17 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .section { padding: 72px 0; }
   .section-head { flex-direction: column; align-items: flex-start; margin-bottom: 30px; }
   .section-lead { margin: -12px 0 30px; }
-  .steps { grid-template-columns: 1fr; }
-  .step, .step + .step { padding: 26px 0; border-left: 0; border-bottom: 1px solid var(--line); }
-  .step-n { font-size: 48px; margin-bottom: 10px; }
+  /* Comment ça marche : carrousel à faire glisser (une étape par écran, la suivante dépasse) */
+  .steps { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-top: 0;
+    margin: 0 calc(var(--gutter) * -1); padding: 2px var(--gutter) 6px; scroll-padding: 0 var(--gutter); }
+  .steps::-webkit-scrollbar { display: none; }
+  .step, .step + .step { flex: none; width: 82%; scroll-snap-align: start; padding: 22px 22px 18px; border: 1px solid var(--line); border-radius: var(--radius-lg);
+    background: var(--surface); box-shadow: var(--shadow-sm); }
+  .step-n { font-size: 44px; margin-bottom: 8px; }
+  .step p { margin-bottom: 0; }
+  .steps-dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+  .steps-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line-2); transition: width .25s var(--ease), background .25s; }
+  .steps-dots i.is-on { width: 18px; background: var(--gold); }
   .coll-grid { grid-template-columns: 1fr; gap: 40px; }
   .coll-grid.is-full { grid-template-columns: 1fr; }
   .event-banner { grid-template-columns: 1fr; }

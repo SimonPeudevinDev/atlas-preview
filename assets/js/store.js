@@ -491,8 +491,9 @@
     for (var i = 0; i < rows.length; i++) { t -= rows[i].p; if (t <= 0) return rows[i].rarity; }
     return rows[rows.length - 1].rarity;
   }
-  function pickEdition(pool, rarity) {
-    var eds = pool.filter(function (e) { return e.rarity === rarity && remaining(e) > 0; });
+  // avoid : personnages déjà tirés dans ce booster (jamais deux fois le même personnage)
+  function pickEdition(pool, rarity, avoid) {
+    var eds = pool.filter(function (e) { return e.rarity === rarity && remaining(e) > 0 && !(avoid && avoid[e.charId]); });
     if (!eds.length) return null;
     if (rarity === 'base') return eds[Math.floor(Math.random() * eds.length)];
     var total = eds.reduce(function (s, e) { return s + remaining(e); }, 0);
@@ -517,13 +518,14 @@
       var guaranteed = pack.guarantee && i === pack.size - 1;
       var rows = S.packOdds(packId, guaranteed);
       var rid = pack.fixed ? pack.fixed[i] : pick(rows, Math.random());
-      var ed = pickEdition(pool, rid), serial = undefined;
+      var ed = pickEdition(pool, rid, seen), serial = undefined;
       if (!ed && pack.fixed) {            // pack de test : rareté imposée même si le stock est épuisé (numéro fictif)
-        var any = pool.filter(function (e) { return e.rarity === rid; });
+        var any = pool.filter(function (e) { return e.rarity === rid && !seen[e.charId]; });
         ed = any[Math.floor(Math.random() * any.length)];
         if (ed) serial = ed.supply ? 1 + Math.floor(Math.random() * ed.supply) : null;
       }
-      if (!ed) ed = pickEdition(pool, 'base');
+      if (!ed) ed = pickEdition(pool, 'base', seen);
+      if (!ed) ed = pickEdition(pool, rid) || pickEdition(pool, 'base');   // très petit choix : on accepte un doublon plutôt que rien
       var first = minted(ed) === 0;                 // personne ne l’avait encore trouvée
       if (serial === undefined) serial = mintNew(ed);
       var it = makeItem(ed.id, serial, 'booster', now + i, 'Tirage — ' + pack.name);
