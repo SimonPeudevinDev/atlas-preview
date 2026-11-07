@@ -102,6 +102,22 @@
     '</div></section>';
   }
 
+  /* Défilement automatique d’une rangée horizontale (en boucle), seulement quand elle est visible
+     et qu’elle déborde ; il s’arrête dès qu’on la touche et repart 8 s plus tard */
+  function autoSlide(row, every) {
+    if (!row || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var visible = false, holdUntil = 0;
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting && en[0].intersectionRatio > 0.5; }, { threshold: [0, 0.5, 1] }).observe(row);
+    ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { row.addEventListener(ev, function () { holdUntil = Date.now() + 8000; }, { passive: true }); });
+    var t = setInterval(function () {
+      if (!row.isConnected) { clearInterval(t); return; }
+      if (!visible || Date.now() < holdUntil || row.scrollWidth <= row.clientWidth + 4 || document.querySelector('.opener')) return;
+      var f = row.firstElementChild, gap = parseFloat(getComputedStyle(row).columnGap) || 0, w = f.offsetWidth + gap;
+      var atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+      row.scrollTo({ left: atEnd ? 0 : Math.round(row.scrollLeft / w + 1) * w, behavior: 'smooth' });
+    }, every);
+  }
+
   P.home = {
     title: 'Le monde, en cartes',
     mount: function (root) {
@@ -119,19 +135,8 @@
         var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
         dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
       }, { passive: true });
-      // Défilement automatique toutes les 4,5 s (en boucle), seulement quand il est visible ;
-      // il s’arrête dès qu’on le touche et repart 8 s plus tard
-      if (st && dots.length && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-        var visible = false, holdUntil = 0;
-        if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting && en[0].intersectionRatio > 0.6; }, { threshold: [0, 0.6, 1] }).observe(st);
-        ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { st.addEventListener(ev, function () { holdUntil = Date.now() + 8000; }, { passive: true }); });
-        var auto = setInterval(function () {
-          if (!st.isConnected) { clearInterval(auto); return; }
-          if (!visible || Date.now() < holdUntil || st.scrollWidth <= st.clientWidth + 4 || document.querySelector('.opener')) return;
-          var w = st.firstElementChild.offsetWidth + 12, atEnd = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4;
-          st.scrollTo({ left: atEnd ? 0 : Math.round(st.scrollLeft / w + 1) * w, behavior: 'smooth' });
-        }, 4500);
-      }
+      autoSlide(st, 4500);
+      autoSlide(root.querySelector('.rarity-row'), 2600);
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {
