@@ -120,7 +120,14 @@
       (style === 'cartel' ? face.querySelector('.card-inner') : face).appendChild(box);
     }
     if (!box) return;
-    if (style === 'cartel' && on) face.style.setProperty('--rd', box.querySelector('.ri-in').offsetHeight + 'px');
+    if (style === 'cartel' && on) {
+      // L’illustration sort entièrement par le haut : le nom vient à sa place, la notice occupe tout le reste
+      var inner = face.querySelector('.card-inner'), art = inner && inner.querySelector('.card-art'), body = inner && inner.querySelector('.card-body');
+      if (art && body) {
+        face.style.setProperty('--rd', (body.offsetTop - art.offsetTop) + 'px');
+        face.style.setProperty('--ri-h', Math.max(0, inner.clientHeight - art.offsetTop - body.offsetHeight) + 'px');
+      } else face.style.setProperty('--rd', box.querySelector('.ri-in').offsetHeight + 'px');
+    }
     void box.offsetWidth;
     box.classList.toggle('is-on', on);
     face.classList.toggle('is-reading', on && style === 'cartel');

@@ -560,7 +560,7 @@
    de rareté) ; elle monte par en dessous pendant que l’illustration et le nom remontent exactement
    de sa hauteur (--rd, mesurée en JS) : un seul mouvement, comme un défilement. */
 .rv-info.v-cartel { z-index: 2; border-radius: 0; transition: opacity .01s linear; }
-.v-cartel .ri-in { top: auto; left: 0; right: 0; bottom: 0; max-height: 72%; padding: 3.6cqw 6.6cqw 6.4cqw; gap: 1.8cqw;
+.v-cartel .ri-in { top: auto; left: 0; right: 0; bottom: 0; height: var(--ri-h, auto); max-height: var(--ri-h, 72%); padding: 3.6cqw 6.6cqw 6.4cqw; gap: 1.8cqw;
   background: var(--card-bg, #FBF8F1); transform: translateY(100%); transition: transform .5s cubic-bezier(.22, .9, .3, 1);
   -webkit-mask: linear-gradient(#000 calc(100% - 9cqw), transparent calc(100% - 2cqw)); mask: linear-gradient(#000 calc(100% - 9cqw), transparent calc(100% - 2cqw)); }
 .rv-info.v-cartel.is-on .ri-in { transform: none; }
@@ -573,8 +573,9 @@
   opacity: 0; transition: top .5s cubic-bezier(.22, .9, .3, 1), opacity .3s ease .2s; z-index: 4; }
 .is-reading .v-cartel .ri-bar { top: 70%; opacity: 1; }
 /* Le contenu de la carte remonte de la hauteur de la notice */
-.card-inner > .card-art, .card-inner > .card-body { transition: transform .5s cubic-bezier(.22, .9, .3, 1); }
+.card-inner > .card-art, .card-inner > .card-body { transition: transform .5s cubic-bezier(.22, .9, .3, 1), opacity .35s ease; }
 .is-reading .card-inner > .card-art, .is-reading .card-inner > .card-body { transform: translateY(calc(-1 * var(--rd, 86cqw))); }
+.is-reading .card-inner > .card-art { opacity: 0; }   /* aucun bout d’illustration ne reste visible */
 .ri-bar { display: none; }
 
 /* 3. Le voile : l’illustration s’efface sous un voile de papier, le texte paraît à l’encre */
