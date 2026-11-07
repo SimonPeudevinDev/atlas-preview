@@ -675,6 +675,43 @@
   opacity: 0; transition: opacity .3s ease; }
 .multi.is-in { opacity: 1; }
 .mu-head { flex: none; padding: max(18px, env(safe-area-inset-top)) 20px 12px; text-align: center; }
+.multi.is-stage .mu-head { padding-top: 6px; }
+.mu-top { flex: none; display: flex; justify-content: flex-end; padding: max(12px, env(safe-area-inset-top)) 14px 0; transition: opacity .3s; }
+.multi.is-going .mu-top { opacity: 0; pointer-events: none; }
+/* La pile : le sachet 3D devant, les autres en tranches derrière */
+.mu-stage { flex: 1; display: grid; place-items: center; min-height: 0; touch-action: none; cursor: grab; }
+.mu-pile { position: relative; --pw: min(230px, 56vw, calc((100vh - 300px) * .625)); }
+.mu-pk .pk { --pk-w: var(--pw); }
+.mu-ghosts i { position: absolute; left: 0; top: 0; width: var(--pw); height: calc(var(--pw) * 1.6); border-radius: 2.5%;
+  background: var(--pk-foil, linear-gradient(158deg, #1F5A47, #06170F)); box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 6px 14px rgba(0,0,0,.35);
+  transform: translate(calc(var(--g) * 3px), calc(var(--g) * 4px)) rotate(calc(var(--g) * .6deg)); opacity: calc(1 - var(--g) * .06); z-index: -1; filter: brightness(calc(.75 - var(--g) * .03)); }
+.multi.t-c-emeraude .mu-ghosts i { --pk-foil: linear-gradient(158deg, #1F5A47 0%, #0A241C 40%, #184A39 70%, #06170F 100%); }
+.multi.t-c-bordeaux .mu-ghosts i { --pk-foil: linear-gradient(158deg, #8E2A3B 0%, #3F0A14 40%, #701C2C 70%, #2A050C 100%); }
+.multi.t-c-nuit .mu-ghosts i { --pk-foil: linear-gradient(158deg, #24407F 0%, #0D1A3C 40%, #1C3366 70%, #070F26 100%); }
+.multi.t-c-noir .mu-ghosts i { --pk-foil: linear-gradient(158deg, #2C2925 0%, #0B0A09 40%, #211E1B 70%, #050505 100%); }
+.mu-badge { position: absolute; top: -12px; right: -14px; z-index: 3; min-width: 46px; height: 46px; padding: 0 10px; border-radius: 23px; display: grid; place-items: center; grid-auto-flow: column;
+  background: linear-gradient(135deg, #E7CB8A, #A9823F); color: #1B1814; font-family: var(--serif); font-size: 15px; font-weight: 600; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+.mu-badge b { font-size: 22px; }
+.mu-hint { flex: none; margin: 0; padding: 14px 20px calc(26px + env(safe-area-inset-bottom)); text-align: center; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(230,220,200,.6); }
+.mu-skip { padding: 8px 18px; border: 1px solid rgba(230,220,200,.3); border-radius: 999px; background: transparent; color: #E6DCC8; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+/* Éclatement d’un sachet : il gonfle, se déchire vers le haut ; flash et gerbe à la couleur de la meilleure carte */
+.mu-pk { position: relative; z-index: 1; }
+.mu-pile.is-burst .mu-pk { animation: muRip var(--dur) cubic-bezier(.5, 0, .7, .4) forwards; }
+.mu-pile.is-burst.is-big .mu-pk { animation-name: muRipBig; }
+.mu-pile.is-back .mu-pk { animation: muBack .16s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes muRip { 0% { transform: none; } 35% { transform: scale(1.06) rotate(-2deg); } 55% { transform: scale(1.1) translateY(-4%); opacity: 1; } 100% { transform: translateY(-75%) scale(.75) rotate(7deg); opacity: 0; } }
+@keyframes muRipBig { 0% { transform: none; } 15%, 45% { transform: scale(1.08) rotate(-1.5deg); } 25%, 55% { transform: scale(1.1) rotate(1.5deg); } 70% { transform: scale(1.16); opacity: 1; } 100% { transform: translateY(-80%) scale(.8) rotate(8deg); opacity: 0; } }
+@keyframes muBack { from { transform: translateY(14px) scale(.96); opacity: .3; } }
+.mu-flash { position: absolute; inset: -40%; z-index: 2; pointer-events: none; opacity: 0;
+  background: radial-gradient(closest-side, #fff 0%, var(--fc, #fff) 22%, color-mix(in srgb, var(--fc, #fff) 40%, transparent) 50%, transparent 72%); }
+.mu-pile.is-burst .mu-flash { animation: muFlash var(--dur) ease-out forwards; }
+.mu-pile.is-burst.is-big .mu-flash { inset: -90%; }
+@keyframes muFlash { 0%, 40% { opacity: 0; transform: scale(.4); } 58% { opacity: .95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.25); } }
+.mu-shards { position: absolute; left: 50%; top: 40%; z-index: 3; pointer-events: none; }
+.mu-shards i { position: absolute; left: -11px; top: -15px; width: 22px; height: 30px; border-radius: 3px; background: linear-gradient(160deg, #fff, var(--c)); box-shadow: 0 0 12px var(--c);
+  opacity: 0; animation: muShard calc(var(--dur) * 1.1) cubic-bezier(.15, .8, .3, 1) forwards; animation-delay: calc(var(--dur) * .45 + var(--k) * 12ms); }
+@keyframes muShard { 0% { opacity: 0; transform: rotate(var(--a)) translateX(0) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(150px) rotate(220deg); } }
+.multi.is-grid .mu-top, .multi.is-grid .mu-hint { display: none; }
 .mu-head .eyebrow { color: var(--gold-2); margin-bottom: 4px; }
 .mu-sub { margin: 6px 0 10px; font-size: 13px; color: #CFC3AC; }
 .mu-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px; font-size: 12px; }
