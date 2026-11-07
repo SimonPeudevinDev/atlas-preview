@@ -505,7 +505,7 @@
           if (closed) return;
           var col = s.querySelectorAll('.dg')[i]; if (col) col.classList.add('is-lock');
           if (i === digs.length - 1) { SFX.seal(c.r); A.haptic(12); s.classList.add('is-sealed'); }
-          else { SFX.tick(); SFX.snap(0, 0.45); A.haptic(4); }
+          else { SFX.snap(0, 0.22); A.haptic(4); }
         }, at);
       });
       var lockEnd = t0 + ((digs.length - 1) * 0.47 + 0.9) * 1000;
@@ -804,10 +804,8 @@
         if (r >= 4) { summaryEl.classList.remove('is-quake'); void summaryEl.offsetWidth; summaryEl.classList.add('is-quake'); }
         SFX.reveal(r);
         A.haptic(r >= 3 ? [30, 40, 80] : 14);
-      } else if (r >= 1) SFX.reveal(Math.min(r, 1));
-      else bellSoft();
+      }   // les autres cartes du récapitulatif : juste le claquement (plus de « ding » en rafale)
     }
-    function bellSoft() { SFX.tick(); }
 
     /* « Ajouter à l’inventaire » : les cartes se rassemblent en une pile au centre (un claquement chacune),
        un sceau doré confirme l’ajout, puis la pile s’envole vers le lien Inventaire du menu, le fond

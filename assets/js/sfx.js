@@ -268,7 +268,7 @@
   };
   // Le numéro s’imprime : coup de sceau grave + éclat
   // Sons du numéro : en retrait (NUM), ils accompagnent sans couvrir la révélation
-  var NUM = 0.45;
+  var NUM = 0.22;
   SFX.seal = function (rank) {
     tone({ f: 96, f2: 48, dur: 0.45, gain: 0.26 * NUM, a: 0.003 });
     bell([1318.5, 1318.5, 1567.98, 1760, 2093, 2093][rank] || 1318.5, 0.03, 0.05 * NUM, 1.1);
@@ -287,8 +287,7 @@
   SFX.lock = function (i, n) {
     var f = [880, 1174.66, 1567.98, 1975.53][Math.min(3, i + (4 - n))] || 1318.5;
     SFX.snap(0, NUM);
-    tone({ type: 'triangle', f: f, dur: 0.09, gain: 0.06 * NUM });
-    bell(f, 0.01, 0.035 * NUM, 0.5);
+    tone({ type: 'triangle', f: f, dur: 0.06, gain: 0.05 * NUM });   // simple déclic, plus de cloche à chaque chiffre
   };
   // Carte qui tourne sur elle-même : souffle qui accélère
   SFX.whirl = function (d) {
@@ -319,7 +318,7 @@
      4 mythique : coup grave + arpège + grand accord
      5 unique   : idem, plus haut et plus long */
   SFX.reveal = function (rank) {
-    if (rank === 0) { bell(659.25, 0, 0.06, 0.7); return; }   // carte Base : le « ding » discret d’origine
+    if (rank === 0) { bell(659.25, 0, 0.035, 0.5); return; }   // carte Base : le « ding » discret d’origine
     if (rank === 1) {                                     // pièce d’or : deux notes vives + paillettes
       hit(0, 0.12);
       pluck(1318.51, 0, 0.07, 0.12); pluck(1975.53, 0.08, 0.07, 0.45);
