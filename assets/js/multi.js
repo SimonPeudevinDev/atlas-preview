@@ -62,9 +62,11 @@
     el.addEventListener('click', function (e) {
       if (e.target.closest('[data-mu-close]') && !started) { close(false); return; }
       if (e.target.closest('[data-mu-skip]')) { skip = true; return; }
+      if (e.target.closest('[data-mu-all]')) { revealAll = true; return; }
       if (e.target.closest('[data-mu-done]')) { close(false); return; }
       if (e.target.closest('[data-mu-again]')) { close(true); return; }
       var it = e.target.closest('.mu-item');
+      if (it && !it.classList.contains('is-shown')) { show(it); return; }
       if (it) U.openCard(it.getAttribute('data-ed'), it.getAttribute('data-uid'));
     });
     document.addEventListener('keydown', function key(e) {
@@ -72,7 +74,7 @@
       if (e.key === 'Escape' && !started) close(false);
     });
 
-    var packs = [], skip = false;
+    var packs = [], skip = false, revealAll = false;
     function go() {
       if (started) return; started = true;
       for (var i = 0; i < n; i++) {               // les tirages
@@ -96,7 +98,7 @@
       (function step(now) {
         if (closed) return;
         var k = Math.min(1, ((now || performance.now()) - t0) / ms), e = k * k * (3 - 2 * k);
-        while (e - lastG >= 0.2) { lastG += 0.2; SFX.grain(lastG); }
+        while (e - lastG >= 0.5) { lastG += 0.5; SFX.grain(lastG); }
         setTp(e);
         if (k < 1) requestAnimationFrame(step); else done();
       })();
@@ -110,11 +112,11 @@
       pile.style.setProperty('--fc', GLOW[rid]);
       pk.classList.remove('is-torn'); pk.classList.add('dir-r', 'is-tearing');
       setTp(0);
-      tear(reduce ? 60 : big ? 320 : 160, function () {
+      tear(reduce ? 40 : big ? 130 : 50, function () {
         if (closed) return;
         pk.classList.add('is-torn');
         SFX.rip(best); A.haptic(big ? [16, 30, 20] : 10);
-        if (best >= 2) SFX.numbered(best);
+        if (best >= 3) SFX.numbered(best);
         pile.classList.add('is-lit'); if (big) pile.classList.add('is-big');
         var left = packs.length - i - 1;
         el.querySelector('.mu-badge b').textContent = left;
@@ -127,11 +129,35 @@
             var gh = el.querySelectorAll('.mu-ghosts i'); if (gh.length) gh[gh.length - 1].remove();
             pk.classList.remove('is-torn', 'is-tearing', 'dir-r'); setTp(0);
             pile.classList.remove('is-out', 'is-lit', 'is-big'); void pile.offsetWidth;
-            pile.classList.add('is-next'); SFX.slide(0.25);  // le suivant glisse depuis la pile
-            setTimeout(function () { pile.classList.remove('is-next'); burst(i + 1); }, reduce ? 40 : 100);
-          }, reduce ? 40 : 110);
-        }, reduce ? 80 : big ? 520 : 150);
+            pile.classList.add('is-next');                  // le suivant glisse depuis la pile
+            setTimeout(function () { pile.classList.remove('is-next'); burst(i + 1); }, reduce ? 30 : 22);
+          }, reduce ? 30 : 32);
+        }, reduce ? 40 : big ? 200 : 35);
       });
+    }
+
+    // Les cartes se retournent une à une, des plus communes aux plus rares : la meilleure en dernier
+    function show(it, quiet) {
+      if (it.classList.contains('is-shown')) return;
+      it.classList.add('is-shown');
+      var r = A.R[A.ED[it.getAttribute('data-ed')].rarity].rank;
+      if (!quiet) { if (r >= 2) { SFX.reveal(r); A.haptic(r >= 3 ? [16, 30, 20] : 8); } else SFX.flip(); }
+    }
+    function flips(items) {
+      var nodes = [].slice.call(el.querySelectorAll('.mu-item')).reverse();   // la grille est triée du plus rare au plus commun
+      var fallEnd = (reduce ? 0 : 520 + items.length * 12);
+      var k = 0;
+      function next() {
+        if (closed) return;
+        if (revealAll) { nodes.forEach(function (n) { show(n, true); }); done(); return; }
+        while (k < nodes.length && nodes[k].classList.contains('is-shown')) k++;
+        if (k >= nodes.length) { done(); return; }
+        var n = nodes[k++], r = A.R[A.ED[n.getAttribute('data-ed')].rarity].rank;
+        var pause = r >= 3 ? 420 : r === 2 ? 160 : r === 1 ? 70 : 32;      // suspense croissant
+        setTimeout(function () { show(n, r === 0 && k % 3 !== 0); next(); }, pause);
+      }
+      function done() { var f = el.querySelector('.mu-foot'); if (f) f.classList.remove('is-revealing'); el.classList.add('is-revealed'); }
+      setTimeout(next, fallEnd);
     }
 
     // Écran récapitulatif
@@ -149,21 +175,25 @@
       el.innerHTML =
         '<div class="mu-head"><p class="eyebrow">' + pack.name + ' × ' + packs.length + '</p>' +
           '<h2 class="op-title">' + items.length + ' cartes obtenues</h2>' +
+          '<p class="mu-wait">Vos cartes se retournent…</p>' +
           '<p class="mu-sub">' + (fresh ? fresh + (fresh > 1 ? ' nouveaux personnages · ' : ' nouveau personnage · ') : '') + 'Meilleure carte : ' + A.R[A.ED[items[0].ed].rarity].label + '</p>' +
           '<div class="mu-chips">' + chips + '</div></div>' +
         '<div class="mu-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed];
-          return '<button class="mu-item r-' + ed.rarity + (A.R[ed.rarity].rank >= 3 ? ' is-big' : '') + '" data-ed="' + it.ed + '" data-uid="' + it.uid + '" style="--d:' + (i * 22) + 'ms;--r:' + (Math.random() * 30 - 15).toFixed(1) + 'deg">' +
-            U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</button>';
+          return '<button class="mu-item r-' + ed.rarity + (A.R[ed.rarity].rank >= 3 ? ' is-big' : '') + '" data-ed="' + it.ed + '" data-uid="' + it.uid + '" style="--d:' + (i * 12) + 'ms;--r:' + (Math.random() * 30 - 15).toFixed(1) + 'deg">' +
+            '<span class="mu-flip"><span class="mu-face mu-front">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</span>' +
+            '<span class="mu-face mu-back">' + U.cardBack(pack.theme) + '</span></span></button>';
         }).join('') + '</div>' +
-        '<div class="mu-foot"><button class="btn btn-gold btn-lg" data-mu-done>Ajouter à l’inventaire</button>' +
+        '<div class="mu-foot is-revealing"><button class="btn btn-ghost-light btn-lg mu-all" data-mu-all>Tout révéler</button>' +
+          '<button class="btn btn-gold btn-lg" data-mu-done>Ajouter à l’inventaire</button>' +
           (again >= 1 ? '<button class="btn btn-ghost-light btn-lg" data-mu-again>Encore ×' + again + '</button>' : '') + '</div>';
+      flips(items);
       // Déferlement : toutes les cartes tombent d’un coup, en cascade serrée
       var deal = 0, tick = setInterval(function () {
         if (!el.isConnected || deal > Math.min(items.length, 22)) { clearInterval(tick); return; }
         SFX.deal(0.12, 0.6 + Math.random() * 0.5); deal++;
       }, 40);
-      if (best >= 1 && !packs.some(function (its) { return Math.max.apply(null, its.map(rankOf)) >= 3; })) setTimeout(function () { if (!closed) SFX.reveal(best); }, 200);
+
     }
   };
 })(window.ATLAS);
