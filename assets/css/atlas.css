@@ -1664,3 +1664,6 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .play-side { gap: 14px; }
 }
 .play-pack.is-empty { opacity: .45; filter: grayscale(.6); }
+.play-reset { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 6px 12px; border: 1px dashed var(--line-2); border-radius: 999px;
+  font-size: 12px; color: var(--ink-3); background: transparent; }
+.play-reset .ic { width: 14px; height: 14px; }

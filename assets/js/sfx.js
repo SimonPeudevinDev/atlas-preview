@@ -122,6 +122,97 @@
       tone({ f: f * 1.003, dur: dur, gain: gain * 0.6, delay: delay, a: a || 0.02 });   // léger chorus
     });
   }
+  /* ---------- Palette « jeu » : paillettes, synthés, montées, impacts ----------
+     Pas de cloches ni de piano : des sons de récompense brillants, qui grossissent avec la rareté. */
+  var SPK = [2093, 2349.32, 2637.02, 3135.96, 3520, 4186.01, 4698.64, 5274.04];   // pentatonique aiguë (do majeur)
+  function route(node, wet, p) {
+    var c = ctx, n = node;
+    if (p && c.createStereoPanner) { var sp = c.createStereoPanner(); sp.pan.value = Math.max(-1, Math.min(1, p)); node.connect(sp); n = sp; }
+    n.connect(master);
+    if (wet && verb) { var w = c.createGain(); w.gain.value = wet; n.connect(w); w.connect(verb); }
+  }
+  // Paillettes : petites notes cristallines dispersées dans l’espace stéréo (up : elles montent)
+  function sparkle(delay, n, spread, gain, up) {
+    var c = ac(); if (!c) return;
+    for (var i = 0; i < n; i++) {
+      var k = up ? Math.min(SPK.length - 1, Math.floor(i / n * SPK.length + Math.random() * 2)) : Math.floor(Math.random() * SPK.length);
+      var f = SPK[k] * (!up && Math.random() < 0.2 ? 0.5 : 1);
+      var t = c.currentTime + delay + i * spread * (0.6 + Math.random() * 0.8);
+      var o = c.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f, t);
+      var o2 = c.createOscillator(); o2.type = 'sine'; o2.frequency.setValueAtTime(f * 2.01, t);
+      var g = c.createGain(), d = 0.1 + Math.random() * 0.28;
+      env(g, t, gain * (0.55 + Math.random() * 0.45), 0.002, d);
+      var g2 = c.createGain(); g2.gain.value = 0.18;
+      o.connect(g); o2.connect(g2); g2.connect(g);
+      route(g, 0.55, Math.random() * 1.6 - 0.8);
+      o.start(t); o2.start(t); o.stop(t + d + 0.05); o2.stop(t + d + 0.05);
+    }
+  }
+  // Note de synthé pincée (dent de scie + carré, filtre qui se referme vite) : le « blip » de récompense
+  function pluck(f, delay, gain, dur, p) {
+    var c = ac(); if (!c) return;
+    var t = c.currentTime + (delay || 0); dur = dur || 0.35;
+    var fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 5;
+    fl.frequency.setValueAtTime(Math.min(16000, f * 9), t);
+    fl.frequency.exponentialRampToValueAtTime(Math.max(200, f * 1.3), t + dur * 0.7);
+    var g = c.createGain(); env(g, t, gain, 0.003, dur);
+    [['sawtooth', 1, 0], ['square', 0.5, 7]].forEach(function (v) {
+      var o = c.createOscillator(); o.type = v[0]; o.frequency.setValueAtTime(f, t); o.detune.value = v[2];
+      var gg = c.createGain(); gg.gain.value = v[1]; o.connect(gg); gg.connect(fl);
+      o.start(t); o.stop(t + dur + 0.05);
+    });
+    var sub = c.createOscillator(); sub.type = 'sine'; sub.frequency.setValueAtTime(f / 2, t);
+    var sg = c.createGain(); sg.gain.value = 0.5; sub.connect(sg); sg.connect(g); sub.start(t); sub.stop(t + dur + 0.05);
+    fl.connect(g); route(g, 0.3, p || 0);
+  }
+  function arp(fs, delay, step, gain, dur) { fs.forEach(function (f, i) { pluck(f, delay + i * step, gain, dur || 0.3, (i / Math.max(1, fs.length - 1) - 0.5) * 0.8); }); }
+  // Accord « supersaw » (5 dents de scie désaccordées par note, étalées en stéréo) : grand accord brillant
+  function stab(fs, delay, gain, dur, att, peak) {
+    var c = ac(); if (!c) return;
+    var t = c.currentTime + (delay || 0); att = att || 0.02; peak = peak || 5200;
+    var fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 1.2;
+    fl.frequency.setValueAtTime(500, t);
+    fl.frequency.exponentialRampToValueAtTime(peak, t + att + 0.08);
+    fl.frequency.exponentialRampToValueAtTime(Math.max(600, peak * 0.3), t + dur);
+    var n = fs.length * 5, g = c.createGain(), G = gain * 2.2 / Math.sqrt(n);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(G, t + att);
+    g.gain.setValueAtTime(G, t + Math.max(att, dur * 0.3));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    fl.connect(g);
+    var L = null, Rr = null;
+    if (c.createStereoPanner) { L = c.createStereoPanner(); Rr = c.createStereoPanner(); L.pan.value = -0.6; Rr.pan.value = 0.6; L.connect(fl); Rr.connect(fl); }
+    fs.forEach(function (fr) {
+      [-22, -11, 0, 11, 22].forEach(function (det, j) {
+        var o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fr; o.detune.value = det + (Math.random() - 0.5) * 4;
+        o.connect(L ? (j < 2 ? L : j > 2 ? Rr : fl) : fl); o.start(t); o.stop(t + dur + 0.05);
+      });
+    });
+    route(g, 0.7);
+  }
+  // Montée de tension : souffle qui s’ouvre + dent de scie qui grimpe
+  function riser(delay, dur, gain, top) {
+    noise({ f: 400, f2: top || 7000, q: 1.6, dur: dur, gain: gain, a: dur * 0.92, delay: delay, wet: 0.5 });
+    var c = ac(); if (!c) return;
+    var t = c.currentTime + (delay || 0);
+    var o = c.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(440, t + dur);
+    var fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 8;
+    fl.frequency.setValueAtTime(250, t); fl.frequency.exponentialRampToValueAtTime(3200, t + dur);
+    var g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain * 0.6, t + dur * 0.95); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.06);
+    o.connect(fl); fl.connect(g); route(g, 0.3);
+    o.start(t); o.stop(t + dur + 0.1);
+  }
+  // Impact : grosse caisse grave + claquement + traîne
+  function hit(delay, gain) {
+    tone({ f: 170, f2: 40, dur: 0.55, gain: gain, a: 0.002, delay: delay, wet: 0.35 });
+    tone({ f: 55, dur: 1.1, gain: gain * 0.35, a: 0.01, delay: delay, wet: 0.4 });
+    noise({ type: 'highpass', f: 1800, q: 0.7, dur: 0.07, gain: gain * 0.45, delay: delay });
+    noise({ type: 'lowpass', f: 900, f2: 150, q: 0.7, dur: 0.3, gain: gain * 0.6, delay: delay, wet: 0.5 });
+  }
+  // Petit souffle qui monte (carte qui se retourne, lumière qui jaillit)
+  function swish(delay, gain, dur) { noise({ f: 600, f2: 4200, q: 1, dur: dur || 0.22, gain: gain, a: (dur || 0.22) * 0.6, delay: delay }); }
+
   // Déchirure : crissement de l’aluminium (micro-craquements) + petit tic qui monte avec la progression
   SFX.grain = function (k) {
     k = k || 0;
@@ -134,9 +225,9 @@
     rank = rank || 0;
     noise({ f: 3200, f2: 1100, q: 0.9, dur: 0.16, gain: 0.22, a: 0.002 });
     for (var i = 0; i < 5; i++) noise({ f: 2000 + Math.random() * 3000, q: 4, dur: 0.012, gain: 0.08, delay: 0.02 + i * 0.025 });
-    boom(0.02, 0.26 + rank * 0.03, 0.9 + rank * 0.15);
-    tone({ type: 'triangle', f: 880, f2: 1760, dur: 0.12, gain: 0.05 });
-    bell(1318.5, 0.05, 0.05, 0.9);
+    hit(0.02, 0.24 + rank * 0.03);
+    swish(0, 0.06, 0.3);
+    sparkle(0.05, 5 + rank * 3, 0.03, 0.035 + rank * 0.004, true);
   };
   // Mouvement d’air (carte lancée, rangée) : souffle bref et filtré
   SFX.whoosh = function (k) {
@@ -169,8 +260,10 @@
     tone({ f: 110, f2: 50, dur: 0.35, gain: 0.12, delay: 0.32 });
   };
   // Le sachet contient une carte numérotée : arpège qui monte depuis l’ouverture
+  // Le sachet contient une carte numérotée : glissando de paillettes qui monte, puis un petit accord lumineux
   SFX.numbered = function (rank) {
-    [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98, 2093].slice(0, 3 + rank).forEach(function (f, i) { bell(f, 0.05 + i * 0.07, 0.05 + rank * 0.006, 1.4); });
+    sparkle(0.02, 9 + rank * 2, 0.028, 0.04 + rank * 0.004, true);
+    stab([1046.5, 1318.51, 1567.98], 0.28 + rank * 0.02, 0.03, 0.7, 0.01, 7000);
   };
   // Le numéro s’imprime : coup de sceau grave + éclat
   SFX.seal = function (rank) {
@@ -178,8 +271,8 @@
     bell([1318.5, 1318.5, 1567.98, 1760, 2093, 2093][rank] || 1318.5, 0.03, 0.05, 1.1);
   };
   SFX.land = function () { tone({ f: 120, f2: 52, dur: 0.3, gain: 0.3 }); };
-  SFX.flip = function () { SFX.snap(); tone({ type: 'triangle', f: 520, f2: 780, dur: 0.05, gain: 0.025 }); };
-  SFX.pop = function () { tone({ f: 540, f2: 820, dur: 0.12, gain: 0.07 }); };
+  SFX.flip = function () { SFX.snap(); swish(0, 0.035, 0.12); };
+  SFX.pop = function () { tone({ f: 380, f2: 1150, dur: 0.11, gain: 0.16 }); sparkle(0.04, 3, 0.03, 0.03); };
   SFX.tick = function () { tone({ f: 2400, dur: 0.025, gain: 0.025 }); };
   // Annonce du tirage (« /25 exemplaires ») : coup sourd feutré + deux notes suspendues
   SFX.tease = function (rank) {
@@ -202,18 +295,18 @@
   };
   // Grand final Unique / Mythique : double impact, accord tenu très large, scintillement qui retombe
   SFX.mega = function (lite) {
-    boom(0, 0.5, 2.4); boom(0.16, 0.32, 1.8);
-    brass(lite ? [110, 164.81, 220, 329.63, 440] : [130.81, 196, 261.63, 392, 523.25, 659.25], 0.06, lite ? 0.045 : 0.055, lite ? 3 : 4.2);
-    var top = lite ? [1760, 2093, 2637] : [2093, 2637, 3135.96, 3951.07];
-    for (var i = 0; i < (lite ? 10 : 18); i++) bell(top[i % top.length] * (i % 2 ? 1 : 0.5), 0.2 + i * 0.11, 0.025, 1.1);
+    hit(0, 0.55); hit(0.16, 0.36);
+    riser(0, 0.18, 0.05, 9000);
+    stab(lite ? [130.81, 196, 261.63, 329.63, 392, 587.33] : [130.81, 196, 261.63, 329.63, 392, 523.25, 587.33, 659.25], 0.05, lite ? 0.05 : 0.06, lite ? 3.4 : 4.4, 0.12, 6500);
+    arp([523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98, 2093, 2637.02], 0.12, 0.05, 0.05, 0.4);
+    sparkle(0.3, lite ? 26 : 40, 0.07, 0.03);
+    tone({ f: 2093, dur: 2.4, gain: 0.02, a: 0.3, delay: 0.4, wet: 0.8 });
   };
   // Charge d’une grande carte : une note qui monte
   SFX.charge = function (rank, dur) {
-    tone({ f: 160, f2: 520 + rank * 90, dur: dur, gain: 0.07, a: dur * 0.85 });
-    tone({ type: 'triangle', f: 80, f2: 240, dur: dur, gain: 0.05, a: dur * 0.85 });
-    tone({ f: 330, f2: 990 + rank * 120, dur: dur, gain: 0.025, a: dur * 0.9 });
-    noise({ f: 600, f2: 5000, q: 1.2, dur: dur, gain: 0.03, a: dur * 0.9 });              // montée d’énergie
-    for (var i = 0; i < 6; i++) tone({ f: 70, dur: 0.12, gain: 0.04 + i * 0.02, delay: dur * (0.25 + i * 0.12), a: 0.003 });   // battements de cœur qui accélèrent
+    riser(0, dur, 0.045 + rank * 0.008, 6000 + rank * 800);
+    noise({ type: 'highpass', f: 3000, f2: 9000, q: 0.7, dur: dur, gain: 0.02, a: dur * 0.95 });   // souffle de cymbale inversée
+    for (var i = 0; i < 6; i++) tone({ f: 62, dur: 0.14, gain: 0.05 + i * 0.022, delay: dur * (0.25 + i * 0.12), a: 0.003 });   // battements de cœur qui accélèrent
   };
   /* Révélation selon la rareté :
      0 commune  : un « ding » discret
@@ -223,25 +316,33 @@
      4 mythique : coup grave + arpège + grand accord
      5 unique   : idem, plus haut et plus long */
   SFX.reveal = function (rank) {
-    if (rank === 0) { bell(659.25, 0, 0.06, 0.7); return; }
-    if (rank === 1) { tone({ f: 130, f2: 70, dur: 0.5, gain: 0.12, wet: 0.4 }); bell(659.25, 0, 0.09, 1.1); bell(987.77, 0.1, 0.09, 1.3); return; }
-    if (rank === 2) {
-      boom(0, 0.18, 0.9);
-      [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { bell(f, i * 0.06, 0.08, 1.3); });
-      bell(2093, 0.28, 0.04, 0.9);
+    if (rank === 0) {                                     // « bloup » net et court
+      pluck(783.99, 0, 0.06, 0.18); pluck(1174.66, 0.06, 0.055, 0.26);
+      sparkle(0.05, 3, 0.03, 0.022);
       return;
     }
-    // Légendaire et plus : impact grave + fanfare de cuivres
-    boom(0, rank >= 4 ? 0.42 : 0.32, rank >= 4 ? 2 : 1.5);
-    brass(rank === 4 ? [110, 164.81, 220, 277.18] : [130.81, 196, 261.63, 329.63], 0.04, rank >= 5 ? 0.05 : 0.04, rank >= 4 ? 3 : 2.4);
-    var arp = rank === 3 ? [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98]
-      : rank === 4 ? [440, 523.25, 659.25, 880, 1046.5, 1318.5, 1760]
-      : [523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98, 2093, 2637];
-    arp.forEach(function (f, i) { bell(f, i * 0.055, 0.075, 1.6); });
-    var end = arp.length * 0.055;
-    var top = rank === 4 ? [440, 554.37, 659.25, 880] : [523.25, 659.25, 783.99, 1046.5];
-    chord(top, end, rank >= 5 ? 0.03 : 0.024, rank >= 4 ? 2.6 : 2.0, 0.08);
-    [0, 0.16, 0.3, 0.5].forEach(function (d, i) { bell(top[3] * 2 * [1, 1.5, 1.25, 2][i], end + d, 0.03, 0.8); });   // scintillement
+    if (rank === 1) {                                     // pièce d’or : deux notes vives + paillettes
+      hit(0, 0.12);
+      pluck(1318.51, 0, 0.07, 0.12); pluck(1975.53, 0.08, 0.07, 0.45);
+      sparkle(0.08, 8, 0.035, 0.035);
+      return;
+    }
+    if (rank === 2) {                                     // arpège qui fuse + accord brillant
+      hit(0, 0.24); swish(0, 0.05);
+      arp([523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98], 0, 0.04, 0.055, 0.28);
+      stab([523.25, 659.25, 783.99, 1046.5], 0.24, 0.04, 0.9, 0.01, 6000);
+      sparkle(0.24, 14, 0.03, 0.035);
+      return;
+    }
+    // Légendaire et plus : impact, arpège éclair, grand accord large, pluie de paillettes
+    var A4 = rank === 4;
+    hit(0, rank >= 4 ? 0.48 : 0.38);
+    if (rank >= 4) hit(0.14, 0.26);
+    swish(0, 0.08, 0.35);
+    arp(A4 ? [440, 554.37, 659.25, 880, 1108.73, 1318.51, 1760, 2217.46] : [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98, 2093, 2637.02], 0, 0.038, 0.055, 0.32);
+    stab(A4 ? [110, 220, 277.18, 329.63, 440, 493.88, 554.37] : [130.81, 261.63, 329.63, 392, 523.25, 587.33, 659.25], 0.3, rank >= 5 ? 0.06 : 0.052, rank >= 4 ? 2.8 : 2.2, 0.05, 6500);
+    sparkle(0.3, rank >= 4 ? 30 : 22, 0.045, 0.034);
+    tone({ f: A4 ? 1760 : 2093, dur: 1.8, gain: 0.018, a: 0.2, delay: 0.35, wet: 0.8 });   // éclat tenu, très aigu
   };
 
   /* ---------- Vibrations (mobile Android) ---------- */

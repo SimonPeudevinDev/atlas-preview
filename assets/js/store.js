@@ -288,6 +288,13 @@
     return { n: c.n, max: S.CHARGE.max, next: c.n >= S.CHARGE.max ? 0 : Math.max(0, c.at + S.CHARGE.every - Date.now()) };
   };
   S.refillCharges = function () { state.charge = { n: S.CHARGE.max, at: Date.now() }; emit(); };   // démo
+  /** Test : tout recharger (réserve pleine, quotidien disponible, 3 Coffrets et 3 Saga du Nord) */
+  S.devRefill = function () {
+    state.charge = { n: S.CHARGE.max, at: Date.now() };
+    state.lastDaily = null;
+    ['conservateur', 'saga'].forEach(function (id) { state.tokens[id] = Math.max(3, state.tokens[id] || 0); });
+    emit();
+  };
 
   /* ---------- Récompenses de collection ----------
      Chaque collection a quatre paliers : quelques personnages, la moitié, tous les personnages,

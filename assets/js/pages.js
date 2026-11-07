@@ -81,6 +81,7 @@
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
         '<p class="play-note">5 cartes, toutes collections · un nouveau toutes les 15 min, jusqu’à ' + ch.max + ' en réserve</p>' +
+        (S.UNLIMITED ? '<button class="play-reset" data-dev-refill>' + I('reset') + 'Tout recharger (test)</button>' : '') +
       '</div>' +
       '<div class="play-side">' + side.map(playTile).join('') + '</div>' +
     '</div></section>';
@@ -93,6 +94,7 @@
       var fp = root.querySelector('.play-pack .pk');
       if (fp && fp._rig) fp._rig.idle(true);
       root.addEventListener('click', function (e) {
+        if (e.target.closest('[data-dev-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
         var t = e.target.closest('[data-open-pack]');
         if (t) A.opener.open(t.getAttribute('data-open-pack'));
       });
@@ -603,7 +605,7 @@
           '<div class="info-grid">' +
             '<div class="info">' + I('shield') + '<h4>Boosters gratuits protégés</h4><p>La réserve et le booster quotidien sont comptés par compte, sur l’horloge du serveur. En phase 2 : compte vérifié, limitation par appareil et détection des comptes automatisés.</p></div>' +
             '<div class="info">' + I('sparkle') + '<h4>Numérotation à la frappe</h4><p>Le numéro d’exemplaire est attribué au moment du tirage, dans une transaction atomique : aucun numéro ne peut être émis deux fois.</p></div>' +
-            '<div class="info">' + I('gift') + '<h4>Rien à acheter</h4><p>Les Éclats servent uniquement à la marketplace. Coffrets et boosters d’événement se gagnent avec les missions, les paliers de collection et les trophées. <button class="link-btn" data-refill>Remplir la réserve (démo)</button></p></div>' +
+            '<div class="info">' + I('gift') + '<h4>Rien à acheter</h4><p>Les Éclats servent uniquement à la marketplace. Coffrets et boosters d’événement se gagnent avec les missions, les paliers de collection et les trophées. <button class="link-btn" data-refill>Tout recharger (test)</button></p></div>' +
           '</div>' +
         '</div></section>';
     },
@@ -671,7 +673,7 @@
           return;
         }
         if (e.target.closest('[data-reset-daily]')) { S.resetDaily(); A.app.rerender(); return; }
-        if (e.target.closest('[data-refill]')) { S.refillCharges(); U.toast('Réserve remplie (démo)'); A.app.rerender(); return; }
+        if (e.target.closest('[data-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
         if (e.target.closest('[data-grant]')) { S.grant(1000); U.toast('1 000 Éclats ajoutés (démo)'); A.app.rerender(); }
       });
       if (ctx.query.open) {
