@@ -560,14 +560,14 @@
    de rareté) ; elle monte par en dessous pendant que l’illustration et le nom remontent exactement
    de sa hauteur (--rd, mesurée en JS) : un seul mouvement, comme un défilement. */
 .rv-info.v-cartel { z-index: 2; border-radius: 0; transition: opacity .01s linear; }
-.v-cartel .ri-in { top: auto; left: 0; right: 0; bottom: 0; height: var(--ri-h, auto); max-height: var(--ri-h, 72%); padding: 3.6cqw 6.6cqw 6.4cqw; gap: 1.8cqw;
+.v-cartel .ri-in { top: auto; left: 0; right: 0; bottom: 0; height: var(--ri-h, auto); max-height: var(--ri-h, 72%); padding: 1.2cqw 6.6cqw 6.4cqw; gap: 1.8cqw;
   background: var(--card-bg, #FBF8F1); transform: translateY(100%); transition: transform .5s cubic-bezier(.22, .9, .3, 1);
   -webkit-mask: linear-gradient(#000 calc(100% - 9cqw), transparent calc(100% - 2cqw)); mask: linear-gradient(#000 calc(100% - 9cqw), transparent calc(100% - 2cqw)); }
 .rv-info.v-cartel.is-on .ri-in { transform: none; }
 .v-cartel .rv-info-k, .v-cartel .rv-info-n, .v-cartel .rv-info-t, .v-cartel .ri-mark, .v-cartel .ri-foot { display: none; }   /* déjà sur la carte, juste au-dessus */
-.v-cartel .ri-rule { display: block; flex: none; height: 1px; background: linear-gradient(90deg, var(--rc), transparent); margin: 0 0 1.2cqw; }
-.v-cartel .rv-info-b { color: var(--ink, #1B1814); font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 6.2cqw; line-height: 1.3; }
-.v-cartel .ri-story { display: block; color: var(--ink-2, #4B453C); font-size: 4.5cqw; line-height: 1.55; }
+.v-cartel .ri-rule, .v-cartel .rv-info-b { display: none; }   /* la phrase d’accroche redisait le début de la notice */
+.v-cartel .ri-story { display: block; color: var(--ink, #1B1814); font-family: "Cormorant Garamond", Georgia, serif; font-size: 6.6cqw; line-height: 1.38; text-wrap: pretty; }
+.v-cartel .ri-story::first-letter { float: left; font-size: 3.15em; line-height: .78; font-weight: 600; color: var(--rc); margin: .07em .09em 0 0; }
 .ri-story { display: none; margin: 0; }
 .v-cartel .ri-bar { display: block; position: absolute; right: 1.6cqw; top: 4%; width: .8cqw; height: 26%; border-radius: 1cqw; background: rgba(60, 45, 25, .2);
   opacity: 0; transition: top .5s cubic-bezier(.22, .9, .3, 1), opacity .3s ease .2s; z-index: 4; }

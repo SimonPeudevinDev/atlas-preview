@@ -141,7 +141,7 @@
       '<p class="rv-info-t">' + U.esc(ch.title) + '</p>' +
       '<span class="ri-rule"></span>' +
       '<p class="rv-info-b">' + U.esc(ch.bio) + '</p>' +
-      (ch.story ? '<p class="ri-story">' + plain(ch, ch.story) + '</p>' : '') +
+      ((ch.story || ch.bio) ? '<p class="ri-story">' + plain(ch, ch.story || ch.bio) + '</p>' : '') +
       '<span class="ri-bar"></span>' +
       '<p class="ri-foot"><span>ATQ <b>' + ch.atk + '</b></span><span>DÉF <b>' + ch.def + '</b></span><span>ESP <b>' + ch.esp + '</b></span><span class="ri-rar"><i></i>' + R.label + '</span></p>' +
     '</div></div>';
