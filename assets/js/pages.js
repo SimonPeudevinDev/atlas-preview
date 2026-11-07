@@ -30,17 +30,26 @@
     var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
     return '<p class="coll-next">' + U.rewardIcon(s.reward) + 'Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
   }
-  // Bloc d’une collection globale dans la liste : en-tête cliquable + ses sous-collections
+  /* Étagère : une collection globale = une ligne compacte (nom, progression) + ses sous-collections
+     en petites vignettes qui défilent à l’horizontale. La page tient en quelques écrans. */
+  function shelfTile(c) {
+    var pr = S.collectionProgress(c.id), done = pr.pct >= 1;
+    return '<a class="shelf-tile' + (done ? ' is-done' : '') + '" href="#/collection/' + c.id + '">' +
+      '<div class="st-art">' + A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 320, h: 200 }) +
+        (S.readyCount(c.id) ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : done ? '<span class="st-badge is-done" title="Complète">' + U.icon('check') + '</span>' : '') +
+        (c.status === 'event' ? '<span class="st-new">Nouveau</span>' : '') + '</div>' +
+      '<h3 class="st-name">' + U.esc(c.name) + '</h3>' +
+      '<p class="st-n"><span>' + pr.owned + '/' + pr.total + '</span><i style="--p:' + Math.round(pr.pct * 100) + '%"></i></p></a>';
+  }
+  function shelf(head, subs) {
+    return '<section class="shelf">' + head + '<div class="shelf-row">' + subs.map(shelfTile).join('') + '</div></section>';
+  }
   function groupBlock(g, subs) {
-    var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id);
-    var nx = S.rewards('@' + g.id).filter(function (x) { return x.state === 'locked'; })[0];
-    return '<section class="cgroup"><a class="cgroup-head" href="#/saga/' + g.id + '">' +
-      '<div class="cgroup-copy"><p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p><h2 class="cgroup-name">' + U.esc(g.name) + '</h2>' +
-        '<p class="cgroup-tag">' + U.esc(g.tagline) + '</p></div>' +
-      '<div class="cgroup-prog">' + U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages · ' + pr.done + ' / ' + pr.subs + ' complètes</span><span>' + Math.round(pr.pct * 100) + ' %</span>') +
-        (ready ? '<p class="coll-next is-ready">' + U.icon('gift') + 'Récompense globale à récupérer</p>' : nx ? '<p class="coll-next">' + U.rewardIcon(nx.reward) + 'Prochain palier : ' + U.esc(nx.label) + ' · ' + U.esc(U.rewardText(nx.reward)) + '</p>' : '') +
-        '<span class="link-arrow">Voir la collection globale ' + I('arrow') + '</span></div></a>' +
-      '<div class="coll-grid is-full cgroup-subs">' + subs.map(function (c) { return collTile(c); }).join('') + '</div></section>';
+    var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id) || subs.some(function (c) { return S.readyCount(c.id); });
+    return shelf('<a class="shelf-head" href="#/saga/' + g.id + '">' +
+      '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
+        '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
+      '<span class="sh-pct" style="--p:' + Math.round(pr.pct * 100) + '"><b>' + Math.round(pr.pct * 100) + '</b>%</span>' + I('chevR') + '</a>', subs);
   }
 
   function globe() {
@@ -246,7 +255,7 @@
             return subs.length ? groupBlock(g, subs) : '';
           }).join('');
           var rest = list.filter(function (c) { return !shown[c.id]; });
-          if (rest.length) html += (html ? '<p class="eyebrow cgroup-rest">Autres collections</p>' : '') + '<div class="coll-grid is-full">' + rest.map(function (c) { return collTile(c); }).join('') + '</div>';
+          if (rest.length) html += shelf('<div class="shelf-head"><div class="sh-copy"><h2 class="sh-name">Autres collections</h2></div></div>', rest);
           if (!list.length) html = '<div class="empty">Toutes les collections de cet univers sont complètes. Bravo !</div>';
         }
         res.innerHTML = html;
