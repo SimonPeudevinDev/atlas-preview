@@ -17,7 +17,8 @@
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
     [/^\/atelier$/, P.atelier, ''],
-    [/^\/infos$/, P.infos, '']
+    [/^\/infos$/, P.infos, ''],
+    [/^\/jauges$/, P.jauges, '']   // temporaire : choix de la jauge des collections
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
