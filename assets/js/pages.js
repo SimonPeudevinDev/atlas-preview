@@ -137,6 +137,7 @@
       }, { passive: true });
       autoSlide(st, 4500);
       autoSlide(root.querySelector('.rarity-row'), 2600);
+      autoSlide(root.querySelector('.upcoming'), 4000);
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {

@@ -493,7 +493,9 @@ window.ATLAS = window.ATLAS || {};
   A.GROUPS.forEach(function (g) { A.GROUP[g.id] = g; });
 
   A.UPCOMING = [
-    { id: 'explo',  name: 'Grands Explorateurs', family: 'Histoire',             motif: 'fjord',  date: 'Automne 2027',   desc: 'Navigateurs et voyageurs qui ont redessiné la carte du monde.' }
+    { id: 'explo',  name: 'Grands Explorateurs', family: 'Histoire',             motif: 'fjord',  date: 'Automne 2027',   desc: 'Navigateurs et voyageurs qui ont redessiné la carte du monde.' },
+    { id: 'peintres', name: 'Les Grands Peintres', family: 'Arts',               motif: 'dome',   date: 'Hiver 2027',     desc: 'De Léonard de Vinci à Frida Kahlo, ceux qui ont changé notre regard.' },
+    { id: 'musique',  name: 'Les Compositeurs',    family: 'Musique',            motif: 'castle', date: 'Printemps 2028', desc: 'Bach, Mozart, Beethoven et les grandes voix de la musique classique.' }
   ];
 
   /* ---------- Personnages ----------
