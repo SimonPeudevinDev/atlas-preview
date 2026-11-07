@@ -143,6 +143,7 @@
       '<p class="rv-info-b">' + U.esc(ch.bio) + '</p>' +
       ((ch.story || ch.bio) ? '<p class="ri-story">' + plain(ch, ch.story || ch.bio) + '</p>' : '') +
       '<span class="ri-bar"></span>' +
+      '<p class="ri-end"><span class="ri-orn">' + U.mark() + '</span><span class="ri-end-k">' + U.esc([A.COLL[ch.coll].family, A.COLL[ch.coll].edition].filter(Boolean).join(' · ')) + '</span></p>' +
       '<p class="ri-foot"><span>ATQ <b>' + ch.atk + '</b></span><span>DÉF <b>' + ch.def + '</b></span><span>ESP <b>' + ch.esp + '</b></span><span class="ri-rar"><i></i>' + R.label + '</span></p>' +
     '</div></div>';
   };
