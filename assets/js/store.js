@@ -49,6 +49,19 @@
   function minted(ed) { var m = state.minted[ed.id]; return m == null ? ed.minted0 : m; }
   function remaining(ed) { return ed.supply == null ? Infinity : Math.max(0, ed.supply - minted(ed)); }
   S.minted = function (edId) { return minted(A.ED[edId]); };
+  /** Premier détenteur d’une édition : celui qui l’a trouvée en premier dans un booster.
+      { name, at, you } ou null si personne ne l’a encore trouvée.
+      (Démo : pour les éditions déjà émises avant votre arrivée, un collectionneur fictif stable.
+       Phase 2 : enregistré par le serveur au premier tirage.) */
+  S.firstOwner = function (edId) {
+    var ed = A.ED[edId]; if (!ed) return null;
+    var at = state.firsts && state.firsts[edId];
+    if (!at) state.inventory.forEach(function (it) { if (it.ed === edId && it.first && (!at || it.at < at)) at = it.at; });
+    if (at) return { name: state.user.name, at: at, you: true };
+    if (minted(ed) <= 0) return null;
+    var h = A.hash(edId + ':first'), U2 = A.DEMO_USERS || ['Calliope'];
+    return { name: U2[h % U2.length], at: Date.now() - (2 + h % 120) * 864e5 - (h % 86400) * 1000, you: false };
+  };
   S.remaining = function (edId) { return remaining(A.ED[edId]); };
 
   // Attribue un numéro déjà en circulation (données de démo uniquement)
@@ -529,7 +542,7 @@
       var first = minted(ed) === 0;                 // personne ne l’avait encore trouvée
       if (serial === undefined) serial = mintNew(ed);
       var it = makeItem(ed.id, serial, 'booster', now + i, 'Tirage — ' + pack.name);
-      if (first) { it.first = true; it.hist.push({ at: now + i, t: 'Première découverte mondiale' }); }
+      if (first) { it.first = true; it.hist.push({ at: now + i, t: 'Première découverte mondiale' }); (state.firsts = state.firsts || {})[ed.id] = now + i; }
       it.isNew = !S.ownsChar(ed.charId) && !seen[ed.charId];
       seen[ed.charId] = true;
       items.push(it);

@@ -552,6 +552,7 @@
           '<div><dt>Émis</dt><dd>' + U.num(minted) + '</dd></div>' +
           '<div><dt>Disponibles</dt><dd>' + (ed.supply ? (rem > 0 ? U.num(rem) : '<span class="sold">Épuisée</span>') : '—') + '</dd></div>' +
           '<div><dt>Prix plancher</dt><dd>' + (floor ? U.price(floor) : '<span class="muted">Aucune annonce</span>') + '</dd></div>' +
+          '<div><dt>Premier détenteur</dt><dd>' + firstOwnerHTML(A.store.firstOwner(ed.id)) + '</dd></div>' +
         '</dl></div>' +
         '<div class="detail-block detail-split' + (prov ? '' : ' is-single') + '"><div class="detail-copies"><p class="eyebrow">Vos exemplaires' + (owned.length > 1 && !isBase ? ' <span class="eyebrow-count">' + owned.length + '</span>' : '') +
           '<span class="copies-nav" hidden><button class="cn-btn" data-cn="-1" aria-label="Exemplaires précédents">' + U.icon('chevL') + '</button><span class="cn-count"></span><button class="cn-btn" data-cn="1" aria-label="Exemplaires suivants">' + U.icon('chevR') + '</button></span></p><div class="copies is-row">' + copies + '</div></div>' + prov + '</div>' +
@@ -824,6 +825,12 @@
       if (!o) return label || slug;
       return '<button type="button" class="bio-link" data-bio-char="' + o.id + '" title="Voir la fiche de ' + U.esc(o.name) + '">' + (label || U.esc(o.name)) + '</button>';
     });
+  }
+  // « Premier détenteur » : qui a trouvé cette édition en premier
+  function firstOwnerHTML(fo) {
+    if (!fo) return '<span class="muted">Personne encore : à vous de la trouver</span>';
+    return '<span class="first-owner' + (fo.you ? ' is-you' : '') + '">' + (fo.you ? U.icon('star') : '') + U.esc(fo.name) +
+      '<small>' + U.date(fo.at) + '</small></span>';
   }
   U.openCard = function (edId, itemUid) {
     if (!A.ED[edId]) return;
