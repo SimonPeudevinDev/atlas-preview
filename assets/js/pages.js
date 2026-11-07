@@ -44,12 +44,22 @@
   function shelf(head, subs) {
     return '<section class="shelf">' + head + '<div class="shelf-row">' + subs.map(shelfTile).join('') + '</div></section>';
   }
+  // Anneau de complétion : arc doré fin sur un rail discret ; pastille dorée cochée à 100 %
+  function ring(pct) {
+    var p = Math.round(pct * 100);
+    if (p >= 100) return '<span class="ring is-full" aria-label="Complète">' + U.icon('check') + '</span>';
+    return '<span class="ring" aria-label="' + p + ' % complété"><svg viewBox="0 0 48 48" aria-hidden="true">' +
+      '<defs><linearGradient id="ringg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9B871"/><stop offset="1" stop-color="#A9823F"/></linearGradient></defs>' +
+      '<circle class="ring-track" cx="24" cy="24" r="20"/>' +
+      (p > 0 ? '<circle class="ring-arc" cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="' + Math.max(1.5, p) + ' 100"/>' : '') +
+      '</svg><b>' + p + '<small>%</small></b></span>';
+  }
   function groupBlock(g, subs) {
     var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id) || subs.some(function (c) { return S.readyCount(c.id); });
     return shelf('<a class="shelf-head" href="#/saga/' + g.id + '">' +
       '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
         '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
-      '<span class="sh-pct" style="--p:' + Math.round(pr.pct * 100) + '"><b>' + Math.round(pr.pct * 100) + '</b>%</span>' + I('chevR') + '</a>', subs);
+      ring(pr.pct) + I('chevR') + '</a>', subs);
   }
 
   function globe() {
