@@ -51,6 +51,7 @@
 
   /* ---------- Contexte WebGL partagé (créé au premier sachet) ---------- */
   var R = null, scene, env, geo, lost = false, views = [];
+  var owner = null;      // sachet en cours d’ouverture : il affiche directement le canevas WebGL (aucune recopie)
 
   function supported() {
     try {
@@ -527,7 +528,9 @@
     v.rx = 0; v.ry = 0; v.rz = 0;
     v.torn0 = 0; v.drop0 = 0; v.em0 = 0; v.raf = 0;
     // Sachet de la boutique : propre. Sachet qu'on ouvre (il contient les cartes) : froissé au hasard.
-    var d = pk.querySelector('.pk-stack') ? messy() : clean();
+    var opening = !!pk.querySelector('.pk-stack');
+    var d = opening ? messy() : clean();
+    v.direct = opening;
     v.infl = d.infl;
     v.U = {
       tp: { value: 0 }, dir: { value: 1 }, guide: { value: -1 }, guideA: { value: 0 },
@@ -559,10 +562,20 @@
     v.cam = new T.PerspectiveCamera();
     v.cam.matrixAutoUpdate = false;
 
-    v.canvas = document.createElement('canvas');
+    // Sachet qu’on ouvre : il anime à chaque image, il prend le canevas WebGL lui-même.
+    // Recopier l’image dans un canevas 2D obligeait le processeur à attendre la carte graphique
+    // à chaque image (lecture de pixels synchrone), très lent sur iPhone.
+    if (v.direct && !owner) {
+      owner = v;
+      v.canvas = R.domElement;
+      v.ctx = null;
+    } else {
+      v.direct = false;
+      v.canvas = document.createElement('canvas');
+      v.ctx = v.canvas.getContext('2d');
+    }
     v.canvas.className = 'pk-gl';
     v.canvas.setAttribute('aria-hidden', 'true');
-    v.ctx = v.canvas.getContext('2d');
     var mv = pk.querySelector('.pk-move');
     mv.appendChild(v.canvas);
     // Le trait lumineux de la déchirure passe au-dessus du film
@@ -585,9 +598,10 @@
     this.wpx = w;
     var cw = Math.round(w * BOX.w * dpr), ch = Math.round(w * 1.6 * BOX.h * dpr);
     // Plafond de pixels (mobiles) : on réduit la définition, pas le cadrage
-    var k = Math.min(1, Math.sqrt(2.6e6 / (cw * ch)));
+    var k = Math.min(1, Math.sqrt((this.direct ? 1.6e6 : 2.6e6) / (cw * ch)));   // sachet ouvert : rendu à chaque image, on allège
     cw = Math.round(cw * k); ch = Math.round(ch * k);
-    if (this.canvas.width !== cw || this.canvas.height !== ch) { this.canvas.width = cw; this.canvas.height = ch; }
+    if (this.direct) { this.cw = cw; this.ch = ch; if (this.canvas.width !== cw || this.canvas.height !== ch) R.setSize(cw, ch, false); }
+    else if (this.canvas.width !== cw || this.canvas.height !== ch) { this.canvas.width = cw; this.canvas.height = ch; }
     // Caméra hors axe : reproduit exactement la perspective CSS du sachet
     var d = PERSP / w, cy = H / 2 - ORIGIN_Y * H, n = 0.1, f = 40;
     var x0 = -W / 2 + BOX.x * W, x1 = x0 + BOX.w * W;
@@ -610,7 +624,7 @@
     var v = this, pk = v.pk;
     if (v.dead || !v.ready || lost) return;
     var cl = pk.classList, dir = cl.contains('dir-l') ? -1 : 1;
-    var tp = parseFloat(pk.style.getPropertyValue('--tp')) || 0;
+    var tp = v.tpv != null ? v.tpv : (parseFloat(pk.style.getPropertyValue('--tp')) || 0);
     var anim = false;
     v.U.tp.value = cl.contains('is-tearing') ? tp : 0;
     v.U.dir.value = dir;
@@ -677,9 +691,16 @@
     render(v);
     if (anim) v.invalidate();
   };
+  /** Progression de la déchirure, sans passer par le style du sachet (évite de recalculer tout son contenu à chaque image) */
+  View.prototype.setTp = function (p) {
+    this.tpv = p;
+    if (this.tearEl) this.tearEl.style.setProperty('--tp', p.toFixed(3));
+    this.invalidate();
+  };
   View.prototype.fallback = function () {
     // Retour à la version CSS (perte du contexte WebGL)
     var v = this;
+    if (v.tpv != null) v.pk.style.setProperty('--tp', v.tpv.toFixed(3));
     v.destroy();
     v.pk.classList.remove('is-gl');
   };
@@ -693,6 +714,12 @@
     if (v.mo) v.mo.disconnect();
     if (v.mats) v.mats.forEach(function (o) { o.m.dispose(); });
     if (v.canvas) v.canvas.remove();
+    if (owner === v) {
+      owner = null;
+      var c = R.domElement; c.className = ''; c.style.transform = ''; c.removeAttribute('aria-hidden');
+      // les sachets restés derrière reprennent leur rendu (ils étaient en pause)
+      views.forEach(function (o) { if (o !== v && o.stale) { o.stale = false; o.invalidate(); } });
+    }
     if (v.tearEl) { var rot = v.pk.querySelector('.pk-rot'); if (rot) rot.appendChild(v.tearEl); }
     if (v.pk._gl === v) v.pk._gl = null;
     if (v.pk._glPending === v) v.pk._glPending = null;
@@ -700,6 +727,14 @@
   };
 
   function render(v) {
+    if (v.direct) {
+      if (R.domElement.width !== v.cw || R.domElement.height !== v.ch) R.setSize(v.cw, v.ch, false);
+      R.setViewport(0, 0, v.cw, v.ch); R.setScissor(0, 0, v.cw, v.ch); R.setScissorTest(true);
+      scene.add(v.root); R.render(scene, v.cam); scene.remove(v.root);
+      return;
+    }
+    // Pendant une ouverture, le canevas WebGL est à l’écran : les autres sachets (cachés derrière) attendent
+    if (owner) { v.stale = true; return; }
     var cw = v.canvas.width, ch = v.canvas.height, el = R.domElement;
     if (el.width < cw || el.height < ch) R.setSize(Math.max(el.width, cw), Math.max(el.height, ch), false);
     R.setViewport(0, 0, cw, ch); R.setScissor(0, 0, cw, ch); R.setScissorTest(true);

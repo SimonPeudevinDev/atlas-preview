@@ -85,6 +85,7 @@
     var skipBtn = el.querySelector('[data-skip]');
     var summaryEl = el.querySelector('.op-summary');
     var flashEl = el.querySelector('.op-flash');
+    var dimEl = el.querySelector('.op-dim');   // --otp / --dimk posés sur lui seul : pas de recalcul de tout l’écran à chaque image
 
     var phase = 'pack', entering = !reduce, items = null, closed = false;
     var tp = 0, dir = 0, lastGrain = 0, drag = null;
@@ -197,8 +198,8 @@
         SFX.grain(lastGrain); A.haptic(3);
       }
       tp = p;
-      pk.style.setProperty('--tp', p.toFixed(3));
-      el.style.setProperty('--otp', p.toFixed(3));
+      if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3));
+      dimEl.style.setProperty('--otp', p.toFixed(3));
     }
     function setDir(d) {
       dir = d;
@@ -297,6 +298,8 @@
       var c = { it: it, i: i, ed: A.ED[it.ed], r: rankOf(it), state: 'stack', st: {}, v: {}, tg: {}, ry: 180, k: 0 };
       c.el = stack.querySelector('.rv-card[data-i="' + i + '"]');
       c.tilt = c.el.querySelector('.rv-tilt'); c.flip = c.el.querySelector('.rv-flip');
+      c.glare = c.el.querySelector('.rv-glare'); c.holo = c.el.querySelector('.rv-holo');
+      c.css = {};
       KEYS.forEach(function (k) { c.st[k] = k === 's' ? 1 : 0; c.v[k] = 0; c.tg[k] = c.st[k]; });
       return c;
     }
@@ -315,11 +318,17 @@
         c.el.classList.toggle('is-under', d > 0);          // les cartes du dessous restent floues : pas de spoil
       });
     }
+    // N’écrit que ce qui a changé : une carte immobile ne coûte plus rien au navigateur
+    function put(c, key, node, prop, val) {
+      if (c.css[key] === val) return;
+      c.css[key] = val;
+      if (prop === 'transform') node.style.transform = val; else node.style.setProperty(prop, val);
+    }
     function draw(c) {
       var s = c.st;
-      c.el.style.transform = 'translate3d(' + s.x.toFixed(1) + 'px,' + s.y.toFixed(1) + 'px,' + s.z.toFixed(1) + 'px) rotate(' + s.rz.toFixed(2) + 'deg) scale(' + s.s.toFixed(4) + ')';
-      c.tilt.style.transform = 'rotateX(' + s.tx.toFixed(2) + 'deg) rotateY(' + s.ty.toFixed(2) + 'deg)';
-      c.flip.style.transform = 'rotateY(' + c.ry.toFixed(2) + 'deg)';
+      put(c, 'm', c.el, 'transform', 'translate3d(' + s.x.toFixed(1) + 'px,' + s.y.toFixed(1) + 'px,' + s.z.toFixed(1) + 'px) rotate(' + s.rz.toFixed(2) + 'deg) scale(' + s.s.toFixed(3) + ')');
+      put(c, 't', c.tilt, 'transform', 'rotateX(' + s.tx.toFixed(1) + 'deg) rotateY(' + s.ty.toFixed(1) + 'deg)');
+      put(c, 'f', c.flip, 'transform', 'rotateY(' + c.ry.toFixed(1) + 'deg)');
     }
     function spring(c, f, K, D) {
       KEYS.forEach(function (k) {
@@ -370,17 +379,17 @@
     function aim(c, now) {
       if (hover) {
         c.tg.tx = (0.5 - hover.y) * 20; c.tg.ty = (hover.x - 0.5) * 26;
-        c.el.style.setProperty('--gx', (hover.x * 100).toFixed(1) + '%');
-        c.el.style.setProperty('--gy', (hover.y * 100).toFixed(1) + '%');
-        c.el.style.setProperty('--go', '1');
+        put(c, 'gx', c.glare, '--gx', (hover.x * 100).toFixed(0) + '%');
+        put(c, 'gy', c.glare, '--gy', (hover.y * 100).toFixed(0) + '%');
+        put(c, 'go', c.glare, '--go', '1');
       } else {
         var t = now / 1000;
         c.tg.tx = Math.sin(t * 0.8) * 3; c.tg.ty = Math.sin(t * 0.55) * 7;
-        c.el.style.setProperty('--gx', (50 + c.st.ty * 3).toFixed(1) + '%');
-        c.el.style.setProperty('--gy', (30 - c.st.tx * 3).toFixed(1) + '%');
-        c.el.style.setProperty('--go', '.55');
+        put(c, 'gx', c.glare, '--gx', (50 + c.st.ty * 3).toFixed(0) + '%');
+        put(c, 'gy', c.glare, '--gy', (30 - c.st.tx * 3).toFixed(0) + '%');
+        put(c, 'go', c.glare, '--go', '.55');
       }
-      c.el.style.setProperty('--hx', (c.st.ty * -2.2 + c.st.tx * 1.2).toFixed(1) + '%');
+      put(c, 'hx', c.holo, '--hx', (c.st.ty * -2.2 + c.st.tx * 1.2).toFixed(1) + '%');
     }
 
     /* Les cartes sortent du sachet face visible. Quand une carte passe sur le dessus, elle se présente :
@@ -389,7 +398,7 @@
     function charging(c, now) {
       var k = clamp((now - c.c0) / c.cd, 0, 1), a = 1 + 6 * k * k;
       c.el.style.setProperty('--charge', k.toFixed(3));
-      el.style.setProperty('--dimk', (k * (c.r >= 4 ? 0.65 : 0.4)).toFixed(3));
+      dimEl.style.setProperty('--dimk', (k * (c.r >= 4 ? 0.65 : 0.4)).toFixed(3));
       c.st.x = (Math.random() - 0.5) * a; c.st.y = (Math.random() - 0.5) * a * 0.6;
       c.st.rz = (Math.random() - 0.5) * a * 0.4; c.st.s = 1 + 0.05 * easeOut(k); c.st.z = 24 * k;
       if (now > (c.nextPull || 0)) {
@@ -420,7 +429,7 @@
       var r = c.r, col = GLOW[c.ed.rarity], b = c.el.getBoundingClientRect(), p = center(b);
       el.style.setProperty('--glow', col);
       el.style.setProperty('--tint', TINT[r]);
-      el.style.setProperty('--dimk', r >= 4 ? 0.55 : r >= 3 ? 0.3 : 0);
+      dimEl.style.setProperty('--dimk', r >= 4 ? 0.55 : r >= 3 ? 0.3 : 0);
       el.classList.toggle('fx-tint', r >= 1);
       el.classList.toggle('fx-aura', r >= 3);
       el.classList.toggle('fx-halo', r >= 1);
@@ -585,7 +594,7 @@
         rig.destroy();
         var wrap = el.querySelector('.op-pack'); if (wrap) wrap.remove();
         el.classList.remove('is-torn', 'is-tearing');
-        el.style.setProperty('--otp', 0);
+        dimEl.style.setProperty('--otp', 0);
         phase = 'reveal';
         prog.hidden = false; skipBtn.hidden = false;
         pip(0, 'is-cur');
@@ -689,7 +698,7 @@
     }
     function hideLabel() { var ol = label.firstChild; if (ol) ol.classList.remove('is-in'); }
     function clearFx() {
-      el.classList.remove('fx-tint', 'fx-aura', 'fx-halo', 'fx-dim', 'fx-black'); el.style.setProperty('--dimk', 0); hideLabel();
+      el.classList.remove('fx-tint', 'fx-aura', 'fx-halo', 'fx-dim', 'fx-black'); dimEl.style.setProperty('--dimk', 0); hideLabel();
       [].forEach.call(el.querySelectorAll('.op-mega'), function (m) { m.classList.add('is-off'); });
       var y = el.querySelector('.op-light'); if (y) { y.classList.add('is-off'); setTimeout(function () { y.remove(); }, 500); }
     }
