@@ -51,8 +51,28 @@
       return '<span class="seg' + (pr.pct >= 1 ? ' is-done' : '') + '" style="flex-grow:' + pr.total + ';--p:' + (pr.pct * 100).toFixed(1) + '%"></span>';
     }).join('') + '</div>';
   }
-  function groupBlock(g, subs) {
+  /* Essai en cours : 3 jauges sur les 3 premières étagères (étoiles, médaille, pourcentage) */
+  function gauge(kind, pct) {
+    var p = Math.round(pct * 100), full = p >= 100;
+    if (kind === 'star') {
+      var n = full ? 3 : p >= 67 ? 2 : p >= 34 ? 1 : 0;
+      return '<span class="g-star"><span class="g-stars">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < n ? 'is-on' : '') + '">' + I('star') + '</i>'; }).join('') + '</span>' +
+        '<small>' + (full ? 'Complète' : p + ' %') + '</small></span>';
+    }
+    if (kind === 'medal') {
+      var t = full ? ['full', 'Complète'] : p >= 67 ? ['or', 'Or'] : p >= 34 ? ['argent', 'Argent'] : p > 0 ? ['bronze', 'Bronze'] : ['none', 'À commencer'];
+      return '<span class="g-medal is-' + t[0] + '">' + I(full ? 'laurel' : 'medal') + '<span><b>' + t[1] + '</b>' + (full || !p ? '' : '<small>' + p + ' %</small>') + '</span></span>';
+    }
+    return full ? '<span class="g-pct is-full">' + I('laurel') + '<small>Complète</small></span>' : '<span class="g-pct"><b>' + p + '<em> %</em></b><small>complété</small></span>';
+  }
+  var TRY = [['star', 'Essai · étoiles'], ['medal', 'Essai · médaille'], ['pct', 'Essai · pourcentage']];
+  function groupBlock(g, subs, k) {
     var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id) || subs.some(function (c) { return S.readyCount(c.id); });
+    var tr = TRY[k];
+    if (tr) return shelf('<p class="g-try">' + tr[1] + '</p><a class="shelf-head" href="#/saga/' + g.id + '">' +
+      '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
+        '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
+      gauge(tr[0], pr.pct) + I('chevR') + '</a>', subs);
     return shelf('<a class="shelf-head" href="#/saga/' + g.id + '">' +
       '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
         '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
@@ -264,11 +284,11 @@
               return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) + '</div>';
             }).join('') + '</div>' : '<div class="empty">Aucun personnage ne correspond à « ' + U.esc(cf.q) + ' ».</div>');
         } else {
-          var shown = {};
+          var shown = {}, gk = 0;
           html = (A.GROUPS || []).map(function (g) {
             var subs = list.filter(function (c) { return c.group === g.id; });
             subs.forEach(function (c) { shown[c.id] = true; });
-            return subs.length ? groupBlock(g, subs) : '';
+            return subs.length ? groupBlock(g, subs, gk++) : '';
           }).join('');
           var rest = list.filter(function (c) { return !shown[c.id]; });
           if (rest.length) html += shelf('<div class="shelf-head"><div class="sh-copy"><h2 class="sh-name">Autres collections</h2></div></div>', rest);
