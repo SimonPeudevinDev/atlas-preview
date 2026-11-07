@@ -283,8 +283,7 @@
             '<div class="coll-stats-bar">' + U.progress(pr.pct, 'Progression ' + Math.round(pr.pct * 100) + ' %') + '</div>' +
           '</div>' +
         '</div></section>' +
-        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack(c.id) + '</div></section>' +
-        '<section class="section-tight ms-sec"><div class="container" data-missions>' + U.missionsHTML(c.id) + '</div></section>' +
+        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.objectives(c.id) + '</div></section>' +
         (U.duelSetsFor(c.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor(c.id).map(U.duelsHTML).join('') + '</div></section>' : '') +
         '<section class="section-tight"><div class="container">' +
           '<div class="toolbar sticky-bar">' +
@@ -352,7 +351,7 @@
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = function () { draw(); rw.innerHTML = U.rewardTrack(c.id); root.querySelector('[data-missions]').innerHTML = U.missionsHTML(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
+      this.refresh = function () { draw(); rw.innerHTML = U.objectives(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
     }
   };
 

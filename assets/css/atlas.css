@@ -1599,3 +1599,15 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 /* Récompenses et missions : sections resserrées */
 .rw-sec { padding-bottom: 8px; }
 .ms-sec { padding-top: 20px; }
+
+/* Objectifs : onglets Paliers | Missions */
+.obj { max-width: 640px; }
+.obj-tabs { display: flex; gap: 22px; margin: 0 0 16px; border-bottom: 1px solid var(--line); }
+.obj-tab { position: relative; display: inline-flex; align-items: baseline; gap: 7px; padding: 0 0 10px; margin-bottom: -1px; background: none; border: 0; border-bottom: 1.5px solid transparent;
+  font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); cursor: pointer; }
+.obj-tab.is-on { color: var(--ink); border-bottom-color: var(--ink); }
+.obj-n { font-family: var(--serif); font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.obj-dot { align-self: center; width: 7px; height: 7px; margin-left: -1px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 2px var(--bg); }
+.obj .ms-list { border-top: 0; }
+.obj .ms-row:first-child { padding-top: 2px; }
+.obj .rw-detail { border-bottom: 0; }

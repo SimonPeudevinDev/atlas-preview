@@ -330,7 +330,7 @@
     if (r.cadre) out.push(U.icon('frame') + 'Cadre');
     return '<span class="rw-short">' + out.map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</span>';
   }
-  U.rewardTrack = function (cid) {
+  U.rewardTrack = function (cid, bare) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
     var sel = steps.findIndex(function (s) { return s.state === 'ready'; });
     if (sel < 0) sel = steps.findIndex(function (s) { return s.state === 'locked'; });
@@ -338,8 +338,8 @@
     var reached = -1;
     steps.forEach(function (s, i) { if (s.state !== 'locked') reached = i; });
     var fill = steps.length > 1 ? Math.max(0, reached) / (steps.length - 1) * 100 : 0;
-    return '<div class="rw"><div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses') + '</p>' +
-      '<span class="rw-count">' + got + ' / ' + steps.length + '</span></div>' +
+    return '<div class="rw">' + (bare ? '' : '<div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses') + '</p>' +
+      '<span class="rw-count">' + got + ' / ' + steps.length + '</span></div>') +
       '<div class="rw-strip" style="--fill:' + fill.toFixed(2) + '">' + steps.map(function (s, i) {
         return '<button type="button" class="rw-dot is-' + s.state + (i === sel ? ' is-sel' : '') + '" data-rw="' + i + '" aria-label="Palier ' + (i + 1) + ' : ' + s.label + '">' +
           '<span class="rw-medal">' + U.rewardIcon(s.reward) + (s.state === 'claimed' ? '<i class="rw-tick">' + U.icon('check') + '</i>' : '') + '</span>' +
@@ -356,12 +356,12 @@
   };
 
   // Missions d’une collection : une ligne par mission (personnages à réunir, ou chasse)
-  U.missionsHTML = function (cid) {
+  U.missionsHTML = function (cid, bare) {
     var list = A.store.missions(cid);
     if (!list.length) return '';
     var got = list.filter(function (m) { return m.state === 'claimed'; }).length;
     var HICON = { rare: 'medal', epic: 'medal', legendary: 'medal', trio: 'cards', numerotes: 'tag', eventail: 'sparkle' };
-    return '<div class="ms"><div class="rw-head"><p class="eyebrow">Missions</p><span class="rw-count">' + got + ' / ' + list.length + '</span></div>' +
+    return '<div class="ms">' + (bare ? '' : '<div class="rw-head"><p class="eyebrow">Missions</p><span class="rw-count">' + got + ' / ' + list.length + '</span></div>') +
       '<ul class="ms-list">' + list.map(function (m) {
         var sub = m.kind === 'set'
           ? '<span class="ms-faces">' + m.chars.map(function (id) {
@@ -378,6 +378,31 @@
           '<div class="ms-end">' + end + '</div></li>';
       }).join('') + '</ul></div>';
   };
+  /* Objectifs d’une collection : un seul bloc, deux onglets (Paliers | Missions).
+     Il s’ouvre sur l’onglet où une récompense attend (sinon Paliers) ; un point doré signale
+     une récompense à récupérer dans l’autre onglet. Le choix du joueur est gardé pendant la visite. */
+  var OBJTAB = {};
+  U.objectives = function (cid) {
+    var steps = A.store.rewards(cid), ms = A.store.missions(cid);
+    var cnt = function (l, st) { return l.filter(function (x) { return x.state === st; }).length; };
+    var tab = OBJTAB[cid] || (!cnt(steps, 'ready') && cnt(ms, 'ready') ? 'ms' : 'rw');
+    if (!ms.length) tab = 'rw';
+    var btn = function (id, label, l) {
+      return '<button type="button" role="tab" class="obj-tab' + (tab === id ? ' is-on' : '') + '" data-obj-tab="' + id + '" aria-selected="' + (tab === id) + '">' + label +
+        '<span class="obj-n">' + cnt(l, 'claimed') + '/' + l.length + '</span>' + (cnt(l, 'ready') ? '<i class="obj-dot" aria-label="Récompense à récupérer"></i>' : '') + '</button>';
+    };
+    return '<div class="obj" data-obj="' + cid + '"><div class="obj-tabs" role="tablist">' + btn('rw', 'Paliers', steps) + (ms.length ? btn('ms', 'Missions', ms) : '') + '</div>' +
+      '<div class="obj-pane" data-pane="rw"' + (tab === 'rw' ? '' : ' hidden') + '>' + U.rewardTrack(cid, true) + '</div>' +
+      (ms.length ? '<div class="obj-pane" data-pane="ms"' + (tab === 'ms' ? '' : ' hidden') + '>' + U.missionsHTML(cid, true) + '</div>' : '') + '</div>';
+  };
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-obj-tab]');
+    if (!t) return;
+    var o = t.closest('.obj'), id = t.getAttribute('data-obj-tab');
+    OBJTAB[o.getAttribute('data-obj')] = id;
+    o.querySelectorAll('.obj-tab').forEach(function (b) { var on = b === t; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
+    o.querySelectorAll('.obj-pane').forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== id; });
+  });
   // Choix du palier affiché
   document.addEventListener('click', function (e) {
     var d = e.target.closest && e.target.closest('[data-rw]');
