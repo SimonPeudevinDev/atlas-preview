@@ -229,6 +229,7 @@
     render: function () {
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
+        (A.pages.jauges ? '<a class="jg-banner" href="#/jauges">' + I('sparkle') + '<span><b>Choix en cours : 6 jauges de complétion</b>Touchez pour voir les propositions A à F</span>' + I('chevR') + '</a>' : '') +   // temporaire
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
         '<p class="lead">' + A.COLLECTIONS.length + ' salles ouvertes, ' + A.CHARS.length + ' figures à collectionner, et d’autres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
