@@ -1120,11 +1120,22 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .event-copy p { font-size: 14px; margin-bottom: 10px; }
   .rarity-row { display: flex; overflow-x: auto; gap: 12px; margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter) 10px; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-padding: 0 var(--gutter); }
   .rarity-row::-webkit-scrollbar { display: none; }
-  .rarity-item { flex: 0 0 calc((100vw - 2 * var(--gutter) - 24px) / 2.5); max-width: 200px; scroll-snap-align: start; }   /* deux cartes et demie à l’écran */
+  .rarity-item { flex: 0 0 calc((100% - 24px) / 3); min-width: 0; scroll-snap-align: start; }   /* trois cartes pile dans la largeur */
+  .rarity-item figcaption { font-size: 11px; }
+  .rarity-item figcaption .rar-chip { font-size: 11.5px; }
   .rarity-item figcaption { gap: 2px; margin-top: 8px; font-size: 12px; }
   .rarity-item figcaption .muted { font-size: 11px; }
   .section:has(.rarity-row) .section-lead { font-size: 14px; line-height: 1.55; margin-bottom: 18px; }
-  .trade-grid { grid-template-columns: 1fr; gap: 48px; }
+  /* Échanges & marketplace, mobile : les deux cartes d’abord, petites, puis un texte resserré */
+  .trade-grid { grid-template-columns: 1fr; gap: 22px; }
+  .section-dark:has(.trade-grid) { padding: 48px 0; }
+  .trade-visual { order: -1; }
+  .trade-copy .h2 { margin-bottom: 8px; }
+  .trade-copy .lead { font-size: 14.5px; line-height: 1.55; margin-bottom: 18px; }
+  .checklist { gap: 10px; margin-bottom: 22px; }
+  .checklist li { font-size: 13.5px; line-height: 1.45; gap: 10px; }
+  .checklist .ic { width: 17px; height: 17px; flex: none; }
+  .trade-copy .btn { width: 100%; }
   .upcoming { grid-template-columns: 1fr; gap: 36px; }
   .cta { padding: 80px 0; }
   .page-head { padding: 16px 0 18px; }
@@ -1193,7 +1204,8 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .wallet { padding: 0 9px; font-size: 13px; }
   .nav-inner { gap: 16px; }
   .nav-right { gap: 8px; }
-  .tv-card { width: 40vw; }
+  .tv-card { width: min(128px, 33vw); }
+  .tv-card p { font-size: 10px; margin-top: 8px; }
   .trade-visual { gap: 12px; }
   .tv-swap { width: 38px; height: 38px; }
   .card-grid, .inv-layout .card-grid, .card-grid.is-market { gap: 24px 12px; }
