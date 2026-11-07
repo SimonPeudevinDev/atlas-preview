@@ -926,7 +926,7 @@
         res.innerHTML = '<p class="result-count">' + L.length + ' annonce' + (L.length > 1 ? 's' : '') + '</p>' +
           (L.length ? '<div class="card-grid is-market">' + L.map(function (l) {
             return '<div class="listing">' + U.card(l.ed, { serial: l.serial, badge: l.mine ? 'Votre annonce' : '' }) +
-              '<div class="listing-foot"><div class="listing-price">' + U.price(l.price) + '<span class="muted small">par ' + U.esc(l.seller) + ' · ' + U.ago(l.at) + '</span></div>' +
+              '<div class="listing-foot"><div class="listing-price">' + U.price(l.price) + '<span class="muted small">par ' + U.esc(l.seller) + '</span><span class="muted small">' + U.ago(l.at) + '</span></div>' +
               (l.mine ? '<div class="row gap-s"><button class="btn btn-ghost btn-sm grow" data-unlist="' + l.id + '">Retirer</button></div>' :
                 '<div class="row gap-s"><button class="btn btn-primary btn-sm grow" data-buy="' + l.id + '">Acheter</button><button class="btn btn-ghost btn-sm" data-offer="' + l.id + '">Offre</button></div>') +
               '</div></div>';
