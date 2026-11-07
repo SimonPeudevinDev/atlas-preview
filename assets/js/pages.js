@@ -83,19 +83,35 @@
       (can.ok ? '<span class="pt-go">' + I('chevR') + '</span>' : '') + '</article>';
   }
   function playHTML() {
-    var P0 = A.PACK.standard, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
+    var P0 = A.PACK.standard, PD = A.PACK.daily, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
+    var dCan = S.canOpen(PD.id);
     for (var i = 0; i < ch.max; i++) pips += '<i' + (i < ch.n ? ' class="is-on"' : '') + '></i>';
-    var side = [A.PACK.daily, A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
-    return '<section class="play"><div class="container play-grid">' +
-      '<div class="play-main">' +
-        '<p class="eyebrow">Vos boosters</p>' +
+    var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
+    // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
+    var atlas = '<div class="play-slide" data-slide="0">' +
         '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' +
         '<div class="play-meter" role="img" aria-label="' + ch.n + ' boosters en réserve sur ' + ch.max + '"><span class="pm-pips">' + pips + '</span>' +
           '<span class="pm-n"><b>' + ch.n + '</b>/' + ch.max + (tk ? ' <em>+' + tk + '</em>' : '') + '</span></div>' +
         '<p class="play-clock">' + chargeClock(ch) + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
-        '<p class="play-note">5 cartes, toutes collections · un nouveau toutes les 15 min, jusqu’à ' + ch.max + ' en réserve</p>' +
+        (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '') +
+        '<p class="play-note">5 cartes, toutes collections · un nouveau toutes les 15 min, jusqu’à ' + ch.max + ' en réserve</p></div>';
+    var daily = '<div class="play-slide" data-slide="1">' +
+        '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' +
+        '<p class="play-day">' + (dCan.ok ? '<b>Prêt à ouvrir</b>' : 'Déjà ouvert aujourd’hui') + '</p>' +
+        '<p class="play-clock">' + (dCan.ok ? 'Un nouveau chaque jour' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>') + '</p>' +
+        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + PD.id + '"' + (dCan.ok ? '' : ' disabled') + '>' +
+          (dCan.ok ? 'Ouvrir le Booster quotidien' : 'Prochain dans <span data-clock="daily">' + U.clock(S.nextDailyIn()) + '</span>') + '</button>' +
+        '<p class="play-note">' + PD.size + ' cartes offertes, une fois par jour</p></div>';
+    return '<section class="play"><div class="container play-grid">' +
+      '<div class="play-main">' +
+        '<p class="eyebrow">Vos boosters</p>' +
+        '<div class="play-tabs" role="tablist">' +
+          '<button class="pt-tab is-on" data-go="0" role="tab">Atlas <span>' + ch.n + '/' + ch.max + '</span></button>' +
+          '<button class="pt-tab" data-go="1" role="tab">Quotidien <span class="' + (dCan.ok ? 'is-ready' : '') + '">' + (dCan.ok ? 'Prêt' : U.clock(S.nextDailyIn())) + '</span></button>' +
+        '</div>' +
+        '<div class="play-slides">' + atlas + daily + '</div>' +
         (S.UNLIMITED ? '<button class="play-reset" data-dev-refill>' + I('reset') + 'Tout recharger (test)</button>' : '') +
       '</div>' +
       '<div class="play-side">' + side.map(playTile).join('') + '</div>' +
@@ -122,10 +138,24 @@
     title: 'Le monde, en cartes',
     mount: function (root) {
       A.pack.mountAll(root);
-      var fp = root.querySelector('.play-pack .pk');
-      if (fp && fp._rig) fp._rig.idle(true);
+      // Carrousel des deux sachets : onglets synchronisés, seul le sachet affiché flotte doucement
+      var slides = root.querySelector('.play-slides'), tabs = root.querySelectorAll('.pt-tab'), packs = root.querySelectorAll('.play-slide .pk');
+      function current() { return slides ? Math.round(slides.scrollLeft / Math.max(1, slides.firstElementChild.offsetWidth)) : 0; }
+      function sync() {
+        var k = current();
+        tabs.forEach(function (t, i) { t.classList.toggle('is-on', i === k); });
+        packs.forEach(function (pk, i) { if (pk._rig) pk._rig.idle(i === k); });
+      }
+      if (slides) {
+        var st0;
+        slides.addEventListener('scroll', function () { clearTimeout(st0); st0 = setTimeout(sync, 80); }, { passive: true });
+        tabs.forEach(function (t) { t.addEventListener('click', function () { var k = +t.getAttribute('data-go'); slides.scrollTo({ left: k * slides.firstElementChild.offsetWidth, behavior: 'smooth' }); }); });
+        sync();
+      }
       root.addEventListener('click', function (e) {
         if (e.target.closest('[data-dev-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
+        var m = e.target.closest('[data-open-many]');
+        if (m) { var id = m.getAttribute('data-open-many'); A.multi.open(id, A.multi.count(id)); return; }
         var t = e.target.closest('[data-open-pack]');
         if (t) A.opener.open(t.getAttribute('data-open-pack'));
       });
