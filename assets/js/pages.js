@@ -416,46 +416,68 @@
   /* ======================================================================
      COLLECTIONS (galerie)
      ====================================================================== */
-  var cf = { universe: 'all', q: '', missing: false };
+  var cf = { universe: 'all', q: '', status: '' };
+  // Recherche sans accents ni majuscules (« egypte » trouve « Égypte »)
+  function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  var STATUS = [['todo', 'À compléter'], ['done', 'Complètes'], ['gift', 'Récompenses']];
   P.collections = {
     title: 'Collections',
     render: function () {
-      var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
-      return '<section class="page-head"><div class="container">' +
+      var unis = A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+      var done = A.COLLECTIONS.filter(function (c) { return S.collectionProgress(c.id).pct >= 1; }).length;
+      return '<section class="page-head cf-head"><div class="container">' +
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
-        '<p class="lead">' + A.COLLECTIONS.length + ' collections ouvertes, ' + A.CHARS.length + ' figures à collectionner, et d’autres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
-        '<div class="toolbar">' +
-          '<div class="chips" data-f="universe">' + unis.map(function (u) { return '<button class="chip' + (cf.universe === u ? ' is-active' : '') + '" data-v="' + u + '">' + (u === 'all' ? 'Tous les univers' : u) + '</button>'; }).join('') + '</div>' +
-          '<div class="toolbar-end">' +
-            '<label class="toggle"><input type="checkbox" data-missing' + (cf.missing ? ' checked' : '') + '><span></span>Collections incomplètes</label>' +
-            '<label class="search">' + I('search') + '<input type="search" placeholder="Rechercher un personnage…" value="' + U.esc(cf.q) + '" data-q></label>' +
-          '</div>' +
-        '</div></div></section>' +
-        '<section class="section-tight"><div class="container"><div data-results></div></div></section>' +
-        '<section class="section section-alt"><div class="container">' + sectionHead('Prochainement', 'En préparation') +
+        '<p class="cf-meta"><b>' + A.COLLECTIONS.length + '</b> collections<span>·</span><b>' + A.CHARS.length + '</b> figures<span>·</span><b>' + done + '</b> complètes</p>' +
+      '</div></section>' +
+      // Barre collante : recherche, statut, univers
+      '<div class="cf-bar"><div class="container">' +
+        '<label class="cf-search">' + I('search') + '<input type="search" enterkeyhint="search" autocomplete="off" placeholder="Collection, personnage, univers…" value="' + U.esc(cf.q) + '" data-q>' +
+          '<button type="button" class="cf-clear" data-clear aria-label="Effacer"' + (cf.q ? '' : ' hidden') + '>' + I('close') + '</button></label>' +
+        '<div class="cf-chips" role="toolbar">' +
+          STATUS.map(function (st) { return '<button class="cf-chip is-status' + (cf.status === st[0] ? ' is-on' : '') + '" data-status="' + st[0] + '">' + (st[0] === 'gift' ? I('gift') : '') + st[1] + '<i data-n="' + st[0] + '"></i></button>'; }).join('') +
+          '<span class="cf-sep" aria-hidden="true"></span>' +
+          unis.map(function (u) { return '<button class="cf-chip' + (cf.universe === u ? ' is-on' : '') + '" data-uni="' + U.esc(u) + '">' + u + '</button>'; }).join('') +
+        '</div>' +
+      '</div></div>' +
+      '<section class="section-tight cf-res"><div class="container"><div class="cf-count" data-count></div><div data-results></div></div></section>' +
+      '<section class="section section-alt"><div class="container">' + sectionHead('Prochainement', 'Les collections à venir.') +
         '<div class="upcoming">' + A.UPCOMING.map(function (u) {
           return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div><p class="eyebrow">' + u.family + '</p><h3 class="h3">' + u.name + '</h3><p class="muted">' + u.desc + '</p></article>';
         }).join('') + '</div></div></section>';
     },
     mount: function (root) {
-      var res = root.querySelector('[data-results]');
+      var res = root.querySelector('[data-results]'), cnt = root.querySelector('[data-count]'), input = root.querySelector('[data-q]');
+      function statusOk(c, st) {
+        var pr = S.collectionProgress(c.id);
+        if (st === 'todo') return pr.pct < 1;
+        if (st === 'done') return pr.pct >= 1;
+        if (st === 'gift') return S.readyCount(c.id) > 0;
+        return true;
+      }
+      function base(st) {
+        return A.COLLECTIONS.filter(function (c) { return (cf.universe === 'all' || c.universe === cf.universe) && statusOk(c, st); });
+      }
       function draw() {
-        var q = cf.q.trim().toLowerCase();
-        var list = A.COLLECTIONS.filter(function (c) {
-          if (cf.universe !== 'all' && c.universe !== cf.universe) return false;
-          if (cf.missing && S.collectionProgress(c.id).pct >= 1) return false;
-          return true;
-        });
-        var html = '';
+        var q = norm(cf.q.trim()), list = base(cf.status);
+        // nombres sur les puces de statut (dans l’univers choisi)
+        STATUS.forEach(function (st) { var el = root.querySelector('[data-n="' + st[0] + '"]'); if (el) el.textContent = base(st[0]).length; });
+        root.querySelector('[data-clear]').hidden = !cf.q;
+        var html = '', filtered = cf.universe !== 'all' || cf.status;
         if (q) {
-          var chars = A.CHARS.filter(function (ch) { return ch.name.toLowerCase().indexOf(q) !== -1 || ch.title.toLowerCase().indexOf(q) !== -1; })
+          var colls = list.filter(function (c) { return norm(c.name + ' ' + c.universe + ' ' + (c.family || '') + ' ' + c.tagline).indexOf(q) !== -1; });
+          var chars = A.CHARS.filter(function (ch) { return norm(ch.name + ' ' + ch.title).indexOf(q) !== -1; })
             .filter(function (ch) { return list.some(function (c) { return c.id === ch.coll; }); });
-          html = '<p class="result-count">' + chars.length + ' personnage' + (chars.length > 1 ? 's' : '') + ' trouvé' + (chars.length > 1 ? 's' : '') + '</p>' +
-            (chars.length ? '<div class="card-grid">' + chars.map(function (ch) {
-              var best = S.bestOwned(ch.id);
-              return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) + U.editionDots(ch.id) + '</div>';
-            }).join('') + '</div>' : '<div class="empty">Aucun personnage ne correspond à « ' + U.esc(cf.q) + ' ».</div>');
+          cnt.innerHTML = '<b>' + colls.length + '</b> collection' + (colls.length > 1 ? 's' : '') + '<span>·</span><b>' + chars.length + '</b> personnage' + (chars.length > 1 ? 's' : '');
+          if (colls.length) html += '<h2 class="cf-sub">Collections</h2>' + shelf('', colls);
+          if (chars.length) html += '<h2 class="cf-sub">Personnages</h2><div class="card-grid">' + chars.map(function (ch) {
+            var best = S.bestOwned(ch.id);
+            return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) +
+              '<a class="cf-from" href="#/collection/' + ch.coll + '">' + U.esc(A.COLL[ch.coll].name) + '</a>' + U.editionDots(ch.id) + '</div>';
+          }).join('') + '</div>';
+          if (!colls.length && !chars.length) html = '<div class="empty">Rien ne correspond à « ' + U.esc(cf.q) + ' »' + (filtered ? ' avec ces filtres' : '') + '.' +
+            '<button class="btn btn-ghost btn-sm" data-reset-f>Tout effacer</button></div>';
         } else {
+          cnt.innerHTML = filtered ? '<b>' + list.length + '</b> collection' + (list.length > 1 ? 's' : '') + '<button class="cf-reset" data-reset-f>Effacer les filtres</button>' : '';
           var shown = {};
           html = (A.GROUPS || []).map(function (g) {
             var subs = list.filter(function (c) { return c.group === g.id; });
@@ -464,20 +486,30 @@
           }).join('');
           var rest = list.filter(function (c) { return !shown[c.id]; });
           if (rest.length) html += shelf('<div class="shelf-head"><div class="sh-copy"><h2 class="sh-name">Autres collections</h2></div></div>', rest);
-          if (!list.length) html = '<div class="empty">Toutes les collections de cet univers sont complètes. Bravo !</div>';
+          if (!list.length) html = '<div class="empty">' + (cf.status === 'gift' ? 'Aucune récompense à récupérer pour le moment.' : cf.status === 'done' ? 'Aucune collection complète ici pour l’instant.' : 'Toutes ces collections sont complètes. Bravo !') +
+            '<button class="btn btn-ghost btn-sm" data-reset-f>Effacer les filtres</button></div>';
         }
         res.innerHTML = html;
       }
       draw();
       root.addEventListener('click', function (e) {
-        var c = e.target.closest('[data-f="universe"] .chip');
-        if (!c) return;
-        cf.universe = c.getAttribute('data-v');
-        root.querySelectorAll('[data-f="universe"] .chip').forEach(function (b) { b.classList.toggle('is-active', b === c); });
+        var t;
+        if ((t = e.target.closest('[data-status]'))) {
+          var v = t.getAttribute('data-status'); cf.status = cf.status === v ? '' : v;   // retoucher la puce l’enlève
+        } else if ((t = e.target.closest('[data-uni]'))) {
+          var u = t.getAttribute('data-uni'); cf.universe = cf.universe === u ? 'all' : u;
+        } else if (e.target.closest('[data-clear]')) {
+          cf.q = ''; input.value = ''; input.focus();
+        } else if (e.target.closest('[data-reset-f]')) {
+          cf.q = ''; cf.status = ''; cf.universe = 'all'; input.value = '';
+        } else return;
+        root.querySelectorAll('[data-status]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-status') === cf.status); });
+        root.querySelectorAll('[data-uni]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-uni') === cf.universe); });
         draw();
       });
-      root.querySelector('[data-q]').addEventListener('input', function (e) { cf.q = e.target.value; draw(); });
-      root.querySelector('[data-missing]').addEventListener('change', function (e) { cf.missing = e.target.checked; draw(); });
+      var tmr = 0;
+      input.addEventListener('input', function () { cf.q = input.value; clearTimeout(tmr); tmr = setTimeout(draw, 120); });
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') input.blur(); });   // ferme le clavier
       this.refresh = draw;
     }
   };
