@@ -1954,22 +1954,33 @@ html[data-theme="dark"] .pop-n i::after { background: #A88A55; }
 .mk-sort::-webkit-scrollbar { display: none; }
 .mk-sort button { flex: none; height: 34px; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 17px; background: transparent; font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
 .mk-sort button.is-on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.mk-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 14px; }
-.mk-item { display: flex; flex-direction: column; gap: 7px; min-width: 0; color: inherit; transition: transform .2s var(--ease); }
-.mk-item:active { transform: scale(.97); }
-.mk-item .card { pointer-events: none; }
-.mk-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; padding: 0 2px; }
-.mk-foot .price { font-size: 14px; font-weight: 600; }
-.mk-by { font-size: 11px; color: var(--ink-3); white-space: nowrap; }
-.mk-all { aspect-ratio: 63 / 88; border: 1px dashed var(--line-2); border-radius: 10px; display: grid; place-items: center; }
-.mk-all-in { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px; text-align: center; font-size: 13px; color: var(--ink-2); }
+.mk-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (min-width: 901px) { .mk-row > :nth-child(n + 5) { display: none; } }
+/* Chaque annonce est un « lot » de maison de ventes : numéro, carte sous un halo de sa rareté, prix */
+.mk-item { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 12px 12px 12px; border: 1px solid var(--line); border-radius: 16px;
+  background: var(--surface); color: inherit; box-shadow: var(--shadow-sm); transition: transform .2s var(--ease), box-shadow .2s; overflow: hidden; }
+.mk-item:active { transform: scale(.98); }
+.mk-lot { display: flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.mk-lot i { width: 6px; height: 6px; border-radius: 50%; background: var(--rc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--rc) 18%, transparent); }
+.mk-stage { position: relative; display: block; margin: 10px -12px 12px; padding: 14px 11% 16px;
+  background: radial-gradient(60% 55% at 50% 50%, color-mix(in srgb, var(--rc) 30%, transparent), transparent 75%),
+              linear-gradient(180deg, transparent, color-mix(in srgb, var(--rc) 7%, transparent)); }
+.mk-stage .card { pointer-events: none; transform: rotate(-2deg); box-shadow: 0 10px 24px rgba(30, 20, 10, .28); }
+.mk-item:nth-child(even) .mk-stage .card { transform: rotate(2deg); }
+.mk-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.mk-foot .price { font-family: var(--serif); font-size: 22px; font-weight: 600; line-height: 1; }
+.mk-foot .price .ic { width: 15px; height: 15px; }
+.mk-buy { flex: none; height: 30px; padding: 0 14px; border-radius: 15px; display: grid; place-items: center; background: var(--ink); color: var(--surface); font-size: 12.5px; font-weight: 600; }
+.mk-item.r-unique { --rc: #C9A45C; }
+.mk-all { border-style: dashed; background: transparent; box-shadow: none; display: grid; place-items: center; }
+.mk-all-in { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px; text-align: center; font-size: 14px; color: var(--ink-2); }
 .mk-all-in b { font-weight: 600; }
-.mk-all-in .ic { width: 20px; height: 20px; color: var(--gold); }
+.mk-all-in .ic { width: 22px; height: 22px; color: var(--gold); }
 @media (max-width: 900px) {
-  .mk-row { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none;
-    margin: 0 calc(var(--gutter) * -1); padding: 2px var(--gutter) 6px; scroll-padding: 0 var(--gutter); }
+  .mk-row { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter) 10px; scroll-padding: 0 var(--gutter); }
   .mk-row::-webkit-scrollbar { display: none; }
-  .mk-item { flex: 0 0 29vw; scroll-snap-align: start; }
+  .mk-item { flex: 0 0 calc((100vw - var(--gutter) * 2 - 12px) / 2); scroll-snap-align: start; }
   .mk-sort { margin: -4px calc(var(--gutter) * -1) 14px; padding: 0 var(--gutter); }
 }
 /* Blocs qui restent foncés dans les deux thèmes (vitrine des échanges de la page d’accueil déconnectée) */

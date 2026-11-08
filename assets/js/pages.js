@@ -165,10 +165,13 @@
       cheap: function (a, b) { return a.price - b.price; },
       'new': function (a, b) { return b.at - a.at; }
     }[sort];
-    return L.slice().sort(by).slice(0, 6).map(function (l) {
-      var ch = A.CHAR[A.ED[l.ed].charId];
-      return '<a class="mk-item" href="#/marketplace?q=' + encodeURIComponent(ch.name) + '" aria-label="' + U.esc(ch.name) + ', ' + l.price + ' Éclats">' + U.card(l.ed, { serial: l.serial }) +
-        '<span class="mk-foot">' + U.price(l.price) + '</span></a>';
+    var seen = {}, pick = L.slice().sort(by).filter(function (l) { if (seen[l.ed]) return false; seen[l.ed] = 1; return true; }).slice(0, 6);   // une seule annonce par édition
+    return pick.map(function (l, k) {
+      var ed = A.ED[l.ed], ch = A.CHAR[ed.charId], R = A.R[ed.rarity];
+      return '<a class="mk-item r-' + ed.rarity + '" href="#/marketplace?q=' + encodeURIComponent(ch.name) + '" aria-label="' + U.esc(ch.name) + ', ' + l.price + ' Éclats">' +
+        '<span class="mk-lot">Lot ' + String(k + 1).padStart(2, '0') + '<i></i>' + R.label + '</span>' +
+        '<span class="mk-stage">' + U.card(l.ed, { serial: l.serial }) + '</span>' +
+        '<span class="mk-foot">' + U.price(l.price) + '<span class="mk-buy">Voir</span></span></a>';
     }).join('') +
     '<a class="mk-item mk-all" href="#/marketplace"><span class="mk-all-in">' + I('market') + '<b>Voir les ' + U.num(L.length) + ' annonces</b>' + I('arrow') + '</span></a>';
   }
