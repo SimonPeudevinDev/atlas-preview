@@ -871,6 +871,14 @@
     }));
   };
 
+  /* Photo du sachet 3D tel qu’il est affiché (vue directe) : image de tout le cadre .pk-gl.
+     Sert aux sachets empilés derrière dans l’ouverture multiple (rendu 3D, sans coût d’animation). */
+  P3.snapshot = function (pk) {
+    var v = pk && pk._gl;
+    if (!v || !v.direct || !v.cw || !R) return null;
+    try { render(v); return R.domElement.toDataURL('image/png'); } catch (e) { return null; }
+  };
+
   P3.attach = function (pk) {
     if (!P3.ok || lost || pk._gl || pk._glPending) return null;
     var p = A.PACK[pk.getAttribute('data-pk')];

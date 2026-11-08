@@ -737,3 +737,7 @@
 .multi.is-revealed .mu-sub, .multi.is-revealed .mu-chips { animation: muFade .35s ease both; }
 @keyframes muFade { from { opacity: 0; transform: translateY(-4px); } }
 .mu-card { display: block; }
+/* Pile en 3D : photo du vrai sachet (même cadre que .pk-gl) */
+.mu-pack .mp-3d { position: absolute; left: -60%; top: -45%; width: 220%; height: 220%; max-width: none; pointer-events: none; }
+.mu-queue.has-3d .mu-behind .mp-body { display: none; }
+.mu-queue.has-3d .mu-behind .mu-pack { filter: brightness(calc(1 - var(--q) * .07)); }

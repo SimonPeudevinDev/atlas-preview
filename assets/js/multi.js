@@ -30,7 +30,7 @@
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Ouverture multiple');
     // Le sachet de devant est le vrai sachet 3D ; les autres sont empilés derrière, chacun un peu plus haut
     var q = '';
-    for (var k = n - 1; k >= 1; k--) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-body"></i></div>';
+    for (var k = n - 1; k >= 1; k--) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-body"></i><img class="mp-3d" alt="" hidden></div>';
     el.innerHTML =
       '<div class="mu-top"><button class="op-icon" data-mu-close aria-label="Fermer">' + U.icon('close') + '</button></div>' +
       '<div class="mu-head"><p class="eyebrow">' + pack.kicker + '</p><h2 class="op-title">' + pack.name + '</h2>' +
@@ -44,7 +44,18 @@
     var queue = el.querySelector('.mu-queue'), front = el.querySelector('.mu-front'), pk = front.querySelector('.pk');
     pk.setAttribute('data-pk-direct', '');
     A.pack.mountAll(el);
-    if (pk._rig) pk._rig.idle(true);
+    // Dès que le sachet 3D est prêt et au repos, on le photographie pour habiller la pile en 3D
+    if (A.pack3d && A.pack3d.snapshot) (function wait(t) {
+      if (closed || started) return;
+      if (!pk.classList.contains('is-gl')) { if (t < 60) setTimeout(function () { wait(t + 1); }, 100); return; }
+      setTimeout(function () {
+        if (closed || started) return;
+        var url = A.pack3d.snapshot(pk);
+        if (url) { [].forEach.call(el.querySelectorAll('.mp-3d'), function (im) { im.src = url; im.hidden = false; }); queue.classList.add('has-3d'); }
+        if (pk._rig) pk._rig.idle(true);
+      }, 450);
+    })(0);
+    else if (pk._rig) pk._rig.idle(true);
     if (A.pack3d && A.pack3d.faceURL) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); });
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     setTimeout(function () { if (el.isConnected) SFX.land(); }, 200);
@@ -116,7 +127,7 @@
       if (closed) return;
       if (i >= packs.length || skip) { setTimeout(grid, skip ? 0 : 260); return; }
       var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), big = best >= 3;
-      var tt = reduce ? 40 : big ? 160 : 75;
+      var tt = reduce ? 40 : 75;                         // même vitesse pour tous : rythme linéaire
       pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);   // la lueur de l’ouverture trahit la meilleure carte
       pk.classList.remove('is-torn'); pk.classList.add('dir-r', 'is-tearing');
       setTp(0);
@@ -145,7 +156,7 @@
           pk.classList.remove('is-torn', 'is-tearing', 'dir-r'); setTp(0);
           front.classList.remove('is-rise'); void front.offsetWidth; front.classList.add('is-rise');
           setTimeout(function () { tearAt(i + 1); }, reduce ? 20 : 45);
-        }, reduce ? 30 : big ? 260 : 25);
+        }, reduce ? 30 : 25);
       });
     }
 
