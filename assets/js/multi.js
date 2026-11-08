@@ -43,8 +43,8 @@
     html.style.overflow = 'hidden';
     var queue = el.querySelector('.mu-queue'), front = el.querySelector('.mu-front'), pk = front.querySelector('.pk');
     pk.setAttribute('data-pk-direct', '');
+    pk.setAttribute('data-pk-still', '');   // aligné sur la pile : pas de flottement ni de rotation
     A.pack.mountAll(el);
-    if (pk._rig) pk._rig.idle(true);
     if (A.pack3d && A.pack3d.faceURL) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); });
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     setTimeout(function () { if (el.isConnected) SFX.land(); }, 200);
@@ -94,7 +94,6 @@
       [].forEach.call(el.querySelectorAll('.mu-behind .mu-pack'), function (p) {   // stock épuisé entre-temps
         if (+p.style.getPropertyValue('--q') > packs.length - 1) p.remove();
       });
-      if (pk._rig) pk._rig.idle(false);
       el.classList.add('is-going');
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
       tearAt(0);

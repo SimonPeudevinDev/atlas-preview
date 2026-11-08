@@ -285,7 +285,7 @@
       raf = 0;
       var W = window.innerWidth, H = window.innerHeight;
       live.forEach(function (pk) {
-        if (!pk.isConnected || !pk._rig) return;
+        if (!pk.isConnected || !pk._rig || pk.hasAttribute('data-pk-still')) return;
         var b = pk.getBoundingClientRect();
         if (b.bottom < 0 || b.top > H) return;
         var cx = b.left + b.width / 2, cy = b.top + b.height / 2;
@@ -309,7 +309,8 @@
     live = live.filter(function (pk) { if (pk.isConnected) return true; pk._rig.destroy(); return false; });
     [].slice.call(root.querySelectorAll('.pk[data-pk-tilt]')).forEach(function (pk) {
       if (pk._rig) return;
-      K.rig(pk, { rx: 5, ry: -20, range: [12, 26], stiff: 0.06, damp: 0.82 });
+      var still = pk.hasAttribute('data-pk-still');   // posé de face, immobile (pile de l’ouverture multiple)
+      K.rig(pk, { rx: still ? 0 : 5, ry: still ? 0 : -20, range: [12, 26], stiff: 0.06, damp: 0.82 });
       live.push(pk);
     });
   };
