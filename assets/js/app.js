@@ -56,9 +56,9 @@
       '<div class="footer-brand"><a class="logo" href="#/">' + U.mark() + '<span>ATLAS</span></a>' +
         '<p>Musée numérique de cartes à collectionner. Les grandes figures de la culture, en œuvres numérotées.</p></div>' +
       '<div class="footer-cols">' +
-        '<div><p class="eyebrow">Explorer</p><a href="#/collections">Collections</a><a href="#/boutique">Boosters</a><a href="#/marketplace">Marketplace</a></div>' +
-        '<div><p class="eyebrow">Mon espace</p><a href="#/inventaire">Inventaire</a><a href="#/boutique?open=daily">Booster quotidien</a></div>' +
-        '<div><p class="eyebrow">Projet</p><a href="#/design-system">Design system</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' +
+        '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/collections">Collections</a><a href="#/boutique">Boosters</a><a href="#/marketplace">Marketplace</a></div>' +
+        '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Inventaire</a><a href="#/boutique?open=daily">Booster quotidien</a></div>' +
+        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
       '</div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ATLAS · Édition I</span><em>Le monde, en cartes.</em></div>' +
     '</div>';

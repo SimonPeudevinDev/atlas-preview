@@ -96,7 +96,7 @@
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
         (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '') +
-        '<p class="play-note">5 cartes, toutes collections · un nouveau toutes les 15 min, jusqu’à ' + ch.max + ' en réserve</p></div>';
+        '<p class="play-note">5 cartes · un nouveau toutes les 15 min · ' + ch.max + ' en réserve max</p></div>';
     var daily = '<div class="play-slide" data-slide="1">' +
         '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' +
         '<p class="play-day">' + (dCan.ok ? '<b>Prêt à ouvrir</b>' : 'Déjà ouvert aujourd’hui') + '</p>' +
@@ -153,6 +153,7 @@
         sync();
       }
       root.addEventListener('click', function (e) {
+        if (e.target.closest('[data-to-top]')) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
         if (e.target.closest('[data-dev-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
         var m = e.target.closest('[data-open-many]');
         if (m) { var id = m.getAttribute('data-open-many'); A.multi.open(id, A.multi.count(id)); return; }
@@ -196,14 +197,13 @@
       var event = A.COLLECTIONS.find(function (c) { return c.status === 'event'; });
 
       return playHTML() +
-      '<section class="hero">' +
+      '<section class="hero h-hero">' +
         '<div class="container hero-grid">' +
           '<div class="hero-copy reveal">' +
             '<p class="eyebrow">Musée numérique de cartes à collectionner</p>' +
             '<h1 class="display">Le monde,<br><em>en cartes.</em></h1>' +
             '<p class="lead">Des dieux de l’Olympe aux héroïnes des contes, ATLAS réunit les grandes figures de la culture en œuvres numérotées que l’on découvre, collectionne et échange.</p>' +
-            '<div class="row gap-s wrap"><a class="btn btn-primary btn-lg" href="#/collections">Découvrir ATLAS</a>' +
-            '<a class="btn btn-ghost btn-lg" href="#/boutique?open=daily">' + I('pack') + 'Ouvrir mon premier booster</a></div>' +
+            '<div class="row gap-s wrap"><a class="btn btn-primary btn-lg" href="#/collections">Découvrir les collections</a></div>' +
             '<dl class="hero-facts"><div><dt>Collections</dt><dd>' + A.COLLECTIONS.length + '</dd></div><div><dt>Personnages</dt><dd>' + A.CHARS.length + '</dd></div><div><dt>Éditions</dt><dd>' + A.EDITIONS.length + '</dd></div></dl>' +
           '</div>' +
           '<div class="hero-visual">' + globe() +
@@ -217,7 +217,7 @@
         '</div>' +
       '</section>' +
 
-      '<section class="section"><div class="container">' +
+      '<section class="section h-steps"><div class="container">' +
         sectionHead('Comment ça marche', 'Trois gestes, une collection.') +
         '<div class="steps">' + steps.map(function (s) {
           return '<article class="step"><span class="step-n">' + s[0] + '</span><h3 class="h3">' + s[1] + '</h3><p>' + s[2] + '</p></article>';
@@ -225,7 +225,7 @@
         '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
       '</div></section>' +
 
-      '<section class="section section-alt"><div class="container">' +
+      '<section class="section section-alt h-coll"><div class="container">' +
         sectionHead('Collections populaires', 'Les salles les plus visitées.', ['Toutes les collections', '#/collections']) +
         '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
         // mobile : grandes cartes au format de l’événement, qui défilent (l’événement en tête)
@@ -245,18 +245,18 @@
           '<span class="link-arrow">Explorer la collection ' + I('arrow') + '</span></div></a>' +
       '</div></section>' +
 
-      '<section class="section"><div class="container">' +
+      '<section class="section h-rar"><div class="container">' +
         sectionHead('Six raretés', 'Une même figure, six œuvres.') +
-        '<p class="section-lead">Chaque personnage peut exister en plusieurs éditions, chacune avec sa propre illustration. Les statistiques restent identiques : la rareté tient à la beauté de l’œuvre et au tirage, jamais à la puissance.</p>' +
+        '<p class="section-lead">Chaque personnage existe en plusieurs éditions illustrées. La rareté tient à l’œuvre et au tirage, jamais à la puissance.</p>' +
         '<div class="rarity-row">' + A.RARITIES.map(function (r) {
           return '<figure class="rarity-item">' + U.card('grece-zeus-' + r.id, { serial: r.supply ? Math.min(7 + r.rank * 3, r.supply) : null, open: true }) +
             '<figcaption><span class="rar-chip r-' + r.id + '"><i></i>' + r.label + '</span><span class="muted small">' + (r.supply ? (r.supply === 1 ? 'Pièce unique' : r.supply + ' exemplaires') : 'Tirage illimité') + '</span></figcaption></figure>';
         }).join('') + '</div>' +
       '</div></section>' +
 
-      '<section class="section section-dark"><div class="container trade-grid">' +
+      '<section class="section section-dark h-trade"><div class="container trade-grid">' +
         '<div class="trade-copy"><p class="eyebrow">Échanges & marketplace</p><h2 class="h2">Chaque carte a une histoire.</h2>' +
-          '<p class="lead">Comme dans une maison de ventes, chaque exemplaire numéroté conserve sa provenance : tirage, propriétaires successifs, prix de cession.</p>' +
+          '<p class="lead">Comme dans une maison de ventes, chaque exemplaire numéroté garde sa provenance : tirage, propriétaires, prix de cession.</p>' +
           '<ul class="checklist">' +
             '<li>' + I('swap') + '<span><b>Échanges entre collectionneurs</b> confirmés par les deux parties avant exécution.</span></li>' +
             '<li>' + I('market') + '<span><b>Marketplace à prix fixe</b> en Éclats, monnaie fictive non convertible.</span></li>' +
@@ -270,7 +270,7 @@
         '</div>' +
       '</div></section>' +
 
-      '<section class="section"><div class="container">' +
+      '<section class="section h-up"><div class="container">' +
         sectionHead('Prochainement', 'Les salles en préparation.') +
         '<div class="upcoming">' + A.UPCOMING.map(function (u) {
           return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div>' +
@@ -278,9 +278,9 @@
         }).join('') + '</div>' +
       '</div></section>' +
 
-      '<section class="section cta"><div class="container cta-inner">' + U.mark('cta-mark') +
+      '<section class="section cta h-cta"><div class="container cta-inner">' + U.mark('cta-mark') +
         '<h2 class="h2">Vos boosters vous attendent.</h2><p class="lead">Un Booster Atlas toutes les 15 minutes, trois cartes chaque jour, et des coffrets à gagner. Sans paiement.</p>' +
-        '<a class="btn btn-primary btn-lg" href="#/">Voir mes boosters</a></div></section>';
+        '<button class="btn btn-primary btn-lg" data-to-top>' + I('arrow') + 'Remonter aux boosters</button></div></section>';
     }
   };
 
