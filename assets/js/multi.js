@@ -92,8 +92,8 @@
       if (!drag) return;
       var d = drag; drag = null;
       if (chain || closed) return;
-      if (!dir) {                                          // un simple toucher : tout part d’un coup
-        if (Math.abs(e.clientX - d.x) < 10 && Math.abs(e.clientY - d.y) < 10 && draw()) { setDir(1); run(0); }
+      if (!dir) {                                          // un simple toucher n’ouvre pas : il faut glisser
+        if (Math.abs(e.clientX - d.x) < 10 && Math.abs(e.clientY - d.y) < 10) el.querySelector('.mu-hint').textContent = 'Glissez le doigt sur le sachet pour l’ouvrir';
         return;
       }
       if (curTp > 0.55 || (curTp > 0.2 && d.v > 0.5)) { run(curTp); return; }

@@ -963,7 +963,7 @@
       if (phase !== 'pack') return;
       stopFollow();
       if (!dir) {
-        if (d.onPack && Math.abs(e.clientX - d.x) < 8 && Math.abs(e.clientY - d.y) < 8) autoTear();
+        if (d.onPack && Math.abs(e.clientX - d.x) < 8 && Math.abs(e.clientY - d.y) < 8) setHint('Glissez le doigt sur le sachet pour l’ouvrir');   // pas d’ouverture au toucher
         /* le sachet reste de face */
         return;
       }
