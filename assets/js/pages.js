@@ -72,7 +72,9 @@
   /* ---------- Accueil : les boosters, comme dans un jeu ----------
      Le Booster Atlas revient toutes les 15 min (10 en réserve), le quotidien chaque jour,
      les autres se gagnent en jouant (missions, paliers, trophées). */
-  function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine' : '+1 dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
+  function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine · un nouveau toutes les 15 min' : 'Prochain dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
+  // Nombre de boosters à ouvrir : une pastille posée sur le coin du sachet
+  function countBadge(n, label) { return '<span class="play-count' + (n ? '' : ' is-zero') + '" aria-label="' + label + '">×' + n + '</span>'; }
   function playTile(p, k) {
     var tk = S.tokens(p.id), can = S.canOpen(p.id), st;
     if (p.daily) st = can.ok ? 'Prêt à ouvrir' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>';
@@ -89,14 +91,12 @@
     var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
     // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
     var atlas = '<div class="play-slide" data-slide="0">' +
-        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' +
-        '<div class="play-meter" role="img" aria-label="' + ch.n + ' boosters en réserve sur ' + ch.max + '"><span class="pm-pips">' + pips + '</span>' +
-          '<span class="pm-n"><b>' + ch.n + '</b>/' + ch.max + (tk ? ' <em>+' + tk + '</em>' : '') + '</span></div>' +
+        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + countBadge(ch.n + tk, ch.n + ' en réserve' + (tk ? ', ' + tk + ' offerts' : '')) + '</div>' +
         '<p class="play-clock">' + chargeClock(ch) + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
         (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '') +
-        '<p class="play-note">5 cartes · un nouveau toutes les 15 min · ' + ch.max + ' en réserve max</p></div>';
+        '<p class="play-note">5 cartes · jusqu’à ' + ch.max + ' en réserve</p></div>';
     var daily = '<div class="play-slide" data-slide="1">' +
         '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' +
         '<p class="play-day">' + (dCan.ok ? '<b>Prêt à ouvrir</b>' : 'Déjà ouvert aujourd’hui') + '</p>' +
@@ -109,7 +109,7 @@
     var extra = side.map(function (p, j) {
       var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
       return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
-        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' +
+        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + (n ? countBadge(n, n + ' à ouvrir') : '') + '</div>' +
         '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
         '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +

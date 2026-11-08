@@ -1854,7 +1854,7 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .play-tile[data-go-slide] { cursor: pointer; }
 
 /* Sélecteur de boosters : onglets texte de largeur fixe, trait doré sous l’actif */
-.pick { position: relative; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); width: 100%; max-width: 420px; margin: 4px 0 8px; border-bottom: 1px solid var(--line); }
+.pick { position: relative; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); width: 100%; max-width: 420px; margin: 4px 0 22px; border-bottom: 1px solid var(--line); }
 .pick-b { position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; height: 44px; padding: 0; border: 0; background: none;
   font-size: 14px; font-weight: 500; color: var(--ink-3); cursor: pointer; transition: color .2s; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
 .pick-b.is-on { color: var(--ink); font-weight: 600; }
@@ -1891,3 +1891,11 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .rar-dot::after { content: ''; position: absolute; inset: -12px -5px; }
   .rar-dot.is-on { width: 22px; opacity: 1; }
 }
+
+/* Réserve : une pastille « ×N » sur le coin du sachet (remplace la jauge en tirets) */
+.play-pack { position: relative; }
+.play-count { position: absolute; top: 4px; right: -14px; z-index: 3; min-width: 44px; height: 30px; padding: 0 10px; border-radius: 15px;
+  display: grid; place-items: center; background: var(--ink); color: var(--gold-2); font-family: var(--serif); font-size: 17px; font-weight: 600; letter-spacing: .02em;
+  font-variant-numeric: tabular-nums; box-shadow: 0 0 0 3px var(--bg, #F6F2EA), 0 6px 14px rgba(30, 22, 10, .25); pointer-events: none; }
+.play-count.is-zero { background: var(--surface); color: var(--ink-3); box-shadow: 0 0 0 1px var(--line), 0 0 0 4px var(--bg, #F6F2EA); }
+.play-clock { margin-top: 2px; }
