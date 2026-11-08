@@ -209,7 +209,8 @@
     document.body.classList.toggle('is-out', out);
     if (out) {
       var v = document.getElementById('view');
-      v.innerHTML = '<div class="page is-entering">' + signedOutHTML() + '</div>';
+      v.innerHTML = '<div class="page is-entering">' + (P.landingHTML ? P.landingHTML() : signedOutHTML()) + '</div>';
+      if (P.landingMount) P.landingMount(v.firstElementChild);
       current = null;
       document.title = 'ATLAS — Déconnecté';
       window.scrollTo(0, 0);

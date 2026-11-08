@@ -116,22 +116,25 @@
         (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '') +
         '<p class="play-note">' + p.size + ' cartes · ' + p.kicker + '</p></div>';
     }).join('');
-    var extraTabs = side.map(function (p, j) {
-      var n = S.tokens(p.id);
-      return '<button class="pt-tab" data-go="' + (j + 2) + '" role="tab">' + SHORT[p.id] + (n ? ' <span class="is-ready">' + n + '</span>' : '') + '</button>';
-    }).join('');
+    // Sélecteur : une tuile par booster (mini sachet, nom, état)
+    function pick(p, k, name, st, ready, empty) {
+      return '<button class="pick-b' + (k ? '' : ' is-on') + (empty ? ' is-empty' : '') + '" data-go="' + k + '" role="tab" aria-label="' + p.name + '">' +
+        '<span class="pick-pk">' + A.pack.html(p) + '</span><span class="pick-name">' + name + '</span>' +
+        '<span class="pick-st' + (ready ? ' is-ready' : '') + '">' + st + '</span></button>';
+    }
+    function short(ms) { return U.clock(ms).replace(' min', ''); }
+    var picker = '<div class="pick" role="tablist">' +
+      pick(P0, 0, 'Atlas', ch.n + '/' + ch.max, ch.n > 0, ch.n === 0) +
+      pick(PD, 1, 'Quotidien', dCan.ok ? 'Prêt' : '<span data-clock="daily-s">' + short(S.nextDailyIn()) + '</span>', dCan.ok, !dCan.ok) +
+      side.map(function (p, j) { var n = S.tokens(p.id); return pick(p, j + 2, SHORT[p.id], n ? '×' + n : 'À gagner', n > 0, !n); }).join('') +
+    '</div>';
     return '<section class="play"><div class="container play-grid">' +
       '<div class="play-main">' +
         '<p class="eyebrow">Vos boosters</p>' +
-        '<div class="play-tabs" role="tablist">' +
-          '<button class="pt-tab is-on" data-go="0" role="tab">Atlas <span>' + ch.n + '/' + ch.max + '</span></button>' +
-          '<button class="pt-tab" data-go="1" role="tab">Quotidien <span class="' + (dCan.ok ? 'is-ready' : '') + '">' + (dCan.ok ? 'Prêt' : U.clock(S.nextDailyIn())) + '</span></button>' +
-          extraTabs +
-        '</div>' +
+        picker +
         '<div class="play-slides">' + atlas + daily + extra + '</div>' +
         (S.UNLIMITED ? '<button class="play-reset" data-dev-refill>' + I('reset') + 'Tout recharger (test)</button>' : '') +
       '</div>' +
-      '<div class="play-side">' + side.map(function (p, j) { return playTile(p, j + 2); }).join('') + '</div>' +
     '</div></section>';
   }
 
@@ -151,12 +154,61 @@
     }, every);
   }
 
+  /* Page d’accueil déconnectée : la présentation d’ATLAS et « Comment ça marche »
+     (le hub des boosters est réservé aux joueurs connectés) */
+  P.landingHTML = function () {
+      var feat = S.ownedOf('grece-zeus-legendary')[0];
+      var steps = [
+        ['I', 'Découvrir', 'Parcourez des collections consacrées aux mythologies, aux contes, à la littérature et à l’histoire. Chaque personnage possède sa notice.'],
+        ['II', 'Collectionner', 'Ouvrez les boosters offerts toutes les 15 minutes et chaque jour, complétez vos collections et traquez les éditions numérotées les plus rares.'],
+        ['III', 'Échanger', 'Négociez avec d’autres collectionneurs ou achetez sur la marketplace. Chaque exemplaire conserve sa provenance.']
+      ];
+      return '<div class="landing">' +
+      '<section class="hero h-hero">' +
+        '<div class="container hero-grid">' +
+          '<div class="hero-copy reveal">' +
+            '<p class="eyebrow">Musée numérique de cartes à collectionner</p>' +
+            '<h1 class="display">Le monde,<br><em>en cartes.</em></h1>' +
+            '<p class="lead">Des dieux de l’Olympe aux héroïnes des contes, ATLAS réunit les grandes figures de la culture en œuvres numérotées que l’on découvre, collectionne et échange.</p>' +
+            '<div class="row gap-s wrap"><button class="btn btn-primary btn-lg" data-login>Se connecter</button></div>' +
+            '<p class="so-note">' + I('lock') + 'Prototype : connexion simulée, aucune donnée n’est envoyée.</p>' +
+            '<dl class="hero-facts"><div><dt>Collections</dt><dd>' + A.COLLECTIONS.length + '</dd></div><div><dt>Personnages</dt><dd>' + A.CHARS.length + '</dd></div><div><dt>Éditions</dt><dd>' + A.EDITIONS.length + '</dd></div></dl>' +
+          '</div>' +
+          '<div class="hero-visual">' + globe() +
+            '<div class="hero-stack">' +
+              '<div class="hs hs-l">' + U.card('egypte-anubis-epic', { serial: 41, tilt: false }) + '</div>' +
+              '<div class="hs hs-r">' + U.card('merveilleux-alice-rare', { serial: 112, tilt: false }) + '</div>' +
+              '<div class="hs hs-c">' + U.card('grece-zeus-legendary', { serial: 18, uid: feat && feat.uid }) + '</div>' +
+            '</div>' +
+            '<p class="hero-caption"><span>Zeus, Roi de l’Olympe</span><span>Légendaire · N° 018/50</span></p>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="section h-steps"><div class="container">' +
+        sectionHead('Comment ça marche', 'Trois gestes, une collection.') +
+        '<div class="steps">' + steps.map(function (s) {
+          return '<article class="step"><span class="step-n">' + s[0] + '</span><h3 class="h3">' + s[1] + '</h3><p>' + s[2] + '</p></article>';
+        }).join('') + '</div>' +
+        '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
+      '</div></section>' +
+      '</div>';
+  };
+  P.landingMount = function (root) {
+    var st = root.querySelector('.steps'), dots = root.querySelectorAll('.steps-dots i');
+    if (st && dots.length) st.addEventListener('scroll', function () {
+      var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
+      dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
+    }, { passive: true });
+    autoSlide(st, 4500);
+  };
+
   P.home = {
     title: 'Le monde, en cartes',
     mount: function (root) {
       A.pack.mountAll(root);
       // Carrousel des deux sachets : onglets synchronisés, seul le sachet affiché flotte doucement
-      var slides = root.querySelector('.play-slides'), tabs = root.querySelectorAll('.pt-tab'), packs = root.querySelectorAll('.play-slide .pk');
+      var slides = root.querySelector('.play-slides'), tabs = root.querySelectorAll('.pick-b'), packs = root.querySelectorAll('.play-slide .pk');
       function current() { return slides ? Math.round(slides.scrollLeft / Math.max(1, slides.firstElementChild.offsetWidth)) : 0; }
       function sync() {
         var k = current();
@@ -207,47 +259,14 @@
         if (ch.n !== n0 || S.dailyAvailable() !== d0) { clearInterval(tick); A.app.rerender(); return; }
         root.querySelectorAll('[data-clock="charge"]').forEach(function (el) { el.textContent = U.clock(ch.next); });
         root.querySelectorAll('[data-clock="daily"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()); });
+        root.querySelectorAll('[data-clock="daily-s"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()).replace(' min', ''); });
       }, 1000);
     },
     render: function () {
-      var feat = S.ownedOf('grece-zeus-legendary')[0];
-      var steps = [
-        ['I', 'Découvrir', 'Parcourez des collections consacrées aux mythologies, aux contes, à la littérature et à l’histoire. Chaque personnage possède sa notice.'],
-        ['II', 'Collectionner', 'Ouvrez les boosters offerts toutes les 15 minutes et chaque jour, complétez vos collections et traquez les éditions numérotées les plus rares.'],
-        ['III', 'Échanger', 'Négociez avec d’autres collectionneurs ou achetez sur la marketplace. Chaque exemplaire conserve sa provenance.']
-      ];
       var popular = A.COLLECTIONS.filter(function (c) { return c.popular; }).sort(function (a, b) { return a.popular - b.popular; }).slice(0, 3);
       var event = A.COLLECTIONS.find(function (c) { return c.status === 'event'; });
 
       return playHTML() +
-      '<section class="hero h-hero">' +
-        '<div class="container hero-grid">' +
-          '<div class="hero-copy reveal">' +
-            '<p class="eyebrow">Musée numérique de cartes à collectionner</p>' +
-            '<h1 class="display">Le monde,<br><em>en cartes.</em></h1>' +
-            '<p class="lead">Des dieux de l’Olympe aux héroïnes des contes, ATLAS réunit les grandes figures de la culture en œuvres numérotées que l’on découvre, collectionne et échange.</p>' +
-            '<div class="row gap-s wrap"><a class="btn btn-primary btn-lg" href="#/collections">Découvrir les collections</a></div>' +
-            '<dl class="hero-facts"><div><dt>Collections</dt><dd>' + A.COLLECTIONS.length + '</dd></div><div><dt>Personnages</dt><dd>' + A.CHARS.length + '</dd></div><div><dt>Éditions</dt><dd>' + A.EDITIONS.length + '</dd></div></dl>' +
-          '</div>' +
-          '<div class="hero-visual">' + globe() +
-            '<div class="hero-stack">' +
-              '<div class="hs hs-l">' + U.card('egypte-anubis-epic', { serial: 41, tilt: false }) + '</div>' +
-              '<div class="hs hs-r">' + U.card('merveilleux-alice-rare', { serial: 112, tilt: false }) + '</div>' +
-              '<div class="hs hs-c">' + U.card('grece-zeus-legendary', { serial: 18, uid: feat && feat.uid }) + '</div>' +
-            '</div>' +
-            '<p class="hero-caption"><span>Zeus, Roi de l’Olympe</span><span>Légendaire · N° 018/50</span></p>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-
-      '<section class="section h-steps"><div class="container">' +
-        sectionHead('Comment ça marche', 'Trois gestes, une collection.') +
-        '<div class="steps">' + steps.map(function (s) {
-          return '<article class="step"><span class="step-n">' + s[0] + '</span><h3 class="h3">' + s[1] + '</h3><p>' + s[2] + '</p></article>';
-        }).join('') + '</div>' +
-        '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
-      '</div></section>' +
-
       '<section class="section section-alt h-coll"><div class="container">' +
         sectionHead('Collections populaires', 'Les salles les plus visitées.', ['Toutes les collections', '#/collections']) +
         '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
