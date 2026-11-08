@@ -12,9 +12,12 @@
      sinon l’aquarelle générée. o : options de l’aquarelle générée ; sizes : largeur affichée. */
   function collArt(c, o, sizes) {
     var id = 'collections-' + c.id;
-    if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll"');
+    if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll"')
+      .replace(' style="', ' style="object-position:50% ' + (COLL_FOCUS[c.id] || 36) + '%;');
     return A.artImg(o);
   }
+  // Hauteur du point d’intérêt de chaque aquarelle (en % de l’image), pour les cadrages très larges
+  var COLL_FOCUS = { grece: 36, nordique: 52 };
   A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
