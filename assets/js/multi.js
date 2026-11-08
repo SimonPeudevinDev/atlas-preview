@@ -69,9 +69,14 @@
       if (e.target.closest('[data-mu-done]')) { close(false); return; }
       if (e.target.closest('[data-mu-again]')) { close(true); return; }
       var it = e.target.closest('.mu-item');
-      if (it && !it.classList.contains('is-shown')) { show(it); return; }
-      if (it) U.openCard(it.getAttribute('data-ed'), it.getAttribute('data-uid'));
+      if (!it || moved) return;                           // un défilement n’ouvre rien
+      if (!it.classList.contains('is-shown')) { show(it); return; }
+      if (el.classList.contains('is-revealed')) U.openCard(it.getAttribute('data-ed'), it.getAttribute('data-uid'));   // la fiche seulement une fois tout révélé
     });
+    var moved = false, px = 0, py = 0;
+    el.addEventListener('pointerdown', function (e) { moved = false; px = e.clientX; py = e.clientY; });
+    el.addEventListener('pointermove', function (e) { if (Math.abs(e.clientX - px) + Math.abs(e.clientY - py) > 10) moved = true; });
+    el.addEventListener('scroll', function () { moved = true; }, true);
     document.addEventListener('keydown', function key(e) {
       if (!el.isConnected) { document.removeEventListener('keydown', key); return; }
       if (e.key === 'Escape' && !started) close(false);
@@ -158,25 +163,17 @@
       var y = node.offsetTop - g.clientHeight * 0.45;
       if (y > g.scrollTop + 8) g.scrollTo({ top: y, behavior: 'smooth' });
     }
+    // Légendaire ou mieux : la carte apparaît sur place en grand, avec sa lueur, puis reprend sa taille
     function spotlight(node, done) {
       var r = A.R[A.ED[node.getAttribute('data-ed')].rarity].rank;
-      var sp = document.createElement('div');
-      sp.className = 'mu-spot r-' + A.ED[node.getAttribute('data-ed')].rarity;
-      sp.style.setProperty('--fc', GLOW[A.RARITIES[r].id]);
-      sp.innerHTML = '<div class="mu-spot-card">' + node.querySelector('.mu-front').innerHTML + '</div>';
-      el.appendChild(sp);
-      SFX.reveal(r); A.haptic([18, 40, 26]);
-      requestAnimationFrame(function () { sp.classList.add('is-in'); });
+      follow(node);
+      node.style.setProperty('--fc', GLOW[A.RARITIES[r].id]);
       setTimeout(function () {
         if (closed) return;
-        follow(node);
-        setTimeout(function () {                        // la carte rejoint sa place dans la grille
-          var c = sp.querySelector('.mu-spot-card'), a = c.getBoundingClientRect(), b = node.getBoundingClientRect();
-          c.style.transform = 'translate(' + (b.left + b.width / 2 - (a.left + a.width / 2)) + 'px,' + (b.top + b.height / 2 - (a.top + a.height / 2)) + 'px) scale(' + (b.width / a.width) + ')';
-          sp.classList.add('is-out');
-          setTimeout(function () { show(node, true); sp.remove(); done(); }, 380);
-        }, 220);
-      }, reduce ? 200 : 900);
+        node.classList.add('is-spot'); show(node, true);
+        SFX.reveal(r); A.haptic([18, 40, 26]);
+        setTimeout(function () { node.classList.remove('is-spot'); done(); }, reduce ? 150 : 650);
+      }, 180);
     }
     function flips(items) {
       var nodes = [].slice.call(el.querySelectorAll('.mu-item'));   // grille triée des plus communes aux plus rares
@@ -217,7 +214,7 @@
         '<div class="mu-grid">' + items.map(function (it, i) {
           var ed = A.ED[it.ed];
           return '<button class="mu-item r-' + ed.rarity + (A.R[ed.rarity].rank >= 3 ? ' is-big' : '') + '" data-ed="' + it.ed + '" data-uid="' + it.uid + '" style="--d:' + (i * 12) + 'ms;--r:' + (Math.random() * 30 - 15).toFixed(1) + 'deg">' +
-            '<span class="mu-front">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</span></button>';
+            '<span class="mu-card">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</span></button>';
         }).join('') + '</div>' +
         '<div class="mu-foot is-revealing"><button class="btn btn-ghost-light btn-lg mu-all" data-mu-all>Tout révéler</button>' +
           '<button class="btn btn-gold btn-lg" data-mu-done>Ajouter à l’inventaire</button>' +

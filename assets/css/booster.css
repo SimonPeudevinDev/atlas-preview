@@ -724,15 +724,9 @@
 .mu-foot .btn { flex: 1 1 0; min-width: 0; padding: 0 12px; }
 @media (min-width: 900px) { .mu-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); max-width: 1100px; margin: 0 auto; width: 100%; } .mu-foot { justify-content: center; } .mu-foot .btn { flex: 0 0 260px; } }
 .mu-item.is-big.is-shown .card-inner { box-shadow: 0 0 0 1px rgba(216, 188, 128, .6), 0 0 30px rgba(216, 188, 128, .45), 0 10px 26px rgba(0, 0, 0, .45); }
-/* Mise en lumière d’une Légendaire ou mieux : en grand au centre, puis elle rejoint sa place */
-.mu-spot { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; pointer-events: none;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--fc) 35%, transparent), transparent 75%), rgba(8, 7, 6, .7); opacity: 0; transition: opacity .25s ease; }
-.mu-spot.is-in { opacity: 1; }
-.mu-spot.is-out { background: transparent; transition: background .3s ease; }
-.mu-spot-card { width: min(62vw, 260px); transform: scale(.4) rotate(-8deg); opacity: 0; transition: transform .38s cubic-bezier(.2, .9, .3, 1.2), opacity .2s; }
-.mu-spot.is-in .mu-spot-card { transform: none; opacity: 1; }
-.mu-spot.is-out .mu-spot-card { transition: transform .38s cubic-bezier(.5, 0, .3, 1), opacity .38s; }
-.mu-spot-card .card-inner { box-shadow: 0 0 0 1px rgba(255, 255, 255, .15), 0 0 60px var(--fc), 0 30px 60px rgba(0, 0, 0, .6); }
+/* Mise en lumière d’une Légendaire ou mieux : sur place, la carte grossit un instant dans sa lueur */
+.mu-item.is-spot { position: relative; z-index: 5; transform: scale(1.18); transition: transform .3s cubic-bezier(.2, .9, .3, 1.3), opacity .2s; }
+.mu-item.is-spot .card-inner { box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 0 44px var(--fc), 0 16px 34px rgba(0, 0, 0, .6); }
 .mu-foot .mu-all { display: none; }
 .mu-foot.is-revealing .mu-all { display: inline-flex; }
 .mu-foot.is-revealing [data-mu-done], .mu-foot.is-revealing [data-mu-again] { display: none; }
@@ -742,3 +736,4 @@
 .multi.is-revealed .mu-wait { display: none; }
 .multi.is-revealed .mu-sub, .multi.is-revealed .mu-chips { animation: muFade .35s ease both; }
 @keyframes muFade { from { opacity: 0; transform: translateY(-4px); } }
+.mu-card { display: block; }
