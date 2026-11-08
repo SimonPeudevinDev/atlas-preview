@@ -518,14 +518,10 @@
   /* Ouverture d’un booster : vérification → débit → tirage → émission des
      numéros → inscription à l’inventaire → écriture au grand livre.
      En phase 2 : une seule transaction SQL (SERIALIZABLE) côté serveur. */
-  S.openPack = function (packId) {
-    var check = S.canOpen(packId);
-    if (!check.ok) return { ok: false, error: check.reason };
+  // Un tirage, sans sauvegarde ni notification (utilisé par openPack et openPacks)
+  function drawOne(packId, check, now) {
     var pack = A.PACK[packId];
     var pool = poolFor(pack);
-    var readyBefore = readyKeys();
-    var duelsBefore = S.duels().filter(function (d) { return d.done; }).map(function (d) { return d.id; });
-    var now = Date.now();
     var items = [], seen = {};
     for (var i = 0; i < pack.size; i++) {
       var guaranteed = pack.guarantee && i === pack.size - 1;
@@ -561,13 +557,40 @@
       state.ledger.unshift({ id: uid('tx'), at: now, type: 'pack', amount: -pack.price, label: pack.name });
     }
     if (pack.daily && !check.token) state.lastDaily = todayKey();
-    emit();
-    // paliers de collection atteints grâce à ce booster
+    return items;
+  }
+  function afterDraw(readyBefore, duelsBefore) {
+    // paliers de collection atteints grâce à ces boosters
     var unlocked = readyKeys().filter(function (k) { return readyBefore.indexOf(k) === -1; }).map(function (k) {
       var p = k.split(':'); return { coll: p[0], step: S.rewards(p[0]).filter(function (r) { return r.id === p[1]; })[0] };
     });
     var duels = S.duels().filter(function (d) { return d.done && duelsBefore.indexOf(d.id) === -1; });
-    return { ok: true, unlocked: unlocked, duels: duels, items: items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }) };
+    return { unlocked: unlocked, duels: duels };
+  }
+  function itemsOut(items) { return items.map(function (it) { var c = Object.assign({}, it); delete it._new; return c; }); }
+  S.openPack = function (packId) {
+    var check = S.canOpen(packId);
+    if (!check.ok) return { ok: false, error: check.reason };
+    var readyBefore = readyKeys();
+    var duelsBefore = S.duels().filter(function (d) { return d.done; }).map(function (d) { return d.id; });
+    var items = drawOne(packId, check, Date.now());
+    emit();
+    var a = afterDraw(readyBefore, duelsBefore);
+    return { ok: true, unlocked: a.unlocked, duels: a.duels, items: itemsOut(items) };
+  };
+  /** Plusieurs boosters d’un coup : les tirages s’enchaînent, une seule sauvegarde à la fin (ouverture multiple fluide) */
+  S.openPacks = function (packId, n) {
+    var readyBefore = readyKeys();
+    var duelsBefore = S.duels().filter(function (d) { return d.done; }).map(function (d) { return d.id; });
+    var out = [], now = Date.now();
+    for (var k = 0; k < n; k++) {
+      var check = S.canOpen(packId);
+      if (!check.ok) break;
+      out.push(itemsOut(drawOne(packId, check, now + k * 10)));
+    }
+    if (out.length) emit();
+    var a = out.length ? afterDraw(readyBefore, duelsBefore) : { unlocked: [], duels: [] };
+    return { ok: out.length > 0, packs: out, unlocked: a.unlocked, duels: a.duels };
   };
   S.resetDaily = function () { state.lastDaily = null; emit(); };
   S.grant = function (n) {

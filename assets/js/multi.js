@@ -45,7 +45,7 @@
     pk.setAttribute('data-pk-direct', '');
     pk.setAttribute('data-pk-still', '');   // aligné sur la pile : pas de flottement ni de rotation
     A.pack.mountAll(el);
-    if (A.pack3d && A.pack3d.faceURL) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); });
+    if (A.pack3d && A.pack3d.faceURL) setTimeout(function () { if (!closed) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); }); }, 900);   // l’image plate du sachet, calculée une fois l’écran posé
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     setTimeout(function () { if (el.isConnected) SFX.land(); }, 200);
 
@@ -75,15 +75,18 @@
       if (!drag) return;
       var dx = e.clientX - drag.x;
       if (!dir && Math.abs(dx) > 8) {
-        if (!draw()) { drag = null; return; }
+        lock();
         setDir(dx > 0 ? 1 : -1);
         el.querySelector('.mu-hint').textContent = '';
         SFX.grain(0.2);
       }
       if (!dir) return;
-      var w = pk.getBoundingClientRect().width;
-      setTp(clamp01(dx * dir / (w * 0.85)));
-      if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); }
+      if (!drag.w) drag.w = pk.getBoundingClientRect().width;
+      drag.goal = clamp01(dx * dir / (drag.w * 0.85));
+      if (!drag.raf) drag.raf = requestAnimationFrame(function () {   // une mise à jour par image, pas par événement
+        if (!drag) return; drag.raf = 0; setTp(drag.goal);
+        if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); }
+      });
       var now = performance.now();
       drag.v = (e.clientX - drag.lx) * dir / Math.max(1, now - drag.lt);
       drag.lx = e.clientX; drag.lt = now;
@@ -91,6 +94,7 @@
     function endDrag(e) {
       if (!drag) return;
       var d = drag; drag = null;
+      if (d.raf) { cancelAnimationFrame(d.raf); if (dir && d.goal != null) setTp(d.goal); }
       if (chain || closed) return;
       if (!dir) {                                          // un simple toucher n’ouvre pas : il faut glisser
         if (Math.abs(e.clientX - d.x) < 10 && Math.abs(e.clientY - d.y) < 10) el.querySelector('.mu-hint').textContent = 'Glissez le doigt sur le sachet pour l’ouvrir';
@@ -128,25 +132,24 @@
     });
 
     var packs = [], skip = false, revealAll = false;
-    // Les tirages, dès que la déchirure commence (on ne peut plus revenir en arrière)
+    // Dès que la déchirure commence, on ne peut plus revenir en arrière…
+    function lock() { if (!started) { started = true; el.classList.add('is-going'); } }
+    // … mais les tirages ne se font qu’au lâcher du doigt : rien ne fige le geste
     function draw() {
-      if (started) return packs.length > 0; started = true;
-      for (var i = 0; i < n; i++) {
-        var r = S.openPack(packId);
-        if (!r.ok) break;
-        packs.push(r.items);
-      }
+      if (packs.length) return true;
+      packs = S.openPacks(packId, n).packs;                // tous les tirages, une seule sauvegarde
       if (!packs.length) { U.toast('Aucun booster à ouvrir', 'error'); close(false); return false; }
       [].forEach.call(el.querySelectorAll('.mu-behind .mu-pack'), function (p) {   // stock épuisé entre-temps
         if (+p.style.getPropertyValue('--q') > packs.length - 1) p.remove();
       });
       var best = Math.max.apply(null, packs[0].map(rankOf));
       pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);
-      el.classList.add('is-going');
       return true;
     }
     function run(from) {
-      if (chain) return; chain = true;
+      if (chain) return;
+      if (!draw()) return;
+      chain = true;
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
       tearAt(0, from);
     }
