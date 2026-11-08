@@ -78,14 +78,14 @@
         lock();
         setDir(dx > 0 ? 1 : -1);
         el.querySelector('.mu-hint').textContent = '';
-        SFX.grain(0.2);
+        SFX.grain(0.2); A.haptic(4);
       }
       if (!dir) return;
       if (!drag.w) drag.w = pk.getBoundingClientRect().width;
       drag.goal = clamp01(dx * dir / (drag.w * 0.85));
       if (!drag.raf) drag.raf = requestAnimationFrame(function () {   // une mise à jour par image, pas par événement
         if (!drag) return; drag.raf = 0; setTp(drag.goal);
-        if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); }
+        if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); A.haptic(4); }
       });
       var now = performance.now();
       drag.v = (e.clientX - drag.lx) * dir / Math.max(1, now - drag.lt);
