@@ -158,6 +158,21 @@
     }, every);
   }
 
+  // Annonces de l’accueil : 6 cartes selon le tri, puis une tuile « tout voir »
+  function mkItems(L, sort) {
+    var by = {
+      rare: function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || a.price - b.price; },
+      cheap: function (a, b) { return a.price - b.price; },
+      'new': function (a, b) { return b.at - a.at; }
+    }[sort];
+    return L.slice().sort(by).slice(0, 6).map(function (l) {
+      var ch = A.CHAR[A.ED[l.ed].charId];
+      return '<a class="mk-item" href="#/marketplace?q=' + encodeURIComponent(ch.name) + '" aria-label="' + U.esc(ch.name) + ', ' + l.price + ' Éclats">' + U.card(l.ed, { serial: l.serial }) +
+        '<span class="mk-foot">' + U.price(l.price) + '</span></a>';
+    }).join('') +
+    '<a class="mk-item mk-all" href="#/marketplace"><span class="mk-all-in">' + I('market') + '<b>Voir les ' + U.num(L.length) + ' annonces</b>' + I('arrow') + '</span></a>';
+  }
+
   /* Page d’accueil déconnectée : la présentation d’ATLAS et « Comment ça marche »
      (le hub des boosters est réservé aux joueurs connectés) */
   P.landingHTML = function () {
@@ -294,6 +309,13 @@
         upd();
       }
       autoSlide(rr, 3200);
+      // Marketplace : changer de tri
+      root.querySelectorAll('[data-mk-sort]').forEach(function (b) { b.addEventListener('click', function () {
+        root.querySelectorAll('[data-mk-sort]').forEach(function (x) { x.classList.toggle('is-on', x === b); });
+        var row = root.querySelector('[data-mk-row]');
+        row.innerHTML = mkItems(S.listings().filter(function (l) { return !l.mine; }), b.getAttribute('data-mk-sort'));
+        row.scrollLeft = 0;
+      }); });
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {
@@ -342,19 +364,17 @@
         '<div class="rar-dots is-mob" role="tablist">' + A.RARITIES.map(function (r, i) { return '<button class="rar-dot r-' + r.id + '" data-rar="' + i + '" aria-label="' + r.label + '"></button>'; }).join('') + '</div>' +
       '</div></section>' +
 
-      // Marketplace : les vraies annonces du moment (les plus rares d’abord), plutôt qu’une vitrine
+      // Marketplace : les vraies annonces du moment, triables (rares, petits prix, nouveautés)
       (function () {
-        var L = S.listings().filter(function (l) { return !l.mine; }), sales = S.sales();
-        var pick = L.slice().sort(function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || b.at - a.at; }).slice(0, 6);
-        var vol = sales.reduce(function (t, x) { return t + x.price; }, 0);
+        var L = S.listings().filter(function (l) { return !l.mine; }), week = Date.now() - 7 * 864e5;
+        var sold = S.sales().filter(function (x) { return x.at > week; }).length;
         return '<section class="section h-trade"><div class="container">' +
-          sectionHead('Marketplace', 'À vendre en ce moment.', ['Tout voir', '#/marketplace']) +
-          '<div class="mk-stats"><div><b>' + U.num(L.length) + '</b><span>annonces</span></div><div><b>' + U.num(sales.length) + '</b><span>ventes récentes</span></div><div><b>' + U.num(vol) + '</b><span>Éclats échangés</span></div></div>' +
-          '<div class="mk-row">' + pick.map(function (l) {
-            return '<a class="mk-item" href="#/marketplace">' + U.card(l.ed, { serial: l.serial }) +
-              '<span class="mk-foot">' + U.price(l.price) + '<span class="mk-by">' + U.esc(l.seller) + '</span></span></a>';
-          }).join('') + '</div>' +
-          '<p class="mk-note">' + I('swap') + 'Prix fixes en Éclats, monnaie fictive. Les échanges entre collectionneurs sont confirmés par les deux parties.</p>' +
+          '<div class="section-head"><div><p class="eyebrow">Marketplace</p><h2 class="h2">À vendre en ce moment.</h2>' +
+            '<p class="mk-meta"><b>' + U.num(L.length) + '</b> annonces<span>·</span><b>' + U.num(sold) + '</b> ventes cette semaine</p></div></div>' +
+          '<div class="mk-sort" role="tablist">' +
+            '<button class="is-on" data-mk-sort="rare" role="tab">Les plus rares</button><button data-mk-sort="cheap" role="tab">Petits prix</button><button data-mk-sort="new" role="tab">Nouveautés</button>' +
+          '</div>' +
+          '<div class="mk-row" data-mk-row>' + mkItems(L, 'rare') + '</div>' +
         '</div></section>';
       })() +
 
