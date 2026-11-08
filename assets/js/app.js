@@ -163,9 +163,22 @@
         '<a href="#/inventaire" role="menuitem">' + U.icon('cards') + 'Mon inventaire</a>' +
         '<button data-buy role="menuitem">' + U.icon('coin') + 'Acheter des Éclats</button>' +
         '<button data-sound-toggle role="menuitem">' + U.icon('sound') + 'Sons<span class="pm-switch' + (muted ? '' : ' is-on') + '"></span></button>' +
+        '<button data-theme-toggle role="menuitem">' + U.icon('moon') + 'Mode sombre<span class="pm-switch' + (app.theme() === 'dark' ? ' is-on' : '') + '"></span></button>' +
       '</nav>' +
       '<button class="pm-logout" data-logout role="menuitem">' + U.icon('logout') + 'Se déconnecter</button>';
   }
+  /* Thème clair / sombre : choix enregistré ; sans choix, on suit le réglage du téléphone */
+  app.theme = function () { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; };
+  app.setTheme = function (t, save) {
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', t === 'dark' ? '#12100D' : '#F6F2EA');
+    if (save !== false) try { localStorage.setItem('atlas-theme', t); } catch (e) { /* ignore */ }
+  };
+  try {
+    var mq = matchMedia('(prefers-color-scheme: dark)');
+    var follow = function () { var t = null; try { t = localStorage.getItem('atlas-theme'); } catch (e) { /* ignore */ } if (!t) app.setTheme(mq.matches ? 'dark' : 'light', false); };
+    if (mq.addEventListener) mq.addEventListener('change', follow); else if (mq.addListener) mq.addListener(follow);
+  } catch (e) { /* ignore */ }
   function closeProfileMenu() {
     var p = document.querySelector('[data-profile-panel]'), b = document.querySelector('[data-profile-menu]');
     if (p) p.hidden = true;
@@ -183,6 +196,12 @@
     }
     if (e.target.closest('[data-logout]')) { app.logout(); return; }
     if (e.target.closest('[data-login]')) { app.login(); return; }
+    if (e.target.closest('[data-theme-toggle]')) {
+      app.setTheme(app.theme() === 'dark' ? 'light' : 'dark');
+      var tw = e.target.closest('[data-theme-toggle]').querySelector('.pm-switch');
+      if (tw) tw.classList.toggle('is-on', app.theme() === 'dark');
+      return;
+    }
     if (e.target.closest('[data-sound-toggle]')) {
       if (A.sfx) A.sfx.setMuted(!A.sfx.muted);
       var sw = e.target.closest('[data-sound-toggle]').querySelector('.pm-switch, .switch');
