@@ -251,7 +251,28 @@
         }, { passive: true });
         autoSlide(pr, 5000);
       });
-      autoSlide(root.querySelector('.rarity-row'), 2600);
+      // Raretés (mobile) : la carte du centre en avant, les voisines plus petites et estompées
+      var rr = root.querySelector('.rarity-row');
+      if (rr && window.matchMedia && matchMedia('(max-width: 900px)').matches) {
+        var ri = [].slice.call(rr.children), rd = root.querySelectorAll('.rar-dot'), rraf = 0;
+        var center = function (i) { return ri[i].offsetLeft + ri[i].offsetWidth / 2 - rr.clientWidth / 2; };
+        var upd = function () {
+          rraf = 0;
+          var c = rr.scrollLeft + rr.clientWidth / 2, best = 0, bd = 1e9;
+          ri.forEach(function (it, i) {
+            var d = Math.abs(it.offsetLeft + it.offsetWidth / 2 - c) / it.offsetWidth;
+            it.style.setProperty('--d', Math.min(1, d).toFixed(3));
+            if (d < bd) { bd = d; best = i; }
+          });
+          ri.forEach(function (it, i) { it.classList.toggle('is-on', i === best); });
+          rd.forEach(function (d, i) { d.classList.toggle('is-on', i === best); });
+        };
+        rr.addEventListener('scroll', function () { if (!rraf) rraf = requestAnimationFrame(upd); }, { passive: true });
+        rd.forEach(function (d) { d.addEventListener('click', function () { rr.scrollTo({ left: center(+d.getAttribute('data-rar')), behavior: 'smooth' }); }); });
+        rr.scrollLeft = center(Math.min(3, ri.length - 1));   // on commence sur la Légendaire
+        upd();
+      }
+      autoSlide(rr, 3200);
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {
@@ -296,6 +317,7 @@
           return '<figure class="rarity-item">' + U.card('grece-zeus-' + r.id, { serial: r.supply ? Math.min(7 + r.rank * 3, r.supply) : null, open: true }) +
             '<figcaption><span class="rar-chip r-' + r.id + '"><i></i>' + r.label + '</span><span class="muted small">' + (r.supply ? (r.supply === 1 ? 'Pièce unique' : r.supply + ' exemplaires') : 'Tirage illimité') + '</span></figcaption></figure>';
         }).join('') + '</div>' +
+        '<div class="rar-dots is-mob" role="tablist">' + A.RARITIES.map(function (r, i) { return '<button class="rar-dot r-' + r.id + '" data-rar="' + i + '" aria-label="' + r.label + '"></button>'; }).join('') + '</div>' +
       '</div></section>' +
 
       '<section class="section section-dark h-trade"><div class="container trade-grid">' +

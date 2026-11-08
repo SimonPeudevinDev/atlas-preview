@@ -1874,3 +1874,20 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .soon-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #CFC3AC; }
   .soon-tag .ic { width: 14px; height: 14px; color: var(--gold-2); }
 }
+
+/* Raretés (mobile) : carrousel centré, la carte du milieu en avant */
+.rar-dots.is-mob { display: none; }
+@media (max-width: 900px) {
+  .rarity-row { position: relative; gap: 0; padding: 22px 24vw 4px; margin-top: -14px; scroll-padding: 0; }
+  .rarity-item { flex: 0 0 52vw; scroll-snap-align: center; transform: scale(calc(1 - var(--d, 1) * .2)); opacity: calc(1 - var(--d, 1) * .55); will-change: transform; }
+  .rarity-item .card-inner { transition: box-shadow .3s; }
+  .rarity-item.is-on .card-inner { box-shadow: 0 12px 28px rgba(40, 30, 15, .2); }
+  .rarity-item figcaption { margin-top: 12px; opacity: 0; transform: translateY(-4px); transition: opacity .25s, transform .25s; }
+  .rarity-item.is-on figcaption { opacity: 1; transform: none; }
+  .rarity-item figcaption .rar-chip { font-size: 14px; }
+  .rarity-item figcaption .muted { font-size: 12.5px; }
+  .rar-dots.is-mob { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .rar-dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 4px; background: var(--rc); opacity: .35; transition: width .25s, opacity .25s; }
+  .rar-dot::after { content: ''; position: absolute; inset: -12px -5px; }
+  .rar-dot.is-on { width: 22px; opacity: 1; }
+}
