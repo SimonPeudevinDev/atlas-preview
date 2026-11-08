@@ -73,14 +73,14 @@
      Le Booster Atlas revient toutes les 15 min (10 en réserve), le quotidien chaque jour,
      les autres se gagnent en jouant (missions, paliers, trophées). */
   function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine' : '+1 dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
-  function playTile(p, state) {
+  function playTile(p, k) {
     var tk = S.tokens(p.id), can = S.canOpen(p.id), st;
     if (p.daily) st = can.ok ? 'Prêt à ouvrir' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>';
     else st = tk ? (tk > 1 ? tk + ' à ouvrir' : '1 à ouvrir') : 'À gagner : missions et paliers';
-    return '<article class="play-tile' + (can.ok ? ' is-ready' : '') + (p.event ? ' is-event' : '') + '"' + (can.ok ? ' data-open-pack="' + p.id + '"' : '') + '>' +
+    return '<article class="play-tile' + (can.ok ? ' is-ready' : '') + (p.event ? ' is-event' : '') + '" data-go-slide="' + k + '">' +
       '<div class="pt-pack">' + A.pack.html(p) + (tk > 1 ? '<span class="pt-count">×' + tk + '</span>' : '') + '</div>' +
       '<div class="pt-copy"><p class="pt-k">' + p.kicker + '</p><h3 class="pt-name">' + p.name + '</h3><p class="pt-st">' + st + '</p></div>' +
-      (can.ok ? '<span class="pt-go">' + I('chevR') + '</span>' : '') + '</article>';
+      '<span class="pt-go">' + I('chevR') + '</span></article>';
   }
   function playHTML() {
     var P0 = A.PACK.standard, PD = A.PACK.daily, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
@@ -104,17 +104,34 @@
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + PD.id + '"' + (dCan.ok ? '' : ' disabled') + '>' +
           (dCan.ok ? 'Ouvrir le Booster quotidien' : 'Prochain dans <span data-clock="daily">' + U.clock(S.nextDailyIn()) + '</span>') + '</button>' +
         '<p class="play-note">' + PD.size + ' cartes offertes, une fois par jour</p></div>';
+    // Coffret, Saga : même présentation en grand quand on les choisit
+    var SHORT = { conservateur: 'Coffret', saga: 'Saga' };
+    var extra = side.map(function (p, j) {
+      var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
+      return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
+        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' +
+        '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
+        '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>' +
+        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
+        (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '') +
+        '<p class="play-note">' + p.size + ' cartes · ' + p.kicker + '</p></div>';
+    }).join('');
+    var extraTabs = side.map(function (p, j) {
+      var n = S.tokens(p.id);
+      return '<button class="pt-tab" data-go="' + (j + 2) + '" role="tab">' + SHORT[p.id] + (n ? ' <span class="is-ready">' + n + '</span>' : '') + '</button>';
+    }).join('');
     return '<section class="play"><div class="container play-grid">' +
       '<div class="play-main">' +
         '<p class="eyebrow">Vos boosters</p>' +
         '<div class="play-tabs" role="tablist">' +
           '<button class="pt-tab is-on" data-go="0" role="tab">Atlas <span>' + ch.n + '/' + ch.max + '</span></button>' +
           '<button class="pt-tab" data-go="1" role="tab">Quotidien <span class="' + (dCan.ok ? 'is-ready' : '') + '">' + (dCan.ok ? 'Prêt' : U.clock(S.nextDailyIn())) + '</span></button>' +
+          extraTabs +
         '</div>' +
-        '<div class="play-slides">' + atlas + daily + '</div>' +
+        '<div class="play-slides">' + atlas + daily + extra + '</div>' +
         (S.UNLIMITED ? '<button class="play-reset" data-dev-refill>' + I('reset') + 'Tout recharger (test)</button>' : '') +
       '</div>' +
-      '<div class="play-side">' + side.map(playTile).join('') + '</div>' +
+      '<div class="play-side">' + side.map(function (p, j) { return playTile(p, j + 2); }).join('') + '</div>' +
     '</div></section>';
   }
 
@@ -150,6 +167,12 @@
         var st0;
         slides.addEventListener('scroll', function () { clearTimeout(st0); st0 = setTimeout(sync, 80); }, { passive: true });
         tabs.forEach(function (t) { t.addEventListener('click', function () { var k = +t.getAttribute('data-go'); slides.scrollTo({ left: k * slides.firstElementChild.offsetWidth, behavior: 'smooth' }); }); });
+        // Toucher Coffret ou Saga plus bas : on remonte et le sachet passe au premier plan
+        root.querySelectorAll('[data-go-slide]').forEach(function (t) { t.addEventListener('click', function () {
+          var k = +t.getAttribute('data-go-slide'), top = root.querySelector('.play').getBoundingClientRect().top + window.scrollY - 60;
+          if (window.scrollY > top + 10) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+          slides.scrollTo({ left: k * slides.firstElementChild.offsetWidth, behavior: 'smooth' });
+        }); });
         sync();
       }
       root.addEventListener('click', function (e) {

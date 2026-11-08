@@ -1780,7 +1780,7 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 .pt-tab.is-on { background: var(--ink); color: #F3ECDD; }
 .pt-tab.is-on span { color: var(--gold-2); }
 .play-main { min-width: 0; width: 100%; }
-.play-slides { display: flex; width: calc(100% + 2 * var(--gutter, 20px)); margin: 0 calc(-1 * var(--gutter, 20px)); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.play-slides { display: flex; width: calc(100% + 2 * var(--gutter, 20px)); margin: 0 calc(-1 * var(--gutter, 20px)); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x pan-y; }
 .play-slides::-webkit-scrollbar { display: none; }
 .play-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: center; scroll-snap-stop: always; display: flex; flex-direction: column; align-items: center; padding: 0 var(--gutter, 20px); box-sizing: border-box; }
 .play-day { margin: 2px 0 0; font-size: 15px; color: var(--ink-2); }
@@ -1819,12 +1819,12 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .play { padding: 10px 0 18px; }
   .play-grid { gap: 12px; }
   .play-pack { padding: 8px 0 12px; }
-  .play-pack .pk { --pk-w: min(156px, 40vw); }
   .play-clock { margin: 4px 0 10px; }
   .play-many { margin-top: 8px; min-height: 44px; }
   .play-note { margin-top: 8px; font-size: 11.5px; max-width: none; }
   .play-reset { margin-top: 8px; }
-  .pt-tab { padding: 9px 16px; }
+  .play-tabs { gap: 2px; }
+  .pt-tab { padding: 9px 11px; font-size: 12.5px; gap: 5px; }
   .play-tile { padding: 8px 12px 8px 10px; gap: 12px; }
   .pt-pack, .pt-pack .pk { width: 38px; --pk-w: 38px; }
   .pt-name { font-size: 17px; }
@@ -1861,3 +1861,5 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .footer-cols a, .footer-cols .link-btn { padding: 11px 15px; }
 }
 .h-cta .btn .ic { transform: rotate(-90deg); }
+.play-pack .pk { touch-action: pan-x pan-y; }   /* le doigt sur le sachet fait défiler la page */
+.play-tile[data-go-slide] { cursor: pointer; }
