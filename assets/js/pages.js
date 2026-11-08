@@ -8,6 +8,14 @@
   var P = A.pages = {};
   var I = U.icon;
 
+  /* Illustration d’une collection : l’aquarelle peinte si elle existe (media/originals/collections/<id>),
+     sinon l’aquarelle générée. o : options de l’aquarelle générée ; sizes : largeur affichée. */
+  function collArt(c, o, sizes) {
+    var id = 'collections-' + c.id;
+    if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll"');
+    return A.artImg(o);
+  }
+  A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
       (link ? '<a class="link-arrow" href="' + link[1] + '">' + link[0] + ' ' + I('arrow') + '</a>' : '') + '</div>';
@@ -16,7 +24,7 @@
     opts = opts || {};
     var pr = S.collectionProgress(c.id);
     return '<a class="coll-tile' + (opts.cls ? ' ' + opts.cls : '') + '" href="#/collection/' + c.id + '">' +
-      '<div class="coll-art">' + (opts.art || A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 })) +
+      '<div class="coll-art">' + (opts.art || collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 }, '(max-width: 900px) 50vw, 400px')) +
       (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') +
       (S.readyCount(c.id) ? '<span class="tag tag-reward">' + U.icon('gift') + 'Récompense à récupérer</span>' : '') + '</div>' +
       '<div class="coll-meta"><p class="eyebrow">' + c.family + ' · ' + c.edition + '</p><h3 class="coll-name">' + c.name + '</h3>' +
@@ -35,7 +43,7 @@
   function shelfTile(c) {
     var pr = S.collectionProgress(c.id), done = pr.pct >= 1;
     return '<a class="shelf-tile' + (done ? ' is-done' : '') + '" href="#/collection/' + c.id + '">' +
-      '<div class="st-art">' + A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 320, h: 200 }) +
+      '<div class="st-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 320, h: 200 }, '(max-width: 900px) 34vw, 240px') +
         (S.readyCount(c.id) ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : done ? '<span class="st-badge is-done" title="Complète">' + U.icon('check') + '</span>' : '') +
         (c.status === 'event' ? '<span class="st-new">Nouveau</span>' : '') + '</div>' +
       '<h3 class="st-name">' + U.esc(c.name) + '</h3>' +
@@ -344,7 +352,7 @@
         '<div class="pop-row is-mob">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c) {
           var pr = S.collectionProgress(c.id), ev = c.id === event.id, done = pr.pct >= 1, gift = S.readyCount(c.id);
           return '<a class="event-banner pop-card" href="#/collection/' + c.id + '">' +
-            '<div class="event-art">' + (ev ? A.artImg({ seed: 'event-hero', coll: c.id, rarity: 'legendary', w: 900, h: 300 }) : A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: 'base', w: 900, h: 300 })) +
+            '<div class="event-art">' + collArt(c, ev ? { seed: 'event-hero', coll: c.id, rarity: 'legendary', w: 900, h: 300 } : { seed: c.id + '-banner', coll: c.id, rarity: 'base', w: 900, h: 300 }, '100vw') +
               (gift ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : '') + '</div>' +
             '<div class="event-copy"><p class="eyebrow">' + (ev ? 'Nouvelle collection · Événement' : 'Collection populaire') + '</p><h3 class="h2">' + U.esc(c.name) + '</h3><p>' + c.tagline + '</p>' +
               '<div class="pop-foot"><span class="link-arrow">Explorer ' + I('arrow') + '</span>' +
@@ -352,7 +360,7 @@
         }).join('') + '</div>' +
         '<div class="steps-dots pop-dots is-mob" aria-hidden="true">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
         '<a class="event-banner is-desk" href="#/collection/' + event.id + '">' +
-          '<div class="event-art">' + A.artImg({ seed: 'event-hero', coll: event.id, rarity: 'legendary', w: 900, h: 300 }) + '</div>' +
+          '<div class="event-art">' + collArt(event, { seed: 'event-hero', coll: event.id, rarity: 'legendary', w: 900, h: 300 }, '760px') + '</div>' +
           '<div class="event-copy"><p class="eyebrow">Nouvelle collection · Événement</p><h3 class="h2">' + event.name + '</h3><p>' + event.tagline + '</p>' +
           '<span class="link-arrow">Explorer la collection ' + I('arrow') + '</span></div></a>' +
       '</div></section>' +
@@ -531,7 +539,7 @@
       var pr = S.collectionProgress(c.id);
       var views = [['chars', 'Personnages'], ['all', 'Toutes']].concat(A.RARITIES.map(function (r) { return [r.id, r.label]; }));
       return '<section class="coll-hero">' +
-        '<div class="coll-hero-art">' + A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 1400, h: 520 }) + '</div>' +
+        '<div class="coll-hero-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 1400, h: 520 }, '100vw') + '</div>' +
         '<div class="container coll-hero-copy">' +
           (c.group ? '<a class="back" href="#/saga/' + c.group + '">← ' + A.GROUP[c.group].name + '</a>' : '<a class="back" href="#/collections">← Collections</a>') +
           '<p class="eyebrow">' + (c.group ? 'Sous-collection · ' : '') + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +

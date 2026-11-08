@@ -2001,3 +2001,4 @@ html[data-theme="dark"] .is-fixed-dark .eyebrow { color: var(--gold-2); }
   .pop-card .pop-foot .link-arrow { font-size: 14px; padding-bottom: 2px; }
   .pop-card .st-badge { top: 8px; right: 8px; }
 }
+.art-pic.is-coll img { object-position: 50% 36%; }   /* aquarelles de collection : le sujet est un peu au-dessus du centre */
