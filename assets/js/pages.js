@@ -268,7 +268,7 @@
           rd.forEach(function (d, i) { d.classList.toggle('is-on', i === best); });
         };
         rr.addEventListener('scroll', function () { if (!rraf) rraf = requestAnimationFrame(upd); }, { passive: true });
-        rd.forEach(function (d) { d.addEventListener('click', function () { rr.scrollTo({ left: center(+d.getAttribute('data-rar')), behavior: 'smooth' }); }); });
+        rd.forEach(function (d) { d.addEventListener('click', function () { rr.dispatchEvent(new Event('pointerdown')); rr.scrollTo({ left: center(+d.getAttribute('data-rar')), behavior: 'smooth' }); }); });
         rr.scrollLeft = center(Math.min(3, ri.length - 1));   // on commence sur la Légendaire
         upd();
       }
