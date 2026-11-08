@@ -73,8 +73,15 @@
      Le Booster Atlas revient toutes les 15 min (10 en réserve), le quotidien chaque jour,
      les autres se gagnent en jouant (missions, paliers, trophées). */
   function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine · un nouveau toutes les 15 min' : 'Prochain dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
-  // Nombre de boosters à ouvrir : une pastille posée sur le coin du sachet
-  function countBadge(n, label) { return '<span class="play-count' + (n ? '' : ' is-zero') + '" aria-label="' + label + '">×' + n + '</span>'; }
+  // Réserve : une barre fine de 10 segments ; le segment en cours se remplit au fil des 15 minutes
+  function reserve(ch, tk) {
+    var seg = '', f = ch.n >= ch.max ? 0 : 1 - ch.next / S.CHARGE.every;
+    for (var i = 0; i < ch.max; i++) seg += '<i' + (i < ch.n ? ' class="is-on"' : i === ch.n ? ' class="is-charging" style="--f:' + f.toFixed(3) + '"' : '') + '></i>';
+    return '<div class="rv" role="img" aria-label="' + ch.n + ' boosters en réserve sur ' + ch.max + '">' +
+      '<div class="rv-bar">' + seg + '</div>' +
+      '<p class="rv-txt"><b>' + ch.n + '</b> sur ' + ch.max + ' en réserve' + (tk ? ' <em>+' + tk + ' offert' + (tk > 1 ? 's' : '') + '</em>' : '') +
+        '<span class="rv-sep">·</span>' + (ch.n >= ch.max ? 'pleine' : '+1 dans <b data-clock="charge">' + U.clock(ch.next) + '</b>') + '</p></div>';
+  }
   function playTile(p, k) {
     var tk = S.tokens(p.id), can = S.canOpen(p.id), st;
     if (p.daily) st = can.ok ? 'Prêt à ouvrir' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>';
@@ -91,8 +98,7 @@
     var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
     // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
     var atlas = '<div class="play-slide" data-slide="0">' +
-        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + countBadge(ch.n + tk, ch.n + ' en réserve' + (tk ? ', ' + tk + ' offerts' : '')) + '</div>' +
-        '<p class="play-clock">' + chargeClock(ch) + '</p>' +
+        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' + reserve(ch, tk) +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
         (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '') +
@@ -109,7 +115,7 @@
     var extra = side.map(function (p, j) {
       var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
       return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
-        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + (n ? countBadge(n, n + ' à ouvrir') : '') + '</div>' +
+        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' +
         '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
         '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
@@ -281,6 +287,7 @@
         var ch = S.charges();
         if (ch.n !== n0 || S.dailyAvailable() !== d0) { clearInterval(tick); A.app.rerender(); return; }
         root.querySelectorAll('[data-clock="charge"]').forEach(function (el) { el.textContent = U.clock(ch.next); });
+        root.querySelectorAll('.rv-bar .is-charging').forEach(function (el) { el.style.setProperty('--f', (1 - ch.next / S.CHARGE.every).toFixed(3)); });
         root.querySelectorAll('[data-clock="daily"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()); });
         root.querySelectorAll('[data-clock="daily-s"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()).replace(' min', ''); });
       }, 1000);

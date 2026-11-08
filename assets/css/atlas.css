@@ -1892,10 +1892,13 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
   .rar-dot.is-on { width: 22px; opacity: 1; }
 }
 
-/* Réserve : une pastille « ×N » sur le coin du sachet (remplace la jauge en tirets) */
-.play-pack { position: relative; }
-.play-count { position: absolute; top: 4px; right: -14px; z-index: 3; min-width: 44px; height: 30px; padding: 0 10px; border-radius: 15px;
-  display: grid; place-items: center; background: var(--ink); color: var(--gold-2); font-family: var(--serif); font-size: 17px; font-weight: 600; letter-spacing: .02em;
-  font-variant-numeric: tabular-nums; box-shadow: 0 0 0 3px var(--bg, #F6F2EA), 0 6px 14px rgba(30, 22, 10, .25); pointer-events: none; }
-.play-count.is-zero { background: var(--surface); color: var(--ink-3); box-shadow: 0 0 0 1px var(--line), 0 0 0 4px var(--bg, #F6F2EA); }
-.play-clock { margin-top: 2px; }
+/* Réserve : barre fine de 10 segments + une ligne de texte */
+.rv { display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(220px, 60vw); margin: 6px 0 18px; }
+.rv-bar { display: flex; gap: 3px; width: 100%; }
+.rv-bar i { position: relative; flex: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.rv-bar i.is-on { background: var(--gold); }
+.rv-bar i.is-charging::after { content: ''; position: absolute; inset: 0 auto 0 0; width: calc(var(--f, 0) * 100%); background: var(--gold); opacity: .45; transition: width 1s linear; }
+.rv-txt { margin: 0; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rv-txt b { color: var(--ink); font-weight: 600; }
+.rv-txt em { font-style: normal; color: var(--gold); font-weight: 600; }
+.rv-sep { margin: 0 6px; color: var(--line-2); }
