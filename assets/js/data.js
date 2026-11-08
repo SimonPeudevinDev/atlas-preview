@@ -2062,7 +2062,7 @@ window.ATLAS = window.ATLAS || {};
       odds: { base: 0.78, rare: 0.15, epic: 0.05, legendary: 0.015, mythic: 0.004, unique: 0.001 },
       desc: 'Cinq cartes issues de l’ensemble des collections publiées. Un nouveau booster toutes les 15 minutes, jusqu’à 10 en réserve.',
       lure: 'legendary',
-      hook: 'Cinq cartes tirées dans toutes les salles du musée. Un nouveau booster vous attend toutes les 15 minutes.'
+      hook: 'Cinq cartes tirées dans toutes les collections du musée. Un nouveau booster vous attend toutes les 15 minutes.'
     },
     {
       id: 'conservateur', name: 'Coffret du Conservateur', kicker: 'Récompense · carte numérotée garantie', price: 0, earned: true, size: 5, theme: 'c-bordeaux', design: 'astrolabe',
@@ -2082,7 +2082,7 @@ window.ATLAS = window.ATLAS || {};
       guarantee: { odds: { rare: 0.8, epic: 0.15, legendary: 0.035, mythic: 0.012, unique: 0.003 } },
       desc: 'Booster de lancement de la nouvelle collection Mythologie nordique : dieux, créatures, géants et neuf mondes. Une carte numérotée garantie.',
       lure: 'legendary',
-      hook: 'Odin, Thor, Freyja… La nouvelle salle nordique ouvre ses portes, pour un temps seulement. Une carte numérotée garantie dans chaque booster.'
+      hook: 'Odin, Thor, Freyja… La nouvelle collection nordique ouvre ses portes, pour un temps seulement. Une carte numérotée garantie dans chaque booster.'
     }
   ];
   A.PACK = {};

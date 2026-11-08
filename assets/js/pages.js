@@ -241,14 +241,17 @@
         dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
       }, { passive: true });
       autoSlide(st, 4500);
-      var pr = root.querySelector('.pop-row'), pd = root.querySelectorAll('.pop-dots i');
-      if (pr && pd.length) pr.addEventListener('scroll', function () {
-        var w = pr.firstElementChild ? pr.firstElementChild.offsetWidth + 12 : 1, k = pr.scrollLeft + pr.clientWidth >= pr.scrollWidth - 4 ? pd.length - 1 : Math.round(pr.scrollLeft / w);
-        pd.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, pd.length - 1)); });
-      }, { passive: true });
-      autoSlide(pr, 5000);
+      // Carrousels de grandes cartes (collections populaires, à venir) : points synchronisés
+      [['.pop-row:not(.up-row)', '.pop-dots:not(.up-dots) i'], ['.up-row', '.up-dots i']].forEach(function (q) {
+        var pr = root.querySelector(q[0]), pd = root.querySelectorAll(q[1]);
+        if (!pr || !pd.length) return;
+        pr.addEventListener('scroll', function () {
+          var w = pr.firstElementChild ? pr.firstElementChild.offsetWidth + 12 : 1, k = pr.scrollLeft + pr.clientWidth >= pr.scrollWidth - 4 ? pd.length - 1 : Math.round(pr.scrollLeft / w);
+          pd.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, pd.length - 1)); });
+        }, { passive: true });
+        autoSlide(pr, 5000);
+      });
       autoSlide(root.querySelector('.rarity-row'), 2600);
-      autoSlide(root.querySelector('.upcoming'), 4000);
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
       var n0 = S.charges().n, d0 = S.dailyAvailable();
       var tick = setInterval(function () {
@@ -267,7 +270,7 @@
 
       return playHTML() +
       '<section class="section section-alt h-coll"><div class="container">' +
-        sectionHead('Collections populaires', 'Les salles les plus visitées.', ['Toutes les collections', '#/collections']) +
+        sectionHead('Collections populaires', 'Les collections les plus visitées.', ['Toutes les collections', '#/collections']) +
         '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
         // mobile : grandes cartes au format de l’événement, qui défilent (l’événement en tête)
         '<div class="pop-row is-mob">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c) {
@@ -312,8 +315,15 @@
       '</div></section>' +
 
       '<section class="section h-up"><div class="container">' +
-        sectionHead('Prochainement', 'Les salles en préparation.') +
-        '<div class="upcoming">' + A.UPCOMING.map(function (u) {
+        sectionHead('Prochainement', 'Les collections à venir.') +
+        // mobile : mêmes grandes cartes que les collections populaires
+        '<div class="pop-row up-row is-mob">' + A.UPCOMING.map(function (u) {
+          return '<div class="event-banner pop-card is-soon"><div class="event-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 900, h: 300 }) + '</div>' +
+            '<div class="event-copy"><p class="eyebrow">' + u.date + ' · ' + u.family + '</p><h3 class="h2">' + u.name + '</h3><p>' + u.desc + '</p>' +
+            '<div class="pop-foot"><span class="soon-tag">' + I('clock') + 'En préparation</span></div></div></div>';
+        }).join('') + '</div>' +
+        '<div class="steps-dots pop-dots up-dots is-mob" aria-hidden="true">' + A.UPCOMING.map(function (u, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
+        '<div class="upcoming is-desk">' + A.UPCOMING.map(function (u) {
           return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div>' +
             '<p class="eyebrow">' + u.family + '</p><h3 class="h3">' + u.name + '</h3><p class="muted">' + u.desc + '</p></article>';
         }).join('') + '</div>' +
@@ -335,7 +345,7 @@
       var unis = ['all'].concat(A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
       return '<section class="page-head"><div class="container">' +
         '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
-        '<p class="lead">' + A.COLLECTIONS.length + ' salles ouvertes, ' + A.CHARS.length + ' figures à collectionner, et d’autres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
+        '<p class="lead">' + A.COLLECTIONS.length + ' collections ouvertes, ' + A.CHARS.length + ' figures à collectionner, et d’autres à venir. Chaque collection rassemble les figures d’un même univers.</p>' +
         '<div class="toolbar">' +
           '<div class="chips" data-f="universe">' + unis.map(function (u) { return '<button class="chip' + (cf.universe === u ? ' is-active' : '') + '" data-v="' + u + '">' + (u === 'all' ? 'Tous les univers' : u) + '</button>'; }).join('') + '</div>' +
           '<div class="toolbar-end">' +
