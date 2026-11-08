@@ -57,11 +57,56 @@
       setTimeout(function () { el.remove(); A.app.rerender(); if (again) M.open(packId, M.count(packId)); }, 260);
     }
 
-    // Glisser (ou toucher) : tout s’ouvre
-    var sx = null, stage = el.querySelector('.mu-stage');
-    stage.addEventListener('pointerdown', function (e) { sx = e.clientX; });
-    stage.addEventListener('pointermove', function (e) { if (sx != null && Math.abs(e.clientX - sx) > 40) { sx = null; go(); } });
-    stage.addEventListener('pointerup', function () { if (sx != null) { sx = null; go(); } });
+    // Le doigt déchire le premier sachet comme à l’ouverture simple ; au bout (ou d’un toucher), la rafale part
+    var stage = el.querySelector('.mu-stage'), drag = null, dir = 0, chain = false, curTp = 0, anim = 0;
+    function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+    function setDir(d) {
+      dir = d;
+      pk.classList.remove('dir-l', 'dir-r', 'is-tearing');
+      if (d) pk.classList.add(d > 0 ? 'dir-r' : 'dir-l', 'is-tearing');
+    }
+    stage.addEventListener('pointerdown', function (e) {
+      if (chain || closed) return;
+      cancelAnimationFrame(anim);
+      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now(), v: 0, half: curTp > 0.5 };
+      try { stage.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x;
+      if (!dir && Math.abs(dx) > 8) {
+        if (!draw()) { drag = null; return; }
+        setDir(dx > 0 ? 1 : -1);
+        el.querySelector('.mu-hint').textContent = '';
+        SFX.grain(0.2);
+      }
+      if (!dir) return;
+      var w = pk.getBoundingClientRect().width;
+      setTp(clamp01(dx * dir / (w * 0.85)));
+      if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); }
+      var now = performance.now();
+      drag.v = (e.clientX - drag.lx) * dir / Math.max(1, now - drag.lt);
+      drag.lx = e.clientX; drag.lt = now;
+    });
+    function endDrag(e) {
+      if (!drag) return;
+      var d = drag; drag = null;
+      if (chain || closed) return;
+      if (!dir) {                                          // un simple toucher : tout part d’un coup
+        if (Math.abs(e.clientX - d.x) < 10 && Math.abs(e.clientY - d.y) < 10 && draw()) { setDir(1); run(0); }
+        return;
+      }
+      if (curTp > 0.55 || (curTp > 0.2 && d.v > 0.5)) { run(curTp); return; }
+      var from = curTp, t0 = performance.now();          // pas assez loin : le bout se recolle
+      (function back(now) {
+        var k = Math.min(1, (now - t0) / 260), e2 = 1 - Math.pow(1 - k, 3);
+        setTp(from * (1 - e2));
+        if (k < 1) anim = requestAnimationFrame(back);
+        else { setDir(0); el.querySelector('.mu-hint').textContent = 'Encore un peu… glissez jusqu’au bout'; }
+      })(t0);
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
     el.addEventListener('click', function (e) {
       if (e.target.closest('[data-mu-close]') && !started) { close(false); return; }
       if (e.target.closest('[data-mu-skip]')) { skip = true; return; }
@@ -83,44 +128,51 @@
     });
 
     var packs = [], skip = false, revealAll = false;
-    function go() {
-      if (started) return; started = true;
-      for (var i = 0; i < n; i++) {               // les tirages
+    // Les tirages, dès que la déchirure commence (on ne peut plus revenir en arrière)
+    function draw() {
+      if (started) return packs.length > 0; started = true;
+      for (var i = 0; i < n; i++) {
         var r = S.openPack(packId);
         if (!r.ok) break;
         packs.push(r.items);
       }
-      if (!packs.length) { U.toast('Aucun booster à ouvrir', 'error'); close(false); return; }
+      if (!packs.length) { U.toast('Aucun booster à ouvrir', 'error'); close(false); return false; }
       [].forEach.call(el.querySelectorAll('.mu-behind .mu-pack'), function (p) {   // stock épuisé entre-temps
         if (+p.style.getPropertyValue('--q') > packs.length - 1) p.remove();
       });
+      var best = Math.max.apply(null, packs[0].map(rankOf));
+      pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);
       el.classList.add('is-going');
+      return true;
+    }
+    function run(from) {
+      if (chain) return; chain = true;
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
-      tearAt(0);
+      tearAt(0, from);
     }
 
     // Rafale : sur le vrai sachet 3D, la lumière file le long de la ligne, le bout s’arrache ; le sachet ouvert
     // part à gauche (copie plate) pendant que celui de derrière descend prendre sa place et se déchire déjà.
-    function setTp(p) { if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3)); }
-    function tear(ms, done) {
-      var t0 = performance.now();
+    function setTp(p) { curTp = p; if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3)); }
+    function tear(ms, from, done) {
+      var t0 = performance.now(); from = from || 0;
       (function step(now) {
         if (closed) return;
         var k = Math.min(1, ((now || performance.now()) - t0) / ms), e = k * k * (3 - 2 * k);
-        setTp(e);
+        setTp(from + (1 - from) * e);
         if (k < 1) requestAnimationFrame(step); else done();
       })();
     }
-    function tearAt(i) {
+    function tearAt(i, from) {
       if (closed) return;
       if (i >= packs.length || skip) { setTimeout(grid, skip ? 0 : 260); return; }
       var items = packs[i], best = Math.max.apply(null, items.map(rankOf)), big = best >= 3;
       var tt = reduce ? 40 : 75;                         // même vitesse pour tous : rythme linéaire
       pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);   // la lueur de l’ouverture trahit la meilleure carte
-      pk.classList.remove('is-torn'); pk.classList.add('dir-r', 'is-tearing');
-      setTp(0);
-      SFX.grain(0.2); setTimeout(function () { if (!closed) SFX.grain(0.7); }, tt * 0.55);
-      tear(tt, function () {
+      pk.classList.remove('is-torn');
+      if (from) tt = Math.max(30, tt * (1 - from) * 1.6);   // le premier finit de s’ouvrir depuis où le doigt l’a laissé
+      else { setDir(1); setTp(0); SFX.grain(0.2); setTimeout(function () { if (!closed) SFX.grain(0.7); }, tt * 0.55); }
+      tear(tt, from, function () {
         if (closed) return;
         pk.classList.add('is-torn');
         SFX.rip(best); A.haptic(big ? [16, 30, 20] : 8);
@@ -141,7 +193,7 @@
           b.forEach(function (p) { p.style.setProperty('--q', +p.style.getPropertyValue('--q') - 1); });
           var first = [].filter.call(b, function (p) { return +p.style.getPropertyValue('--q') <= 0; })[0];
           if (first) first.remove();
-          pk.classList.remove('is-torn', 'is-tearing', 'dir-r'); setTp(0);
+          pk.classList.remove('is-torn'); setDir(0); setTp(0);
           front.classList.remove('is-rise'); void front.offsetWidth; front.classList.add('is-rise');
           setTimeout(function () { tearAt(i + 1); }, reduce ? 20 : 45);
         }, reduce ? 30 : 25);
