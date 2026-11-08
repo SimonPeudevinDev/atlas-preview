@@ -117,17 +117,15 @@
         '<p class="play-note">' + p.size + ' cartes · ' + p.kicker + '</p></div>';
     }).join('');
     // Sélecteur : une tuile par booster (mini sachet, nom, état)
-    function pick(p, k, name, st, ready, empty) {
-      return '<button class="pick-b' + (k ? '' : ' is-on') + (empty ? ' is-empty' : '') + '" data-go="' + k + '" role="tab" aria-label="' + p.name + '">' +
-        '<span class="pick-pk">' + A.pack.html(p) + '</span><span class="pick-name">' + name + '</span>' +
-        '<span class="pick-st' + (ready ? ' is-ready' : '') + '">' + st + '</span></button>';
+    // Sélecteur sobre : des onglets texte de largeur fixe, un trait sous l’actif, un point quand il y a de quoi ouvrir
+    function pick(p, k, name, ready) {
+      return '<button class="pick-b' + (k ? '' : ' is-on') + '" data-go="' + k + '" role="tab" aria-label="' + p.name + (ready ? ', prêt' : '') + '">' +
+        name + (ready ? '<i class="pick-dot"></i>' : '') + '</button>';
     }
-    function short(ms) { return U.clock(ms).replace(' min', ''); }
-    var picker = '<div class="pick" role="tablist">' +
-      pick(P0, 0, 'Atlas', ch.n + '/' + ch.max, ch.n > 0, ch.n === 0) +
-      pick(PD, 1, 'Quotidien', dCan.ok ? 'Prêt' : '<span data-clock="daily-s">' + short(S.nextDailyIn()) + '</span>', dCan.ok, !dCan.ok) +
-      side.map(function (p, j) { var n = S.tokens(p.id); return pick(p, j + 2, SHORT[p.id], n ? '×' + n : 'À gagner', n > 0, !n); }).join('') +
-    '</div>';
+    var picker = '<div class="pick" role="tablist" style="--n:' + (2 + side.length) + '">' +
+      pick(P0, 0, 'Atlas', ch.n > 0) + pick(PD, 1, 'Quotidien', dCan.ok) +
+      side.map(function (p, j) { return pick(p, j + 2, SHORT[p.id], S.tokens(p.id) > 0); }).join('') +
+      '<span class="pick-bar"></span></div>';
     return '<section class="play"><div class="container play-grid">' +
       '<div class="play-main">' +
         '<p class="eyebrow">Vos boosters</p>' +
@@ -213,6 +211,7 @@
       function sync() {
         var k = current();
         tabs.forEach(function (t, i) { t.classList.toggle('is-on', i === k); });
+        var pk0 = root.querySelector('.pick'); if (pk0) pk0.style.setProperty('--k', k);
         packs.forEach(function (pk, i) { if (pk._rig) pk._rig.idle(i === k); });
       }
       if (slides) {
