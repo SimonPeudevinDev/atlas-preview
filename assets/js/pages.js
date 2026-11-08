@@ -166,6 +166,12 @@
         dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
       }, { passive: true });
       autoSlide(st, 4500);
+      var pr = root.querySelector('.pop-row'), pd = root.querySelectorAll('.pop-dots i');
+      if (pr && pd.length) pr.addEventListener('scroll', function () {
+        var w = pr.firstElementChild ? pr.firstElementChild.offsetWidth + 12 : 1, k = pr.scrollLeft + pr.clientWidth >= pr.scrollWidth - 4 ? pd.length - 1 : Math.round(pr.scrollLeft / w);
+        pd.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, pd.length - 1)); });
+      }, { passive: true });
+      autoSlide(pr, 5000);
       autoSlide(root.querySelector('.rarity-row'), 2600);
       autoSlide(root.querySelector('.upcoming'), 4000);
       // Comptes à rebours ; quand un booster arrive (ou le quotidien revient), on redessine la page
@@ -222,8 +228,18 @@
       '<section class="section section-alt"><div class="container">' +
         sectionHead('Collections populaires', 'Les salles les plus visitées.', ['Toutes les collections', '#/collections']) +
         '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
-        '<div class="shelf-row is-mob">' + popular.map(shelfTile).join('') + '</div>' +   // mobile : petites vignettes qui défilent
-        '<a class="event-banner" href="#/collection/' + event.id + '">' +
+        // mobile : grandes cartes au format de l’événement, qui défilent (l’événement en tête)
+        '<div class="pop-row is-mob">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c) {
+          var pr = S.collectionProgress(c.id), ev = c.id === event.id, done = pr.pct >= 1, gift = S.readyCount(c.id);
+          return '<a class="event-banner pop-card" href="#/collection/' + c.id + '">' +
+            '<div class="event-art">' + (ev ? A.artImg({ seed: 'event-hero', coll: c.id, rarity: 'legendary', w: 900, h: 300 }) : A.artImg({ seed: c.id + '-banner', coll: c.id, rarity: 'base', w: 900, h: 300 })) +
+              (gift ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : '') + '</div>' +
+            '<div class="event-copy"><p class="eyebrow">' + (ev ? 'Nouvelle collection · Événement' : 'Collection populaire') + '</p><h3 class="h2">' + U.esc(c.name) + '</h3><p>' + c.tagline + '</p>' +
+              '<div class="pop-foot"><span class="link-arrow">Explorer ' + I('arrow') + '</span>' +
+              '<span class="pop-n' + (done ? ' is-done' : '') + '">' + pr.owned + '/' + pr.total + '<i style="--p:' + Math.round(pr.pct * 100) + '%"></i></span></div></div></a>';
+        }).join('') + '</div>' +
+        '<div class="steps-dots pop-dots is-mob" aria-hidden="true">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
+        '<a class="event-banner is-desk" href="#/collection/' + event.id + '">' +
           '<div class="event-art">' + A.artImg({ seed: 'event-hero', coll: event.id, rarity: 'legendary', w: 900, h: 300 }) + '</div>' +
           '<div class="event-copy"><p class="eyebrow">Nouvelle collection · Événement</p><h3 class="h2">' + event.name + '</h3><p>' + event.tagline + '</p>' +
           '<span class="link-arrow">Explorer la collection ' + I('arrow') + '</span></div></a>' +
