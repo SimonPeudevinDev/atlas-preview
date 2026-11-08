@@ -111,6 +111,10 @@
         else { setDir(0); el.querySelector('.mu-hint').textContent = 'Encore un peu… glissez jusqu’au bout'; }
       })(t0);
     }
+    // iPhone : le retour haptique n’est accepté que pendant un vrai geste ; on en donne un dès que le doigt se pose
+    // et un au lâcher, dans les événements tactiles eux-mêmes
+    stage.addEventListener('touchstart', function () { if (!chain && !closed) A.haptic(4); }, { passive: true });
+    stage.addEventListener('touchend', function () { if (!closed && dir && curTp > 0.2) A.haptic(10); }, { passive: true });
     stage.addEventListener('pointerup', endDrag);
     stage.addEventListener('pointercancel', endDrag);
     el.addEventListener('click', function (e) {

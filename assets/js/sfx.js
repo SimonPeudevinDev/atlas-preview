@@ -347,21 +347,20 @@
   /* Retour haptique. Android : navigator.vibrate. iPhone (Safari ne connaît pas vibrate) : depuis iOS 18,
      basculer un interrupteur <input type="checkbox" switch> déclenche le petit « tic » du clavier ;
      on en garde un caché hors écran et on le bascule. Un motif [a, pause, b…] devient une suite de tics. */
-  var hsw = null, lastTick = 0;
+  var lastTick = 0;
   function tick() {
     var now = performance.now();
     if (now - lastTick < 35) return;                // trop rapproché : le système l’ignorerait
     lastTick = now;
-    if (!hsw) {
-      hsw = document.createElement('label');
-      hsw.setAttribute('aria-hidden', 'true');
-      hsw.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
-      var inp = document.createElement('input'); inp.type = 'checkbox'; inp.setAttribute('switch', ''); inp.tabIndex = -1;
-      hsw.appendChild(inp);
-      hsw.addEventListener('click', function (e) { e.stopPropagation(); });
-      document.body.appendChild(hsw);
-    }
-    hsw.click();
+    // un interrupteur neuf à chaque fois, caché, basculé puis retiré (méthode éprouvée sur Safari iOS 18)
+    var l = document.createElement('label');
+    l.setAttribute('aria-hidden', 'true'); l.style.display = 'none';
+    var inp = document.createElement('input'); inp.type = 'checkbox'; inp.setAttribute('switch', '');
+    l.appendChild(inp);
+    l.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.head.appendChild(l);
+    l.click();
+    document.head.removeChild(l);
   }
   A.haptic = function (p) {
     try {
