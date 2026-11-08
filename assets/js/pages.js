@@ -17,7 +17,7 @@
     return A.artImg(o);
   }
   // Hauteur du point d’intérêt de chaque aquarelle (en % de l’image), pour les cadrages très larges
-  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 44, gothique: 30 };
+  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 64, gothique: 60 };
   A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
