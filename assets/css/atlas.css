@@ -1967,3 +1967,10 @@ html[data-theme="dark"] .pop-n i::after { background: #A88A55; }
   .mk-row::-webkit-scrollbar { display: none; }
   .mk-item { flex: 0 0 38vw; scroll-snap-align: start; }
 }
+/* Blocs qui restent foncés dans les deux thèmes (vitrine des échanges de la page d’accueil déconnectée) */
+html[data-theme="dark"] .is-fixed-dark {
+  --night: #15130F; --night-2: #1F1C17; --night-glow: #2A251D;
+  --on-night: #F1E8D6; --on-night-2: #CFC3AC; --on-night-3: #9E9178; --on-night-line: rgba(241, 232, 214, .3);
+  box-shadow: inset 0 1px 0 var(--line), inset 0 -1px 0 var(--line);
+}
+html[data-theme="dark"] .is-fixed-dark .eyebrow { color: var(--gold-2); }

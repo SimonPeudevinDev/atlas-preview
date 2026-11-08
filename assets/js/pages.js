@@ -196,6 +196,21 @@
         }).join('') + '</div>' +
         '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
       '</div></section>' +
+      // Échanges : la vitrine du concept, toujours foncée (même en mode sombre)
+      '<section class="section section-dark is-fixed-dark h-trade-landing"><div class="container trade-grid">' +
+        '<div class="trade-copy"><p class="eyebrow">Échanges & marketplace</p><h2 class="h2">Chaque carte a une histoire.</h2>' +
+          '<p class="lead">Comme dans une maison de ventes, chaque exemplaire numéroté garde sa provenance : tirage, propriétaires, prix de cession.</p>' +
+          '<ul class="checklist">' +
+            '<li>' + I('swap') + '<span><b>Échanges entre collectionneurs</b> confirmés par les deux parties avant exécution.</span></li>' +
+            '<li>' + I('market') + '<span><b>Marketplace à prix fixe</b> en Éclats, monnaie fictive non convertible.</span></li>' +
+          '</ul>' +
+          '<button class="btn btn-gold" data-login>Commencer ma collection</button></div>' +
+        '<div class="trade-visual">' +
+          '<div class="tv-card">' + U.card('gothique-dracula-legendary', { serial: 12 }) + '<p>Ombre_de_Rhodes</p></div>' +
+          '<div class="tv-swap">' + I('swap') + '</div>' +
+          '<div class="tv-card">' + U.card('histoire-napoleon-epic', { serial: 33 }) + '<p>Vous</p></div>' +
+        '</div>' +
+      '</div></section>' +
       '</div>';
   };
   P.landingMount = function (root) {
@@ -330,7 +345,7 @@
       // Marketplace : les vraies annonces du moment (les plus rares d’abord), plutôt qu’une vitrine
       (function () {
         var L = S.listings().filter(function (l) { return !l.mine; }), sales = S.sales();
-        var pick = L.slice().sort(function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || b.at - a.at; }).slice(0, 8);
+        var pick = L.slice().sort(function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || b.at - a.at; }).slice(0, 6);
         var vol = sales.reduce(function (t, x) { return t + x.price; }, 0);
         return '<section class="section h-trade"><div class="container">' +
           sectionHead('Marketplace', 'À vendre en ce moment.', ['Tout voir', '#/marketplace']) +
