@@ -373,6 +373,8 @@
       }
     } catch (e) { /* ignore */ }
   };
+  // iPhone : pas de navigator.vibrate ; les tics ne passent que pendant un geste ou juste après (minuteries lancées par le geste)
+  A.haptic.ios = !navigator.vibrate;
 
   /* ---------- Particules ---------- */
   var sprites = {};

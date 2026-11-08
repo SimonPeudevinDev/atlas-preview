@@ -152,9 +152,30 @@
       pk.setAttribute('data-glow', GLOW[A.RARITIES[best].id]);
       return true;
     }
+    // iPhone : les vibrations de la rafale sont programmées tout de suite, depuis le geste du lâcher
+    // (une minuterie lancée par un geste garde le droit de vibrer ; une vibration lancée plus tard par l’animation serait ignorée)
+    // Horaire fixe de la rafale (départ de chaque sachet), partagé par l’animation et les vibrations
+    var hapT = [], plan = [], t0run = 0;
+    function makePlan(from) {
+      var tt = reduce ? 40 : 75, gap = (reduce ? 30 : 25) + (reduce ? 20 : 45) + 8, t = 0;
+      plan = packs.map(function (items, i) {
+        var d = i === 0 && from ? Math.max(30, tt * (1 - from) * 1.6) : tt, at = t;
+        t = at + d + gap;
+        return { start: at, rip: at + d };
+      });
+    }
+    function scheduleHaptics() {
+      if (!A.haptic.ios) return;
+      packs.forEach(function (items, i) {
+        var best = Math.max.apply(null, items.map(rankOf));
+        hapT.push(setTimeout(function () { if (!closed && !skip) A.haptic(best >= 3 ? [16, 30, 20] : best >= 2 ? [10, 30] : 8); }, plan[i].rip + 6));
+      });
+    }
     function run(from) {
       if (chain) return;
       if (!draw()) return;
+      makePlan(from); t0run = performance.now();
+      scheduleHaptics();
       chain = true;
       el.querySelector('.mu-hint').innerHTML = '<button class="mu-skip" data-mu-skip>Passer</button>';
       tearAt(0, from);
@@ -184,7 +205,7 @@
       tear(tt, from, function () {
         if (closed) return;
         pk.classList.add('is-torn');
-        SFX.rip(best); A.haptic(big ? [16, 30, 20] : 8);
+        SFX.rip(best); if (!A.haptic.ios) A.haptic(big ? [16, 30, 20] : 8);
         if (big) SFX.numbered(best);
         var c = el.querySelector('.mu-count b'); if (c) c.textContent = packs.length - i - 1;
         setTimeout(function () {
@@ -204,7 +225,8 @@
           if (first) first.remove();
           pk.classList.remove('is-torn'); setDir(0); setTp(0);
           front.classList.remove('is-rise'); void front.offsetWidth; front.classList.add('is-rise');
-          setTimeout(function () { tearAt(i + 1); }, reduce ? 20 : 45);
+          var next = plan[i + 1] ? plan[i + 1].start - (performance.now() - t0run) : 45;   // on tient l’horaire (vibrations calées dessus)
+          setTimeout(function () { tearAt(i + 1); }, Math.max(0, next));
         }, reduce ? 30 : 25);
       });
     }
