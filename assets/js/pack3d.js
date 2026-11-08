@@ -859,6 +859,7 @@
      (ouverture multiple). Mise en cache par sachet. */
   var faceCache = {};
   P3.tearRatio = TY / 160;
+  P3.crimpRatio = CRIMP_T / 160;   // hauteur de la languette du haut / hauteur du sachet
   P3.faceURL = function (p) {
     if (faceCache[p.id]) return faceCache[p.id];
     var th = THEMES[p.theme] || THEMES.ivory;

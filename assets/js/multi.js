@@ -30,12 +30,12 @@
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Ouverture multiple');
     // Le sachet de devant est le vrai sachet 3D ; les autres sont empilés derrière, chacun un peu plus haut
     var q = '';
-    for (var k = n - 1; k >= 1; k--) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-body"></i><img class="mp-3d" alt="" hidden></div>';
+    for (var k = n - 1; k >= 1; k--) q += '<div class="mu-pack" style="--q:' + k + '"><i class="mp-tab"></i></div>';   // derrière : seule la languette dépasse
     el.innerHTML =
       '<div class="mu-top"><button class="op-icon" data-mu-close aria-label="Fermer">' + U.icon('close') + '</button></div>' +
       '<div class="mu-head"><p class="eyebrow">' + pack.kicker + '</p><h2 class="op-title">' + pack.name + '</h2>' +
         '<p class="mu-count"><b>' + n + '</b> booster' + (n > 1 ? 's' : '') + '</p></div>' +
-      '<div class="mu-stage"><div class="mu-queue" style="--ty:' + ((A.pack3d && A.pack3d.tearRatio) || 0.12).toFixed(4) + '">' +
+      '<div class="mu-stage"><div class="mu-queue" style="--ty:' + ((A.pack3d && A.pack3d.tearRatio) || 0.12).toFixed(4) + ';--cr:' + ((A.pack3d && A.pack3d.crimpRatio) || 0.075).toFixed(4) + '">' +
         '<div class="mu-behind">' + q + '</div><div class="mu-front">' + A.pack.html(pack, { tilt: true }) + '</div><div class="mu-fly"></div></div></div>' +
       '<p class="mu-hint">Glissez pour ouvrir les ' + n + '</p>';
     document.body.appendChild(el);
@@ -44,18 +44,7 @@
     var queue = el.querySelector('.mu-queue'), front = el.querySelector('.mu-front'), pk = front.querySelector('.pk');
     pk.setAttribute('data-pk-direct', '');
     A.pack.mountAll(el);
-    // Dès que le sachet 3D est prêt et au repos, on le photographie pour habiller la pile en 3D
-    if (A.pack3d && A.pack3d.snapshot) (function wait(t) {
-      if (closed || started) return;
-      if (!pk.classList.contains('is-gl')) { if (t < 60) setTimeout(function () { wait(t + 1); }, 100); return; }
-      setTimeout(function () {
-        if (closed || started) return;
-        var url = A.pack3d.snapshot(pk);
-        if (url) { [].forEach.call(el.querySelectorAll('.mp-3d'), function (im) { im.src = url; im.hidden = false; }); queue.classList.add('has-3d'); }
-        if (pk._rig) pk._rig.idle(true);
-      }, 450);
-    })(0);
-    else if (pk._rig) pk._rig.idle(true);
+    if (pk._rig) pk._rig.idle(true);
     if (A.pack3d && A.pack3d.faceURL) A.pack3d.faceURL(pack).then(function (u) { queue.style.setProperty('--face', 'url("' + u + '")'); queue.classList.add('has-face'); });
     requestAnimationFrame(function () { el.classList.add('is-in'); });
     setTimeout(function () { if (el.isConnected) SFX.land(); }, 200);
