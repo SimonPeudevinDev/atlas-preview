@@ -234,7 +234,7 @@
       el.classList.add('is-torn');
       var best = rankOf(items[items.length - 1]);
       var glow = el.style.getPropertyValue('--glow') || GLOW.base;
-      SFX.rip(best); A.haptic(28);
+      SFX.rip(best); if (!A.haptic.ios) A.haptic(28);
       if (!reduce) { rig.shake(9, 420); rig.impulse(-1.6, dir * 2.4); }
       var pt = tearPoint(0.5);
       flash(0.35 + best * 0.08);
@@ -970,7 +970,12 @@
         return;
       }
       var reach = Math.max(tp, tpGoal);
-      if (reach > 0.55 || (reach > 0.2 && d.v > 0.5)) { phase = 'tearing'; animateTp(1, 220, finishTear); }
+      if (reach > 0.55 || (reach > 0.2 && d.v > 0.5)) {
+        phase = 'tearing';
+        // iPhone : l’impact vibre au lâcher du doigt (seul moment où iOS l’autorise), et l’arrachage suit aussitôt
+        if (A.haptic.ios) A.haptic(rankOf(items[items.length - 1]) >= 3 ? [16, 30, 20] : 12);
+        animateTp(1, A.haptic.ios ? 110 : 220, finishTear);
+      }
       else {
         animateTp(0, 320, function () { setDir(0); pk.classList.remove('is-tearing'); el.classList.remove('is-tearing'); guide(true); });
         setHint('Encore un peu… glissez jusqu’au bout');

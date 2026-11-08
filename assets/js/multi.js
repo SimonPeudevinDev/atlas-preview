@@ -114,7 +114,7 @@
     // iPhone : le retour haptique n’est accepté que pendant un vrai geste ; on en donne un dès que le doigt se pose
     // et un au lâcher, dans les événements tactiles eux-mêmes
     stage.addEventListener('touchstart', function () { if (!chain && !closed) A.haptic(4); }, { passive: true });
-    stage.addEventListener('touchend', function () { if (!closed && dir && curTp > 0.2) A.haptic(10); }, { passive: true });
+    stage.addEventListener('touchend', function () { if (!closed && dir && curTp > 0.2) A.haptic(12); }, { passive: true });
     stage.addEventListener('pointerup', endDrag);
     stage.addEventListener('pointercancel', endDrag);
     el.addEventListener('click', function (e) {
@@ -167,6 +167,7 @@
     function scheduleHaptics() {
       if (!A.haptic.ios) return;
       packs.forEach(function (items, i) {
+        if (i === 0) return;                               // le premier vibre déjà au lâcher du doigt
         var best = Math.max.apply(null, items.map(rankOf));
         hapT.push(setTimeout(function () { if (!closed && !skip) A.haptic(best >= 3 ? [16, 30, 20] : best >= 2 ? [10, 30] : 8); }, plan[i].rip + 6));
       });
