@@ -327,21 +327,21 @@
         '<div class="rar-dots is-mob" role="tablist">' + A.RARITIES.map(function (r, i) { return '<button class="rar-dot r-' + r.id + '" data-rar="' + i + '" aria-label="' + r.label + '"></button>'; }).join('') + '</div>' +
       '</div></section>' +
 
-      '<section class="section section-dark h-trade"><div class="container trade-grid">' +
-        '<div class="trade-copy"><p class="eyebrow">Échanges & marketplace</p><h2 class="h2">Chaque carte a une histoire.</h2>' +
-          '<p class="lead">Comme dans une maison de ventes, chaque exemplaire numéroté garde sa provenance : tirage, propriétaires, prix de cession.</p>' +
-          '<ul class="checklist">' +
-            '<li>' + I('swap') + '<span><b>Échanges entre collectionneurs</b> confirmés par les deux parties avant exécution.</span></li>' +
-            '<li>' + I('market') + '<span><b>Marketplace à prix fixe</b> en Éclats, monnaie fictive non convertible.</span></li>' +
-            '<li>' + I('shield') + '<span><b>Transferts sécurisés</b> : séquestre, traçabilité et protection contre la duplication.</span></li>' +
-          '</ul>' +
-          '<a class="btn btn-gold" href="#/marketplace">Visiter la marketplace</a></div>' +
-        '<div class="trade-visual">' +
-          '<div class="tv-card">' + U.card('gothique-dracula-legendary', { serial: 12 }) + '<p>Ombre_de_Rhodes</p></div>' +
-          '<div class="tv-swap">' + I('swap') + '</div>' +
-          '<div class="tv-card">' + U.card('histoire-napoleon-epic', { serial: 33 }) + '<p>Vous</p></div>' +
-        '</div>' +
-      '</div></section>' +
+      // Marketplace : les vraies annonces du moment (les plus rares d’abord), plutôt qu’une vitrine
+      (function () {
+        var L = S.listings().filter(function (l) { return !l.mine; }), sales = S.sales();
+        var pick = L.slice().sort(function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || b.at - a.at; }).slice(0, 8);
+        var vol = sales.reduce(function (t, x) { return t + x.price; }, 0);
+        return '<section class="section h-trade"><div class="container">' +
+          sectionHead('Marketplace', 'À vendre en ce moment.', ['Tout voir', '#/marketplace']) +
+          '<div class="mk-stats"><div><b>' + U.num(L.length) + '</b><span>annonces</span></div><div><b>' + U.num(sales.length) + '</b><span>ventes récentes</span></div><div><b>' + U.num(vol) + '</b><span>Éclats échangés</span></div></div>' +
+          '<div class="mk-row">' + pick.map(function (l) {
+            return '<a class="mk-item" href="#/marketplace">' + U.card(l.ed, { serial: l.serial }) +
+              '<span class="mk-foot">' + U.price(l.price) + '<span class="mk-by">' + U.esc(l.seller) + '</span></span></a>';
+          }).join('') + '</div>' +
+          '<p class="mk-note">' + I('swap') + 'Prix fixes en Éclats, monnaie fictive. Les échanges entre collectionneurs sont confirmés par les deux parties.</p>' +
+        '</div></section>';
+      })() +
 
       '<section class="section h-up"><div class="container">' +
         sectionHead('Prochainement', 'Les collections à venir.') +
