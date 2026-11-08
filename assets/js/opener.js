@@ -196,7 +196,7 @@
       if (p < lastGrain) lastGrain = Math.floor(p / 0.06) * 0.06;
       while (p - lastGrain >= 0.06) {
         lastGrain += 0.06;
-        SFX.grain(lastGrain); A.haptic(3);
+        SFX.grain(lastGrain); if (!drag) A.haptic(3);
       }
       tp = p;
       if (pk._gl && pk._gl.setTp) pk._gl.setTp(p); else pk.style.setProperty('--tp', p.toFixed(3));
@@ -348,7 +348,7 @@
           if (now >= c.t0) {
             // la carte quitte le sachet : petit envol en arc, puis elle claque sur la pile
             c.state = 'stack'; c.v.y = -7; c.v.z = 6; c.v.rz = (Math.random() - 0.5) * 4;
-            SFX.deal(0.24, 0.55 + Math.random() * 0.3);
+            SFX.deal(0.24, 0.55 + Math.random() * 0.3); A.haptic(4);
             if (c.i === 0) setTimeout(function () { if (!closed) A.haptic(8); }, 260);
           } else { draw(c); return; }
         }
@@ -951,8 +951,10 @@
         setHint('');
       }
       if (!dir) return;
-      var w = pk.getBoundingClientRect().width;
-      followTp(clamp(dx * dir / (w * 0.85), 0, 1));
+      var w = pk.getBoundingClientRect().width, goal = clamp(dx * dir / (w * 0.85), 0, 1);
+      followTp(goal);
+      var step = Math.floor(goal / 0.07);                 // un « tic » tous les 7 % de coupe, au rythme du doigt
+      if (step !== (drag.hs || 0)) { if (step > (drag.hs || 0)) A.haptic(3); drag.hs = step; }
       var now = performance.now();
       drag.v = (e.clientX - drag.lx) * dir / Math.max(1, now - drag.lt);
       drag.lx = e.clientX; drag.lt = now;

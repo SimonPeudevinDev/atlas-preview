@@ -83,9 +83,11 @@
       if (!dir) return;
       if (!drag.w) drag.w = pk.getBoundingClientRect().width;
       drag.goal = clamp01(dx * dir / (drag.w * 0.85));
+      var hs = Math.floor(drag.goal / 0.07);              // un « tic » tous les 7 % de coupe, dans l’événement du doigt
+      if (hs !== (drag.hs || 0)) { if (hs > (drag.hs || 0)) A.haptic(3); drag.hs = hs; }
       if (!drag.raf) drag.raf = requestAnimationFrame(function () {   // une mise à jour par image, pas par événement
         if (!drag) return; drag.raf = 0; setTp(drag.goal);
-        if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); A.haptic(4); }
+        if (!drag.half && curTp > 0.5) { drag.half = true; SFX.grain(0.7); }
       });
       var now = performance.now();
       drag.v = (e.clientX - drag.lx) * dir / Math.max(1, now - drag.lt);
@@ -210,7 +212,7 @@
       it.classList.add('is-shown');
       if (quiet) return;
       var r = A.R[A.ED[it.getAttribute('data-ed')].rarity].rank;
-      if (r === 2) { SFX.reveal(2); A.haptic(8); } else if (r === 1) SFX.flip();
+      if (r === 2) { SFX.reveal(2); A.haptic(8); } else { if (r === 1) SFX.flip(); A.haptic(3); }
     }
     function follow(node) {
       var g = el.querySelector('.mu-grid'); if (!g) return;
