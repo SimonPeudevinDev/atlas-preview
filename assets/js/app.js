@@ -12,7 +12,7 @@
     [/^\/collection\/([\w-]+)$/, P.collection, 'collections'],
     [/^\/saga\/([\w-]+)$/, P.saga, 'collections'],
     [/^\/boutique$/, P.shop, 'shop'],
-    [/^\/inventaire$/, P.inventory, 'inventory'],
+    [/^\/inventaire$/, P.inventory, 'collections'],   // onglet « Mes cartes » de la page Collection
     [/^\/marketplace$/, P.market, 'market'],
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
@@ -21,9 +21,8 @@
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
-    ['collections', '#/collections', 'Collections', 'grid'],
+    ['collections', '#/collections', 'Collection', 'grid'],
     ['shop', '#/boutique', 'Boosters', 'pack'],
-    ['inventory', '#/inventaire', 'Inventaire', 'cards'],
     ['market', '#/marketplace', 'Marketplace', 'market']
   ];
 
@@ -57,7 +56,7 @@
         '<p>Musée numérique de cartes à collectionner. Les grandes figures de la culture, en œuvres numérotées.</p></div>' +
       '<div class="footer-cols">' +
         '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/collections">Collections</a><a href="#/boutique">Boosters</a><a href="#/marketplace">Marketplace</a></div>' +
-        '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Inventaire</a><a href="#/boutique?open=daily">Booster quotidien</a></div>' +
+        '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Mes cartes</a><a href="#/boutique?open=daily">Booster quotidien</a></div>' +
         (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
       '</div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ATLAS · Édition I</span><em>Le monde, en cartes.</em></div>' +
@@ -160,7 +159,7 @@
       '<div class="pm-stats"><a href="#/inventaire"><b>' + U.num(items.length) + '</b><span>Cartes</span></a><a href="#/profil"><b>' + U.num(S.balance()) + '</b><span>Éclats</span></a></div>' +
       '<nav class="pm-links">' +
         '<a href="#/profil" role="menuitem">' + U.icon('user') + 'Mon profil</a>' +
-        '<a href="#/inventaire" role="menuitem">' + U.icon('cards') + 'Mon inventaire</a>' +
+        '<a href="#/inventaire" role="menuitem">' + U.icon('cards') + 'Mes cartes</a>' +
         '<button data-buy role="menuitem">' + U.icon('coin') + 'Acheter des Éclats</button>' +
         '<button data-sound-toggle role="menuitem">' + U.icon('sound') + 'Sons<span class="pm-switch' + (muted ? '' : ' is-on') + '"></span></button>' +
         (A.store.UNLIMITED ? '<button data-da-toggle role="menuitem">' + U.icon('cards') + 'Style des collections<span class="pm-val">' + DA_NAMES[A.collStyle()] + '</span></button>' : '') +   // essai de directions artistiques (test)

@@ -1090,7 +1090,7 @@ body.is-out .nav-right, body.is-out .nav-links, body.is-out .tabbar { display: n
 @media (max-width: 900px) {
   :root { --gutter: 20px; --nav-h: 60px; }
   .nav-links { display: none; }
-  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  .tabbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
   .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 10.5px; color: var(--ink-3); transition: color .2s; }
   .tabbar a .ic { width: 22px; height: 22px; stroke-width: 1.4; }
   .tabbar a.is-active { color: var(--ink); }
@@ -2046,3 +2046,12 @@ html[data-theme="dark"] .is-fixed-dark .eyebrow { color: var(--gold-2); }
 .da-test span { width: 100%; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
 .da-test button { flex: 1; height: 34px; border: 1px solid var(--line-2); border-radius: 17px; background: var(--surface); font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; }
 .da-test button.is-on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+
+/* COLLECTION : onglets Albums / Mes cartes ================================ */
+.hub-tabs { display: inline-flex; gap: 4px; padding: 4px; margin: 14px 0 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); }
+.hub-tabs a { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: background .2s, color .2s; }
+.hub-tabs a .ic { width: 16px; height: 16px; }
+.hub-tabs a i { font-style: normal; font-size: 11.5px; color: var(--ink-3); margin-left: 1px; }
+.hub-tabs a.is-on { background: var(--ink); color: var(--surface); box-shadow: var(--shadow-sm); }
+.hub-tabs a.is-on i { color: color-mix(in srgb, var(--surface) 70%, transparent); }
+

@@ -422,13 +422,21 @@
   // Recherche sans accents ni majuscules (« egypte » trouve « Égypte »)
   function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
   var STATUS = [['todo', 'À compléter'], ['done', 'Complètes'], ['gift', 'Récompenses']];
+  /* Collection : une seule page, deux onglets (Albums = le musée, Mes cartes = l’ancien inventaire) */
+  function hubHead(tab) {
+    var n = S.items().length;
+    return '<p class="eyebrow">Galerie</p><h1 class="h1">Collection</h1>' +
+      '<nav class="hub-tabs" aria-label="Collection">' +
+        '<a href="#/collections"' + (tab === 'albums' ? ' class="is-on" aria-current="page"' : '') + '>' + I('grid') + 'Albums</a>' +
+        '<a href="#/inventaire"' + (tab === 'cartes' ? ' class="is-on" aria-current="page"' : '') + '>' + I('cards') + 'Mes cartes<i>' + U.num(n) + '</i></a>' +
+      '</nav>';
+  }
   P.collections = {
-    title: 'Collections',
+    title: 'Collection · Albums',
     render: function () {
       var unis = A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       var done = A.COLLECTIONS.filter(function (c) { return S.collectionProgress(c.id).pct >= 1; }).length;
-      return '<section class="page-head cf-head"><div class="container">' +
-        '<p class="eyebrow">Galerie</p><h1 class="h1">Collections</h1>' +
+      return '<section class="page-head cf-head"><div class="container">' + hubHead('albums') +
         '<p class="cf-meta"><b>' + A.COLLECTIONS.length + '</b> collections<span>·</span><b>' + A.CHARS.length + '</b> figures<span>·</span><b>' + done + '</b> complètes</p>' +
       '</div></section>' +
       // Barre collante : recherche, statut, univers
@@ -537,7 +545,7 @@
       return '<section class="coll-hero">' +
         '<div class="coll-hero-art">' + A.artImg({ seed: g.id + '-saga', coll: g.subs[0], rarity: 'legendary', w: 1400, h: 520 }) + '</div>' +
         '<div class="container coll-hero-copy">' +
-          '<a class="back" href="#/collections">← Collections</a>' +
+          '<a class="back" href="#/collections">← Albums</a>' +
           '<p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p>' +
           '<h1 class="h1">' + U.esc(g.name) + '</h1><p class="lead">' + U.esc(g.description) + '</p>' +
           '<div class="coll-stats" data-saga-stats>' + sagaStats(pr) + '</div>' +
@@ -586,7 +594,7 @@
       return '<section class="coll-hero">' +
         '<div class="coll-hero-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 1400, h: 520 }, '100vw') + '</div>' +
         '<div class="container coll-hero-copy">' +
-          (c.group ? '<a class="back" href="#/saga/' + c.group + '">← ' + A.GROUP[c.group].name + '</a>' : '<a class="back" href="#/collections">← Collections</a>') +
+          (c.group ? '<a class="back" href="#/saga/' + c.group + '">← ' + A.GROUP[c.group].name + '</a>' : '<a class="back" href="#/collections">← Albums</a>') +
           '<p class="eyebrow">' + (c.group ? 'Sous-collection · ' : '') + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +
           '<h1 class="h1">' + c.name + '</h1><p class="lead">' + c.description + '</p>' +
           '<div class="coll-stats">' +
@@ -950,7 +958,7 @@
   var inv = { sort: 'recent', rarity: 'all', coll: 'all', only: 'all', select: false, selected: [] };
   var SORTS = { recent: 'Plus récentes', rarity: 'Rareté', collection: 'Collection', name: 'Personnage' };
   P.inventory = {
-    title: 'Mon inventaire',
+    title: 'Collection · Mes cartes',
     render: function () {
       var items = S.items();
       var numbered = items.filter(function (i) { return i.serial != null; }).length;
@@ -958,7 +966,7 @@
       var complete = A.COLLECTIONS.filter(function (c) { return S.collectionProgress(c.id).pct >= 1; }).length;
       var showcase = items.filter(function (i) { return i.show; });
       return '<section class="page-head"><div class="container">' +
-        '<p class="eyebrow">Collectionneur · Niveau ' + S.get().user.level + '</p><h1 class="h1">Mon inventaire</h1>' +
+        hubHead('cartes') +
         '<div class="kpis">' +
           '<div><span>Cartes</span><b>' + items.length + '</b></div>' +
           '<div><span>Personnages</span><b>' + Object.keys(distinct).length + '<small> / ' + A.CHARS.length + '</small></b></div>' +
