@@ -1031,7 +1031,8 @@
         if (diff < 31) return 'Ce mois-ci';
         return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^./, function (c) { return c.toUpperCase(); });
       }
-      function draw() {
+      var more = null, CHUNK = 40, shownLast = 0;
+      function draw(keep) {   // keep : garde au moins autant de tuiles qu’avant (sélection, sans saut de défilement)
         var l = list();
         // Doublons empilés : une seule tuile par édition (l’exemplaire le mieux placé selon le tri),
         // les autres exemplaires apparaissent en pile derrière. En mode échange, chaque exemplaire est sélectionnable.
@@ -1052,17 +1053,42 @@
             open: !inv.select, select: inv.select, selected: inv.selected.indexOf(i.uid) !== -1, tilt: !inv.select
           }) + '<p class="cg-note">' + (t.n > 1 ? t.n + ' exemplaires · ' : '') + U.ago(i.at) + '</p></div>';
         }
-        // Tri par date : regroupement par période d’obtention
-        var body = '';
-        if (inv.sort === 'recent') {
-          var cur = null, buf = [];
-          var flush = function () { if (buf.length) body += '<div class="inv-period"><p class="eyebrow">' + cur + '</p><div class="card-grid">' + buf.join('') + '</div></div>'; buf = []; };
-          tiles.forEach(function (t) { var lb = dayLabel(t.i.at); if (lb !== cur) { flush(); cur = lb; } buf.push(tile(t)); });
-          flush();
-        } else body = '<div class="card-grid">' + tiles.map(tile).join('') + '</div>';
+        // Affichage par tranches : seules les premières tuiles sont construites, la suite arrive au défilement
+        // (un inventaire de plusieurs milliers de cartes d’un coup fait planter Safari iOS).
+        if (more) { more.disconnect(); more = null; }
         res.innerHTML = '<p class="result-count">' + l.items.length + ' carte' + (l.items.length > 1 ? 's' : '') +
           (tiles.length !== l.items.length ? ' · ' + tiles.length + ' différente' + (tiles.length > 1 ? 's' : '') : '') + '</p>' +
-          (l.items.length ? body : '<div class="empty">Aucune carte pour ces filtres. <a href="#/boutique">Ouvrir un booster</a></div>');
+          (l.items.length ? '<div data-tiles></div><div class="inv-more" data-more></div>' : '<div class="empty">Aucune carte pour ces filtres. <a href="#/boutique">Ouvrir un booster</a></div>');
+        var box = res.querySelector('[data-tiles]'), sentinel = res.querySelector('[data-more]'), shown = 0, cur = null, grid = null;
+        function chunk() {
+          var end = Math.min(tiles.length, shown + CHUNK), html = '';
+          for (; shown < end; shown++) {
+            var t = tiles[shown];
+            if (inv.sort === 'recent') {   // tri par date : regroupement par période d’obtention
+              var lb = dayLabel(t.i.at);
+              if (lb !== cur) { flushHtml(); cur = lb; box.insertAdjacentHTML('beforeend', '<div class="inv-period"><p class="eyebrow">' + lb + '</p><div class="card-grid"></div></div>'); grid = box.lastElementChild.querySelector('.card-grid'); }
+            } else if (!grid) { box.innerHTML = '<div class="card-grid"></div>'; grid = box.firstElementChild; }
+            html += tile(t);
+          }
+          flushHtml();
+          function flushHtml() { if (html && grid) { grid.insertAdjacentHTML('beforeend', html); html = ''; } }
+          shownLast = shown;
+          if (shown >= tiles.length && more) { more.disconnect(); more = null; sentinel.remove(); }
+        }
+        if (box) {
+          var want = keep ? shownLast : 0;
+          do chunk(); while (shown < tiles.length && shown < want);
+          if (shown < tiles.length) {
+            if ('IntersectionObserver' in window) {
+              more = new IntersectionObserver(function (en) {
+                if (!en[0].isIntersecting) return;
+                chunk();
+                if (more) { more.unobserve(sentinel); more.observe(sentinel); }   // toujours visible : on relance pour la tranche suivante
+              }, { rootMargin: '900px 0px' });
+              more.observe(sentinel);
+            } else while (shown < tiles.length) chunk();
+          } else sentinel.remove();
+        }
         var n = inv.selected.length;
         root.querySelector('[data-sel-count]').textContent = n + ' carte' + (n > 1 ? 's' : '') + ' sélectionnée' + (n > 1 ? 's' : '');
       }
@@ -1078,9 +1104,9 @@
         if ((t = e.target.closest('.card[data-select]'))) {
           var u = t.getAttribute('data-uid'), k = inv.selected.indexOf(u);
           if (k === -1) inv.selected.push(u); else inv.selected.splice(k, 1);
-          draw(); return;
+          draw(true); return;
         }
-        if (e.target.closest('[data-sel-clear]')) { inv.selected = []; draw(); return; }
+        if (e.target.closest('[data-sel-clear]')) { inv.selected = []; draw(true); return; }
         if (e.target.closest('[data-sel-trade]')) {
           if (!inv.selected.length) { U.toast('Sélectionnez au moins une carte', 'error'); return; }
           U.modal('<div class="dialog"><p class="eyebrow">Échanges · Phase 2</p><h2 class="h3">Proposer un échange</h2>' +
