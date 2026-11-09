@@ -19,7 +19,7 @@
     return A.artImg(o);
   }
   // Hauteur du point d’intérêt de chaque aquarelle (en % de l’image), pour les cadrages très larges
-  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66, 'grece--objet': 48, 'grece--lino': 50 };
+  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66, 'grece--objet': 48, 'grece--lino': 50, 'egypte--lino': 52, 'gothique--lino': 44, 'nordique--lino': 58 };
   A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +

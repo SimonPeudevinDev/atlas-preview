@@ -170,7 +170,7 @@
   }
   /* Style d’essai des illustrations de collection : aquarelle (défaut), objet de musée, linogravure */
   var DA_NAMES = { '': 'Aquarelle', objet: 'Objet', lino: 'Linogravure' };
-  A.collStyle = function () { var v = ''; try { v = localStorage.getItem('atlas-da') || ''; } catch (e) { /* ignore */ } return DA_NAMES[v] ? v : ''; };
+  A.collStyle = function () { var v = null; try { v = localStorage.getItem('atlas-da'); } catch (e) { /* ignore */ } if (v === null) v = 'lino'; return DA_NAMES[v] !== undefined ? v : 'lino'; };   // linogravure par défaut
   /* Thème clair / sombre : choix enregistré ; sans choix, on suit le réglage du téléphone */
   app.theme = function () { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; };
   app.setTheme = function (t, save) {
