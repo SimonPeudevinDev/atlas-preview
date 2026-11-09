@@ -441,7 +441,10 @@
           unis.map(function (u) { return '<button class="cf-chip' + (cf.universe === u ? ' is-on' : '') + '" data-uni="' + U.esc(u) + '">' + u + '</button>'; }).join('') +
         '</div>' +
       '</div></div>' +
-      '<section class="section-tight cf-res"><div class="container"><div class="cf-count" data-count></div><div data-results></div></div></section>' +
+      '<section class="section-tight cf-res"><div class="container">' +
+        (S.UNLIMITED ? '<div class="da-test"><span>Essai de style (test)</span>' + [['', 'Aquarelle'], ['objet', 'Objet'], ['lino', 'Linogravure']].map(function (d) {
+          return '<button data-da="' + d[0] + '"' + ((A.collStyle ? A.collStyle() : '') === d[0] ? ' class="is-on"' : '') + '>' + d[1] + '</button>'; }).join('') + '</div>' : '') +
+        '<div class="cf-count" data-count></div><div data-results></div></div></section>' +
       '<section class="section section-alt"><div class="container">' + sectionHead('Prochainement', 'Les collections à venir.') +
         '<div class="upcoming">' + A.UPCOMING.map(function (u) {
           return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div><p class="eyebrow">' + u.family + '</p><h3 class="h3">' + u.name + '</h3><p class="muted">' + u.desc + '</p></article>';
@@ -496,6 +499,11 @@
       draw();
       root.addEventListener('click', function (e) {
         var t;
+        if ((t = e.target.closest('[data-da]'))) {   // essai de style des illustrations (test)
+          try { localStorage.setItem('atlas-da', t.getAttribute('data-da')); } catch (er) { /* ignore */ }
+          root.querySelectorAll('[data-da]').forEach(function (b) { b.classList.toggle('is-on', b === t); });
+          draw(); return;
+        }
         if ((t = e.target.closest('[data-status]'))) {
           var v = t.getAttribute('data-status'); cf.status = cf.status === v ? '' : v;   // retoucher la puce l’enlève
         } else if ((t = e.target.closest('[data-uni]'))) {

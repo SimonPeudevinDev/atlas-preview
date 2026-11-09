@@ -2038,3 +2038,8 @@ html[data-theme="dark"] .is-fixed-dark .eyebrow { color: var(--gold-2); }
 .empty .btn { display: block; margin: 14px auto 0; }
 @media (min-width: 901px) { .cf-bar .container { display: flex; align-items: center; gap: 16px; } .cf-search { flex: 0 0 340px; } .cf-chips { margin: 0; padding: 2px 0; flex: 1; } }
 .profile-menu .pm-val { margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--gold); }
+/* Essai de style des illustrations de collection (mode test) */
+.da-test { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; padding: 10px 12px; border: 1px dashed var(--gold); border-radius: 12px; background: var(--gold-tint); }
+.da-test span { width: 100%; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.da-test button { flex: 1; height: 34px; border: 1px solid var(--line-2); border-radius: 17px; background: var(--surface); font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; }
+.da-test button.is-on { background: var(--ink); border-color: var(--ink); color: var(--surface); }
