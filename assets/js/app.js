@@ -163,10 +163,14 @@
         '<a href="#/inventaire" role="menuitem">' + U.icon('cards') + 'Mon inventaire</a>' +
         '<button data-buy role="menuitem">' + U.icon('coin') + 'Acheter des Éclats</button>' +
         '<button data-sound-toggle role="menuitem">' + U.icon('sound') + 'Sons<span class="pm-switch' + (muted ? '' : ' is-on') + '"></span></button>' +
+        (A.store.UNLIMITED ? '<button data-da-toggle role="menuitem">' + U.icon('cards') + 'Style des collections<span class="pm-val">' + DA_NAMES[A.collStyle()] + '</span></button>' : '') +   // essai de directions artistiques (test)
         '<button data-theme-toggle role="menuitem">' + U.icon('moon') + 'Mode sombre<span class="pm-switch' + (app.theme() === 'dark' ? ' is-on' : '') + '"></span></button>' +
       '</nav>' +
       '<button class="pm-logout" data-logout role="menuitem">' + U.icon('logout') + 'Se déconnecter</button>';
   }
+  /* Style d’essai des illustrations de collection : aquarelle (défaut), objet de musée, linogravure */
+  var DA_NAMES = { '': 'Aquarelle', objet: 'Objet', lino: 'Linogravure' };
+  A.collStyle = function () { var v = ''; try { v = localStorage.getItem('atlas-da') || ''; } catch (e) { /* ignore */ } return DA_NAMES[v] ? v : ''; };
   /* Thème clair / sombre : choix enregistré ; sans choix, on suit le réglage du téléphone */
   app.theme = function () { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; };
   app.setTheme = function (t, save) {
@@ -196,6 +200,13 @@
     }
     if (e.target.closest('[data-logout]')) { app.logout(); return; }
     if (e.target.closest('[data-login]')) { app.login(); return; }
+    if (e.target.closest('[data-da-toggle]')) {
+      var order = ['', 'objet', 'lino'], cur = order.indexOf(A.collStyle()), nx = order[(cur + 1) % order.length];
+      try { localStorage.setItem('atlas-da', nx); } catch (er) { /* ignore */ }
+      e.target.closest('[data-da-toggle]').querySelector('.pm-val').textContent = DA_NAMES[nx];
+      if (app.rerender) app.rerender();
+      return;
+    }
     if (e.target.closest('[data-theme-toggle]')) {
       app.setTheme(app.theme() === 'dark' ? 'light' : 'dark');
       var tw = e.target.closest('[data-theme-toggle]').querySelector('.pm-switch');

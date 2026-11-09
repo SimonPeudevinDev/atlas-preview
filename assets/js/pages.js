@@ -11,13 +11,15 @@
   /* Illustration d’une collection : l’aquarelle peinte si elle existe (media/originals/collections/<id>),
      sinon l’aquarelle générée. o : options de l’aquarelle générée ; sizes : largeur affichée. */
   function collArt(c, o, sizes) {
-    var id = 'collections-' + c.id;
+    // Style d’essai choisi dans le menu (test) : « collections-grece--objet » si elle existe, sinon l’image normale
+    var id = 'collections-' + c.id, key = c.id, da = A.collStyle && A.collStyle();
+    if (da && A.media && A.media.has(id + '--' + da)) { id += '--' + da; key += '--' + da; }
     if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll"')
-      .replace(' style="', ' style="object-position:50% ' + (COLL_FOCUS[c.id] || 36) + '%;');
+      .replace(' style="', ' style="object-position:50% ' + (COLL_FOCUS[key] || 36) + '%;');
     return A.artImg(o);
   }
   // Hauteur du point d’intérêt de chaque aquarelle (en % de l’image), pour les cadrages très larges
-  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66 };
+  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66, 'grece--objet': 48, 'grece--lino': 50 };
   A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
