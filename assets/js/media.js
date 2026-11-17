@@ -35,6 +35,8 @@
     pack: '200px',                               // fenêtre du sachet
     avatar: '80px',
     duel: '72px',
+    versus: '(max-width: 700px) 170px, 290px',
+    fighter: '(max-width: 899px) 96px, 340px',    // carte d’un combattant dans l’arène (grande sur ordinateur)   // intro « VS » du combat (grandes cartes, nettes)
     mini: '120px'
   };
 

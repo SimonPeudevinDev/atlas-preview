@@ -131,7 +131,7 @@
         U.mark('pk-mark') + '<span class="pk-brand">ATLAS</span>' +
         '<p class="pk-copy">Ce sachet contient <b>' + p.size + ' cartes</b> à collectionner issues de : ' + names + '.</p>' +
         '<div class="pk-rars">' + rars + '</div>' +
-        '<p class="pk-copy is-small">Probabilités publiées et mises à jour en temps réel dans la boutique.' + (p.guarantee ? ' Une carte numérotée garantie.' : '') + '</p>' +
+        '<p class="pk-copy is-small">Probabilités publiées et mises à jour en temps réel.' + (p.guarantee ? ' Une carte numérotée garantie.' : '') + '</p>' +
         '<div class="pk-barcode"></div>' +
         '<p class="pk-legal">Prototype · Sans valeur marchande · Éclats non convertibles</p>' +
       '</div><div class="pf-pillow"></div>';

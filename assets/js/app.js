@@ -11,18 +11,21 @@
     [/^\/collections$/, P.collections, 'collections'],
     [/^\/collection\/([\w-]+)$/, P.collection, 'collections'],
     [/^\/saga\/([\w-]+)$/, P.saga, 'collections'],
-    [/^\/boutique$/, P.shop, 'shop'],
+    [/^\/boutique$/, P.home, 'home'],   // ancienne page Boosters : les sachets sont sur l’accueil (?open= reste valable)
     [/^\/inventaire$/, P.inventory, 'collections'],   // onglet « Mes cartes » de la page Collection
+    [/^\/combat$/, P.combat, 'combat'],
+    [/^\/combat-studio$/, P.combatLab, ''],   // outil de test : toutes les animations du combat
     [/^\/marketplace$/, P.market, 'market'],
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
+    [/^\/raretes$/, P.rarities, ''],
     [/^\/atelier$/, P.atelier, ''],
     [/^\/infos$/, P.infos, '']
   ];
   var NAV = [
     ['home', '#/', 'Accueil', 'home'],
-    ['collections', '#/collections', 'Collection', 'grid'],
-    ['shop', '#/boutique', 'Boosters', 'pack'],
+    ['collections', '#/inventaire', 'Collection', 'grid'],   // la Collection s’ouvre sur « Mes cartes »
+    ['combat', '#/combat', 'Combat', 'swords'],
     ['market', '#/marketplace', 'Marketplace', 'market']
   ];
 
@@ -39,9 +42,10 @@
     header.innerHTML = '<div class="container nav-inner">' +
       '<a class="logo" href="#/">' + U.mark() + '<span>ATLAS</span></a>' +
       '<nav class="nav-links">' + NAV.slice(1).map(function (n) { return '<a href="' + n[1] + '" data-nav="' + n[0] + '">' + n[2] + '</a>'; }).join('') + '</nav>' +
+      '<a class="btn btn-ghost btn-sm nav-login" href="#/connexion">Se connecter</a>' +   // visible seulement déconnecté
       '<div class="nav-right">' +
         // Booster du jour : libellé explicite, point doré quand il est disponible.
-        '<a class="daily-btn" href="#/boutique?open=daily" data-daily>' + U.icon('pack') + '<span>Booster du jour</span><i></i></a>' +
+        '<a class="daily-btn" href="#/?open=daily" data-daily>' + U.icon('pack') + '<span>Booster du jour</span><i></i></a>' +
         // Solde + achat dans un seul bloc lisible : « ◎ ∞ | + Acheter » (même ordre que les prix)
         '<div class="wallet-group"><a class="wallet" href="#/profil" title="Votre solde en Éclats" aria-label="Votre solde en Éclats">' + U.icon('coin', 'coin') + '<b data-wallet></b></a>' +
         '<button class="buy-coins" data-buy title="Acheter des Éclats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg><span>Acheter</span></button></div>' +
@@ -55,9 +59,9 @@
       '<div class="footer-brand"><a class="logo" href="#/">' + U.mark() + '<span>ATLAS</span></a>' +
         '<p>Musée numérique de cartes à collectionner. Les grandes figures de la culture, en œuvres numérotées.</p></div>' +
       '<div class="footer-cols">' +
-        '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/collections">Collections</a><a href="#/boutique">Boosters</a><a href="#/marketplace">Marketplace</a></div>' +
-        '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Mes cartes</a><a href="#/boutique?open=daily">Booster quotidien</a></div>' +
-        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
+        '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/">Boosters</a><a href="#/collections">Collections</a><a href="#/marketplace">Marketplace</a></div>' +
+        '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Mes cartes</a><a href="#/combat">Combat</a><a href="#/?open=daily" data-daily-open>Booster quotidien</a></div>' +
+        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><a href="#/raretes">Raretés des cartes</a><a href="#/combat-studio">Studio combat</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
       '</div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ATLAS · Édition I</span><em>Le monde, en cartes.</em></div>' +
     '</div>';
@@ -122,6 +126,15 @@
       } });
   };
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-buy]')) app.buyCoins(); });
+  // Booster du jour : disponible, il s’ouvre par-dessus la page en cours ;
+  // pas encore disponible, on va sur l’accueil, positionné sur le booster quotidien (avec son compte à rebours).
+  document.addEventListener('click', function (e) {
+    var d = e.target.closest && e.target.closest('[data-daily], [data-daily-open]');
+    if (!d || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    if (S.canOpen('daily').ok) A.opener.open('daily');
+    else location.hash = '#/?open=daily';
+  });
 
   app.refreshChrome = function () {
     var w = document.querySelector('[data-wallet]');
@@ -131,7 +144,7 @@
       var ready = S.dailyAvailable();
       d.classList.toggle('is-ready', ready);
       d.title = ready ? 'Votre booster gratuit du jour est disponible' : 'Prochain booster gratuit dans ' + U.duration(S.nextDailyIn());
-      d.setAttribute('href', ready ? '#/boutique?open=daily' : '#/boutique');
+      d.setAttribute('href', '#/?open=daily');
     }
     var av = document.querySelector('[data-avatar]');
     if (av) { av.innerHTML = U.avatarInner(); av.className = 'avatar' + U.avatarCls(); }
@@ -147,10 +160,11 @@
     U.closeModal();
     render(false);
   };
-  app.login = function () {
+  app.login = function (msg) {
     try { localStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
+    if (parse().path === '/connexion') history.replaceState(null, '', '#/');   // après la connexion, on arrive sur ses boosters
     render(false);
-    U.toast('Bon retour, ' + U.esc(S.get().user.name));
+    U.toast(msg || 'Bon retour, ' + U.esc(S.get().user.name));
   };
   function profileMenuHTML() {
     var u = S.get().user, items = S.items();
@@ -236,12 +250,16 @@
   function render(keepScroll) {
     var out = app.isOut();
     document.body.classList.toggle('is-out', out);
+    document.body.classList.remove('is-login', 'is-combat');
     if (out) {
-      var v = document.getElementById('view');
-      v.innerHTML = '<div class="page is-entering">' + (P.landingHTML ? P.landingHTML() : signedOutHTML()) + '</div>';
-      if (P.landingMount) P.landingMount(v.firstElementChild);
+      // Déconnecté : la page de présentation, ou la connexion / l’inscription (#/connexion?mode=inscription)
+      var v = document.getElementById('view'), r0 = parse(), login = r0.path === '/connexion' && P.loginHTML;
+      document.body.classList.toggle('is-login', !!login);
+      v.innerHTML = '<div class="page is-entering">' + (login ? P.loginHTML(r0.query.mode) : P.landingHTML ? P.landingHTML() : signedOutHTML()) + '</div>';
+      if (login) P.loginMount(v.firstElementChild, r0.query.mode);
+      else if (P.landingMount) P.landingMount(v.firstElementChild);
       current = null;
-      document.title = 'ATLAS — Déconnecté';
+      document.title = 'ATLAS — ' + (login ? (r0.query.mode === 'inscription' ? 'Inscription' : 'Connexion') : 'Le monde, en cartes');
       window.scrollTo(0, 0);
       return;
     }
@@ -263,6 +281,7 @@
     view.appendChild(root);
     if (page.mount) page.mount(root, ctx);
     current = page;
+    document.body.classList.toggle('is-combat', page === P.combat);   // page Combat : pas de pied de page, l’arène prend tout l’écran
     document.title = 'ATLAS — ' + page.title;
     document.querySelectorAll('[data-nav]').forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('data-nav') === match[2]); });
     window.scrollTo(0, keepScroll ? y : 0);

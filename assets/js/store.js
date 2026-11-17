@@ -167,6 +167,8 @@
     if (!state || state.v !== 1) fresh();
     state.claimed = state.claimed || {}; state.tokens = state.tokens || {}; state.titles = state.titles || [];
     if (!state.charge) state.charge = { n: S.CHARGE.max, at: Date.now() };   // réserve pleine pour les comptes existants
+    // 10 Boosters Atlas au plus : les Boosters Atlas offerts rejoignent la réserve (l’excédent est retiré)
+    if (state.tokens.standard) { state.charge.n = Math.min(S.CHARGE.max, state.charge.n + state.tokens.standard); if (state.charge.n >= S.CHARGE.max) state.charge.at = Date.now(); delete state.tokens.standard; }
     migrateMoved();
     state.trophies = state.trophies || {}; state.avatars = state.avatars || [];
     if (S.UNLOCK_ALL) unlockAll();
@@ -183,13 +185,13 @@
     if (n) save();
   }
   // Mode test : complète certaines éditions jusqu’à N exemplaires (pour éprouver l’interface).
-  S.TEST_COPIES = { 'grece-zeus-base': 50 };
+  S.TEST_COPIES = { 'grece-zeus-base': 50, 'grece-zeus-rare': 1, 'grece-zeus-epic': 1, 'grece-zeus-legendary': 1, 'grece-zeus-mythic': 1, 'grece-zeus-unique': 1 };
   function fillTestCopies() {
     var r = rng(A.hash('atlas-copies')), now = Date.now(), added = 0;
     Object.keys(S.TEST_COPIES).forEach(function (edId) {
       var ed = A.ED[edId]; if (!ed) return;
       for (var n = S.ownedOf(edId).length; n < S.TEST_COPIES[edId]; n++) {
-        var serial = ed.supply == null ? null : (remaining(ed) > 0 ? mintNew(ed) : null);
+        var serial = ed.supply == null ? null : (takeExistingSerial(ed, r) || (remaining(ed) > 0 ? mintNew(ed) : null));
         if (ed.supply != null && serial == null) break;
         state.inventory.push(makeItem(edId, serial, 'test', now - Math.floor(r() * 20 * DAY), 'Ajoutée (mode test)'));
         added++;
@@ -243,8 +245,10 @@
     return { owned: owned, total: chars.length, edOwned: edOwned, edTotal: eds.length, pct: chars.length ? owned / chars.length : 0 };
   };
   S.toggleFav = function (u) { var it = S.item(u); if (it) { it.fav = !it.fav; emit(); } return it; };
+  S.SHOWCASE_MAX = 5;   // la vitrine publique compte 5 emplacements
   S.toggleShow = function (u) {
     var it = S.item(u); if (!it) return it;
+    if (!it.show && state.inventory.filter(function (x) { return x.show; }).length >= S.SHOWCASE_MAX) return { full: true };
     it.show = !it.show;
     it.hist.unshift({ at: Date.now(), t: it.show ? 'Exposée en vitrine' : 'Retirée de la vitrine' });
     emit(); return it;
@@ -380,7 +384,7 @@
     var g = A.GROUP[key.slice(1)], pr = S.groupProgress(g.id), n = g.subs.length;
     var steps = [
       { id: 'explorateur', goal: n, of: 'started', label: 'Explorateur', reward: { eclats: 300 } },
-      { id: 'premiere', goal: 1, of: 'done', label: 'Première sous-collection', reward: { booster: 'standard' } },
+      { id: 'premiere', goal: 1, of: 'done', label: 'Première collection complète', reward: { booster: 'standard' } },
       { id: 'pantheon', goal: n, of: 'done', label: 'Panthéon complet', reward: { eclats: 3000, booster: 'conservateur', titre: g.title } }
     ];
     return steps.map(function (s) {
@@ -460,10 +464,13 @@
   S.claim = function (cid, stepId) {
     var s = S.rewards(cid).concat(cid.charAt(0) === '@' ? [] : S.missions(cid)).filter(function (x) { return x.id === stepId; })[0];
     if (!s || s.state !== 'ready') return { ok: false, error: 'Ce palier n’est pas encore atteint.' };
+    // Booster Atlas offert : il rejoint la réserve, plafonnée à 10 ; réserve pleine = la récompense attend
+    if (s.reward.booster === S.CHARGE.pack && S.charges().n >= S.CHARGE.max) return { ok: false, full: true, error: 'Réserve pleine : 10 Boosters Atlas au plus. Ouvrez-en un pour récupérer celui-ci.' };
     var r = s.reward, now = Date.now(), label = (s.kind ? 'Mission' : 'Récompense') + ' · ' + S.scopeName(cid) + ' · ' + s.label;
     state.claimed[cid + ':' + stepId] = now;
     if (r.eclats) { state.wallet.balance += r.eclats; state.ledger.unshift({ id: uid('tx'), at: now, type: 'reward', amount: r.eclats, label: label }); }
-    if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
+    if (r.booster === S.CHARGE.pack) { var cg = regen(); cg.n = Math.min(S.CHARGE.max, cg.n + 1); if (cg.n >= S.CHARGE.max) cg.at = now; }
+    else if (r.booster) state.tokens[r.booster] = (state.tokens[r.booster] || 0) + 1;
     if (r.titre && state.titles.indexOf(r.titre) === -1) state.titles.push(r.titre);
     // Personnage secret : numéroté dans l’ordre des collectionneurs qui l’ont révélé (fictif en démo)
     if (r.trophee && !state.trophies[cid]) state.trophies[cid] = { at: now, no: 3 + A.hash(cid + state.user.handle) % 57 };
@@ -479,6 +486,20 @@
     });
   };
   S.trophy = function (cid) { return state.trophies[cid] || null; };
+  /* Combat : palmarès et récompense de victoire */
+  S.COMBAT_REWARD = 30;
+  S.combat = function () { return state.combat || (state.combat = { w: 0, l: 0, d: 0, best: 0, streak: 0 }); };
+  S.recordCombat = function (res, dealt, rival, mode) {   // res : 'win' | 'loss' | 'draw'
+    if (['win', 'loss', 'draw'].indexOf(res) === -1) return 0;
+    mode = mode || 'duel';
+    var c = S.combat(), gain = res === 'win' ? S.COMBAT_REWARD : 0;
+    if (res === 'win') { c.w++; c.streak++; } else if (res === 'loss') { c.l++; c.streak = 0; } else c.d++;
+    if (mode === 'duel') c.best = Math.max(c.best, dealt || 0);
+    var label = { duel: 'Duel tactique', quiz: 'Quiz des légendes', terrains: 'Trois terrains' }[mode] || 'Combat';
+    if (gain) { state.wallet.balance += gain; state.ledger.unshift({ id: uid('tx'), at: Date.now(), type: 'reward', amount: gain, label: 'Victoire · ' + label + ' contre ' + rival }); }
+    emit();
+    return gain;
+  };
   S.avatars = function () { return state.avatars || []; };
   S.avatar = function () { return state.avatar && state.avatars.indexOf(state.avatar) !== -1 ? state.avatar : null; };
   S.setAvatar = function (cid) { state.avatar = cid && state.avatars.indexOf(cid) !== -1 ? cid : null; emit(); };

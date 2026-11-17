@@ -310,6 +310,109 @@
     noise({ type: 'highpass', f: 3000, f2: 9000, q: 0.7, dur: dur, gain: 0.02, a: dur * 0.95 });   // souffle de cymbale inversée
     for (var i = 0; i < 6; i++) tone({ f: 62, dur: 0.14, gain: 0.05 + i * 0.022, delay: dur * (0.25 + i * 0.12), a: 0.003 });   // battements de cœur qui accélèrent
   };
+  /* ---------- Combat (Duel tactique) ----------
+     Tous programmés avec un délai (horloge audio) pour tomber pile sur l’animation : choc à 0,76 s.
+     Souffles toujours brefs et filtrés ; le reste est tonal (partiels métalliques, notes qui montent). */
+  var DUEL = SFX.duel = {};
+  function metal(delay, f, gain, dur, partials) {
+    (partials || [[1, 1], [2.76, 0.5], [4.6, 0.32], [6.7, 0.2], [9.3, 0.1]]).forEach(function (p) {
+      tone({ type: 'sine', f: f * p[0] * (1 + (Math.random() - 0.5) * 0.008), dur: dur * (1.1 - p[0] / 12), gain: gain * p[1], a: 0.002, delay: delay, wet: 0.45 });
+    });
+  }
+  // La lame fend l’air : souffle qui monte puis retombe, puis « shing » d’acier
+  DUEL.swing = function (delay, heavy) {
+    var k = heavy ? 1.35 : 1;
+    noise({ f: 500, f2: 4200, q: 1.5, dur: 0.11, gain: 0.12 * k, a: 0.08, delay: delay });
+    noise({ f: 4200, f2: 900, q: 1.2, dur: 0.12, gain: 0.08 * k, a: 0.004, delay: delay + 0.11 });
+    metal(delay + 0.02, 2650, 0.018 * k, 0.4, [[1, 1], [1.48, 0.6], [2.21, 0.35]]);
+    if (heavy) tone({ type: 'triangle', f: 160, f2: 480, dur: 0.18, gain: 0.06, a: 0.12, delay: delay });
+  };
+  // Épée contre bouclier : « klang » d’acier qui résonne + coup sourd du bouclier qui encaisse
+  DUEL.clang = function (delay, heavy) {
+    var k = heavy ? 1.4 : 1;
+    noise({ type: 'highpass', f: 2600, q: 0.7, dur: 0.045, gain: 0.22 * k, delay: delay });
+    metal(delay, 440, 0.07 * k, 1.1);
+    metal(delay + 0.004, 1245, 0.03 * k, 0.7);
+    tone({ f: 150, f2: 62, dur: 0.32, gain: 0.24 * k, a: 0.002, delay: delay });
+    sparkle(delay + 0.03, heavy ? 7 : 4, 0.02, 0.025);
+  };
+  // Deux lames qui se croisent : double « shing » aigu + impact
+  DUEL.cross = function (delay, heavy) {
+    [0, 0.05].forEach(function (d, i) {
+      noise({ type: 'highpass', f: 3000, q: 0.7, dur: 0.04, gain: 0.16, delay: delay + d });
+      metal(delay + d, i ? 1960 : 1760, 0.035, 0.6, [[1, 1], [1.5, 0.5], [2.4, 0.3], [3.3, 0.15]]);
+    });
+    hit(delay, heavy ? 0.34 : 0.22);
+  };
+  // Coup qui porte : impact grave + claque (plus lourd avec une charge)
+  DUEL.strike = function (delay, heavy) {
+    hit(delay, heavy ? 0.46 : 0.3);
+    noise({ type: 'highpass', f: 1800, q: 0.7, dur: 0.06, gain: 0.14, delay: delay });
+    if (heavy) boom(delay, 0.3, 0.9);
+  };
+  // Le bouclier se lève : frottement bref + coup mat, petite résonance de métal
+  DUEL.shield = function (delay) {
+    noise({ f: 900, f2: 380, q: 0.9, dur: 0.13, gain: 0.06, a: 0.05, delay: delay });
+    tone({ f: 210, f2: 120, dur: 0.16, gain: 0.13, a: 0.003, delay: delay + 0.12 });
+    metal(delay + 0.12, 620, 0.012, 0.35, [[1, 1], [2.3, 0.4]]);
+  };
+  // Gardes et charges qui se frôlent : petit choc mat
+  DUEL.knock = function (delay) {
+    tone({ f: 240, f2: 150, dur: 0.14, gain: 0.14, delay: delay });
+    noise({ type: 'lowpass', f: 900, q: 0.7, dur: 0.06, gain: 0.08, delay: delay });
+  };
+  // Charge : l’énergie monte (deux notes qui grimpent, crépitements qui accélèrent), plus aiguë à chaque niveau
+  DUEL.power = function (delay, level, dur) {
+    level = Math.max(1, Math.min(level || 1, 8)); dur = dur || 0.62;
+    var base = 196 * Math.pow(1.1225, level - 1);
+    tone({ f: base, f2: base * 2, dur: dur, gain: 0.05, a: dur * 0.85, delay: delay, wet: 0.4 });
+    tone({ type: 'triangle', f: base * 1.5, f2: base * 3, dur: dur, gain: 0.022, a: dur * 0.9, delay: delay });
+    for (var i = 0; i < 8; i++) noise({ f: 2600 + Math.random() * 3200, q: 4, dur: 0.014, gain: 0.025 + i * 0.006, delay: delay + dur * (1 - Math.pow(0.8, i + 1)) * 1.2 });
+  };
+  // Fin de charge : éclat lumineux (accord bref + paillettes qui montent)
+  DUEL.burst = function (delay, level) {
+    level = Math.max(1, Math.min(level || 1, 8));
+    var base = 392 * Math.pow(1.1225, level - 1);
+    [1, 1.25, 1.5].forEach(function (m, i) { pluck(base * m * 2, delay + i * 0.03, 0.035, 0.35, (i - 1) * 0.5); });
+    sparkle(delay + 0.04, 5 + level, 0.022, 0.03, true);
+  };
+
+  // Intro « VS » : deux souffles (les camps entrent), puis le VS s’abat (coup grave + acier + éclat) à 0,55 s
+  DUEL.versus = function (delay) {
+    delay = delay || 0;
+    SFX.whoosh(1.1); noise({ f: 600, f2: 2600, q: 0.8, dur: 0.2, gain: 0.07, a: 0.08, delay: delay + 0.14 });
+    tone({ f: 110, f2: 220, dur: 0.45, gain: 0.04, a: 0.4, delay: delay + 0.1 });
+    boom(delay + 0.55, 0.42, 1.2);
+    metal(delay + 0.55, 330, 0.06, 1.3);
+    metal(delay + 0.56, 990, 0.025, 0.8);
+    noise({ type: 'highpass', f: 2400, q: 0.7, dur: 0.05, gain: 0.18, delay: delay + 0.55 });
+    sparkle(delay + 0.6, 6, 0.025, 0.025);
+  };
+  // Victoire : impact, arpège doré qui monte, grand accord brillant, paillettes
+  DUEL.victory = function (delay) {
+    delay = delay || 0;
+    hit(delay, 0.3);
+    arp([523.25, 659.25, 783.99, 1046.5, 1318.51], delay + 0.08, 0.07, 0.05, 0.35);
+    stab([261.63, 329.63, 392, 523.25, 659.25], delay + 0.45, 0.05, 2.2, 0.06, 6000);
+    brass([261.63, 392, 523.25], delay + 0.45, 0.03, 1.6);
+    sparkle(delay + 0.5, 18, 0.05, 0.03);
+  };
+  // Défaite : l’acier se brise (claque + éclats métalliques), puis trois notes graves qui descendent
+  DUEL.defeat = function (delay) {
+    delay = delay || 0;
+    noise({ type: 'highpass', f: 2200, q: 0.7, dur: 0.06, gain: 0.2, delay: delay + 0.5 });
+    metal(delay + 0.5, 720, 0.05, 0.7, [[1, 1], [2.3, 0.6], [3.9, 0.4], [5.6, 0.25]]);
+    [0.58, 0.66, 0.79].forEach(function (d, i) { metal(delay + d, 1800 + i * 500, 0.012, 0.25, [[1, 1], [1.7, 0.5]]); });
+    [[293.66, 1], [261.63, 1.35], [196, 1.75]].forEach(function (n) { tone({ type: 'triangle', f: n[0], dur: 0.9, gain: 0.06, a: 0.02, delay: delay + 0.9 + (n[1] - 1) * 0.9, wet: 0.5 }); });
+    tone({ f: 98, f2: 73.4, dur: 1.6, gain: 0.08, a: 0.05, delay: delay + 2.1, wet: 0.5 });
+  };
+  // Égalité : deux lames qui se touchent, accord suspendu
+  DUEL.draw = function (delay) {
+    delay = delay || 0;
+    DUEL.cross(delay + 0.3, false);
+    chord([392, 587.33], delay + 0.5, 0.03, 1.4, 0.05);
+  };
+
   /* Révélation selon la rareté :
      0 commune  : un « ding » discret
      1 rare     : deux notes qui montent

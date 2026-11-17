@@ -195,9 +195,11 @@
       '</div></article>';
   };
 
-  U.cardBack = function (theme) {
+  /* Dos de carte : thème du sachet ; label (nom du sachet, facultatif) inscrit en bas */
+  U.cardBack = function (theme, label) {
     return '<div class="card-back' + (theme ? ' t-' + theme : '') + '"><div class="cb-frame">' + U.mark('cb-mark') +
-      '<span class="cb-name">ATLAS</span><span class="cb-sub">Édition I</span></div></div>';
+      '<span class="cb-name">ATLAS</span><span class="cb-sub">Édition I</span>' +
+      (label ? '<span class="cb-coll">' + U.esc(label) + '</span>' : '') + '</div></div>';
   };
 
   U.editionDots = function (charId) {
@@ -220,7 +222,7 @@
     if (r.cadre) out.push('Cadre doré');
     return out.join(' + ');
   };
-  U.scopeHref = function (key) { return key.charAt(0) === '@' ? '#/saga/' + key.slice(1) : '#/collection/' + key; };
+  U.scopeHref = function (key) { return key.charAt(0) === '@' ? '#/collections?album=' + key.slice(1) : '#/collection/' + key; };
   U.rewardIcon = function (r, cls) { return U.icon(r.trophee ? 'key' : r.titre ? 'laurel' : r.booster ? 'pack' : r.cadre ? 'frame' : 'coin', cls); };
   // Récompense détaillée en pastilles (pictogramme + libellé)
   U.rewardChips = function (r) {
@@ -247,9 +249,11 @@
 
   /* Personnage secret de fin de collection : jamais en booster. Son illustration se révèle
      fragment par fragment (un fragment par personnage obtenu), il est remis quand la collection est complète. */
-  U.secretCard = function (cid) {
+  U.secretCard = function (cid, o) {
     var c = A.COLL[cid], sc = A.SECRET[cid], t = A.store.trophy(cid), n = c.chars.length;
     if (!sc) return '';
+    if (o && o.reveal && !t) t = { no: 7 };   // aperçu (page Raretés) : révélée sans avoir été gagnée
+    if (o && o.locked) t = null;
     // Illustration définitive (manifeste « secret-<collection> », sinon sc.image), sinon illustration provisoire générée
     var art = A.media && A.media.has('secret-' + cid) ? A.media.picture('secret-' + cid, { sizes: '(max-width: 600px) 80vw, 360px' })
       : sc.image ? '<img class="art" src="' + sc.image + '" alt="" loading="lazy" draggable="false">' : A.artImg({ seed: 'secret-' + cid, coll: cid, rarity: 'mythic', w: 600, h: 780 });
@@ -276,8 +280,10 @@
   };
   /* Duels héros contre monstre : les deux cartes réunies débloquent le récit de l’exploit */
   var DUEL_SETS = {
-    grecque: { head: 'Duels · héros contre monstres', intro: 'Réunissez un héros et son monstre pour débloquer le récit de leur affrontement.', k: 'Exploit', ok: 'débloqué', x: 'swords', unit: 'exploits' },
-    ragnarok: { head: 'Ragnarök · les combats de la fin du monde', intro: 'Réunissez les deux adversaires pour lire la prophétie de leur dernier combat.', k: 'Prophétie', ok: 'débloquée', x: 'flame', unit: 'prophéties' }
+    grecque: { head: 'Duels · héros contre monstres', title: 'Les grands exploits', k: 'Exploit', ok: 'débloqué', x: 'swords', unit: 'exploits',
+      a: 'le héros', b: 'son monstre', read: 'le récit de l’exploit' },
+    ragnarok: { head: 'Ragnarök · les combats de la fin du monde', title: 'Les combats du Ragnarök', k: 'Prophétie', ok: 'débloquée', x: 'flame', unit: 'prophéties',
+      a: 'le dieu', b: 'son adversaire', read: 'la prophétie de leur combat' }
   };
   // Jeux de duels qui concernent une collection (ou une collection globale, « @id »)
   U.duelSetsFor = function (key) {
@@ -287,6 +293,13 @@
     });
     return out;
   };
+  /* En-tête de section des pages d’album : surtitre, grand titre, compteur avec barre (Récompenses, Collections, Duels) */
+  U.secHead = function (eyebrow, title, n, total, label) {
+    return '<div class="du-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="du-h">' + title + '</h2></div>' +
+      (total == null ? '' : '<div class="du-meter"><span><b>' + n + '</b> / ' + total + ' ' + label + '</span><i style="--p:' + (total ? Math.round(n / total * 100) : 0) + '%"></i></div>') + '</div>';   // sans total : titre seul
+  };
+  /* Duels : chaque exploit réunit deux cartes. Mode d’emploi en trois étapes, puis une carte par exploit :
+     les deux adversaires face à face, l’état (0, 1 ou 2 cartes sur 2) et, s’il en manque, où les trouver. */
   U.duelsHTML = function (set) {
     set = set || 'grecque';
     var T = DUEL_SETS[set] || DUEL_SETS.grecque;
@@ -294,20 +307,26 @@
     function side(id, own) {
       var ch = A.CHAR[id], best = A.store.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
       return '<button type="button" class="du-side' + (own ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' + (best ? ' data-bio-uid="' + best.uid + '"' : '') + '>' +
-        '<span class="du-pic">' + A.editionArt(ed, { w: 160, h: 160, ctx: 'duel' }) + '</span><span class="du-name">' + U.esc(ch.name) + '</span>' +
-        '<span class="du-own">' + (own ? 'À vous' : 'Manquant') + '</span></button>';
+        '<span class="du-pic">' + A.editionArt(ed, { w: 240, h: 240, ctx: 'duel' }) + '<i class="du-tag">' + (own ? U.icon('check') + 'À vous' : 'Manquant') + '</i></span>' +
+        '<span class="du-name">' + U.esc(ch.name) + '</span></button>';
     }
-    return '<div class="du"><div class="rw-head"><p class="eyebrow">' + T.head + '</p><span class="rw-count">' + done + ' / ' + list.length + ' ' + T.unit + '</span></div>' +
-      '<p class="du-intro muted small">' + T.intro + '</p>' +
+    return '<div class="du">' +
+      U.secHead(T.head, T.title, done, list.length, T.unit + ' ' + (T.ok === 'débloquée' ? 'débloquées' : 'débloqués')) +
+      '<ol class="du-how">' +
+        '<li><span>1</span>Obtenez ' + T.a + '</li>' +
+        '<li><span>2</span>Obtenez ' + T.b + '</li>' +
+        '<li><span>3</span>' + T.read.charAt(0).toUpperCase() + T.read.slice(1) + ' se débloque ici</li>' +
+      '</ol>' +
       '<div class="du-list">' + list.map(function (d, i) {
-        return '<article class="du-item' + (d.done ? ' is-done' : '') + '">' +
+        var n = (d.heroOwned ? 1 : 0) + (d.monsterOwned ? 1 : 0);
+        return '<article class="du-item ' + (d.done ? 'is-done' : n ? 'is-half' : 'is-none') + '">' +
           '<div class="du-vs">' + side(d.hero, d.heroOwned) + '<span class="du-x" aria-hidden="true">' + U.icon(T.x) + '</span>' + side(d.monster, d.monsterOwned) + '</div>' +
-          '<p class="du-k">' + T.k + ' ' + (i < 9 ? '0' : '') + (i + 1) + (d.done ? ' · ' + T.ok : '') + '</p>' +
+          '<div class="du-body"><p class="du-k">' + T.k + ' ' + (i < 9 ? '0' : '') + (i + 1) + '<span>' + (d.done ? T.ok : n + ' / 2 cartes') + '</span></p>' +
           '<h3 class="du-title">' + U.esc(d.title) + '</h3>' +
-          (d.done ? '<p class="du-text">' + U.esc(d.text) + '</p>'
-            : '<p class="du-lock">' + U.icon('lock') + 'Il vous manque ' + U.esc([!d.heroOwned && A.CHAR[d.hero].name, !d.monsterOwned && A.CHAR[d.monster].name].filter(Boolean).join(' et ')) + '.</p>') +
-        '</article>';
-      }).join('') + '</div></div>';
+          (d.done ? '<p class="du-text">' + U.esc(d.text) + '</p>' : '') +
+          '</div></article>';
+      }).join('') + '</div>' +
+      '<p class="du-note">' + U.icon('pack') + 'Les cartes s’obtiennent dans les boosters ou sur la marketplace.</p></div>';
   };
   // Fiche du personnage secret (une fois révélé)
   U.openSecret = function (cid) {
@@ -345,30 +364,98 @@
     if (r.cadre) out.push(U.icon('frame') + 'Cadre');
     return '<span class="rw-short">' + out.map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</span>';
   }
+  /* Paliers d’une collection (ou d’une collection globale « @id ») : une carte par palier, côte à côte.
+     Chaque carte dit ce qu’il faut faire, où l’on en est (barre) et ce qu’on gagne ; « Récupérer » quand c’est prêt. */
   U.rewardTrack = function (cid, bare) {
     var steps = A.store.rewards(cid), got = steps.filter(function (s) { return s.state === 'claimed'; }).length;
-    var sel = steps.findIndex(function (s) { return s.state === 'ready'; });
-    if (sel < 0) sel = steps.findIndex(function (s) { return s.state === 'locked'; });
-    if (sel < 0) sel = steps.length - 1;
-    var reached = -1;
-    steps.forEach(function (s, i) { if (s.state !== 'locked') reached = i; });
-    var fill = steps.length > 1 ? Math.max(0, reached) / (steps.length - 1) * 100 : 0;
-    return '<div class="rw">' + (bare ? '' : '<div class="rw-head"><p class="eyebrow">' + (cid.charAt(0) === '@' ? 'Récompenses de la collection globale' : 'Récompenses') + '</p>' +
-      '<span class="rw-count">' + got + ' / ' + steps.length + '</span></div>') +
-      '<div class="rw-strip" style="--fill:' + fill.toFixed(2) + '">' + steps.map(function (s, i) {
-        return '<button type="button" class="rw-dot is-' + s.state + (i === sel ? ' is-sel' : '') + '" data-rw="' + i + '" aria-label="Palier ' + (i + 1) + ' : ' + s.label + '">' +
-          '<span class="rw-medal">' + U.rewardIcon(s.reward) + (s.state === 'claimed' ? '<i class="rw-tick">' + U.icon('check') + '</i>' : '') + '</span>' +
-          '<span class="rw-goal">' + s.goal + (s.of === 'eds' ? ' éd.' : '') + '</span></button>';
-      }).join('') + '</div>' +
-      steps.map(function (s, i) {
-        var u = UNITS[s.of], left = s.goal - s.have;
-        var action = s.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + s.id + '">Récupérer</button>'
-          : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Récupérée</span>'
-          : '<span class="rw-left">encore ' + left + ' ' + u[left > 1 ? 1 : 0] + '</span>';
-        return '<div class="rw-detail' + (i === sel ? ' is-sel' : '') + '" data-rw-d="' + i + '"><div class="rw-dl"><p class="rw-label">' + s.label + '</p>' +
-          '<p class="rw-gift">' + U.esc(U.rewardText(s.reward)) + '</p></div>' + action + '</div>';
-      }).join('') + '</div>';
+    var next = steps.findIndex(function (s) { return s.state !== 'claimed'; });
+    return '<div class="rw">' + (bare ? '' : U.secHead(cid.charAt(0) === '@' ? 'Récompenses de l’album' : 'Récompenses', 'Les paliers à franchir', got, steps.length, 'obtenues')) +
+      '<ol class="rw-cards">' + steps.map(function (s, i) {
+        var u = UNITS[s.of], have = Math.min(s.have, s.goal), left = s.goal - s.have;
+        var end = s.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + s.id + '">' + U.icon('gift') + 'Récupérer</button>'
+          : s.state === 'claimed' ? '<span class="rw-done">' + U.icon('check') + 'Obtenue</span>'
+          : '<span class="rw-left">Encore ' + left + ' ' + u[left > 1 ? 1 : 0] + '</span>';
+        return '<li class="rw-card is-' + s.state + (i === next ? ' is-next' : '') + '">' +
+          '<div class="rw-top"><span class="rw-medal">' + U.rewardIcon(s.reward) + '</span><span class="rw-step">Palier ' + (i + 1) + '</span></div>' +
+          '<p class="rw-label">' + U.esc(s.label) + '</p>' +
+          '<p class="rw-gift">' + U.esc(U.rewardText(s.reward)) + '</p>' +
+          '<div class="rw-prog"><i style="--p:' + Math.round(have / Math.max(1, s.goal) * 100) + '%"></i><span>' + have + ' / ' + s.goal + ' ' + u[s.goal > 1 ? 1 : 0] + '</span></div>' +
+          '<div class="rw-end">' + end + '</div></li>';
+      }).join('') + '</ol></div>';
   };
+
+  /* Paliers et missions, présentés comme dans les jeux de cartes (Pokémon TCG Pocket, Game Center…) :
+     une liste compacte des objectifs en cours (à récupérer d’abord, puis les plus avancés).
+     Chaque ligne : icône, objectif, barre x / y, récompense, puis « Récupérer » quand c’est prêt.
+     Périmètre : une collection (« olympe »), un album (« @grecque » + ses collections) ou tout (null). */
+  // album : pour une collection, ajoute aussi les paliers de son album (panneau Missions)
+  U.questScope = function (key, album) {
+    var keys = !key ? A.COLLECTIONS.map(function (c) { return c.id; }).concat((A.GROUPS || []).map(function (g) { return '@' + g.id; }))
+      : key.charAt(0) === '@' ? [key].concat(A.GROUP[key.slice(1)].subs) : [key].concat(album && A.COLL[key].group ? ['@' + A.COLL[key].group] : []);
+    var out = [];
+    keys.forEach(function (k) {
+      S.rewards(k).concat(k.charAt(0) === '@' ? [] : S.missions(k)).forEach(function (s) { s.cid = k; out.push(s); });
+    });
+    return out;
+  };
+  function questRow(s, key) {
+    var u = s.of ? UNITS[s.of] : s.kind === 'set' ? ['personnage', 'personnages'] : null;
+    var desc = s.kind ? s.desc : (s.of === 'eds' ? 'Obtenir ' : 'Réunir ') + s.goal + ' ' + u[s.goal > 1 ? 1 : 0] + (s.cid.charAt(0) === '@' ? ' dans l’album' : ' de la collection');
+    var have = Math.min(s.have, s.goal), left = s.goal - have;
+    var end = s.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-qs-claim="' + s.id + '" data-cid="' + s.cid + '">Récupérer</button>'
+      : s.state === 'claimed' ? '<span class="qs-ok">' + U.icon('check') + 'Obtenue</span>'
+      : '<span class="qs-left">' + (u ? 'Encore ' + left + ' ' + u[left > 1 ? 1 : 0] : have + ' / ' + s.goal) + '</span>';
+    // Plusieurs collections : le nom de la collection (ou de l’album) mène à sa page
+    var where = s.cid !== key ? '<a class="qs-where" href="' + U.scopeHref(s.cid) + '">' + (s.cid.charAt(0) === '@' ? 'Album · ' : '') + U.esc(S.scopeName(s.cid)) + '</a>' : '';
+    return '<li class="qs-row is-' + s.state + '" title="' + U.esc(desc) + '">' +
+      '<span class="qs-ico">' + U.rewardIcon(s.reward) + '</span>' +
+      '<div class="qs-main"><p class="qs-title">' + U.esc(s.label) + '<span class="qs-kind">' + (s.kind ? 'Mission' : 'Palier') + '</span></p>' +
+        '<p class="qs-desc">' + (where ? where + '<span class="qs-sep"> · </span>' : '') + U.esc(desc) + '</p>' +
+        (s.state !== 'claimed' ? '<div class="qs-prog"><i style="--p:' + Math.round(have / Math.max(1, s.goal) * 100) + '%"></i><span>' + have + ' / ' + s.goal + '</span></div>' : '') + '</div>' +
+      '<div class="qs-gift" title="' + U.esc(U.rewardText(s.reward)) + '">' + rewardShort(s.reward) + '</div>' +
+      '<div class="qs-end">' + end + '</div></li>';
+  }
+  U.questList = function (key) {
+    var all = U.questScope(key, true);
+    var todo = all.filter(function (s) { return s.state !== 'claimed'; }).sort(function (a, b) {
+      return (a.state === 'ready' ? 0 : 1) - (b.state === 'ready' ? 0 : 1) || b.have / b.goal - a.have / a.goal;
+    });
+    var ready = todo.filter(function (s) { return s.state === 'ready'; }).length;
+    // Toutes les collections : les objectifs prêts, puis les 15 plus avancés (les collections non commencées restent hors liste)
+    var shown = key ? todo : todo.filter(function (s, i) { return s.state === 'ready' || (s.have > 0 && i < ready + 15); });
+    // Seules les missions en cours : les objectifs déjà obtenus n’apportent rien ici
+    return '<div class="qs">' +
+      (ready > 1 ? '<div class="qs-bar"><button type="button" class="btn btn-gold btn-sm" data-qs-claim-all="' + (key || '') + '">' + U.icon('gift') + 'Tout récupérer (' + ready + ')</button></div>' : '') +
+      '<ul class="qs-list">' + (shown.length ? shown.map(function (s) { return questRow(s, key); }).join('')
+        : '<li class="qs-empty">' + (all.length && !todo.length ? 'Tous les objectifs sont atteints.' : 'Ouvrez des boosters pour lancer vos premiers objectifs.') + '</li>') + '</ul></div>';
+  };
+  // Bandeau compact sur la page d’une collection : l’essentiel, et le panneau des missions pour le détail
+  U.questStrip = function (key) {
+    var all = U.questScope(key), done = all.filter(function (s) { return s.state === 'claimed'; }).length;
+    var ready = all.filter(function (s) { return s.state === 'ready'; }).length;
+    var next = all.filter(function (s) { return s.state === 'locked'; }).sort(function (a, b) { return b.have / b.goal - a.have / a.goal; })[0];
+    var u = next && (next.of ? UNITS[next.of] : next.kind === 'set' ? ['personnage', 'personnages'] : null), left = next ? next.goal - next.have : 0;
+    return '<div class="qs-strip"><span class="qs-strip-ico">' + U.icon('scroll') + '</span><div class="qs-strip-txt">' +
+      '<p><b>Paliers et missions</b> · ' + done + ' / ' + all.length + ' obtenues' + (ready ? ' · <em>' + ready + ' à récupérer</em>' : '') + '</p>' +
+      (next ? '<small>Prochain : ' + U.esc(next.label) + (u ? ' · encore ' + left + ' ' + u[left > 1 ? 1 : 0] : '') + '</small>' : '<small>Tous les objectifs sont atteints.</small>') + '</div>' +
+      '<button type="button" class="btn ' + (ready ? 'btn-gold' : 'btn-ghost') + ' btn-sm" data-qs-open>' + (ready ? U.icon('gift') + 'Récupérer' : 'Voir les missions') + '</button></div>';
+  };
+  function claimToast(cid, res) { U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · dans vos boosters' : '')); }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-qs-claim], [data-qs-claim-all]');
+    if (!t) return;
+    if (t.hasAttribute('data-qs-claim')) {
+      var cid = t.getAttribute('data-cid'), res = S.claim(cid, t.getAttribute('data-qs-claim'));
+      if (!res.ok) U.toast(res.error, 'error'); else claimToast(cid, res);
+      return;
+    }
+    if (t.hasAttribute('data-qs-claim-all')) {
+      var n = 0;
+      U.questScope(t.getAttribute('data-qs-claim-all') || null).forEach(function (s) { if (s.state === 'ready' && S.claim(s.cid, s.id).ok) n++; });
+      if (n) U.toast(n + ' récompense' + (n > 1 ? 's' : '') + ' récupérée' + (n > 1 ? 's' : ''));
+      return;
+    }
+  });
 
   // Missions d’une collection : une ligne par mission (personnages à réunir, ou chasse)
   U.missionsHTML = function (cid, bare) {
@@ -393,39 +480,108 @@
           '<div class="ms-end">' + end + '</div></li>';
       }).join('') + '</ul></div>';
   };
-  /* Objectifs d’une collection : un seul bloc, deux onglets (Paliers | Missions).
-     Il s’ouvre sur l’onglet où une récompense attend (sinon Paliers) ; un point doré signale
-     une récompense à récupérer dans l’autre onglet. Le choix du joueur est gardé pendant la visite. */
-  var OBJTAB = {};
-  U.objectives = function (cid) {
-    var steps = A.store.rewards(cid), ms = A.store.missions(cid);
-    var cnt = function (l, st) { return l.filter(function (x) { return x.state === st; }).length; };
-    var tab = OBJTAB[cid] || (!cnt(steps, 'ready') && cnt(ms, 'ready') ? 'ms' : 'rw');
-    if (!ms.length) tab = 'rw';
-    var btn = function (id, label, l) {
-      return '<button type="button" role="tab" class="obj-tab' + (tab === id ? ' is-on' : '') + '" data-obj-tab="' + id + '" aria-selected="' + (tab === id) + '">' + label +
-        '<span class="obj-n">' + cnt(l, 'claimed') + '/' + l.length + '</span>' + (cnt(l, 'ready') ? '<i class="obj-dot" aria-label="Récompense à récupérer"></i>' : '') + '</button>';
+  /* Les totaux des personnages et des éditions restent distincts. */
+  U.collectionStats = function (cid) {
+    var pr = S.collectionProgress(cid);
+    var line = function (names, have, total, icon, feminine) {
+      var complete = total > 0 && have >= total;
+      return '<li>' + U.icon(icon) + '<span class="coll-summary-text"><b>' + have + '</b> ' + names[have > 1 ? 1 : 0] +
+        (complete ? ' réuni' + (feminine ? 'e' : '') + (have > 1 ? 's' : '') : ' sur <b>' + total + '</b>') + '</span>' +
+        (complete ? '<span class="coll-summary-status">' + U.icon('check') + 'Complet</span>' : '') +
+        '<progress class="coll-meter" value="' + have + '" max="' + (total || 1) + '" aria-label="Progression des ' + names[1] + '"></progress></li>';
     };
-    return '<div class="obj" data-obj="' + cid + '"><div class="obj-tabs" role="tablist">' + btn('rw', 'Paliers', steps) + (ms.length ? btn('ms', 'Missions', ms) : '') + '</div>' +
-      '<div class="obj-pane" data-pane="rw"' + (tab === 'rw' ? '' : ' hidden') + '>' + U.rewardTrack(cid, true) + '</div>' +
-      (ms.length ? '<div class="obj-pane" data-pane="ms"' + (tab === 'ms' ? '' : ' hidden') + '>' + U.missionsHTML(cid, true) + '</div>' : '') + '</div>';
+    var left = pr.edTotal - pr.edOwned;
+    return '<p class="coll-summary-label">Votre album</p><ul class="coll-summary-list" aria-label="Contenu de votre album">' +
+      line(['personnage', 'personnages'], pr.owned, pr.total, 'user') + line(['édition', 'éditions'], pr.edOwned, pr.edTotal, 'cards', true) + '</ul>' +
+      (left ? '<button type="button" class="coll-missing-link" data-show-missing>Voir ' + (left > 1 ? 'les ' + left + ' éditions manquantes' : 'l’édition manquante') + U.icon('arrow') + '</button>'
+        : '');
   };
+
+  /* Chiffres clés d’une collection : tableau à filets (comme l’onglet Albums), puis le lien vers les éditions manquantes */
+  U.collectionFigures = function (cid) {
+    var pr = S.collectionProgress(cid), left = pr.edTotal - pr.edOwned;
+    var all = S.rewards(cid).concat(S.missions(cid)), got = all.filter(function (s) { return s.state === 'claimed'; }).length;
+    return '<div class="kpis">' +
+      '<div><span>Personnages</span><b>' + pr.owned + '<small> / ' + pr.total + '</small></b></div>' +
+      '<div><span>Éditions</span><b>' + pr.edOwned + '<small> / ' + pr.edTotal + '</small></b></div>' +
+      '<div><span>Progression</span><b>' + Math.round(pr.pct * 100) + '<small> %</small></b></div>' +
+      '<div><span>Récompenses obtenues</span><b>' + got + '<small> / ' + all.length + '</small></b></div></div>' +
+      (left ? '<button type="button" class="coll-missing-link" data-show-missing>Voir ' + (left > 1 ? 'les ' + left + ' éditions manquantes' : 'l’édition manquante') + U.icon('arrow') + '</button>' : '');
+  };
+
+  /* Objectifs dépliables : le résumé reste compact, les récompenses restent explicites.
+     L’ouverture est conservée lors de la récupération d’une récompense. */
+  var OBJOPEN = {}, OBJANIM = new WeakMap();
+  function objectiveRow(s) {
+    var mission = !!s.kind, unit = s.of ? UNITS[s.of] : s.kind === 'set' ? ['personnage', 'personnages'] : null;
+    var faces = mission && s.kind === 'set' ? '<div class="coll-objective-faces">' + s.chars.map(function (id) {
+      var best = S.bestOwned(id), ed = A.ED[best ? best.ed : id + '-base'];
+      return '<button type="button" class="ms-face' + (s.owned.indexOf(id) !== -1 ? ' is-own' : '') + '" data-bio-open="' + ed.id + '"' +
+        (best ? ' data-bio-uid="' + best.uid + '"' : '') + ' title="' + U.esc(A.CHAR[id].name) + '" aria-label="Consulter ' + U.esc(A.CHAR[id].name) + '">' +
+        A.editionArt(ed, { w: 60, h: 60, ctx: 'duel' }) + '</button>';
+    }).join('') + '</div>' : '';
+    return '<li class="coll-objective-row is-' + s.state + '"><div class="coll-objective-identity">' +
+      '<span class="coll-objective-icon">' + U.rewardIcon(s.reward) + '</span><div><p class="coll-objective-kind">' + (mission ? 'Mission' : 'Palier de collection') + '</p>' +
+      '<h3>' + U.esc(s.label) + '</h3>' + (mission ? '<p class="coll-objective-desc">' + U.esc(s.desc) + '</p>' : '') + faces + '</div></div>' +
+      '<div class="coll-objective-progress"><span>' + s.have + ' / ' + s.goal + (unit ? ' ' + unit[s.goal > 1 ? 1 : 0] : '') + '</span>' +
+        '<progress class="coll-meter" value="' + s.have + '" max="' + s.goal + '" aria-label="Progression de ' + U.esc(s.label) + '"></progress></div>' +
+      '<div class="coll-objective-end"><div class="coll-objective-reward"><span>À gagner</span>' + U.rewardChips(s.reward) + '</div>' +
+      (s.state === 'ready' ? '<button type="button" class="btn btn-gold btn-sm" data-claim="' + s.id + '" aria-label="Récupérer la récompense : ' + U.esc(s.label) + '">Récupérer</button>' : '') + '</div></li>';
+  }
+  U.objectives = function (cid) {
+    var current = document.querySelector('[data-obj="' + cid + '"]');
+    if (current) OBJOPEN[cid] = current.open;
+    var steps = A.store.rewards(cid), ms = A.store.missions(cid);
+    var all = steps.concat(ms), ready = all.filter(function (s) { return s.state === 'ready'; }).length;
+    var claimed = all.filter(function (s) { return s.state === 'claimed'; });
+    var next = steps.filter(function (s) { return s.state === 'locked'; })[0];
+    var sub = next ? 'Prochain palier : ' + next.label + ' · Encore ' + (next.goal - next.have) + ' ' + UNITS[next.of][next.goal - next.have > 1 ? 1 : 0]
+      : claimed.length === all.length ? 'Toutes les récompenses ont été récupérées' : 'Vos récompenses vous attendent';
+    var locked = all.filter(function (s) { return s.state === 'locked'; }).length;
+    var openSub = (locked ? locked + ' en cours' : 'Tous les objectifs sont atteints') + (claimed.length ? ' · ' + claimed.length + (claimed.length > 1 ? ' accomplis' : ' accompli') : '');
+    var pending = all.filter(function (s) { return s.state !== 'claimed'; }).sort(function (a, b) {
+      return (a.state === 'ready' ? 0 : 1) - (b.state === 'ready' ? 0 : 1);
+    });
+    return '<details class="coll-objectives' + (ready ? ' has-rewards' : '') + '" data-obj="' + cid + '"' + (OBJOPEN[cid] ? ' open' : '') + '><summary>' +
+      '<span class="coll-objectives-heading"><strong>Objectifs de l’album</strong><span class="coll-objectives-sub when-closed">' + U.esc(sub) + '</span><span class="coll-objectives-sub when-open">' + U.esc(openSub) + '</span></span>' +
+      '<span class="coll-objectives-end">' + (ready ? '<span class="coll-reward-badge">' + U.icon('gift') + ready + (ready > 1 ? ' récompenses à récupérer' : ' récompense à récupérer') + '</span>' : '') +
+        '<span class="coll-objectives-toggle"><span class="when-closed">Détails</span><span class="when-open">Masquer</span>' + U.icon('chevR') + '</span></span></summary>' +
+      '<div class="coll-objectives-body"><section class="coll-objectives-active" aria-label="Objectifs restants"><h3 class="coll-objectives-column-title">Objectifs restants <span>' + pending.length + ' / ' + all.length + '</span></h3>' +
+      (pending.length ? '<ul class="coll-objective-list">' + pending.map(objectiveRow).join('') + '</ul>' : '<p class="coll-objectives-empty">Tous les objectifs de cet album sont accomplis.</p>') + '</section>' +
+      '<section class="coll-objectives-done" data-obj-done="' + cid + '" aria-label="Objectifs accomplis"><h3 class="coll-objectives-column-title">Objectifs accomplis <span>' + claimed.length + ' / ' + all.length + '</span></h3>' +
+      (claimed.length ? '<ul>' + claimed.map(function (s) {
+        return '<li>' + U.icon('check') + '<span><strong>' + U.esc(s.label) + '</strong><span class="coll-achievement-reward" role="group" aria-label="' + U.esc(U.rewardText(s.reward)) + '" title="' + U.esc(U.rewardText(s.reward)) + '">' + rewardShort(s.reward) + '</span></span></li>';
+      }).join('') + '</ul>' : '<p class="coll-objectives-empty">Vos objectifs accomplis apparaîtront ici.</p>') + '</section></div></details>';
+  };
+  // Garder le comportement natif du résumé, y compris au clavier, et animer seulement l’ouverture.
   document.addEventListener('click', function (e) {
-    var t = e.target.closest && e.target.closest('[data-obj-tab]');
-    if (!t) return;
-    var o = t.closest('.obj'), id = t.getAttribute('data-obj-tab');
-    OBJTAB[o.getAttribute('data-obj')] = id;
-    o.querySelectorAll('.obj-tab').forEach(function (b) { var on = b === t; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
-    o.querySelectorAll('.obj-pane').forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== id; });
+    var summary = e.target.closest && e.target.closest('.coll-objectives > summary');
+    if (!summary || e.defaultPrevented) return;
+    var el = summary.parentElement, body = el.querySelector('.coll-objectives-body');
+    if (el.open || !body.animate || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    e.preventDefault();
+    var previous = OBJANIM.get(el);
+    if (previous) previous.cancel();
+    el.open = true;
+    var height = body.getBoundingClientRect().height;
+    el.classList.add('is-opening');
+    var animation = body.animate([{ height: '0px', opacity: 0 }, { height: height + 'px', opacity: 1 }], {
+      duration: 320, easing: 'cubic-bezier(.22, 1, .36, 1)'
+    });
+    OBJANIM.set(el, animation);
+    animation.onfinish = animation.oncancel = function () {
+      if (OBJANIM.get(el) !== animation) return;
+      el.classList.remove('is-opening');
+      OBJANIM.delete(el);
+    };
   });
-  // Choix du palier affiché
-  document.addEventListener('click', function (e) {
-    var d = e.target.closest && e.target.closest('[data-rw]');
-    if (!d) return;
-    var rw = d.closest('.rw'), i = d.getAttribute('data-rw');
-    rw.querySelectorAll('.rw-dot').forEach(function (x) { x.classList.toggle('is-sel', x === d); });
-    rw.querySelectorAll('.rw-detail').forEach(function (x) { x.classList.toggle('is-sel', x.getAttribute('data-rw-d') === i); });
-  });
+  document.addEventListener('toggle', function (e) {
+    var el = e.target;
+    if (!el.matches('[data-obj]')) return;
+    OBJOPEN[el.getAttribute('data-obj')] = el.open;
+    var animation = OBJANIM.get(el);
+    if (!el.open && animation) animation.cancel();
+  }, true);
 
   U.progress = function (p, label) {
     return '<div class="progress"><span style="width:' + Math.round(p * 100) + '%"></span></div>' + (label ? '<p class="progress-label">' + label + '</p>' : '');
@@ -939,7 +1095,7 @@
             }
             if (act === 'zoom') { var it = cur.uid && S.item(cur.uid); U.viewCard(cur.ed, it ? it.serial : null); return; }
             if (act === 'fav') { S.toggleFav(cur.uid); draw(); }
-            if (act === 'show') { S.toggleShow(cur.uid); draw(); }
+            if (act === 'show') { var sh = S.toggleShow(cur.uid); if (sh && sh.full) { U.toast('Vitrine pleine : retirez d’abord une des ' + S.SHOWCASE_MAX + ' cartes exposées', 'error'); return; } draw(); }
             if (act === 'sell') { el.querySelector('.sell-form').hidden = false; t.parentNode.hidden = true; el.querySelector('[data-price]').focus(); }
             if (act === 'sell-cancel') draw();
             if (act === 'sell-ok') {
@@ -994,4 +1150,102 @@
     }, { passive: true });
     document.addEventListener('pointerleave', function () { reset(active); active = null; });
   };
+
+  /* ---------- Menus déroulants aux couleurs d’ATLAS ----------
+     Tout <select> placé dans un .select ouvre ce menu au lieu de la liste du système (illisible en mode sombre).
+     Le <select> natif garde la valeur et émet toujours « change » : les pages n’ont rien à changer. */
+  var dd = null;
+  function ddClose(refocus) {
+    if (!dd) return;
+    var cur = dd; dd = null;
+    cur.menu.remove();
+    cur.wrap.classList.remove('is-open');
+    cur.sel.setAttribute('aria-expanded', 'false');
+    if (refocus) cur.sel.focus({ preventScroll: true });
+  }
+  function ddOpt(o) {
+    return '<button type="button" role="option" class="dd-opt' + (o.selected ? ' is-on' : '') + '" aria-selected="' + o.selected + '" data-dd-i="' + o.index + '"' + (o.disabled ? ' disabled' : '') + '>' +
+      '<span>' + U.esc(o.text) + '</span>' + (o.selected ? U.icon('check') : '') + '</button>';
+  }
+  function ddOpen(wrap, kb) {
+    var sel = wrap.querySelector('select');
+    if (!sel || sel.disabled) return;
+    ddClose();
+    var menu = document.createElement('div');
+    menu.className = 'dd-menu';
+    menu.setAttribute('role', 'listbox');
+    if (sel.getAttribute('aria-label')) menu.setAttribute('aria-label', sel.getAttribute('aria-label'));
+    menu.innerHTML = Array.prototype.map.call(sel.children, function (n) {
+      if (n.tagName === 'OPTGROUP') return '<p class="dd-group">' + U.esc(n.label) + '</p>' + Array.prototype.map.call(n.children, ddOpt).join('');
+      return ddOpt(n);
+    }).join('');
+    document.body.appendChild(menu);
+    // Placement : sous le champ, ou au-dessus s’il manque de place ; jamais hors de l’écran.
+    var r = wrap.getBoundingClientRect(), H = window.innerHeight, m = 12;
+    var below = H - r.bottom - m, above = r.top - m - 64, up = below < 260 && above > below;
+    menu.style.maxHeight = Math.max(160, Math.min(380, (up ? above : below) - 6)) + 'px';
+    if (up) menu.classList.add('is-up');
+    wrap.classList.add('is-open');
+    sel.setAttribute('aria-expanded', 'true');
+    dd = { wrap: wrap, sel: sel, menu: menu, kb: kb, up: up };
+    ddPlace();
+    var on = menu.querySelector('.is-on');
+    if (on) menu.scrollTop = on.offsetTop - menu.clientHeight / 2 + on.offsetHeight / 2;
+    if (kb) (on || menu.querySelector('.dd-opt')).focus({ preventScroll: true });
+  }
+  // Le menu est fixé à l’écran et suit son champ (défilement, chargement des images) ; fermé si le champ disparaît.
+  function ddPlace() {
+    if (!dd) return;
+    if (!dd.wrap.isConnected) { ddClose(); return; }
+    var r = dd.wrap.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight, m = 12, menu = dd.menu;
+    if (r.bottom < 0 || r.top > H) { ddClose(); return; }
+    var w = Math.min(Math.max(r.width, 200), W - 2 * m);
+    menu.style.width = w + 'px';
+    menu.style.left = Math.max(m, Math.min(r.left, W - m - w)) + 'px';
+    if (dd.up) menu.style.bottom = (H - r.top + 6) + 'px'; else menu.style.top = (r.bottom + 6) + 'px';
+  }
+  function ddPick(i) {
+    var cur = dd; if (!cur) return;
+    ddClose(cur.kb);
+    if (cur.sel.selectedIndex === i) return;
+    cur.sel.selectedIndex = i;
+    cur.sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest) return;
+    var opt = e.target.closest('.dd-opt');
+    if (opt) { ddPick(+opt.getAttribute('data-dd-i')); return; }
+    if (e.target.closest('.dd-menu')) return;
+    var wrap = e.target.closest('.select');
+    if (wrap && wrap.querySelector('select')) {
+      e.preventDefault();   // pas de liste native (le libellé ne transmet pas le clic au <select>)
+      if (dd && dd.wrap === wrap) ddClose(); else ddOpen(wrap, false);
+      return;
+    }
+    ddClose();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (dd) {
+      var opts = Array.prototype.slice.call(dd.menu.querySelectorAll('.dd-opt:not([disabled])')), k = opts.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); ddClose(true); return; }
+      if (e.key === 'Tab') { ddClose(true); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        k = k === -1 ? opts.indexOf(dd.menu.querySelector('.is-on')) : k + (e.key === 'ArrowDown' ? 1 : -1);
+        var t = opts[Math.max(0, Math.min(opts.length - 1, k))];
+        if (t) t.focus();
+        return;
+      }
+      if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); var x = opts[e.key === 'Home' ? 0 : opts.length - 1]; if (x) x.focus(); }
+      return;
+    }
+    var s = e.target;
+    if (s && s.tagName === 'SELECT' && s.closest('.select') && (e.key === 'Enter' || e.key === ' ' || (e.altKey && e.key === 'ArrowDown'))) {
+      e.preventDefault();
+      ddOpen(s.closest('.select'), true);
+    }
+  }, true);
+  window.addEventListener('scroll', ddPlace, { passive: true });
+  window.addEventListener('resize', ddPlace);
+  window.addEventListener('hashchange', function () { ddClose(); });
 })(window.ATLAS);

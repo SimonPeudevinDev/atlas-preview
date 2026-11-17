@@ -45,7 +45,7 @@
     SFX.unlock();
 
     var proxies = '';
-    for (var i = 0; i < Math.min(pack.size, 4); i++) proxies += '<div class="psc" style="--i:' + i + '">' + U.cardBack(pack.theme) + '</div>';
+    for (var i = 0; i < Math.min(pack.size, 4); i++) proxies += '<div class="psc" style="--i:' + i + '">' + U.cardBack(pack.theme, pack.name) + '</div>';
 
     var el = document.createElement('div');
     el.className = 'opener t-' + pack.theme;
@@ -289,7 +289,7 @@
       var ed = A.ED[it.ed];
       return '<div class="rv-card r-' + ed.rarity + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + ';z-index:' + (50 - i) + '">' +
         '<div class="rv-tilt"><div class="rv-flip">' +
-          '<div class="rv-face rv-back">' + U.cardBack(pack.theme) + '</div>' +
+          '<div class="rv-face rv-back">' + U.cardBack(pack.theme, pack.name) + '</div>' +
           '<div class="rv-face rv-front">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, newBadge: it._new, firstBadge: it.first, ctx: 'opener', priority: i < 2 }) +
             '<span class="rv-holo"></span><span class="rv-glare"></span><span class="rv-sweep"></span><span class="rv-edge"></span>' +
             (i > 0 ? '<div class="rv-decoy">' + U.card(decoyFor(it), { open: false, tilt: false }) + '</div>' : '') + '</div>' +
@@ -733,7 +733,7 @@
           var ed = A.ED[it.ed], R = A.R[ed.rarity];
           return '<div class="sum-item r-' + ed.rarity + (i === items.length - 1 && R.rank >= 1 ? ' is-best' : '') + (unseen[i] ? ' is-down' : '') + '" data-i="' + i + '" style="--cg:' + GLOW[ed.rarity] + '">' +
             '<div class="sum-flip"><div class="sum-face">' + U.card(it.ed, { serial: it.serial, open: false, newBadge: it._new, firstBadge: it.first }) + '</div>' +
-            '<div class="sum-face sum-back">' + U.cardBack(pack.theme) + '</div></div>' +
+            '<div class="sum-face sum-back">' + U.cardBack(pack.theme, pack.name) + '</div></div>' +
             '<p class="sum-cap"><span class="rar-chip r-' + ed.rarity + '"><i></i>' + R.label + '</span>' + (ed.supply ? '<span class="mono">' + U.serial(it.serial, ed.supply) + '</span>' : '') + '</p></div>';
         }).join('') + '</div>' +
         '<div class="sum-actions"><button class="btn btn-gold btn-lg" data-done>Ajouter à l’inventaire</button>' +

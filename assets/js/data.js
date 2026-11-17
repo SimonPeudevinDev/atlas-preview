@@ -15,7 +15,7 @@ window.ATLAS = window.ATLAS || {};
     { id: 'rare',      label: 'Rare',       supply: 250,  identity: 'Argent · bleu ardoise',   desc: '250 exemplaires numérotés par édition.' },
     { id: 'epic',      label: 'Épique',     supply: 100,  identity: 'Violet',                 desc: '100 exemplaires numérotés par édition.' },
     { id: 'legendary', label: 'Légendaire', supply: 50,   identity: 'Or satiné',              desc: '50 exemplaires numérotés par édition.' },
-    { id: 'mythic',    label: 'Mythique',   supply: 25,   identity: 'Rouge grenat',           desc: '25 exemplaires numérotés par édition.' },
+    { id: 'mythic',    label: 'Mythique',   supply: 25,   identity: 'Rouge vif',              desc: '25 exemplaires numérotés par édition.' },
     { id: 'unique',    label: 'Unique',     supply: 1,    identity: 'Noir et or',             desc: 'Une seule pièce au monde.' }
   ];
   A.R = {};
@@ -375,13 +375,13 @@ window.ATLAS = window.ATLAS || {};
     {
       id: 'grecque', name: 'Mythologie grecque', subs: ['grece', 'titans', 'geants', 'heros', 'monstres'], title: 'Gardien du Panthéon grec',
       tagline: 'Dieux, Titans, Géants, héros et monstres : tout l’univers des mythes grecs.',
-      description: 'Des Titans qui régnaient avant l’Olympe aux héros qui ont affronté les monstres, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en cinq sous-collections.'
+      description: 'Des Titans qui régnaient avant l’Olympe aux héros qui ont affronté les monstres, en passant par les dieux qui l’ont emporté : toute la mythologie grecque, en cinq collections.'
     }
   ];
   A.GROUPS.push({
     id: 'egyptienne', name: 'Égypte ancienne', subs: ['egypte', 'pharaons'], title: 'Grand Vizir d’Égypte',
     tagline: 'Les dieux du Nil et les rois qui ont gouverné en leur nom.',
-    description: 'Des dieux qui guident le soleil et pèsent les cœurs aux pharaons qui ont bâti les pyramides : trois mille ans d’Égypte en deux sous-collections.'
+    description: 'Des dieux qui guident le soleil et pèsent les cœurs aux pharaons qui ont bâti les pyramides : trois mille ans d’Égypte en deux collections.'
   });
   /* ---------- Duels : un héros, son monstre ----------
      Posséder les deux cartes d’un duel débloque le récit de leur affrontement (un « exploit »). */
@@ -406,27 +406,27 @@ window.ATLAS = window.ATLAS || {};
   A.GROUPS.push({
     id: 'solaire', name: 'L’Espace', subs: ['planetes', 'lunes', 'cosmos', 'astronautes', 'missions'], title: 'Explorateur de l’espace',
     tagline: 'Planètes, lunes, trous noirs, astronautes et missions : le ciel et ceux qui l’ont exploré.',
-    description: 'Les planètes et leurs lunes, les objets les plus extrêmes de l’Univers, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : cinq sous-collections, de Mercure aux trous noirs.'
+    description: 'Les planètes et leurs lunes, les objets les plus extrêmes de l’Univers, puis celles et ceux qui sont partis les explorer, en hommes ou en robots : cinq collections, de Mercure aux trous noirs.'
   });
   A.GROUPS.push({
     id: 'aventure', name: 'Romans d’aventure', subs: ['detectives', 'verne', 'mousquetaires'], title: 'Grand Aventurier',
     tagline: 'Détectives, explorateurs et mousquetaires : les héros des grands romans populaires.',
-    description: 'De Baker Street au Nautilus en passant par la cour de Louis XIII : les héros qui ont fait vibrer des générations de lecteurs, en trois sous-collections.'
+    description: 'De Baker Street au Nautilus en passant par la cour de Louis XIII : les héros qui ont fait vibrer des générations de lecteurs, en trois collections.'
   });
   A.GROUPS.push({
     id: 'contesmonde', name: 'Contes et merveilles', subs: ['contes', 'nuits', 'merveilleux', 'jungle'], title: 'Grand Conteur',
     tagline: 'Contes de Perrault et de Grimm, Mille et Une Nuits, Oz et la jungle de Kipling.',
-    description: 'Des forêts de Perrault aux palais de Bagdad, du pays d’Oz à la jungle indienne : les contes qui ont bercé le monde entier, en quatre sous-collections.'
+    description: 'Des forêts de Perrault aux palais de Bagdad, du pays d’Oz à la jungle indienne : les contes qui ont bercé le monde entier, en quatre collections.'
   });
   A.GROUPS.push({
     id: 'medieval', name: 'Légendes médiévales', subs: ['arthur', 'robin'], title: 'Chevalier de la Table ronde',
     tagline: 'Chevaliers de Camelot et hors-la-loi de Sherwood.',
-    description: 'Épées magiques, enchanteurs et archers rebelles : les deux grandes légendes du Moyen Âge anglais, en deux sous-collections.'
+    description: 'Épées magiques, enchanteurs et archers rebelles : les deux grandes légendes du Moyen Âge anglais, en deux collections.'
   });
   A.GROUPS.push({
     id: 'fantastique', name: 'Récits fantastiques', subs: ['gothique', 'etranges'], title: 'Maître de l’étrange',
     tagline: 'Vampires, savants fous, créatures et vaisseaux fantômes.',
-    description: 'Les monstres du roman gothique et les êtres étranges des légendes et des récits fantastiques, en deux sous-collections.'
+    description: 'Les monstres du roman gothique et les êtres étranges des légendes et des récits fantastiques, en deux collections.'
   });
   A.GROUPS.push({
     id: 'pirates', name: 'L’Âge des pirates', subs: ['flibustiers', 'forbans'], title: 'Seigneur des sept mers',
@@ -447,42 +447,42 @@ window.ATLAS = window.ATLAS || {};
   A.GROUPS.push({
     id: 'norrois', name: 'Mythologie nordique', subs: ['nordique', 'creatures', 'jotnar', 'mondes'], title: 'Survivant du Ragnarök',
     tagline: 'Dieux, créatures, géants et neuf mondes, jusqu’au Ragnarök.',
-    description: 'D’Odin au serpent de Midgard, des géants de feu aux neuf mondes suspendus à l’arbre Yggdrasil : toute la mythologie des Vikings, en quatre sous-collections.'
+    description: 'D’Odin au serpent de Midgard, des géants de feu aux neuf mondes suspendus à l’arbre Yggdrasil : toute la mythologie des Vikings, en quatre collections.'
   });
   A.GROUPS.push({
     id: 'france', name: 'Histoire de France', subs: ['histoire', 'presidents', 'herosfr', 'savants', 'ecrivains'], title: 'Mémoire de la France',
     tagline: 'Souverains, présidents, héros, savants et écrivains : ceux qui ont façonné la France.',
-    description: 'De la Gaule à la Ve République, les femmes et les hommes qui ont gouverné, défendu, inventé et raconté la France, en cinq sous-collections.'
+    description: 'De la Gaule à la Ve République, les femmes et les hommes qui ont gouverné, défendu, inventé et raconté la France, en cinq collections.'
   });
   A.GROUPS.push({
     id: 'japon', name: 'Le Japon', subs: ['kami', 'yokai', 'samourais', 'epoques'], title: 'Shōgun',
     tagline: 'Kami, yōkai, samouraïs et grandes époques : le Japon des mythes et de l’histoire.',
-    description: 'Des dieux qui ont créé l’archipel aux esprits du folklore, des samouraïs légendaires aux grandes époques de son histoire : le Japon en quatre sous-collections.'
+    description: 'Des dieux qui ont créé l’archipel aux esprits du folklore, des samouraïs légendaires aux grandes époques de son histoire : le Japon en quatre collections.'
   });
   A.GROUPS.push({
     id: 'cryptozoo', name: 'Cryptozoologie', subs: ['eaux', 'hommessauvages', 'betes'], title: 'Cryptozoologue',
     tagline: 'Nessie, le Yéti, le Chupacabra : les créatures que l’on cherche encore.',
-    description: 'La cryptozoologie traque les animaux dont l’existence n’a jamais été prouvée. Entre témoignages troublants, canulars célèbres et vraies découvertes, trois sous-collections pour enquêter.'
+    description: 'La cryptozoologie traque les animaux dont l’existence n’a jamais été prouvée. Entre témoignages troublants, canulars célèbres et vraies découvertes, trois collections pour enquêter.'
   });
   A.GROUPS.push({
     id: 'mysteres', name: 'Mystères du monde', subs: ['citesperdues', 'enigmes', 'tresors'], title: 'Gardien des secrets',
     tagline: 'Cités englouties, énigmes de pierre et trésors disparus.',
-    description: 'Atlantide, Stonehenge, Saint Graal : ce que l’on sait vraiment, ce que l’on croit savoir, et ce qui reste à découvrir. Trois sous-collections pour les amateurs de mystères.'
+    description: 'Atlantide, Stonehenge, Saint Graal : ce que l’on sait vraiment, ce que l’on croit savoir, et ce qui reste à découvrir. Trois collections pour les amateurs de mystères.'
   });
   A.GROUPS.push({
     id: 'prehistoire', name: 'Préhistoire', subs: ['dinosaures', 'mersciel', 'megafaune'], title: 'Paléontologue',
     tagline: 'Dinosaures, monstres marins et géants de l’âge de glace.',
-    description: 'Des premiers poissons cuirassés aux mammouths, des centaines de millions d’années d’histoire de la vie. Trois sous-collections construites à partir de vrais fossiles.'
+    description: 'Des premiers poissons cuirassés aux mammouths, des centaines de millions d’années d’histoire de la vie. Trois collections construites à partir de vrais fossiles.'
   });
   A.GROUPS.push({
     id: 'marine', name: 'Navires légendaires', subs: ['navires', 'maudits'], title: 'Amiral',
     tagline: 'Navires de légende et vaisseaux maudits.',
-    description: 'Les navires qui ont fait le tour du monde, gagné des batailles ou disparu sans laisser de trace : l’histoire des océans en deux sous-collections.'
+    description: 'Les navires qui ont fait le tour du monde, gagné des batailles ou disparu sans laisser de trace : l’histoire des océans en deux collections.'
   });
   A.GROUPS.push({
     id: 'magie', name: 'Magie et illusion', subs: ['alchimistes', 'illusionnistes'], title: 'Grand Mage',
     tagline: 'Alchimistes, prophètes et magiciens de scène.',
-    description: 'De la pierre philosophale aux tours de scène, l’histoire de ceux qui ont voulu percer les secrets du monde, ou simplement émerveiller le public. Deux sous-collections, de la pierre philosophale au cinéma de Méliès.'
+    description: 'De la pierre philosophale aux tours de scène, l’histoire de ceux qui ont voulu percer les secrets du monde, ou simplement émerveiller le public. Deux collections, de la pierre philosophale au cinéma de Méliès.'
   });
   A.GROUPS.push({
     id: 'mythesmonde', name: 'Mythologies du monde', subs: ['celtes', 'azteques', 'chine', 'inde', 'slaves', 'afrique'], title: 'Mythographe',

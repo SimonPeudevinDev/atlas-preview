@@ -469,7 +469,7 @@
     });
     y += 8;
     x.font = '400 3.2px ' + SANS; x.fillStyle = th.ink2;
-    wrap(x, 'Probabilités publiées et mises à jour en temps réel dans la boutique.' + (p.guarantee ? ' Une carte numérotée garantie.' : ''), 74).forEach(function (l) { x.fillText(l, 50, y); y += 4.6; });
+    wrap(x, 'Probabilités publiées et mises à jour en temps réel.' + (p.guarantee ? ' Une carte numérotée garantie.' : ''), 74).forEach(function (l) { x.fillText(l, 50, y); y += 4.6; });
     // Code-barres
     var bw = 46, bx = 50 - bw / 2, by = 160 - 19 - 16;
     x.fillStyle = th.ink; x.globalAlpha = 0.75;

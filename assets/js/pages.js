@@ -8,18 +8,29 @@
   var P = A.pages = {};
   var I = U.icon;
 
+  function hasEstampe(c, style) {
+    var da = style === undefined && A.collStyle ? A.collStyle() : style;
+    return da === 'lino' && A.media && A.media.has('collections-' + c.id + '--estampe');
+  }
   /* Illustration d’une collection : l’aquarelle peinte si elle existe (media/originals/collections/<id>),
      sinon l’aquarelle générée. o : options de l’aquarelle générée ; sizes : largeur affichée. */
-  function collArt(c, o, sizes) {
+  function collArt(c, o, sizes, style) {
     // Style d’essai choisi dans le menu (test) : « collections-grece--objet » si elle existe, sinon l’image normale
-    var id = 'collections-' + c.id, key = c.id, da = A.collStyle && A.collStyle();
+    // Visuels d’origine pour toutes les collections (illustrations peintes mises de côté, fichiers conservés dans media/) :
+    // repasser A.COLL_PICS à true pour les réafficher
+    if (!A.COLL_PICS) return A.artImg(o);
+    var id = 'collections-' + c.id, key = c.id, da = style === undefined ? A.collStyle && A.collStyle() : style;
     if (da && A.media && A.media.has(id + '--' + da)) { id += '--' + da; key += '--' + da; }
-    if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll"')
+    // Estampes immersives : le sujet central reste lisible en bandeau, couverture et vignette.
+    var engraving = hasEstampe(c, da);
+    if (engraving) { id = 'collections-' + c.id + '--estampe'; key = c.id + '--estampe'; }
+    if (A.media && A.media.has(id)) return A.media.picture(id, { sizes: sizes || '100vw' }).replace('class="art-pic"', 'class="art-pic is-coll' + (engraving ? ' is-engraving' : '') + (/--objet$/.test(id) ? ' is-object' : '') + '"')
       .replace(' style="', ' style="object-position:50% ' + (COLL_FOCUS[key] || 36) + '%;');
     return A.artImg(o);
   }
   // Hauteur du point d’intérêt de chaque aquarelle (en % de l’image), pour les cadrages très larges
-  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66, 'grece--objet': 48, 'grece--lino': 50, 'egypte--lino': 52, 'gothique--lino': 44, 'nordique--lino': 58 };
+  var COLL_FOCUS = { grece: 36, nordique: 52, egypte: 58, gothique: 46, heros: 52, geants: 51, titans: 53, monstres: 66, 'grece--objet': 60, 'egypte--objet': 60, 'gothique--objet': 60, 'nordique--objet': 60, 'grece--lino': 50, 'egypte--lino': 52, 'gothique--lino': 44, 'nordique--lino': 58, 'grece--estampe': 27, 'nordique--estampe': 30 };
+  A.COLL_PICS = false;
   A.collArt = collArt;
   function sectionHead(eyebrow, title, link) {
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
@@ -29,7 +40,7 @@
     opts = opts || {};
     var pr = S.collectionProgress(c.id);
     return '<a class="coll-tile' + (opts.cls ? ' ' + opts.cls : '') + '" href="#/collection/' + c.id + '">' +
-      '<div class="coll-art">' + (opts.art || collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 }, '(max-width: 900px) 50vw, 400px')) +
+      '<div class="coll-art">' + (opts.art || collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 }, '(max-width: 900px) 50vw, 400px', opts.style)) +
       (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') +
       (S.readyCount(c.id) ? '<span class="tag tag-reward">' + U.icon('gift') + 'Récompense à récupérer</span>' : '') + '</div>' +
       '<div class="coll-meta"><p class="eyebrow">' + c.family + ' · ' + c.edition + '</p><h3 class="coll-name">' + c.name + '</h3>' +
@@ -43,32 +54,32 @@
     var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
     return '<p class="coll-next">' + U.rewardIcon(s.reward) + 'Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
   }
-  /* Étagère : une collection globale = une ligne compacte (nom, progression) + ses sous-collections
-     en petites vignettes qui défilent à l’horizontale. La page tient en quelques écrans. */
-  function shelfTile(c) {
-    var pr = S.collectionProgress(c.id), done = pr.pct >= 1;
-    return '<a class="shelf-tile' + (done ? ' is-done' : '') + '" href="#/collection/' + c.id + '">' +
-      '<div class="st-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 320, h: 200 }, '(max-width: 900px) 34vw, 240px') +
-        (S.readyCount(c.id) ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : done ? '<span class="st-badge is-done" title="Complète">' + U.icon('check') + '</span>' : '') +
-        (c.status === 'event' ? '<span class="st-new">Nouveau</span>' : '') + '</div>' +
-      '<h3 class="st-name">' + U.esc(c.name) + '</h3>' +
-      '<p class="st-n"><span>' + pr.owned + '/' + pr.total + '</span><i style="--p:' + Math.round(pr.pct * 100) + '%"></i></p></a>';
+  /* Étagère : une collection globale = un en-tête (nom, jauge) + ses sous-collections
+     en lignes, comme « Votre collection » sur l’accueil (vignette, progression, prochain palier) */
+  function shelf(head, subs, eyebrow, folded) {
+    var rows = '<div class="rail">' +
+      '<button type="button" class="rail-arrow is-prev" data-rail="-1" aria-label="Collections précédentes" hidden>' + I('chevL') + '</button>' +
+      '<div class="pg-colls is-shelf" data-rail-row>' + subs.map(function (c) { return pgRow(c, eyebrow ? c.family : ''); }).join('') + '</div>' +
+      '<button type="button" class="rail-arrow is-next" data-rail="1" aria-label="Collections suivantes" hidden>' + I('chevR') + '</button></div>';
+    // Univers pas encore commencé : replié derrière « Voir les N collections » pour raccourcir la page
+    return '<section class="shelf">' + head + (folded ? '<details class="shelf-fold"><summary>' + I('chevR') + '<span>Voir les ' + subs.length + ' collections</span></summary>' + rows + '</details>' : rows) + '</section>';
   }
-  function shelf(head, subs) {
-    return '<section class="shelf">' + head + '<div class="shelf-row">' + subs.map(shelfTile).join('') + '</div></section>';
-  }
-  // Jauge de complétion : le pourcentage en grand chiffre doré ; un laurier à 100 %
+  // Jauge de complétion : anneau doré qui se remplit, le pourcentage au centre ; un laurier à 100 %
   function gauge(pct) {
     var p = Math.round(pct * 100);
     return p >= 100 ? '<span class="g-pct is-full">' + I('laurel') + '<small>Complète</small></span>'
-      : '<span class="g-pct"><b>' + p + '<em> %</em></b><small>complété</small></span>';
+      : '<span class="g-pct g-ring" role="img" aria-label="' + p + ' % complété"><svg viewBox="0 0 48 48" aria-hidden="true">' +
+          '<circle class="g-track" cx="24" cy="24" r="21" pathLength="100"/>' +
+          (p ? '<circle class="g-fill" cx="24" cy="24" r="21" pathLength="100" stroke-dasharray="' + p + ' 100"/>' : '') + '</svg><b>' + p + '<em>%</em></b></span>';
   }
-  function groupBlock(g, subs) {
-    var pr = S.groupProgress(g.id), ready = S.readyCount('@' + g.id) || subs.some(function (c) { return S.readyCount(c.id); });
-    return shelf('<a class="shelf-head" href="#/saga/' + g.id + '">' +
+  function groupBlock(g, subs, folded) {
+    var pr = S.groupProgress(g.id);
+    // L’album n’a plus de page à lui : son en-tête porte ses chiffres, ses paliers sont dans le panneau Missions
+    return shelf('<div class="shelf-head" id="album-' + g.id + '">' +
       '<div class="sh-copy"><h2 class="sh-name">' + U.esc(g.name) + '</h2>' +
-        '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' + (ready ? '<br><b>' + U.icon('gift') + 'Récompense à récupérer</b>' : '') + '</p></div>' +
-      gauge(pr.pct) + I('chevR') + '</a>', subs);
+        '<p class="sh-meta">' + pr.owned + '/' + pr.total + ' personnages · ' + pr.done + '/' + pr.subs + ' complètes' +
+          (S.readyCount('@' + g.id) ? '<br><button type="button" class="sh-gift" data-qs-open>' + U.icon('gift') + 'Récompense de l’album à récupérer</button>' : '') + '</p></div>' +
+      gauge(pr.pct) + '</div>', subs, false, folded && pr.owned === 0);
   }
 
   function globe() {
@@ -111,29 +122,30 @@
     var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
     // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
     var atlas = '<div class="play-slide" data-slide="0">' +
-        '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' + reserve(ch, tk) +
+        '<div class="play-stage is-' + P0.theme + '">' + PLAY_AURA + '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' + playSide(P0) + '</div>' + reserve(ch, tk) +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
-        (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '') +
-        '<p class="play-note">5 cartes · jusqu’à ' + ch.max + ' en réserve</p></div>';
+        (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>') +   // place réservée : le sachet reste à la même hauteur d’un booster à l’autre
+        '</div>';
     var daily = '<div class="play-slide" data-slide="1">' +
-        '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' +
+        '<div class="play-stage is-' + PD.theme + '">' + PLAY_AURA + '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' + playSide(PD) + '</div>' +
         '<p class="play-day">' + (dCan.ok ? '<b>Prêt à ouvrir</b>' : 'Déjà ouvert aujourd’hui') + '</p>' +
         '<p class="play-clock">' + (dCan.ok ? 'Un nouveau chaque jour' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>') + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + PD.id + '"' + (dCan.ok ? '' : ' disabled') + '>' +
           (dCan.ok ? 'Ouvrir le Booster quotidien' : 'Prochain dans <span data-clock="daily">' + U.clock(S.nextDailyIn()) + '</span>') + '</button>' +
-        '<p class="play-note">' + PD.size + ' cartes offertes, une fois par jour</p></div>';
+        '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>' +
+        '</div>';
     // Coffret, Saga : même présentation en grand quand on les choisit
     var SHORT = { conservateur: 'Coffret', saga: 'Saga' };
     var extra = side.map(function (p, j) {
       var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
       return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
-        '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' +
+        '<div class="play-stage is-' + p.theme + '">' + PLAY_AURA + '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' + playSide(p) + '</div>' +
         '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
         '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>' +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
-        (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '') +
-        '<p class="play-note">' + p.size + ' cartes · ' + p.kicker + '</p></div>';
+        (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>') +
+        '</div>';
     }).join('');
     // Sélecteur : une tuile par booster (mini sachet, nom, état)
     // Sélecteur sobre : des onglets texte de largeur fixe, un trait sous l’actif, un point quand il y a de quoi ouvrir
@@ -150,7 +162,6 @@
         '<p class="eyebrow">Vos boosters</p>' +
         picker +
         '<div class="play-slides">' + atlas + daily + extra + '</div>' +
-        (S.UNLIMITED ? '<button class="play-reset" data-dev-refill>' + I('reset') + 'Tout recharger (test)</button>' : '') +
       '</div>' +
     '</div></section>';
   }
@@ -173,6 +184,8 @@
 
   // Annonces de l’accueil : 6 cartes selon le tri, puis une tuile « tout voir »
   function mkItems(L, sort) {
+    var total = L.length;
+    if (sort === 'missing') { L = L.filter(function (l) { return !S.ownedOf(l.ed).length; }); sort = 'rare'; }   // éditions pas encore possédées, les plus rares d’abord
     var by = {
       rare: function (a, b) { return A.R[A.ED[b.ed].rarity].rank - A.R[A.ED[a.ed].rarity].rank || a.price - b.price; },
       cheap: function (a, b) { return a.price - b.price; },
@@ -186,7 +199,7 @@
         '<span class="mk-stage">' + U.card(l.ed, { serial: l.serial }) + '</span>' +
         '<span class="mk-foot">' + U.price(l.price) + '<span class="mk-buy">Voir</span></span></a>';
     }).join('') +
-    '<a class="mk-item mk-all" href="#/marketplace"><span class="mk-all-in">' + I('market') + '<b>Voir les ' + U.num(L.length) + ' annonces</b>' + I('arrow') + '</span></a>';
+    '<a class="mk-item mk-all" href="#/marketplace"><span class="mk-all-in">' + I('market') + '<b>Voir les ' + U.num(total) + ' annonces</b>' + I('arrow') + '</span></a>';
   }
 
   /* Page d’accueil déconnectée : la présentation d’ATLAS et « Comment ça marche »
@@ -205,17 +218,11 @@
             '<p class="eyebrow">Musée numérique de cartes à collectionner</p>' +
             '<h1 class="display">Le monde,<br><em>en cartes.</em></h1>' +
             '<p class="lead">Des dieux de l’Olympe aux héroïnes des contes, ATLAS réunit les grandes figures de la culture en œuvres numérotées que l’on découvre, collectionne et échange.</p>' +
-            '<div class="row gap-s wrap"><button class="btn btn-primary btn-lg" data-login>Se connecter</button></div>' +
-            '<p class="so-note">' + I('lock') + 'Prototype : connexion simulée, aucune donnée n’est envoyée.</p>' +
-            '<dl class="hero-facts"><div><dt>Collections</dt><dd>' + A.COLLECTIONS.length + '</dd></div><div><dt>Personnages</dt><dd>' + A.CHARS.length + '</dd></div><div><dt>Éditions</dt><dd>' + A.EDITIONS.length + '</dd></div></dl>' +
+            '<div class="row gap-s wrap"><a class="btn btn-primary btn-lg" href="#/connexion?mode=inscription">Commencer ma collection</a><a class="btn btn-ghost btn-lg" href="#/connexion">Se connecter</a></div>' +
+            '<dl class="hero-facts"><div><dt>Collections</dt><dd>' + A.COLLECTIONS.length + '</dd></div><div><dt>Personnages</dt><dd>' + A.CHARS.length + '</dd></div><div><dt>Éditions</dt><dd>' + U.num(A.EDITIONS.length) + '</dd></div></dl>' +
           '</div>' +
-          '<div class="hero-visual">' + globe() +
-            '<div class="hero-stack">' +
-              '<div class="hs hs-l">' + U.card('egypte-anubis-epic', { serial: 41, tilt: false }) + '</div>' +
-              '<div class="hs hs-r">' + U.card('merveilleux-alice-rare', { serial: 112, tilt: false }) + '</div>' +
-              '<div class="hs hs-c">' + U.card('grece-zeus-legendary', { serial: 18, uid: feat && feat.uid }) + '</div>' +
-            '</div>' +
-            '<p class="hero-caption"><span>Zeus, Roi de l’Olympe</span><span>Légendaire · N° 018/50</span></p>' +
+          '<div class="hero-visual">' + globe() + zeusFan(feat) +
+            '<p class="hero-caption"><span>Zeus, Roi de l’Olympe</span><span>Épique · Légendaire · Unique</span></p>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -227,6 +234,8 @@
         }).join('') + '</div>' +
         '<div class="steps-dots" aria-hidden="true">' + steps.map(function (s, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
       '</div></section>' +
+      raritiesHTML() +
+      landingCollsHTML() +
       // Échanges : la vitrine du concept, toujours foncée (même en mode sombre)
       '<section class="section section-dark is-fixed-dark h-trade-landing"><div class="container trade-grid">' +
         '<div class="trade-copy"><p class="eyebrow">Échanges & marketplace</p><h2 class="h2">Chaque carte a une histoire.</h2>' +
@@ -234,28 +243,318 @@
           '<ul class="checklist">' +
             '<li>' + I('swap') + '<span><b>Échanges entre collectionneurs</b> confirmés par les deux parties avant exécution.</span></li>' +
             '<li>' + I('market') + '<span><b>Marketplace à prix fixe</b> en Éclats, monnaie fictive non convertible.</span></li>' +
-          '</ul>' +
-          '<button class="btn btn-gold" data-login>Commencer ma collection</button></div>' +
+          '</ul></div>' +
         '<div class="trade-visual">' +
-          '<div class="tv-card">' + U.card('gothique-dracula-legendary', { serial: 12 }) + '<p>Ombre_de_Rhodes</p></div>' +
-          '<div class="tv-swap">' + I('swap') + '</div>' +
-          '<div class="tv-card">' + U.card('histoire-napoleon-epic', { serial: 33 }) + '<p>Vous</p></div>' +
+          '<div class="tv-card">' + U.card('grece-zeus-mythic', { serial: 19, tilt: false }) + '<p>Ombre_de_Rhodes</p></div>' +
+          '<span class="tv-mid"><span class="tv-ring" aria-hidden="true"></span><button type="button" class="tv-swap is-idle" data-trade-swap aria-label="Échanger les cartes">' + I('swap') + '</button></span>' +
+          '<div class="tv-card">' + U.card('grece-zeus-rare', { serial: 112, tilt: false }) + '<p>Vous</p></div>' +
         '</div>' +
+      '</div></section>' +
+      // Appel final : c’est ici qu’il a sa place (le visiteur a tout vu)
+      '<section class="section cta l-cta"><div class="container cta-inner">' + U.mark('cta-mark') +
+        '<h2 class="h2">Votre collection commence ici.</h2>' +
+        '<p class="lead">Un compte gratuit, un booster offert toutes les 15 minutes et un autre chaque jour. Sans paiement.</p>' +
+        '<a class="btn btn-primary btn-lg" href="#/connexion?mode=inscription">Commencer ma collection</a>' +
+        '<p class="l-cta-sub">Déjà inscrit ? <a href="#/connexion">Se connecter</a></p>' +
       '</div></section>' +
       '</div>';
   };
   P.landingMount = function (root) {
-    var st = root.querySelector('.steps'), dots = root.querySelectorAll('.steps-dots i');
-    if (st && dots.length) st.addEventListener('scroll', function () {
-      var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
+    rowDots(root.querySelector('.steps'), root.querySelectorAll('.steps-dots:not(.lc-dots) i'), 4500);
+    rowDots(root.querySelector('.lc-row'), root.querySelectorAll('.lc-dots i'), 5000);
+    rarityMount(root);
+    tradeSwap(root);
+  };
+  /* Échanges : la carte change de main.
+     Technique « FLIP » : les cartes sont échangées dans la page dès le clic, puis animées depuis leur ancienne place
+     jusqu’à la nouvelle ; l’animation finit donc exactement à leur position (aucun saut).
+     Trajectoire calculée image par image (≈ 60 étapes) :
+       élan     0 → 16 %  : les cartes reculent, se cabrent, celle qui part chez « Vous » se soulève ;
+       vol     16 → 80 %  : arc de Bézier (l’une passe au-dessus, plus grande et plus ombrée ; l’autre dessous, assombrie),
+                            un tour complet sur elle-même qui laisse voir le dos ATLAS ;
+       réception 80 → 100 % : ressort amorti (léger dépassement, tassement à l’impact), halo de la couleur de la rareté.
+     Le bouton s’enfonce, tourne avec ressort et lâche une onde dorée quand les cartes se croisent. */
+  function tradeSwap(root) {
+    var btn = root.querySelector('[data-trade-swap]'), ring = root.querySelector('.tv-ring'), busy = false, turn = 0;
+    if (!btn || !btn.animate) return;
+    var X = A.sfx || {};
+    function sfx(name, x, y) { try { if (X[name] && !X.muted) X[name](x, y); } catch (e) { /* son facultatif */ } }
+    function angle(el) { var m = new DOMMatrix(getComputedStyle(el).transform); return Math.atan2(m.b, m.a); }
+    function center(el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, h: r.height }; }
+    function rarity(card) { var m = card.className.match(/\br-(\w+)/); return m ? m[1] : 'base'; }
+    var eOut = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var eInOut = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    var eSine = function (t) { return -(Math.cos(Math.PI * t) - 1) / 2; };
+    // st : décalage de départ (repère de la nouvelle place) ; o : rôle de la carte dans le croisement
+    function flight(st, o) {
+      var N = 60, out = [], P0x = st.x * 1.06, P0y = st.y - o.rise, R0 = st.r - 6 * o.dir;
+      var Cx = P0x * 0.5, Cy = P0y * 0.5 + o.arc;   // point de contrôle de l’arc
+      for (var i = 0; i <= N; i++) {
+        var t = i / N, x, y, r, ry = 0, sc = 1, sx = 1, sy = 1;
+        if (t < 0.16) {
+          var u = eOut(t / 0.16);
+          x = st.x + (P0x - st.x) * u; y = st.y + (P0y - st.y) * u; r = st.r + (R0 - st.r) * u; sc = 1 + o.pre * u;
+        } else if (t < 0.8) {
+          var v = eInOut((t - 0.16) / 0.64), q = 1 - v, bump = Math.sin(Math.PI * v);
+          x = q * q * P0x + 2 * q * v * Cx; y = q * q * P0y + 2 * q * v * Cy;
+          r = R0 * q + o.dir * 4 * bump; ry = o.flip * 360 * eSine(v); sc = 1 + o.pre * q + o.peak * bump;
+        } else {
+          var k = (t - 0.8) / 0.2, d = Math.exp(-5 * k) * Math.sin(2.8 * Math.PI * k);
+          x = -st.x * 0.035 * d; y = -3 * Math.abs(d); r = -o.dir * 3 * d; ry = o.flip * 360; sx = 1 + 0.025 * Math.abs(d); sy = 1 - 0.035 * Math.abs(d);
+        }
+        if (i === N) { x = 0; y = 0; r = 0; sx = 1; sy = 1; sc = 1; }
+        out.push({ offset: t, transform: 'perspective(1000px) translate(' + x.toFixed(1) + 'px, ' + y.toFixed(1) + 'px) rotate(' + r.toFixed(2) + 'deg) rotateY(' + ry.toFixed(1) + 'deg) scale(' + (sx * sc).toFixed(4) + ', ' + (sy * sc).toFixed(4) + ')' });
+      }
+      return out;
+    }
+    btn.addEventListener('click', function () {
+      if (busy) return;
+      busy = true;
+      btn.classList.remove('is-idle');
+      var w = root.querySelectorAll('.tv-card'), a = w[0].querySelector('.card'), b = w[1].querySelector('.card');
+      var a0 = center(a), b0 = center(b), t0 = angle(w[0]), t1 = angle(w[1]);
+      // 1. échange dans la page (positions finales), 2. décalage de départ dans le repère incliné de la nouvelle place
+      w[0].insertBefore(b, w[0].firstChild); w[1].insertBefore(a, w[1].firstChild);
+      var a1 = center(a), b1 = center(b);
+      function start(o, n, tOld, tNew) {
+        var dx = o.x - n.x, dy = o.y - n.y, c = Math.cos(-tNew), sn = Math.sin(-tNew);
+        return { x: dx * c - dy * sn, y: dx * sn + dy * c, r: (tOld - tNew) * 180 / Math.PI };
+      }
+      var sa = start(a0, a1, t0, t1), sb = start(b0, b1, t1, t0), h = a0.h;
+      var T = 1500;
+      // dos de carte, visible pendant le tour complet
+      [a, b].forEach(function (c) {
+        var back = document.createElement('div'); back.className = 'tv-back'; back.innerHTML = U.cardBack('night');
+        c.appendChild(back); c.classList.add('is-flying');
+      });
+      w[1].style.position = 'relative'; w[1].style.zIndex = 4;   // la carte qui part chez « Vous » passe au-dessus de tout
+      // hauteur de l’arc limitée à la place libre au-dessus de la carte (le sommet monte d’environ la moitié de l’arc)
+      var sec = root.querySelector('.h-trade-landing'), room = sec ? a0.y - h / 2 - sec.getBoundingClientRect().top - 8 : h;
+      var arcUp = Math.max(h * 0.06, Math.min(h * 0.24, 2 * (room - h * 0.16)));   // marge pour l’agrandissement et la rotation en vol
+      var ka = a.animate(flight(sa, { dir: 1, rise: 6, arc: -arcUp, pre: 0.04, peak: 0.16, flip: 1 }), { duration: T, easing: 'linear' });
+      var kb = b.animate(flight(sb, { dir: -1, rise: -2, arc: h * 0.1, pre: -0.03, peak: -0.12, flip: -1 }), { duration: T, easing: 'linear' });
+      // profondeur : ombre portée qui grandit pour la carte du dessus, assombrissement pour celle du dessous
+      var ia = a.querySelector('.card-inner'), ib = b.querySelector('.card-inner'), base = getComputedStyle(ia).boxShadow;
+      ia.animate([{ boxShadow: base }, { boxShadow: '0 38px 60px rgba(0, 0, 0, .55), 0 0 30px rgba(231, 207, 149, .18)', offset: 0.48 }, { boxShadow: base }], { duration: T * 0.8, easing: 'ease-in-out' });
+      [ib, b.querySelector('.tv-back')].forEach(function (el) { el.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(.62)', offset: 0.5 }, { filter: 'brightness(1)' }], { duration: T * 0.8, easing: 'ease-in-out', delay: 0 }); });
+      // bouton : s’enfonce, tourne avec ressort, onde dorée au croisement
+      turn += 180;
+      btn.animate([
+        { transform: 'rotate(' + (turn - 180) + 'deg) scale(1)' },
+        { transform: 'rotate(' + (turn - 200) + 'deg) scale(.84)', offset: 0.12 },
+        { transform: 'rotate(' + (turn + 16) + 'deg) scale(1.12)', offset: 0.52 },
+        { transform: 'rotate(' + (turn - 6) + 'deg) scale(.97)', offset: 0.72 },
+        { transform: 'rotate(' + turn + 'deg) scale(1)' }
+      ], { duration: T, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' });
+      btn.classList.add('is-busy');
+      setTimeout(function () {
+        if (ring) ring.animate([{ transform: 'scale(1)', opacity: 0.7 }, { transform: 'scale(3.2)', opacity: 0 }], { duration: 750, easing: 'cubic-bezier(.2, .7, .3, 1)' });
+      }, T * 0.46);
+      // sons : souffle au départ, carte qui tourne, claquements à la pose, note selon la rareté reçue
+      var rank = (A.R[rarity(a)] || { rank: 0 }).rank;
+      setTimeout(function () { sfx('whoosh', 0.9); }, T * 0.15);
+      setTimeout(function () { sfx('flip'); }, T * 0.44);
+      setTimeout(function () { sfx('snap', 0); sfx('snap', 0.06); }, T * 0.8);
+      setTimeout(function () { sfx('seal', rank); }, T * 0.84);
+      // réception : halo de la couleur de la rareté, le nom du nouveau propriétaire s’allume
+      setTimeout(function () {
+        [a, b].forEach(function (c) { c.classList.remove('is-landed'); void c.offsetWidth; c.classList.add('is-landed'); });
+        var you = w[1].querySelector('p'), them = w[0].querySelector('p');
+        [[you, a], [them, b]].forEach(function (x) {
+          if (!x[0]) return;
+          x[0].className = 'is-got r-' + rarity(x[1]);
+          setTimeout(function () { x[0].className = ''; }, 1300);
+        });
+        setTimeout(function () { a.classList.remove('is-landed'); b.classList.remove('is-landed'); }, 1100);
+      }, T * 0.8);
+      ka.onfinish = function () {
+        [a, b].forEach(function (c) { c.classList.remove('is-flying'); var bk = c.querySelector('.tv-back'); if (bk) bk.remove(); });
+        w[1].style.zIndex = '';
+        btn.classList.remove('is-busy');
+        busy = false;
+      };
+    });
+  }
+  // Éventail de trois Zeus (les seules cartes déjà illustrées) : Épique, Légendaire, Unique
+  function zeusFan(feat) {
+    return '<div class="hero-stack">' +
+      '<div class="hs hs-l">' + U.card('grece-zeus-epic', { serial: 13, tilt: false }) + '</div>' +
+      '<div class="hs hs-r">' + U.card('grece-zeus-unique', { serial: 1, tilt: false }) + '</div>' +
+      '<div class="hs hs-c">' + U.card('grece-zeus-legendary', { serial: 18, uid: feat && feat.uid, tilt: false }) + '</div>' +
+    '</div>';
+  }
+
+  /* Rangée horizontale : le point actif suit la carte visible, défilement automatique */
+  function rowDots(row, dots, every) {
+    if (!row || !dots.length) return;
+    row.addEventListener('scroll', function () {
+      var w = row.firstElementChild ? row.firstElementChild.offsetWidth + 12 : 1, k = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4 ? dots.length - 1 : Math.round(row.scrollLeft / w);
       dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
     }, { passive: true });
-    autoSlide(st, 4500);
+    autoSlide(row, every);
+  }
+
+  /* Six raretés : une vitrine à une seule grande carte et un sélecteur Base → Unique */
+  var RS_TEXT = {
+    base: 'L’œuvre de référence, en aquarelle sépia. La porte d’entrée de chaque collection.',
+    rare: 'Une autre scène, dans une palette froide d’ardoise et d’argent. Chaque exemplaire porte son numéro.',
+    epic: 'Une composition inédite rehaussée de violet, sur un cadre assorti.',
+    legendary: 'Rehauts d’or et lumière dorée : la pièce maîtresse d’une collection.',
+    mythic: 'Rouge vif sur fond sombre. Vingt-cinq collectionneurs seulement la posséderont.',
+    unique: 'Une seule carte au monde, en noir et or. Le nom de son propriétaire reste dans sa provenance.'
+  };
+  function rsNow(r) {
+    var c = packChance(A.PACK.standard, r.id), n = c > 0 ? Math.max(2, Math.round(1 / c)) : 0;
+    var odds = r.rank === 0 ? 'Dans chaque Booster Atlas.'
+      : n ? '<b>1 chance sur ' + U.num(n) + '</b> par Booster Atlas d’obtenir une carte ' + r.label + (r.id === 'unique' ? '.' : ' ou plus rare.') : '';
+    return '<span class="rar-chip r-' + r.id + '"><i></i>' + r.label + '</span>' +
+      '<p class="rs-supply"><b>' + (r.supply ? U.num(r.supply) : 'Illimité') + '</b><span>' + (r.supply ? (r.supply === 1 ? 'pièce au monde' : 'exemplaires numérotés') : 'tirage ouvert') + '</span></p>' +
+      '<p class="rs-desc">' + RS_TEXT[r.id] + '</p>' +
+      '<p class="rs-odds">' + odds + '</p>';
+  }
+  function raritiesHTML() {
+    var R = A.RARITIES, k = 0;
+    return '<section class="section h-rar"><div class="container">' +
+      sectionHead('Six raretés', 'Une même figure, six œuvres.') +
+      '<div class="rs" data-rs>' +
+        '<div class="rs-stage" data-rs-stage>' + R.map(function (r, i) {
+          return '<div class="rs-card' + (i === k ? ' is-on' : '') + '">' + U.card('grece-zeus-' + r.id, { serial: r.supply ? Math.min(7 + r.rank * 3, r.supply) : null, tilt: false }) + '</div>';
+        }).join('') + '</div>' +
+        '<div class="rs-info">' +
+          '<div class="rs-now" aria-live="polite" data-rs-now>' + rsNow(R[k]) + '</div>' +
+          '<div class="rs-list" role="tablist" aria-label="Raretés">' + R.map(function (r, i) {
+            return '<button class="rs-row r-' + r.id + (i === k ? ' is-on' : '') + '" role="tab" aria-selected="' + (i === k) + '" data-rs-i="' + i + '">' +
+              '<i class="rs-dot"></i><span class="rs-l">' + r.label + '</span><span class="rs-s">' + (r.supply ? (r.supply === 1 ? 'Pièce unique' : r.supply + ' ex.') : 'Illimité') + '</span></button>';
+          }).join('') + '</div>' +
+          '<p class="rs-foot">La rareté tient à l’œuvre et au tirage, jamais à la puissance : ATQ, DÉF et ESP restent les mêmes.</p>' +
+        '</div>' +
+      '</div>' +
+    '</div></section>';
+  }
+  function rarityMount(root) {
+    var box = root.querySelector('[data-rs]');
+    if (!box) return;
+    var cards = box.querySelectorAll('.rs-card'), rows = box.querySelectorAll('[data-rs-i]'), now = box.querySelector('[data-rs-now]');
+    var k = 0, hold = 0, visible = false;
+    function go(i) {
+      k = (i + cards.length) % cards.length;
+      cards.forEach(function (c, j) { c.classList.toggle('is-on', j === k); });
+      rows.forEach(function (b, j) { b.classList.toggle('is-on', j === k); b.setAttribute('aria-selected', String(j === k)); });
+      now.innerHTML = rsNow(A.RARITIES[k]);
+    }
+    rows.forEach(function (b) { b.addEventListener('click', function () { hold = Date.now() + 12000; go(+b.getAttribute('data-rs-i')); }); });
+    box.querySelector('[data-rs-stage]').addEventListener('click', function () { hold = Date.now() + 12000; go(k + 1); });   // toucher la carte : rareté suivante
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }, { threshold: 0.4 }).observe(box);
+    var t = setInterval(function () {
+      if (!box.isConnected) { clearInterval(t); return; }
+      if (visible && Date.now() > hold) go(k + 1);
+    }, 3200);
+  }
+
+  /* Les collections : les quatre linogravures, et une ligne pour la suite */
+  function landingCollsHTML() {
+    var list = ['grece', 'egypte', 'gothique', 'nordique'].map(function (id) { return A.COLL[id]; }).filter(Boolean);
+    var more = A.COLLECTIONS.length - list.length;
+    return '<section class="section h-lcoll"><div class="container">' +
+      sectionHead('Les collections', 'Un musée en ' + A.COLLECTIONS.length + ' salles.') +
+      '<div class="lc-row">' + list.map(function (c) {
+        return '<article class="lc-item"><div class="lc-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: 'base', w: 640, h: 420 }, '(max-width: 900px) 78vw, 300px') + '</div>' +
+          '<p class="eyebrow">' + c.family + '</p><h3 class="lc-name">' + U.esc(c.name) + '</h3><p class="lc-tag">' + c.tagline + '</p>' +
+          '<p class="lc-n">' + c.chars.length + ' personnages</p></article>';
+      }).join('') + '</div>' +
+      '<div class="steps-dots lc-dots is-mob" aria-hidden="true">' + list.map(function (c, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
+      '<p class="lc-more">Et ' + more + ' autres collections. Prochainement : ' + A.UPCOMING.map(function (u) { return u.name; }).join(', ') + '.</p>' +
+    '</div></section>';
+  }
+
+  /* ---------- Connexion / inscription (simulées) ----------
+     #/connexion et #/connexion?mode=inscription, affichées tant que le joueur est déconnecté */
+  var LOGO_APPLE = '<svg class="auth-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.72-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.75.73 1.05 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.5zM14.19 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>';
+  var LOGO_GOOGLE = '<svg class="auth-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.87-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95h-4v3.1A11.99 11.99 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.29 14.3A7.2 7.2 0 0 1 4.91 12c0-.8.14-1.57.38-2.3V6.6h-4A11.99 11.99 0 0 0 0 12c0 1.94.46 3.77 1.29 5.4l4-3.1z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.8l3.43-3.43C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.29 6.6l4 3.1C6.23 6.86 8.88 4.75 12 4.75z"/></svg>';
+  P.loginHTML = function (mode) {
+    var up = mode === 'inscription', u = S.get().user;
+    var field = function (name, label, type, extra) {
+      return '<label class="auth-field"><span>' + label + '</span><input class="auth-input" name="' + name + '" type="' + type + '"' + (extra || '') + '>' +
+        '<small class="auth-err" data-err="' + name + '"></small></label>';
+    };
+    return '<section class="auth"><div class="container auth-grid">' +
+      '<div class="auth-visual" aria-hidden="true">' + globe() + zeusFan(null) + '</div>' +
+      '<div class="auth-main">' +
+        // Onglets sur toute la largeur du formulaire, trait doré sous l’actif (comme le sélecteur de boosters)
+        '<nav class="auth-tabs" aria-label="Compte" style="--k:' + (up ? 1 : 0) + '">' +
+          '<a href="#/connexion"' + (up ? '' : ' class="is-on" aria-current="page"') + '>Connexion</a>' +
+          '<a href="#/connexion?mode=inscription"' + (up ? ' class="is-on" aria-current="page"' : '') + '>Inscription</a>' +
+          '<span class="auth-tabs-bar"></span>' +
+        '</nav>' +
+        '<h1 class="h1">' + (up ? 'Créer un compte.' : 'Bon retour.') + '</h1>' +
+        '<p class="lead">' + (up ? 'Gratuit, et un booster offert toutes les 15 minutes.' : 'Retrouvez votre collection et vos boosters.') + '</p>' +
+        '<div class="auth-social">' +
+          '<button type="button" class="btn btn-ghost btn-lg" data-auth-social="Apple">' + LOGO_APPLE + 'Apple</button>' +
+          '<button type="button" class="btn btn-ghost btn-lg" data-auth-social="Google">' + LOGO_GOOGLE + 'Google</button>' +
+        '</div>' +
+        '<p class="auth-or"><span>ou avec votre e-mail</span></p>' +
+        '<form class="auth-form" novalidate data-auth-form>' +
+          (up ? field('name', 'Pseudo', 'text', ' autocomplete="nickname" autocapitalize="off" maxlength="24"') : '') +
+          field('email', 'E-mail', 'email', ' autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"' + (!up && u.email ? ' value="' + U.esc(u.email) + '"' : '')) +
+          '<label class="auth-field"><span>Mot de passe' + (up ? '' : '<button type="button" class="link-btn" data-forgot>Mot de passe oublié ?</button>') + '</span>' +
+            '<span class="auth-pass"><input class="auth-input" name="password" type="password" autocomplete="' + (up ? 'new-password' : 'current-password') + '"' + (up ? ' placeholder="8 caractères minimum"' : '') + '>' +
+            '<button type="button" class="auth-eye" data-eye aria-label="Afficher le mot de passe">Afficher</button></span>' +
+            '<small class="auth-err" data-err="password"></small></label>' +
+          '<button class="btn btn-primary btn-lg auth-submit" type="submit">' + (up ? 'Créer mon compte' : 'Se connecter') + '</button>' +
+          (up ? '<p class="auth-legal">En créant un compte, vous acceptez les conditions d’utilisation.</p>' : '') +
+        '</form>' +
+        '<p class="so-note">' + I('lock') + 'Prototype : connexion simulée, aucune donnée n’est envoyée.</p>' +
+      '</div>' +
+    '</div></section>';
+  };
+  P.loginMount = function (root, mode) {
+    var up = mode === 'inscription', form = root.querySelector('[data-auth-form]');
+    function err(name, msg) {
+      var el = form.querySelector('[data-err="' + name + '"]'), input = form.querySelector('[name="' + name + '"]');
+      if (el) el.textContent = msg || '';
+      if (input) input.classList.toggle('is-bad', !!msg);
+      return !msg;
+    }
+    root.addEventListener('click', function (e) {
+      var eye = e.target.closest('[data-eye]');
+      if (eye) {
+        var p = form.querySelector('[name="password"]'), show = p.type === 'password';
+        p.type = show ? 'text' : 'password';
+        eye.textContent = show ? 'Masquer' : 'Afficher';
+        eye.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+        return;
+      }
+      if (e.target.closest('[data-forgot]')) {
+        var em = form.querySelector('[name="email"]').value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { err('email', 'Indiquez votre e-mail pour recevoir le lien.'); return; }
+        U.toast('Lien de réinitialisation envoyé à ' + U.esc(em) + ' (simulation)');
+        return;
+      }
+      var so = e.target.closest('[data-auth-social]');
+      if (so) A.app.login(up ? 'Bienvenue sur ATLAS' : null);
+    });
+    form.addEventListener('input', function (e) { if (e.target.name) err(e.target.name, ''); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = function (n) { var x = form.querySelector('[name="' + n + '"]'); return x ? x.value.trim() : ''; };
+      var ok = true;
+      if (up) ok = err('name', v('name').length < 2 ? 'Choisissez un pseudo d’au moins 2 caractères.' : '') && ok;
+      ok = err('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')) ? '' : 'Cette adresse e-mail n’est pas valide.') && ok;
+      ok = err('password', v('password').length < (up ? 8 : 1) ? (up ? 'Au moins 8 caractères.' : 'Indiquez votre mot de passe.') : '') && ok;
+      if (!ok) { var bad = form.querySelector('.is-bad'); if (bad) bad.focus(); return; }
+      var btn = form.querySelector('.auth-submit');
+      btn.disabled = true; btn.textContent = up ? 'Création du compte…' : 'Connexion…';
+      setTimeout(function () {
+        if (up) S.updateUser({ name: v('name'), email: v('email') });
+        else S.updateUser({ email: v('email') });
+        A.app.login(up ? 'Bienvenue sur ATLAS, ' + U.esc(v('name')) : null);
+      }, 500);
+    });
   };
 
   P.home = {
     title: 'Le monde, en cartes',
-    mount: function (root) {
+    mount: function (root, ctx) {
       A.pack.mountAll(root);
       // Carrousel des deux sachets : onglets synchronisés, seul le sachet affiché flotte doucement
       var slides = root.querySelector('.play-slides'), tabs = root.querySelectorAll('.pick-b'), packs = root.querySelectorAll('.play-slide .pk');
@@ -269,63 +568,93 @@
       if (slides) {
         var st0;
         slides.addEventListener('scroll', function () { clearTimeout(st0); st0 = setTimeout(sync, 80); }, { passive: true });
-        tabs.forEach(function (t) { t.addEventListener('click', function () { var k = +t.getAttribute('data-go'); slides.scrollTo({ left: k * slides.firstElementChild.offsetWidth, behavior: 'smooth' }); }); });
+        /* Passage d’un sachet à l’autre : glissement animé par le site lui-même (le défilement « doux » du navigateur
+           saute d’un coup quand les animations du système sont coupées). Le sachet qui part recule et s’estompe,
+           celui qui arrive s’avance ; le trait des onglets suit. */
+        var glideRaf = 0;
+        function glide(k) {
+          var w = slides.firstElementChild.offsetWidth, from = slides.scrollLeft, to = k * w, cur = current();
+          cancelAnimationFrame(glideRaf);
+          Array.prototype.forEach.call(slides.children, function (c) { c.classList.remove('is-leave', 'is-arrive'); });
+          if (Math.abs(to - from) < 1) { slides.classList.remove('is-gliding', 'is-dragging'); sync(); return; }
+          var dur = Math.round(Math.min(760, 460 + Math.abs(to - from) / w * 120)), t0 = performance.now();
+          slides.style.setProperty('--glide', dur + 'ms');
+          slides.classList.add('is-gliding');
+          if (cur !== k && slides.children[cur]) slides.children[cur].classList.add('is-leave');
+          if (slides.children[k]) slides.children[k].classList.add('is-arrive');
+          tabs.forEach(function (t, i) { t.classList.toggle('is-on', i === k); });
+          var pk0 = root.querySelector('.pick'); if (pk0) pk0.style.setProperty('--k', k);
+          (function step(now) {
+            var p = Math.min(1, (now - t0) / dur), e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+            slides.scrollLeft = from + (to - from) * e;
+            if (p < 1) { glideRaf = requestAnimationFrame(step); return; }
+            slides.classList.remove('is-gliding', 'is-dragging');
+            Array.prototype.forEach.call(slides.children, function (c) { c.classList.remove('is-leave', 'is-arrive'); });
+            sync();
+          })(t0);
+        }
+        tabs.forEach(function (t) { t.addEventListener('click', function () { glide(+t.getAttribute('data-go')); }); });
         // Toucher Coffret ou Saga plus bas : on remonte et le sachet passe au premier plan
         root.querySelectorAll('[data-go-slide]').forEach(function (t) { t.addEventListener('click', function () {
           var k = +t.getAttribute('data-go-slide'), top = root.querySelector('.play').getBoundingClientRect().top + window.scrollY - 60;
           if (window.scrollY > top + 10) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-          slides.scrollTo({ left: k * slides.firstElementChild.offsetWidth, behavior: 'smooth' });
+          glide(k);
         }); });
+        // Souris : on fait glisser les sachets à la main (le doigt et le pavé tactile défilent déjà nativement).
+        // Un glissement d’un huitième de largeur suffit à changer de sachet ; un vrai glissement n’ouvre pas le booster.
+        var drag = null, dragged = false, settle;
+        slides.addEventListener('dragstart', function (e) { e.preventDefault(); });
+        slides.addEventListener('pointerdown', function (e) {
+          if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('button')) return;
+          cancelAnimationFrame(glideRaf); slides.classList.remove('is-gliding');
+          drag = { x: e.clientX, left: slides.scrollLeft, k: current(), id: e.pointerId }; dragged = false;
+        });
+        slides.addEventListener('pointermove', function (e) {
+          if (!drag || e.pointerId !== drag.id) return;
+          var dx = e.clientX - drag.x;
+          if (!dragged) {
+            if (Math.abs(dx) < 6) return;
+            dragged = true; clearTimeout(settle);
+            try { slides.setPointerCapture(e.pointerId); } catch (er) { /* pointeur déjà relâché */ }
+            slides.classList.add('is-dragging');
+          }
+          slides.scrollLeft = drag.left - dx;
+        });
+        function endDrag(e) {
+          if (!drag) return;
+          var d = drag; drag = null;
+          if (!dragged) return;
+          var w = slides.firstElementChild.offsetWidth, dx = e.clientX - d.x;
+          var k = Math.max(0, Math.min(slides.children.length - 1, Math.abs(dx) > w / 8 ? d.k + (dx < 0 ? 1 : -1) : d.k));
+          glide(k);   // l’aimantation reste coupée pendant le glissement (is-gliding), sinon elle l’interrompt
+        }
+        slides.addEventListener('pointerup', endDrag);
+        slides.addEventListener('pointercancel', endDrag);
+        slides.addEventListener('click', function (e) { if (dragged) { dragged = false; e.preventDefault(); e.stopPropagation(); } }, true);
         sync();
       }
       root.addEventListener('click', function (e) {
-        if (e.target.closest('[data-to-top]')) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
         if (e.target.closest('[data-dev-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
+        // Récompenses prêtes : on les récupère sans quitter l’accueil (les boosters gagnés arrivent dans le hub)
+        if (claimClick(e)) return;
+        var od = e.target.closest('[data-odds]');
+        if (od) { oddsModal(od.getAttribute('data-odds')); return; }
         var m = e.target.closest('[data-open-many]');
         if (m) { var id = m.getAttribute('data-open-many'); A.multi.open(id, A.multi.count(id)); return; }
         var t = e.target.closest('[data-open-pack]');
         if (t) A.opener.open(t.getAttribute('data-open-pack'));
       });
-      // Carrousel « Comment ça marche » : le point actif suit l’étape visible
-      var st = root.querySelector('.steps'), dots = root.querySelectorAll('.steps-dots i');
-      if (st && dots.length) st.addEventListener('scroll', function () {
-        var w = st.firstElementChild ? st.firstElementChild.offsetWidth + 12 : 1, k = st.scrollLeft + st.clientWidth >= st.scrollWidth - 4 ? dots.length - 1 : Math.round(st.scrollLeft / w);
-        dots.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, dots.length - 1)); });
-      }, { passive: true });
-      autoSlide(st, 4500);
-      // Carrousels de grandes cartes (collections populaires, à venir) : points synchronisés
-      [['.pop-row:not(.up-row)', '.pop-dots:not(.up-dots) i'], ['.up-row', '.up-dots i']].forEach(function (q) {
-        var pr = root.querySelector(q[0]), pd = root.querySelectorAll(q[1]);
-        if (!pr || !pd.length) return;
-        pr.addEventListener('scroll', function () {
-          var w = pr.firstElementChild ? pr.firstElementChild.offsetWidth + 12 : 1, k = pr.scrollLeft + pr.clientWidth >= pr.scrollWidth - 4 ? pd.length - 1 : Math.round(pr.scrollLeft / w);
-          pd.forEach(function (d, i) { d.classList.toggle('is-on', i === Math.min(k, pd.length - 1)); });
-        }, { passive: true });
-        autoSlide(pr, 5000);
-      });
-      // Raretés (mobile) : la carte du centre en avant, les voisines plus petites et estompées
-      var rr = root.querySelector('.rarity-row');
-      if (rr && window.matchMedia && matchMedia('(max-width: 900px)').matches) {
-        var ri = [].slice.call(rr.children), rd = root.querySelectorAll('.rar-dot'), rraf = 0;
-        var center = function (i) { return ri[i].offsetLeft + ri[i].offsetWidth / 2 - rr.clientWidth / 2; };
-        var upd = function () {
-          rraf = 0;
-          var c = rr.scrollLeft + rr.clientWidth / 2, best = 0, bd = 1e9;
-          ri.forEach(function (it, i) {
-            var d = Math.abs(it.offsetLeft + it.offsetWidth / 2 - c) / it.offsetWidth;
-            it.style.setProperty('--d', Math.min(1, d).toFixed(3));
-            if (d < bd) { bd = d; best = i; }
-          });
-          ri.forEach(function (it, i) { it.classList.toggle('is-on', i === best); });
-          rd.forEach(function (d, i) { d.classList.toggle('is-on', i === best); });
-        };
-        rr.addEventListener('scroll', function () { if (!rraf) rraf = requestAnimationFrame(upd); }, { passive: true });
-        rd.forEach(function (d) { d.addEventListener('click', function () { rr.dispatchEvent(new Event('pointerdown')); rr.scrollTo({ left: center(+d.getAttribute('data-rar')), behavior: 'smooth' }); }); });
-        rr.scrollLeft = center(Math.min(3, ri.length - 1));   // on commence sur la Légendaire
-        upd();
+      var toOpen = ctx && ctx.query.open;
+      if (toOpen && A.PACK[toOpen]) {
+        // On retire « ?open= » de l’adresse : sinon un nouveau rendu rouvrirait le booster
+        try { history.replaceState(null, '', '#/'); } catch (er) { /* ignore */ }
+        var sl = slides && slides.querySelector('[data-open-pack="' + toOpen + '"]');
+        sl = sl && sl.closest('.play-slide');
+        if (sl) { slides.scrollLeft = Array.prototype.indexOf.call(slides.children, sl) * slides.firstElementChild.offsetWidth; sync(); }
+        if (S.canOpen(toOpen).ok) setTimeout(function () { A.opener.open(toOpen); }, 350);
       }
-      autoSlide(rr, 3200);
-      // Marketplace : changer de tri
+      // Marketplace : la rangée des lots défile seule tant qu’on n’y touche pas ; changer de tri
+      autoSlide(root.querySelector('[data-mk-row]'), 3800);
       root.querySelectorAll('[data-mk-sort]').forEach(function (b) { b.addEventListener('click', function () {
         root.querySelectorAll('[data-mk-sort]').forEach(function (x) { x.classList.toggle('is-on', x === b); });
         var row = root.querySelector('[data-mk-row]');
@@ -345,75 +674,158 @@
         root.querySelectorAll('[data-clock="daily-s"]').forEach(function (el) { el.textContent = U.clock(S.nextDailyIn()).replace(' min', ''); });
       }, 1000);
     },
+    // Ordre : vos boosters (plein écran) → votre collection (récompenses, événement, collections presque complètes) → marketplace
     render: function () {
-      var popular = A.COLLECTIONS.filter(function (c) { return c.popular; }).sort(function (a, b) { return a.popular - b.popular; }).slice(0, 3);
-      var event = A.COLLECTIONS.find(function (c) { return c.status === 'event'; });
-
-      return playHTML() +
-      '<section class="section section-alt h-coll"><div class="container">' +
-        sectionHead('Collections populaires', 'Les collections les plus visitées.', ['Toutes les collections', '#/collections']) +
-        '<div class="coll-grid is-desk">' + popular.map(function (c) { return collTile(c); }).join('') + '</div>' +
-        // mobile : grandes cartes au format de l’événement, qui défilent (l’événement en tête)
-        '<div class="pop-row is-mob">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c) {
-          var pr = S.collectionProgress(c.id), ev = c.id === event.id, done = pr.pct >= 1, gift = S.readyCount(c.id);
-          return '<a class="event-banner pop-card" href="#/collection/' + c.id + '">' +
-            '<div class="event-art">' + collArt(c, ev ? { seed: 'event-hero', coll: c.id, rarity: 'legendary', w: 900, h: 300 } : { seed: c.id + '-banner', coll: c.id, rarity: 'base', w: 900, h: 300 }, '100vw') +
-              (gift ? '<span class="st-badge is-reward" title="Récompense à récupérer">' + U.icon('gift') + '</span>' : '') + '</div>' +
-            '<div class="event-copy"><p class="eyebrow">' + (ev ? 'Nouvelle collection · Événement' : 'Collection populaire') + '</p><h3 class="h2">' + U.esc(c.name) + '</h3><p>' + c.tagline + '</p>' +
-              '<div class="pop-foot"><span class="link-arrow">Explorer ' + I('arrow') + '</span>' +
-              '<span class="pop-n' + (done ? ' is-done' : '') + '">' + pr.owned + '/' + pr.total + '<i style="--p:' + Math.round(pr.pct * 100) + '%"></i></span></div></div></a>';
-        }).join('') + '</div>' +
-        '<div class="steps-dots pop-dots is-mob" aria-hidden="true">' + [event].concat(popular.filter(function (c) { return c.id !== event.id; })).map(function (c, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
-        '<a class="event-banner is-desk" href="#/collection/' + event.id + '">' +
-          '<div class="event-art">' + collArt(event, { seed: 'event-hero', coll: event.id, rarity: 'legendary', w: 900, h: 300 }, '760px') + '</div>' +
-          '<div class="event-copy"><p class="eyebrow">Nouvelle collection · Événement</p><h3 class="h2">' + event.name + '</h3><p>' + event.tagline + '</p>' +
-          '<span class="link-arrow">Explorer la collection ' + I('arrow') + '</span></div></a>' +
-      '</div></section>' +
-
-      '<section class="section h-rar"><div class="container">' +
-        sectionHead('Six raretés', 'Une même figure, six œuvres.') +
-        '<p class="section-lead">Chaque personnage existe en plusieurs éditions illustrées. La rareté tient à l’œuvre et au tirage, jamais à la puissance.</p>' +
-        '<div class="rarity-row">' + A.RARITIES.map(function (r) {
-          return '<figure class="rarity-item">' + U.card('grece-zeus-' + r.id, { serial: r.supply ? Math.min(7 + r.rank * 3, r.supply) : null, open: true }) +
-            '<figcaption><span class="rar-chip r-' + r.id + '"><i></i>' + r.label + '</span><span class="muted small">' + (r.supply ? (r.supply === 1 ? 'Pièce unique' : r.supply + ' exemplaires') : 'Tirage illimité') + '</span></figcaption></figure>';
-        }).join('') + '</div>' +
-        '<div class="rar-dots is-mob" role="tablist">' + A.RARITIES.map(function (r, i) { return '<button class="rar-dot r-' + r.id + '" data-rar="' + i + '" aria-label="' + r.label + '"></button>'; }).join('') + '</div>' +
-      '</div></section>' +
-
-      // Marketplace : les vraies annonces du moment, triables (rares, petits prix, nouveautés)
-      (function () {
-        var L = S.listings().filter(function (l) { return !l.mine; }), week = Date.now() - 7 * 864e5;
-        var sold = S.sales().filter(function (x) { return x.at > week; }).length;
-        return '<section class="section h-trade"><div class="container">' +
-          '<div class="section-head"><div><p class="eyebrow">Marketplace</p><h2 class="h2">À vendre en ce moment.</h2>' +
-            '<p class="mk-meta"><b>' + U.num(L.length) + '</b> annonces<span>·</span><b>' + U.num(sold) + '</b> ventes cette semaine</p></div></div>' +
-          '<div class="mk-sort" role="tablist">' +
-            '<button class="is-on" data-mk-sort="rare" role="tab">Les plus rares</button><button data-mk-sort="cheap" role="tab">Petits prix</button><button data-mk-sort="new" role="tab">Nouveautés</button>' +
-          '</div>' +
-          '<div class="mk-row" data-mk-row>' + mkItems(L, 'rare') + '</div>' +
-        '</div></section>';
-      })() +
-
-      '<section class="section h-up"><div class="container">' +
-        sectionHead('Prochainement', 'Les collections à venir.') +
-        // mobile : mêmes grandes cartes que les collections populaires
-        '<div class="pop-row up-row is-mob">' + A.UPCOMING.map(function (u) {
-          return '<div class="event-banner pop-card is-soon"><div class="event-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 900, h: 300 }) + '</div>' +
-            '<div class="event-copy"><p class="eyebrow">' + u.date + ' · ' + u.family + '</p><h3 class="h2">' + u.name + '</h3><p>' + u.desc + '</p>' +
-            '<div class="pop-foot"><span class="soon-tag">' + I('clock') + 'En préparation</span></div></div></div>';
-        }).join('') + '</div>' +
-        '<div class="steps-dots pop-dots up-dots is-mob" aria-hidden="true">' + A.UPCOMING.map(function (u, i) { return '<i' + (i ? '' : ' class="is-on"') + '></i>'; }).join('') + '</div>' +
-        '<div class="upcoming is-desk">' + A.UPCOMING.map(function (u) {
-          return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div>' +
-            '<p class="eyebrow">' + u.family + '</p><h3 class="h3">' + u.name + '</h3><p class="muted">' + u.desc + '</p></article>';
-        }).join('') + '</div>' +
-      '</div></section>' +
-
-      '<section class="section cta h-cta"><div class="container cta-inner">' + U.mark('cta-mark') +
-        '<h2 class="h2">Vos boosters vous attendent.</h2><p class="lead">Un Booster Atlas toutes les 15 minutes, trois cartes chaque jour, et des coffrets à gagner. Sans paiement.</p>' +
-        '<button class="btn btn-primary btn-lg" data-to-top>' + I('arrow') + 'Remonter aux boosters</button></div></section>';
+      return playHTML() + progressHTML() + combatHTML() + marketHTML();
     }
   };
+
+  /* Récompenses et missions prêtes à récupérer, toutes collections confondues */
+  function readyRewards() {
+    var out = [];
+    A.COLLECTIONS.forEach(function (c) { S.rewards(c.id).concat(S.missions(c.id)).forEach(function (s) { if (s.state === 'ready') out.push(s); }); });
+    (A.GROUPS || []).forEach(function (g) { S.rewards('@' + g.id).forEach(function (s) { if (s.state === 'ready') out.push(s); }); });
+    return out;
+  }
+  /* Votre progression : ce qu’il y a à récupérer, l’événement en cours, puis les collections les plus proches d’être complètes */
+  function progressHTML() {
+    var ready = readyRewards();
+    var ev = S.eventRemaining() > 0 ? A.COLLECTIONS.find(function (c) { return c.status === 'event'; }) : null;
+    var started = A.COLLECTIONS.map(function (c) { return { c: c, pr: S.collectionProgress(c.id) }; })
+      .filter(function (x) { return x.pr.owned > 0 && x.pr.pct < 1 && x.c !== ev; })
+      .sort(function (a, b) { return b.pr.pct - a.pr.pct || (a.pr.total - a.pr.owned) - (b.pr.total - b.pr.owned); });
+    var fresh = !started.length;
+    // Aucune collection commencée : on propose les plus populaires pour démarrer
+    var list = fresh ? A.COLLECTIONS.filter(function (c) { return c.popular && c !== ev; }).sort(function (a, b) { return a.popular - b.popular; }).slice(0, 3).map(function (c) { return { c: c, pr: S.collectionProgress(c.id) }; }) : started.slice(0, 3);
+    /* Récompenses prêtes : une seule ligne (icônes, total, aperçu des deux premières) et un bouton
+       qui récupère tout ; le détail reste dans chaque collection, signalé sur les vignettes */
+    return '<section class="section section-dark is-fixed-dark is-ink-dark h-prog"><div class="container">' +
+      sectionHead('Votre collection', fresh ? 'Vos premières salles' : 'Vos salles presque complètes', ['Toutes les collections', '#/collections']) +
+      giftsHTML(ready) +
+      '<div class="pg-colls" style="--n:' + (list.length + (ev ? 1 : 0)) + '">' + (ev ? pgEvent(ev) : '') + list.map(function (x) { return pgRow(x.c, x.c.family); }).join('') + '</div>' +
+    '</div></section>';
+  }
+  function giftsHTML(ready) {
+    if (!ready.length) return '';
+    var one = ready.length === 1, rest = ready.length - 2;
+    return '<div class="pg-gifts">' +
+        '<span class="pg-ics" aria-hidden="true">' + ready.slice(0, 3).map(function (s) { return '<span class="pg-ic">' + U.rewardIcon(s.reward) + '</span>'; }).join('') + '</span>' +
+        '<span class="pg-txt"><b>' + (one ? U.esc(ready[0].label) : ready.length + ' récompenses<span class="pg-tail"> à récupérer</span>') + '</b><small>' +
+          (one ? U.esc(S.scopeName(ready[0].coll)) + ' · ' + U.esc(U.rewardText(ready[0].reward))
+               : ready.slice(0, 2).map(function (s) { return U.esc(s.label) + ' · ' + U.esc(S.scopeName(s.coll)); }).join(', ') + (rest > 0 ? ' et ' + rest + ' autre' + (rest > 1 ? 's' : '') : '')) +
+        '</small></span>' +
+        (one ? '<button class="btn btn-gold btn-sm" data-claim="' + ready[0].id + '" data-scope="' + ready[0].coll + '">Récupérer</button>'
+             : '<button class="btn btn-gold btn-sm" data-claim-all>' + I('gift') + 'Tout récupérer</button>') +
+      '</div>';
+  }
+  // Récupère une récompense (data-claim) ou toutes (data-claim-all) ; renvoie true si le clic est traité
+  function claimClick(e) {
+    var cl = e.target.closest('[data-claim]');
+    if (cl) {
+      var res = S.claim(cl.getAttribute('data-scope'), cl.getAttribute('data-claim'));
+      if (!res.ok) { U.toast(res.error, 'error'); return true; }
+      U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · dans vos boosters' : ''));
+      A.app.rerender();
+      return true;
+    }
+    if (e.target.closest('[data-claim-all]')) {
+      var got = readyRewards(), boost = 0, ok = 0, full = 0;
+      got.forEach(function (s) { var r = S.claim(s.coll, s.id); if (r.ok) { ok++; if (r.reward.booster) boost++; } else if (r.full) full++; });
+      U.toast(ok + ' récompense' + (ok > 1 ? 's' : '') + ' récupérée' + (ok > 1 ? 's' : '') + (boost ? ' · ' + boost + ' booster' + (boost > 1 ? 's' : '') + ' dans vos boosters' : '') +
+        (full ? ' · ' + full + ' en attente (réserve pleine)' : ''));
+      A.app.rerender();
+      return true;
+    }
+    return false;
+  }
+  // Une collection en ligne : vignette, nom, progression, prochain palier
+  function pgRow(c, eyebrow) {
+    var pr = S.collectionProgress(c.id), done = pr.pct >= 1;
+    return '<a class="pg-coll' + (done ? ' is-done' : '') + '" href="#/collection/' + c.id + '">' +
+      '<span class="pg-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 320, h: 200 }, '(max-width: 900px) 96px, 360px') +
+        (S.readyCount(c.id) ? '<span class="pg-flag is-gift" title="Récompense à récupérer">' + I('gift') + '<span>Récompense</span></span>'
+          : c.status === 'event' ? '<span class="pg-flag">Nouveau</span>' : '') + pgNext(c.id, true) + '</span>' +
+      '<span class="pg-copy">' + (eyebrow ? '<span class="eyebrow">' + eyebrow + '</span>' : '') + '<span class="pg-name">' + U.esc(c.name) + '</span>' +
+        '<span class="pg-n"><b>' + pr.owned + '/' + pr.total + '</b><i style="--p:' + Math.round(pr.pct * 100) + '%"></i>' + (done ? '<em>' + I('check') + 'Complète</em>' : '') + '</span>' +
+        pgNext(c.id) + '</span>' + I('chevR') + '</a>';
+  }
+  // L’événement en cours : première vignette, objet de musée et temps restant en doré
+  function pgEvent(ev) {
+    var pr = S.collectionProgress(ev.id), days = Math.ceil(S.eventRemaining() / 864e5);
+    return '<a class="pg-coll is-event" href="#/collection/' + ev.id + '">' +
+      '<span class="pg-art">' + collArt(ev, { seed: 'event-hero', coll: ev.id, rarity: 'legendary', w: 320, h: 200 }, '(max-width: 900px) 96px, 360px', 'objet') +
+        '<span class="pg-flag">Événement</span>' + pgNext(ev.id, true) + '</span>' +
+      '<span class="pg-copy"><span class="eyebrow">Encore ' + days + ' jour' + (days > 1 ? 's' : '') + '</span><span class="pg-name">' + U.esc(ev.name) + '</span>' +
+        '<span class="pg-n"><b>' + pr.owned + '/' + pr.total + '</b><i style="--p:' + Math.round(pr.pct * 100) + '%"></i></span>' +
+        pgNext(ev.id) + '</span>' + I('chevR') + '</a>';
+  }
+  // Prochain palier, en une ligne courte : « Encore 1 personnage · Personnage secret »
+  // onArt : la même info en pastille sur l’illustration (ordinateur) ; sous le nom sur mobile, la vignette est trop petite
+  function pgNext(cid, onArt) {
+    var s = S.rewards(cid).filter(function (x) { return x.state === 'locked'; })[0];
+    if (!s) return '';
+    var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
+    return '<span class="pg-next' + (onArt ? ' is-on-art' : '') + '">' + U.rewardIcon(s.reward) + '<span>Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' · ' + U.esc(U.rewardText(s.reward).split(' + ')[0]) + '</span></span>';
+  }
+  /* Vitrine du sachet : halo à la couleur du sachet et globe gravé en filigrane (statique, aucun calque GPU) */
+  var PLAY_AURA = '<span class="play-aura" aria-hidden="true"><i class="pa-halo"></i>' + globe() + '</span>';
+  /* En bas à droite du sachet : « Tout recharger » (mode test) au-dessus, probabilités en dessous */
+  function playSide(p) {
+    return '<div class="play-tools">' +
+      (S.UNLIMITED ? '<button class="play-tool is-test" data-dev-refill title="Tout recharger (test)" aria-label="Tout recharger (test)">' + I('reset') + '</button>' : '') +
+      '<button class="play-tool" data-odds="' + p.id + '" title="Probabilités" aria-label="Probabilités du ' + U.esc(p.name) + '"><b>%</b></button></div>';
+  }
+  /* Arène : votre bilan, votre meilleure équipe (trois cartes) et les trois modes, jouables d’un geste */
+  var HC_MODES = [
+    ['duel', 'swords', 'Duel tactique', 'Attaquer, défendre ou charger : devinez le coup adverse.', '3 cartes · 3 manches'],
+    ['quiz', 'scroll', 'Quiz des légendes', 'Liens, repères et récits des univers de vos cartes.', '100 PV · 5 manches'],
+    ['terrains', 'laurel', 'Trois terrains', 'Déployez vos renforts sur trois fronts, avec une bannière de +20.', '5 cartes · 3 fronts']
+  ];
+  function combatHTML() {
+    var c = S.combat();
+    var ros = A.combat && A.combat.roster ? A.combat.roster() : [], team = ros.slice(0, 3), ready = ros.length >= 3;
+    var stats = [['Victoires', c.w], ['Série', c.streak], ['Record', c.best]];
+    return '<section class="section h-combat"><div class="container">' +
+      sectionHead('Combat', 'L’arène des légendes', ['Ouvrir l’arène', '#/combat']) +
+      '<div class="hc-grid">' +
+        '<div class="hc-team">' +
+          '<p class="hc-label">' + (ready ? 'Votre meilleure équipe' : 'Votre équipe') + '</p>' +
+          (team.length ? '<div class="hc-fan">' + team.map(function (it, k) {
+            return '<a class="hc-card is-' + k + '" href="#/inventaire" aria-label="' + U.esc(A.CHAR[A.ED[it.ed].charId].name) + '">' + U.card(it.ed, { serial: it.serial, open: false, tilt: false, ctx: 'mini' }) + '</a>';
+          }).join('') + '</div>' : '') +
+          (ready ? '' : '<p class="hc-need">Il vous faut trois personnages différents pour combattre. <a href="#/">Ouvrez un booster</a>.</p>') +
+          '<dl class="hc-stats">' + stats.map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + U.num(x[1]) + '</dd></div>'; }).join('') + '</dl>' +
+          '<p class="hc-gain">' + I('coin') + '<span><b>' + S.COMBAT_REWARD + ' Éclats</b> par victoire, dans les trois modes</span></p>' +
+        '</div>' +
+        '<div class="hc-modes">' + HC_MODES.map(function (m) {
+          return '<a class="hc-mode" href="#/combat' + (ready ? '?mode=' + m[0] : '') + '">' +
+            '<span class="hc-ic">' + I(m[1]) + '</span>' +
+            '<span class="hc-copy"><span class="hc-name">' + m[2] + '</span><span class="hc-desc">' + m[3] + '</span><span class="hc-meta">' + m[4] + '</span></span>' +
+            '<span class="btn btn-gold btn-sm hc-go">' + I(m[1]) + 'Jouer</span></a>';
+        }).join('') + '</div>' +
+      '</div></div></section>';
+  }
+  /* Marketplace : une bande sombre mise en avant, avec ses deux entrées (acheter, vendre)
+     et, par défaut, les annonces de cartes que vous n’avez pas encore */
+  function marketHTML() {
+    var L = S.listings().filter(function (l) { return !l.mine; }), week = Date.now() - 7 * 864e5;
+    var sold = S.sales().filter(function (x) { return x.at > week; }).length;
+    var miss = L.filter(function (l) { return !S.ownedOf(l.ed).length; }).length;
+    var first = miss ? 'missing' : 'rare';
+    var sorts = (miss ? [['missing', 'Qui vous manquent']] : []).concat([['rare', 'Les plus rares'], ['cheap', 'Petits prix'], ['new', 'Nouveautés']]);
+    return '<section class="section section-dark is-fixed-dark h-trade h-mk"><div class="container">' +
+      '<div class="mk-band-head">' +
+        '<div class="mk-band-copy"><p class="eyebrow">Marketplace</p><h2 class="h2">La salle des ventes</h2>' +
+          '<p class="mk-meta"><b>' + U.num(L.length) + '</b> annonces<span>·</span><b>' + U.num(sold) + '</b> ventes cette semaine</p></div>' +
+        '<div class="mk-band-cta"><a class="btn btn-gold" href="#/marketplace">' + I('market') + 'Explorer la marketplace</a>' +
+          '<a class="btn btn-ghost-light" href="#/inventaire">' + I('tag') + 'Vendre une carte</a></div>' +
+      '</div>' +
+      '<div class="mk-sort" role="tablist">' + sorts.map(function (s) {
+        return '<button' + (s[0] === first ? ' class="is-on"' : '') + ' data-mk-sort="' + s[0] + '" role="tab">' + s[1] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="mk-row" data-mk-row>' + mkItems(L, first) + '</div>' +
+    '</div></section>';
+  }
 
   /* ======================================================================
      COLLECTIONS (galerie)
@@ -422,43 +834,57 @@
   // Recherche sans accents ni majuscules (« egypte » trouve « Égypte »)
   function norm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
   var STATUS = [['todo', 'À compléter'], ['done', 'Complètes'], ['gift', 'Récompenses']];
-  /* Collection : une seule page, deux onglets (Albums = le musée, Mes cartes = l’ancien inventaire) */
+  /* Collection : une seule page, deux onglets (Mes cartes en premier, puis Albums = le musée) */
+  /* Collection : même DA que la page d’un album. Bandeau sans illustration (titre, onglets, texte, chiffres clés,
+     progression globale), puis des sections avec surtitre, grand titre et compteur (U.secHead). */
+  function hubHero(tab, lead, kpis, cls) {
+    return '<section class="coll-hero is-saga is-hub is-plain">' +
+      '<div class="container coll-hero-copy">' + hubHead(tab) + '<p class="lead">' + lead + '</p>' +
+        '<div class="kpis' + (cls ? ' ' + cls : '') + '">' + kpis + '</div>' +   // tableau de chiffres clés, cases séparées par des filets
+      '</div></section>';
+  }
   function hubHead(tab) {
     var n = S.items().length;
-    return '<p class="eyebrow">Galerie</p><h1 class="h1">Collection</h1>' +
+    return '<div class="hub-head"><div><p class="eyebrow">Galerie</p><h1 class="h1">Collection</h1></div>' +
       '<nav class="hub-tabs" aria-label="Collection">' +
-        '<a href="#/collections"' + (tab === 'albums' ? ' class="is-on" aria-current="page"' : '') + '>' + I('grid') + 'Albums</a>' +
         '<a href="#/inventaire"' + (tab === 'cartes' ? ' class="is-on" aria-current="page"' : '') + '>' + I('cards') + 'Mes cartes<i>' + U.num(n) + '</i></a>' +
-      '</nav>';
+        '<a href="#/collections"' + (tab === 'albums' ? ' class="is-on" aria-current="page"' : '') + '>' + I('grid') + 'Albums</a>' +
+      '</nav></div>';
   }
   P.collections = {
     title: 'Collection · Albums',
-    render: function () {
+    render: function (ctx) {
+      if (ctx && ctx.query && ctx.query.album) cf = { universe: 'all', q: '', status: '' };   // l’album demandé doit être visible
       var unis = A.COLLECTIONS.map(function (c) { return c.universe; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       var done = A.COLLECTIONS.filter(function (c) { return S.collectionProgress(c.id).pct >= 1; }).length;
-      return '<section class="page-head cf-head"><div class="container">' + hubHead('albums') +
-        '<p class="cf-meta"><b>' + A.COLLECTIONS.length + '</b> collections<span>·</span><b>' + A.CHARS.length + '</b> figures<span>·</span><b>' + done + '</b> complètes</p>' +
-      '</div></section>' +
-      // Barre collante : recherche, statut, univers
-      '<div class="cf-bar"><div class="container">' +
-        '<label class="cf-search">' + I('search') + '<input type="search" enterkeyhint="search" autocomplete="off" placeholder="Collection, personnage, univers…" value="' + U.esc(cf.q) + '" data-q>' +
-          '<button type="button" class="cf-clear" data-clear aria-label="Effacer"' + (cf.q ? '' : ' hidden') + '>' + I('close') + '</button></label>' +
-        '<div class="cf-chips" role="toolbar">' +
-          STATUS.map(function (st) { return '<button class="cf-chip is-status' + (cf.status === st[0] ? ' is-on' : '') + '" data-status="' + st[0] + '">' + (st[0] === 'gift' ? I('gift') : '') + st[1] + '<i data-n="' + st[0] + '"></i></button>'; }).join('') +
-          '<span class="cf-sep" aria-hidden="true"></span>' +
-          unis.map(function (u) { return '<button class="cf-chip' + (cf.universe === u ? ' is-on' : '') + '" data-uni="' + U.esc(u) + '">' + u + '</button>'; }).join('') +
+      var owned = A.CHARS.filter(function (ch) { return S.ownsChar(ch.id); }).length, ready = readyRewards().length;
+      return hubHero('albums', A.COLLECTIONS.length + ' collections rangées par univers : complétez-les pour débloquer portraits, titres et personnages secrets.',
+          '<div><span>Collections</span><b>' + A.COLLECTIONS.length + '</b></div>' +
+          '<div><span>Personnages</span><b>' + owned + '<small> / ' + A.CHARS.length + '</small></b></div>' +
+          '<div><span>Complètes</span><b>' + done + '<small> / ' + A.COLLECTIONS.length + '</small></b></div>' +
+          '<div class="cf-kpi-gift"><span>Récompenses prêtes</span><b>' + ready + '</b>' +
+            (ready ? '<button class="btn btn-gold btn-xs" data-claim-all>' + I('gift') + 'Tout récupérer</button>' : '') + '</div>', 'cf-kpis') +
+      '<section class="section-tight cf-res hub-sec"><div class="container">' +
+        U.secHead('Albums', 'Les salles du musée', done, A.COLLECTIONS.length, 'complètes') +
+        // Filtres comme « Mes cartes » : pastilles de statut à gauche, univers et recherche à droite
+        '<div class="toolbar sticky-bar cf-tools">' +
+          '<div class="chips scroll-x" role="toolbar">' + [['', 'Toutes']].concat(STATUS).map(function (st) {
+            return '<button class="chip' + (cf.status === st[0] ? ' is-active' : '') + '" data-status="' + st[0] + '">' + (st[0] === 'gift' ? I('gift') : '') + st[1] + (st[0] ? '<i class="chip-n" data-n="' + st[0] + '"></i>' : '') + '</button>';
+          }).join('') + '</div>' +
+          '<div class="tb-filters">' +
+            '<label class="select is-compact" title="Univers"><select data-uni-sel aria-label="Univers"><option value="all">Tous les univers</option>' +
+              unis.map(function (u) { return '<option value="' + U.esc(u) + '"' + (cf.universe === u ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select></label>' +
+            '<label class="search cf-find">' + I('search') + '<input type="search" enterkeyhint="search" autocomplete="off" placeholder="Rechercher…" aria-label="Rechercher une collection, un personnage" value="' + U.esc(cf.q) + '" data-q>' +
+              '<button type="button" class="cf-clear" data-clear aria-label="Effacer"' + (cf.q ? '' : ' hidden') + '>' + I('close') + '</button></label>' +
+          '</div>' +
         '</div>' +
-      '</div></div>' +
-      '<section class="section-tight cf-res"><div class="container">' +
-        (S.UNLIMITED ? '<div class="da-test"><span>Essai de style (test)</span>' + [['', 'Aquarelle'], ['objet', 'Objet'], ['lino', 'Linogravure']].map(function (d) {
-          return '<button data-da="' + d[0] + '"' + ((A.collStyle ? A.collStyle() : '') === d[0] ? ' class="is-on"' : '') + '>' + d[1] + '</button>'; }).join('') + '</div>' : '') +
         '<div class="cf-count" data-count></div><div data-results></div></div></section>' +
       '<section class="section section-alt"><div class="container">' + sectionHead('Prochainement', 'Les collections à venir.') +
         '<div class="upcoming">' + A.UPCOMING.map(function (u) {
           return '<article class="up-item"><div class="up-art">' + A.artImg({ seed: u.id, coll: 'x', rarity: 'base', motif: u.motif, w: 480, h: 280 }) + '<span class="tag">' + u.date + '</span></div><p class="eyebrow">' + u.family + '</p><h3 class="h3">' + u.name + '</h3><p class="muted">' + u.desc + '</p></article>';
         }).join('') + '</div></div></section>';
     },
-    mount: function (root) {
+    mount: function (root, ctx) {
       var res = root.querySelector('[data-results]'), cnt = root.querySelector('[data-count]'), input = root.querySelector('[data-q]');
       function statusOk(c, st) {
         var pr = S.collectionProgress(c.id);
@@ -481,7 +907,7 @@
           var chars = A.CHARS.filter(function (ch) { return norm(ch.name + ' ' + ch.title).indexOf(q) !== -1; })
             .filter(function (ch) { return list.some(function (c) { return c.id === ch.coll; }); });
           cnt.innerHTML = '<b>' + colls.length + '</b> collection' + (colls.length > 1 ? 's' : '') + '<span>·</span><b>' + chars.length + '</b> personnage' + (chars.length > 1 ? 's' : '');
-          if (colls.length) html += '<h2 class="cf-sub">Collections</h2>' + shelf('', colls);
+          if (colls.length) html += '<h2 class="cf-sub">Collections</h2>' + shelf('', colls, true);
           if (chars.length) html += '<h2 class="cf-sub">Personnages</h2><div class="card-grid">' + chars.map(function (ch) {
             var best = S.bestOwned(ch.id);
             return '<div class="cg-item">' + U.card(best ? best.ed : ch.id + '-base', { serial: best && best.serial, uid: best && best.uid, missing: !best }) +
@@ -495,7 +921,7 @@
           html = (A.GROUPS || []).map(function (g) {
             var subs = list.filter(function (c) { return c.group === g.id; });
             subs.forEach(function (c) { shown[c.id] = true; });
-            return subs.length ? groupBlock(g, subs) : '';
+            return subs.length ? groupBlock(g, subs, !filtered) : '';
           }).join('');
           var rest = list.filter(function (c) { return !shown[c.id]; });
           if (rest.length) html += shelf('<div class="shelf-head"><div class="sh-copy"><h2 class="sh-name">Autres collections</h2></div></div>', rest);
@@ -507,114 +933,117 @@
       draw();
       root.addEventListener('click', function (e) {
         var t;
-        if ((t = e.target.closest('[data-da]'))) {   // essai de style des illustrations (test)
-          try { localStorage.setItem('atlas-da', t.getAttribute('data-da')); } catch (er) { /* ignore */ }
-          root.querySelectorAll('[data-da]').forEach(function (b) { b.classList.toggle('is-on', b === t); });
-          draw(); return;
+        if (claimClick(e)) return;
+        if ((t = e.target.closest('[data-rail]'))) {
+          var row = t.parentNode.querySelector('[data-rail-row]'), it = row.firstElementChild;
+          row.scrollBy({ left: +t.getAttribute('data-rail') * 3 * (it.offsetWidth + 24), behavior: 'smooth' });
+          return;
         }
         if ((t = e.target.closest('[data-status]'))) {
-          var v = t.getAttribute('data-status'); cf.status = cf.status === v ? '' : v;   // retoucher la puce l’enlève
-        } else if ((t = e.target.closest('[data-uni]'))) {
-          var u = t.getAttribute('data-uni'); cf.universe = cf.universe === u ? 'all' : u;
+          var v = t.getAttribute('data-status'); cf.status = cf.status === v ? '' : v;   // retoucher la pastille l’enlève
         } else if (e.target.closest('[data-clear]')) {
           cf.q = ''; input.value = ''; input.focus();
         } else if (e.target.closest('[data-reset-f]')) {
           cf.q = ''; cf.status = ''; cf.universe = 'all'; input.value = '';
         } else return;
-        root.querySelectorAll('[data-status]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-status') === cf.status); });
-        root.querySelectorAll('[data-uni]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-uni') === cf.universe); });
+        root.querySelectorAll('[data-status]').forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-status') === cf.status); });
+        var us = root.querySelector('[data-uni-sel]'); if (us) us.value = cf.universe;
         draw();
       });
+      root.addEventListener('change', function (e) {
+        if (!e.target.matches('[data-uni-sel]')) return;
+        cf.universe = e.target.value; draw();
+      });
+      // Flèches des rails : visibles seulement s’il reste des collections de ce côté
+      function rails() {
+        root.querySelectorAll('[data-rail-row]').forEach(function (row) {
+          var max = row.scrollWidth - row.clientWidth, w = row.parentNode;
+          w.querySelector('.is-prev').hidden = row.scrollLeft <= 2;
+          w.querySelector('.is-next').hidden = max <= 2 || row.scrollLeft >= max - 2;
+        });
+      }
+      root.addEventListener('scroll', function (e) { if (e.target.matches && e.target.matches('[data-rail-row]')) rails(); }, true);
+      root.addEventListener('toggle', rails, true);   // univers replié qu’on déplie
+      window.addEventListener('resize', function onR() { if (!root.isConnected) { window.removeEventListener('resize', onR); return; } rails(); });
+      var draw0 = draw; draw = function () { draw0(); rails(); };
+      rails();
       var tmr = 0;
       input.addEventListener('input', function () { cf.q = input.value; clearTimeout(tmr); tmr = setTimeout(draw, 120); });
       input.addEventListener('keydown', function (e) { if (e.key === 'Enter') input.blur(); });   // ferme le clavier
       this.refresh = draw;
+      var want = ctx && ctx.query && ctx.query.album && root.querySelector('#album-' + ctx.query.album);
+      if (want) {
+        var fold = want.parentNode.querySelector('.shelf-fold'); if (fold) fold.open = true;
+        // après le retour en haut de page fait par le routeur
+        requestAnimationFrame(function () { want.scrollIntoView({ block: 'start' }); rails(); });
+      }
     }
   };
 
   /* ======================================================================
      COLLECTION GLOBALE (ex. Mythologie grecque = Olympe + Titans + Géants)
      ====================================================================== */
+  // La page d’un album a été retirée (doublon de l’onglet Albums) : les anciens liens mènent à sa ligne dans Albums.
   P.saga = {
-    title: 'Collection globale',
-    render: function (ctx) {
-      var g = A.GROUP[ctx.params[0]];
-      if (!g) return '<section class="page-head"><div class="container"><h1 class="h1">Collection introuvable</h1><a class="link-arrow" href="#/collections">Retour aux collections ' + I('arrow') + '</a></div></section>';
-      this.title = g.name;
-      var pr = S.groupProgress(g.id);
-      return '<section class="coll-hero">' +
-        '<div class="coll-hero-art">' + A.artImg({ seed: g.id + '-saga', coll: g.subs[0], rarity: 'legendary', w: 1400, h: 520 }) + '</div>' +
-        '<div class="container coll-hero-copy">' +
-          '<a class="back" href="#/collections">← Albums</a>' +
-          '<p class="eyebrow">Collection globale · ' + g.subs.length + ' sous-collections</p>' +
-          '<h1 class="h1">' + U.esc(g.name) + '</h1><p class="lead">' + U.esc(g.description) + '</p>' +
-          '<div class="coll-stats" data-saga-stats>' + sagaStats(pr) + '</div>' +
-        '</div></section>' +
-        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.rewardTrack('@' + g.id) + '</div></section>' +
-        '<section class="section-tight"><div class="container"><p class="eyebrow">Sous-collections</p>' +
-          '<div class="coll-grid is-full" data-subs>' + g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('') + '</div></div></section>' +
-        (U.duelSetsFor('@' + g.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor('@' + g.id).map(U.duelsHTML).join('') + '</div></section>' : '');
-    },
-    mount: function (root, ctx) {
-      var g = A.GROUP[ctx.params[0]];
-      if (!g) return;
-      root.addEventListener('click', function (e) {
-        var k = e.target.closest('[data-claim]');
-        if (!k) return;
-        var res = S.claim('@' + g.id, k.getAttribute('data-claim'));
-        if (!res.ok) { U.toast(res.error, 'error'); return; }
-        U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
-      });
-      this.refresh = function () {
-        root.querySelector('[data-rewards]').innerHTML = U.rewardTrack('@' + g.id);
-        root.querySelector('[data-saga-stats]').innerHTML = sagaStats(S.groupProgress(g.id));
-        root.querySelector('[data-subs]').innerHTML = g.subs.map(function (cid) { return collTile(A.COLL[cid]); }).join('');
-        var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor('@' + g.id).map(U.duelsHTML).join('');
-      };
-    }
+    title: 'Albums',
+    render: function () { return ''; },
+    mount: function (root, ctx) { location.replace('#/collections?album=' + encodeURIComponent(ctx.params[0])); }
   };
-  function sagaStats(pr) {
-    return '<div><span>Personnages</span><b>' + pr.owned + '<small> / ' + pr.total + '</small></b></div>' +
-      '<div><span>Sous-collections complètes</span><b>' + pr.done + '<small> / ' + pr.subs + '</small></b></div>' +
-      '<div class="coll-stats-bar">' + U.progress(pr.pct, 'Progression globale ' + Math.round(pr.pct * 100) + ' %') + '</div>';
+  // Retour : flèche ronde à gauche du titre (la destination est dans l’infobulle et pour les lecteurs d’écran)
+  function backArrow(href, name) {
+    return '<a class="back-arrow" href="' + href + '" title="Retour : ' + U.esc(name) + '" aria-label="Retour : ' + U.esc(name) + '">' + I('arrow') + '</a>';
   }
 
   /* ======================================================================
      COLLECTION (détail)
      ====================================================================== */
-  var cd = { view: 'chars', missing: false, q: '' };
+  var cd = { view: 'chars', rarity: 'all', missing: false, q: '' };
+  function closeRarityMenu(menu, restoreFocus) {
+    menu.classList.remove('is-open', 'opens-up');
+    menu.querySelector('[data-rarity-options]').hidden = true;
+    var trigger = menu.querySelector('[data-rarity-trigger]');
+    trigger.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) trigger.focus({ preventScroll: true });
+  }
+  // Ces écouteurs sont installés une seule fois, indépendamment des changements de page.
+  function closeRarityOutside(e) {
+    document.querySelectorAll('[data-rarity-menu].is-open').forEach(function (menu) {
+      if (!menu.contains(e.target)) closeRarityMenu(menu, false);
+    });
+  }
+  document.addEventListener('pointerdown', closeRarityOutside);
+  document.addEventListener('focusin', closeRarityOutside);
   P.collection = {
     title: 'Collection',
     render: function (ctx) {
       var c = A.COLL[ctx.params[0]];
       if (!c) return '<section class="page-head"><div class="container"><h1 class="h1">Collection introuvable</h1><a class="link-arrow" href="#/collections">Retour aux collections ' + I('arrow') + '</a></div></section>';
       this.title = c.name;
-      var pr = S.collectionProgress(c.id);
-      var views = [['chars', 'Personnages'], ['all', 'Toutes']].concat(A.RARITIES.map(function (r) { return [r.id, r.label]; }));
-      return '<section class="coll-hero">' +
-        '<div class="coll-hero-art">' + collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 1400, h: 520 }, '100vw') + '</div>' +
-        '<div class="container coll-hero-copy">' +
-          (c.group ? '<a class="back" href="#/saga/' + c.group + '">← ' + A.GROUP[c.group].name + '</a>' : '<a class="back" href="#/collections">← Albums</a>') +
-          '<p class="eyebrow">' + (c.group ? 'Sous-collection · ' : '') + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +
-          '<h1 class="h1">' + c.name + '</h1><p class="lead">' + c.description + '</p>' +
-          '<div class="coll-stats">' +
-            '<div><span>Personnages</span><b>' + pr.owned + '<small> / ' + pr.total + '</small></b></div>' +
-            '<div><span>Éditions</span><b>' + pr.edOwned + '<small> / ' + pr.edTotal + '</small></b></div>' +
-            '<div class="coll-stats-bar">' + U.progress(pr.pct, 'Progression ' + Math.round(pr.pct * 100) + ' %') + '</div>' +
-          '</div>' +
+      var views = [['chars', 'Personnages'], ['all', 'Éditions']];
+      // Même présentation que la page d’album : titre, chiffres + barre, puis paliers et missions en cartes
+      return '<section class="coll-hero is-saga is-plain is-coll">' +
+        '<div class="container coll-container coll-hero-copy">' +
+          '<p class="eyebrow">' + c.family + ' · ' + c.edition + (c.status === 'event' ? ' · Événement' : '') + '</p>' +
+          '<div class="title-row">' + (c.group ? backArrow('#/collections?album=' + c.group, A.GROUP[c.group].name) : backArrow('#/collections', 'Albums')) + '<h1 class="h1">' + c.name + '</h1></div><p class="lead">' + c.description + '</p>' +
+          '<div data-coll-progress>' + U.collectionFigures(c.id) + '</div>' +
         '</div></section>' +
-        '<section class="section-tight rw-sec"><div class="container" data-rewards>' + U.objectives(c.id) + '</div></section>' +
+        '<section class="section-tight qs-strip-sec"><div class="container coll-container" data-rewards>' + U.questStrip(c.id) + '</div></section>' +
         (U.duelSetsFor(c.id).length ? '<section class="section-tight du-sec"><div class="container" data-duels>' + U.duelSetsFor(c.id).map(U.duelsHTML).join('') + '</div></section>' : '') +
-        '<section class="section-tight"><div class="container">' +
-          '<div class="toolbar sticky-bar">' +
-            '<div class="chips scroll-x" data-f="view">' + views.map(function (v) {
-              var plain = v[0] === 'chars' || v[0] === 'all';
-              return '<button class="chip' + (!plain ? ' chip-r r-' + v[0] : '') + (cd.view === v[0] ? ' is-active' : '') + '" data-v="' + v[0] + '">' + (!plain ? '<i></i>' : '') + v[1] + '</button>';
+        '<section class="section-tight coll-browse"><div class="container coll-container">' +
+          '<div class="toolbar sticky-bar coll-toolbar">' +
+            '<div class="coll-view"><span class="coll-filter-label">Vue</span><div class="chips" data-f="view" role="group" aria-label="Vue de l’album">' + views.map(function (v) {
+              return '<button class="chip' + (cd.view === v[0] ? ' is-active' : '') + '" data-v="' + v[0] + '" aria-pressed="' + (cd.view === v[0]) + '">' + v[1] + '</button>';
             }).join('') + '</div>' +
-            '<label class="search">' + I('search') + '<input type="search" placeholder="Personnage…" value="' + U.esc(cd.q) + '" data-q></label>' +
+            '</div><div class="coll-rarity" data-rarity-menu>' +
+              '<button type="button" class="coll-rarity-trigger" data-rarity-trigger aria-label="Rareté des éditions : ' + (A.R[cd.rarity] ? A.R[cd.rarity].label : 'Toutes') + '" aria-haspopup="listbox" aria-expanded="false" aria-controls="coll-rarity-options">' +
+                '<span class="coll-rarity-caption">Rareté</span><span class="coll-rarity-value' + (cd.rarity !== 'all' ? ' r-' + cd.rarity : '') + '" data-rarity-current><i' + (cd.rarity === 'all' ? ' hidden' : '') + '></i><span>' + (A.R[cd.rarity] ? A.R[cd.rarity].label : 'Toutes') + '</span></span>' + I('chevR') + '</button>' +
+              '<div class="coll-rarity-options" id="coll-rarity-options" role="listbox" aria-label="Rareté des éditions" data-rarity-options hidden>' + [{ id: 'all', label: 'Toutes' }].concat(A.RARITIES).map(function (r) {
+                return '<button type="button" role="option" tabindex="-1" class="coll-rarity-option' + (r.id === 'all' ? ' is-all' : ' r-' + r.id) + '" aria-selected="' + (cd.rarity === r.id) + '" data-rarity-value="' + r.id + '"><i class="coll-rarity-dot"></i><span>' + r.label + '</span>' + I('check') + '</button>';
+              }).join('') + '</div></div>' +
+            '<label class="search">' + I('search') + '<input type="search" aria-label="Rechercher un personnage" placeholder="Rechercher un personnage…" value="' + U.esc(cd.q) + '" data-q></label>' +
             '<label class="toggle"><input type="checkbox" data-missing' + (cd.missing ? ' checked' : '') + '><span></span>Manquantes</label>' +
           '</div>' +
-          '<div data-results></div>' +
+          '<p class="coll-result-count" data-result-count aria-live="polite"></p><div data-results></div>' +
         '</div></section>';
     },
     mount: function (root, ctx) {
@@ -634,7 +1063,7 @@
           });
           if (!q && !cd.missing && A.SECRET[c.id]) cells.push('<div class="cg-item is-trophy">' + U.secretCard(c.id) + '<p class="cg-no">★ · ' + (S.trophy(c.id) ? 'Révélé' : 'Personnage secret') + '</p></div>');
         } else {
-          var rids = cd.view === 'all' ? A.RARITIES.map(function (r) { return r.id; }) : [cd.view];
+          var rids = cd.rarity === 'all' ? A.RARITIES.map(function (r) { return r.id; }) : [cd.rarity];
           chars.forEach(function (ch) {
             rids.forEach(function (rid) {
               if (ch.editions.indexOf(rid) === -1) return;
@@ -650,37 +1079,128 @@
             });
           });
         }
+        root.querySelector('[data-result-count]').textContent = cells.length + (cells.length > 1 ? ' cartes affichées' : ' carte affichée');
         res.innerHTML = cells.length ? '<div class="card-grid">' + cells.join('') + '</div>' :
           '<div class="empty">' + (cd.missing ? 'Rien ne manque ici. Collection complète pour ce filtre.' : 'Aucune carte pour ce filtre.') + '</div>';
       }
       draw();
       var rw = root.querySelector('[data-rewards]');
+      var rarityMenu = root.querySelector('[data-rarity-menu]');
+      var rarityTrigger = rarityMenu.querySelector('[data-rarity-trigger]');
+      var rarityOptions = rarityMenu.querySelector('[data-rarity-options]');
+      var rarityButtons = Array.from(rarityOptions.querySelectorAll('[data-rarity-value]'));
+      function openRarityMenu(edge) {
+        raritySearch = ''; raritySearchAt = 0;
+        rarityOptions.hidden = false;
+        rarityOptions.style.maxHeight = '';
+        rarityMenu.classList.add('is-open');
+        rarityTrigger.setAttribute('aria-expanded', 'true');
+        var rect = rarityTrigger.getBoundingClientRect(), limit = window.innerHeight - 12;
+        var tabbar = document.querySelector('.tabbar');
+        if (tabbar && getComputedStyle(tabbar).display !== 'none') limit = Math.min(limit, tabbar.getBoundingClientRect().top - 8);
+        var topLimit = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) + 8;
+        var below = Math.max(0, limit - rect.bottom - 8), above = Math.max(0, rect.top - topLimit - 8);
+        var opensUp = rarityOptions.offsetHeight > below && above > below;
+        rarityMenu.classList.toggle('opens-up', opensUp);
+        rarityOptions.style.maxHeight = Math.max(80, Math.min(320, opensUp ? above : below)) + 'px';
+        var target = edge === 'first' ? rarityButtons[0] : edge === 'last' ? rarityButtons[rarityButtons.length - 1] : rarityOptions.querySelector('[aria-selected="true"]');
+        target.focus({ preventScroll: true });
+        rarityOptions.scrollTop = Math.max(0, target.offsetTop - rarityOptions.clientHeight / 2);
+      }
+      function syncFilters() {
+        root.querySelectorAll('[data-f="view"] .chip').forEach(function (x) {
+          var active = x.getAttribute('data-v') === cd.view;
+          x.classList.toggle('is-active', active); x.setAttribute('aria-pressed', active);
+        });
+        var rarityLabel = A.R[cd.rarity] ? A.R[cd.rarity].label : 'Toutes';
+        var currentRarity = rarityMenu.querySelector('[data-rarity-current]');
+        currentRarity.className = 'coll-rarity-value' + (cd.rarity !== 'all' ? ' r-' + cd.rarity : '');
+        currentRarity.querySelector('i').hidden = cd.rarity === 'all';
+        currentRarity.querySelector('span').textContent = rarityLabel;
+        rarityTrigger.setAttribute('aria-label', 'Rareté des éditions : ' + rarityLabel);
+        rarityButtons.forEach(function (button) { button.setAttribute('aria-selected', String(button.getAttribute('data-rarity-value') === cd.rarity)); });
+        root.querySelector('[data-missing]').checked = cd.missing;
+        root.querySelector('[data-q]').value = cd.q;
+      }
       root.addEventListener('click', function (e) {
+        var rarityChoice = e.target.closest('[data-rarity-value]');
+        if (rarityChoice) {
+          cd.rarity = rarityChoice.getAttribute('data-rarity-value');
+          if (cd.rarity !== 'all') cd.view = 'all';
+          syncFilters(); draw(); closeRarityMenu(rarityMenu, true);
+          return;
+        }
+        if (e.target.closest('[data-rarity-trigger]')) {
+          if (rarityOptions.hidden) openRarityMenu();
+          else closeRarityMenu(rarityMenu, true);
+          return;
+        }
         var k = e.target.closest('[data-claim]');
         if (k) {
           var res = S.claim(c.id, k.getAttribute('data-claim'));
           if (!res.ok) { U.toast(res.error, 'error'); return; }
-          U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · à ouvrir dans la Boutique' : ''));
+          U.toast(res.step.label + ' : ' + U.rewardText(res.reward) + (res.reward.booster ? ' · dans vos boosters' : ''));
+          return;
+        }
+        if (e.target.closest('[data-show-missing]')) {
+          cd.view = 'all'; cd.rarity = 'all'; cd.missing = true; cd.q = '';
+          syncFilters(); draw();
+          var toolbar = root.querySelector('.coll-toolbar');
+          toolbar.scrollIntoView({ block: 'start' });
+          root.querySelector('[data-q]').focus({ preventScroll: true });
           return;
         }
         var b = e.target.closest('[data-f="view"] .chip');
         if (!b) return;
         cd.view = b.getAttribute('data-v');
-        root.querySelectorAll('[data-f="view"] .chip').forEach(function (x) { x.classList.toggle('is-active', x === b); });
-        draw();
+        if (cd.view === 'chars') cd.rarity = 'all';
+        syncFilters(); draw();
+      });
+      var raritySearch = '', raritySearchAt = 0;
+      rarityMenu.addEventListener('keydown', function (e) {
+        var key = e.key;
+        if (e.target === rarityTrigger) {
+          if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+            e.preventDefault(); openRarityMenu(key === 'Home' ? 'first' : key === 'End' ? 'last' : undefined);
+          }
+          return;
+        }
+        var index = rarityButtons.indexOf(document.activeElement), next = index;
+        if (key === 'Escape') { e.preventDefault(); closeRarityMenu(rarityMenu, true); return; }
+        if (key === 'Tab') {
+          e.preventDefault(); closeRarityMenu(rarityMenu, false);
+          (e.shiftKey ? rarityTrigger : root.querySelector('[data-q]')).focus({ preventScroll: true });
+          return;
+        }
+        if (key === 'Enter' || key === ' ') { e.preventDefault(); if (index >= 0) rarityButtons[index].click(); return; }
+        if (key === 'ArrowDown') next = Math.min(rarityButtons.length - 1, index + 1);
+        else if (key === 'ArrowUp') next = Math.max(0, index - 1);
+        else if (key === 'Home') next = 0;
+        else if (key === 'End') next = rarityButtons.length - 1;
+        else if (key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+          var now = Date.now();
+          raritySearch = (now - raritySearchAt < 600 ? raritySearch : '') + key.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          raritySearchAt = now;
+          next = rarityButtons.findIndex(function (button) { return button.textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').indexOf(raritySearch) === 0; });
+          if (next < 0) return;
+        } else return;
+        e.preventDefault(); rarityButtons[next].focus({ preventScroll: true });
+        rarityButtons[next].scrollIntoView({ block: 'nearest' });
       });
       root.querySelector('[data-q]').addEventListener('input', function (e) { cd.q = e.target.value; draw(); });
       root.querySelector('[data-missing]').addEventListener('change', function (e) { cd.missing = e.target.checked; draw(); });
-      this.refresh = function () { draw(); rw.innerHTML = U.objectives(c.id); var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join(''); };
+      this.refresh = function () {
+        draw(); rw.innerHTML = U.questStrip(c.id);
+        root.querySelector('[data-coll-progress]').innerHTML = U.collectionFigures(c.id);
+        var du = root.querySelector('[data-duels]'); if (du) du.innerHTML = U.duelSetsFor(c.id).map(U.duelsHTML).join('');
+      };
     }
   };
 
   /* ======================================================================
-     BOUTIQUE
+     PROBABILITÉS DES BOOSTERS (fenêtre ouverte depuis l’accueil)
      ====================================================================== */
-  var oddsOpen = null;   // booster dont le tableau détaillé des probabilités est déplié (aucun par défaut)
-
-  function shopPacks() { return A.PACKS.filter(function (p) { return !p.test; }); }
+  
   function packPool(p) { return A.EDITIONS.filter(function (e) { return p.collections.indexOf(A.CHAR[e.charId].coll) !== -1; }); }
   /* Raretés qu’un booster peut donner, de la plus haute à la plus basse. */
   function packRarities(p) {
@@ -708,12 +1228,6 @@
     }
     return 1 - miss;
   }
-  function lureHTML(p) {
-    if (p.fixed) return 'Une carte de chaque rareté numérotée, de la <span class="lure-r r-rare">Rare</span> à l’<span class="lure-r r-unique">Unique</span>.';
-    var rid = p.lure || 'epic', c = packChance(p, rid);
-    var odds = c >= 0.5 ? 'Plus d’une chance sur deux' : '1 chance sur ' + Math.max(2, Math.round(1 / c));
-    return '<b>' + odds + '</b> d’obtenir une <span class="lure-r r-' + rid + '">' + A.R[rid].label + '</span> ou mieux.';
-  }
   /* Encart « 1 sur 18 » : la chance d’obtenir la rareté visée, mise en avant dans sa couleur. */
   function oddsBox(p) {
     if (p.fixed) return '<div class="pack-odds r-unique"><span class="po-n">5 <small>sur</small> 5</span><span class="po-t">cartes numérotées, de la <b>Rare</b> à l’<b>Unique</b></span></div>';
@@ -732,84 +1246,6 @@
     var eds = showcase(p, rs.concat(rs, rs)).slice(0, 3);
     return '<div class="pack-win"><span class="pack-win-label">À gagner</span><span class="pack-win-list">' + eds.map(miniCard).join('') + '</span></div>';
   }
-  function packPill(p) {
-    if (p.timer) { var ch = S.charges(); return '<span class="pill pill-gold">' + I('clock') + ch.n + '/' + ch.max + (ch.n < ch.max ? ' · +1 dans ' + U.clock(ch.next) : ' · réserve pleine') + '</span>'; }
-    if (p.daily) return S.dailyAvailable()
-      ? '<span class="pill pill-gold">' + I('clock') + 'Encore ' + U.duration(S.nextDailyIn()) + '</span>'
-      : '<span class="pill">' + I('clock') + 'Prochain dans ' + U.duration(S.nextDailyIn()) + '</span>';
-    if (p.event) return '<span class="pill pill-gold">' + I('clock') + 'Fin dans ' + U.duration(S.eventRemaining()) + '</span>';
-    return '';
-  }
-  function priceHTML(p) {
-    var tk = S.tokens(p.id);
-    if (p.timer) return '<span class="free">' + S.charges().n + ' en réserve' + (tk ? ' +' + tk : '') + '</span>';
-    if (tk) return '<span class="free">' + U.icon('gift') + 'Gagné' + (tk > 1 ? ' ×' + tk : '') + '</span>';
-    if (p.earned) return '<span class="free is-muted">À gagner en jouant</span>';
-    return p.price ? U.price(p.price) : '<span class="free">Gratuit</span>';
-  }
-
-  /* ---------- Booster vedette ---------- */
-  function featuredPack() {
-    if (S.dailyAvailable()) return A.PACK.daily;
-    if (S.eventRemaining() > 0 && S.tokens('saga')) return A.PACK.saga;
-    return A.PACK.standard;
-  }
-  function featureHTML(p) {
-    var can = S.canOpen(p.id);
-    var rs = packRarities(p).filter(function (r) { return r !== 'base'; });
-    var center = rs.indexOf('legendary') !== -1 ? 'legendary' : rs[0];
-    var side = rs[rs.indexOf(center) + 1] || center;
-    var eds = showcase(p, [center, side, side], true);
-    var fan = [eds[1], eds[0], eds[2]].filter(Boolean);
-    var hint = p.daily ? '<span class="pill pill-gold">' + I('clock') + 'Encore ' + U.duration(S.nextDailyIn()) + ' pour l’ouvrir</span>' : packPill(p);
-    return '<div class="feature' + (p.event ? ' is-dark' : '') + '">' +
-      '<div class="feature-stage"><div class="feature-scene">' +
-        '<div class="feature-fan">' + fan.map(function (ed, i) { return '<div class="ff ff-' + i + '">' + U.card(ed.id, { open: false, tilt: false }) + '</div>'; }).join('') + '</div>' +
-        '<div class="feature-pack"' + (can.ok ? ' data-open-pack="' + p.id + '"' : '') + '>' + A.pack.html(p, { tilt: true }) + '</div>' +
-      '</div></div>' +
-      '<div class="feature-copy">' +
-        '<p class="eyebrow">À l’affiche · ' + p.kicker + '</p>' +
-        '<h2 class="h2">' + p.name + '</h2>' +
-        '<p class="feature-hook">' + (p.hook || p.desc) + '</p>' +
-        '<p class="feature-lure">' + lureHTML(p) + '</p>' +
-        '<div class="feature-meta">' + hint + '</div>' +
-        '<div class="feature-buy"><span class="pack-price">' + priceHTML(p) + '</span>' +
-          '<button class="btn btn-lg ' + (can.ok ? (p.event ? 'btn-gold' : 'btn-primary') : 'btn-ghost') + '" data-open-pack="' + p.id + '"' + (can.ok ? '' : ' disabled') + '>' + (can.ok ? 'Ouvrir le booster' : can.reason) + '</button></div>' +
-      '</div></div>';
-  }
-
-  /* ---------- Fil « Dernières ouvertures » (fictif) ---------- */
-  var FEED_W = { rare: 48, epic: 30, legendary: 15, mythic: 5, unique: 2 };
-  var feed = null;
-  function feedItem(at) {
-    var packs = shopPacks(), p = packs[Math.floor(Math.random() * packs.length)];
-    var rs = packRarities(p).filter(function (r) { return FEED_W[r]; });
-    var sum = rs.reduce(function (s, r) { return s + FEED_W[r]; }, 0), t = Math.random() * sum, rid = rs[0];
-    for (var i = 0; i < rs.length; i++) { t -= FEED_W[rs[i]]; if (t <= 0) { rid = rs[i]; break; } }
-    var eds = packPool(p).filter(function (e) { return e.rarity === rid; });
-    return { user: A.DEMO_USERS[Math.floor(Math.random() * A.DEMO_USERS.length)], ed: eds[Math.floor(Math.random() * eds.length)].id, at: at };
-  }
-  function feedRow(f, cls) {
-    var ed = A.ED[f.ed], R = A.R[ed.rarity];
-    return '<li class="feed-row' + (cls ? ' ' + cls : '') + '">' + miniCard(ed) +
-      '<p><b>' + U.esc(f.user) + '</b> a obtenu <b>' + U.esc(A.CHAR[ed.charId].name) + '</b></p>' +
-      '<span class="rar-chip r-' + ed.rarity + '"><i></i><span>' + R.label + '</span></span>' +
-      '<time data-at="' + f.at + '">' + feedAgo(f.at) + '</time></li>';
-  }
-  function feedAgo(t) {
-    var s = (Date.now() - t) / 1000;
-    if (s < 10) return 'à l’instant';
-    if (s < 60) return 'il y a ' + Math.floor(s / 5) * 5 + ' s';
-    return U.ago(t);
-  }
-  function feedHTML() {
-    if (!feed) { var now = Date.now(); feed = [1, 3, 6, 11, 17].map(function (m) { return feedItem(now - m * 60000 - Math.random() * 40000); }); }
-    return '<div class="feed">' +
-      '<div class="feed-head"><p class="eyebrow feed-live"><i></i>En direct</p><h3 class="h3">Dernières ouvertures</h3>' +
-        '<p class="muted">Les plus belles cartes tirées par les collectionneurs, à l’instant.</p></div>' +
-      '<ul class="feed-list" data-feed>' + feed.map(function (f) { return feedRow(f); }).join('') + '</ul></div>';
-  }
-
   /* ---------- Probabilités ---------- */
   function oddsTable(packId) {
     var p = A.PACK[packId];
@@ -824,133 +1260,55 @@
       (g ? '<p class="odds-note"><b>Dernière carte garantie Rare ou mieux :</b> ' + g.map(function (r) { return A.R[r.rarity].label + ' ' + U.pct(r.p); }).join(' · ') + '</p>' : '') +
       '</div>';
   }
-  function oddsItem(p) {
-    var open = oddsOpen === p.id;
-    return '<div class="odds-item' + (open ? ' is-open' : '') + '" data-odds-item="' + p.id + '">' +
-      '<button class="odds-sum" data-odds-toggle="' + p.id + '" aria-expanded="' + open + '">' +
-        '<span class="odds-name">' + p.name + '</span>' +
-        '<span class="odds-lure">' + p.size + ' cartes · ' + lureHTML(p) + '</span>' +
-        '<span class="odds-more"><span>' + (open ? 'Masquer' : 'Voir le détail') + '</span>' + I('chevR') + '</span>' +
-      '</button>' +
-      '<div class="odds-detail"' + (open ? '' : ' hidden') + '>' + oddsTable(p.id) + '</div></div>';
-  }
-
-  P.shop = {
-    title: 'Boosters',
-    render: function () {
-      var st = S.get();
-      return '<section class="page-head"><div class="container">' +
-        '<p class="eyebrow">Boosters</p><h1 class="h1">Boosters</h1>' +
-        '<p class="lead">Aucun booster ne s’achète : le Booster Atlas revient toutes les 15 minutes, le quotidien chaque jour, et les coffrets se gagnent en jouant. Chaque carte est tirée dans le stock réel des éditions.</p>' +
-        '</div></section>' +
-        '<section class="section-tight"><div class="container">' +
-        featureHTML(featuredPack()) +
-        '<div class="packs-wrap">' +
-        '<button class="packs-arrow is-prev" data-packs="-1" aria-label="Boosters précédents" hidden>' + I('chevL') + '</button>' +
-        '<button class="packs-arrow is-next" data-packs="1" aria-label="Boosters suivants" hidden>' + I('chevR') + '</button>' +
-        '<div class="packs">' + A.PACKS.map(function (p) {
-          var can = S.canOpen(p.id);
-          return '<article class="pack-card' + (p.event ? ' is-event' : '') + '">' +
-            '<div class="pack-stage"' + (can.ok ? ' data-open-pack="' + p.id + '"' : '') + '>' + A.pack.html(p, { tilt: true }) +
-              '<span class="pack-timer">' + packPill(p) + '</span></div>' +
-            '<div class="pack-info"><p class="eyebrow">' + p.kicker + '</p><h3 class="h3">' + p.name + '</h3>' +
-            oddsBox(p) +
-            winRow(p) +
-            '<div class="pack-meta">' + packPill(p) + '</div>' +   /* mobile uniquement (sur ordinateur le minuteur est sur le visuel) */
-            '<div class="pack-buy"><span class="pack-price">' + priceHTML(p) + '</span>' +
-            '<button class="btn ' + (can.ok ? 'btn-primary' : 'btn-ghost') + '" data-open-pack="' + p.id + '"' + (can.ok ? '' : ' disabled') + '>' + (can.ok ? 'Ouvrir' : can.reason) + '</button></div>' +
-            '<div class="pack-links">' + (p.test ? '<span></span>' : '<button class="link-btn" data-odds="' + p.id + '">Voir les probabilités</button>') +
-            (p.daily && !S.dailyAvailable() ? '<button class="icon-reset" data-reset-daily title="Réinitialiser le booster quotidien (démo)" aria-label="Réinitialiser le booster quotidien">' + I('reset') + '</button>' : '') + '</div>' +
-            '</div></article>';
-        }).join('') + '</div></div>' +
-        feedHTML() +
-        '</div></section>' +
-        '<section class="section section-alt" id="odds"><div class="container">' +
-          sectionHead('Transparence', 'Probabilités en temps réel') +
-          '<div class="odds-list">' + shopPacks().map(oddsItem).join('') + '</div>' +
-          '<p class="odds-note muted">Probabilités par carte tirée. Le taux réel est recalculé à chaque tirage : taux de référence × part du stock encore disponible. La part non attribuée revient à la rareté la plus courante. Les quantités d’édition (250, 100, 50…) ne sont pas des probabilités.</p>' +
-          '<div class="info-grid">' +
-            '<div class="info">' + I('shield') + '<h4>Boosters gratuits protégés</h4><p>La réserve et le booster quotidien sont comptés par compte, sur l’horloge du serveur. En phase 2 : compte vérifié, limitation par appareil et détection des comptes automatisés.</p></div>' +
-            '<div class="info">' + I('sparkle') + '<h4>Numérotation à la frappe</h4><p>Le numéro d’exemplaire est attribué au moment du tirage, dans une transaction atomique : aucun numéro ne peut être émis deux fois.</p></div>' +
-            '<div class="info">' + I('gift') + '<h4>Rien à acheter</h4><p>Les Éclats servent uniquement à la marketplace. Coffrets et boosters d’événement se gagnent avec les missions, les paliers de collection et les trophées. <button class="link-btn" data-refill>Tout recharger (test)</button></p></div>' +
-          '</div>' +
-        '</div></section>';
-    },
-    mount: function (root, ctx) {
-      A.pack.mountAll(root);
-      // Le sachet vedette flotte doucement (en plus de suivre la souris)
-      var fp = root.querySelector('.feature-pack .pk');
-      if (fp && fp._rig) fp._rig.idle(true);
-
-      // Carrousel des boosters : flèches visibles seulement s’il reste des boosters de ce côté.
-      var row = root.querySelector('.packs'), prev = root.querySelector('.packs-arrow.is-prev'), next = root.querySelector('.packs-arrow.is-next');
-      function updArrows() {
-        if (!row.isConnected) { window.removeEventListener('resize', updArrows); return; }
-        var max = row.scrollWidth - row.clientWidth;
-        prev.hidden = row.scrollLeft <= 2;
-        next.hidden = max <= 2 || row.scrollLeft >= max - 2;
-      }
-      row.addEventListener('scroll', updArrows, { passive: true });
-      window.addEventListener('resize', updArrows);
-      setTimeout(updArrows, 0);
-
-      // Fil des dernières ouvertures : une nouvelle ligne glisse en haut toutes les ~6 s, la plus ancienne sort.
-      var list = root.querySelector('[data-feed]');
-      var feedTimer = setInterval(function () {
-        if (!list.isConnected) { clearInterval(feedTimer); return; }
-        var f = feedItem(Date.now());
-        feed.unshift(f); feed.length = 5;
-        list.insertAdjacentHTML('afterbegin', feedRow(f, 'is-enter'));
-        var li = list.firstElementChild;
-        li.offsetHeight;                                   // force le style initial avant la transition
-        li.classList.remove('is-enter');
-        var rows = list.children;
-        if (rows.length > 5) { var old = rows[rows.length - 1]; old.classList.add('is-leave'); setTimeout(function () { old.remove(); }, 700); }
-        list.querySelectorAll('time[data-at]').forEach(function (t) { t.textContent = feedAgo(+t.getAttribute('data-at')); });
-      }, 9000);
-
-      function setOdds(id) {
-        oddsOpen = id;
-        root.querySelectorAll('[data-odds-item]').forEach(function (it) {
-          var on = it.getAttribute('data-odds-item') === id;
-          it.classList.toggle('is-open', on);
-          it.querySelector('.odds-detail').hidden = !on;
-          it.querySelector('.odds-sum').setAttribute('aria-expanded', on);
-          it.querySelector('.odds-more span').textContent = on ? 'Masquer' : 'Voir le détail';
-        });
-      }
-      root.addEventListener('click', function (e) {
-        var t;
-        if ((t = e.target.closest('[data-packs]'))) {
-          var card = row.querySelector('.pack-card');
-          row.scrollBy({ left: +t.getAttribute('data-packs') * (card.offsetWidth + 20), behavior: 'smooth' });
-          return;
-        }
-        if ((t = e.target.closest('[data-open-pack]'))) { A.opener.open(t.getAttribute('data-open-pack')); return; }
-        if ((t = e.target.closest('[data-odds-toggle]'))) {
-          var id = t.getAttribute('data-odds-toggle');
-          setOdds(oddsOpen === id ? null : id);
-          return;
-        }
-        if ((t = e.target.closest('[data-odds]'))) {
-          var pid = t.getAttribute('data-odds');
-          setOdds(pid);
-          var it = root.querySelector('[data-odds-item="' + pid + '"]');
-          if (it) it.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          return;
-        }
-        if (e.target.closest('[data-reset-daily]')) { S.resetDaily(); A.app.rerender(); return; }
-        if (e.target.closest('[data-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
-        if (e.target.closest('[data-grant]')) { S.grant(1000); U.toast('1 000 Éclats ajoutés (démo)'); A.app.rerender(); }
-      });
-      if (ctx.query.open) {
-        // On retire « ?open= » de l’URL : sinon, à la fermeture (croix / Échap), le re-rendu rouvrirait le booster.
-        var toOpen = ctx.query.open;
-        try { history.replaceState(null, '', '#/boutique'); } catch (e) {}
-        if (S.canOpen(toOpen).ok) setTimeout(function () { A.opener.open(toOpen); }, 350);
-      }
+  /* Fenêtre « Probabilités » d’un booster (ouverte depuis l’accueil, bouton %).
+     Lecture simple d’abord : pour chaque rareté, « 1 sachet sur N » (chance d’en avoir au moins une
+     dans un sachet), puis le taux par carte et le stock restant. Le détail du calcul est replié. */
+  function rarityPackChance(p, rid) {
+    var miss = 1;
+    for (var k = 0; k < p.size; k++) {
+      var tot = 0, hit = 0;
+      S.packOdds(p.id, !!(p.guarantee && k === p.size - 1)).forEach(function (r) { tot += r.p; if (r.rarity === rid) hit += r.p; });
+      miss *= 1 - (tot ? hit / tot : 0);
     }
-  };
+    return 1 - miss;
+  }
+  function oneIn(c) {
+    if (c >= 0.995) return '<b>Chaque</b> sachet';
+    if (c >= 0.5) return '<b>' + Math.round(c * 100) + '&nbsp;%</b> des sachets';
+    return '<b>1</b> sachet sur <b>' + U.num(Math.round(1 / c)) + '</b>';
+  }
+  function oddsModal(id) {
+    var p = A.PACK[id], rows = S.packOdds(id).slice().reverse();   // de la plus rare à la plus courante
+    var rs = packRarities(p).filter(function (r) { return r !== 'base'; });
+    var wins = showcase(p, rs.concat(rs, rs), true).slice(0, 3);
+    var list = rows.map(function (r) {
+      var R = A.R[r.rarity], c = rarityPackChance(p, r.rarity);
+      var stock = r.total == null ? '<span class="om-stock">Illimitée</span>'
+        : '<span class="om-stock"><i style="--s:' + Math.max(2, Math.round(r.remaining / Math.max(1, r.total) * 100)) + '%"></i>' + U.num(r.remaining) + ' / ' + U.num(r.total) + ' en stock</span>';
+      return '<li class="om-row r-' + r.rarity + '">' +
+        '<span class="rar-chip r-' + r.rarity + '"><i></i>' + R.label + '</span>' +
+        '<span class="om-odds">' + oneIn(c) + '</span>' +
+        '<span class="om-sub">' + U.pct(r.p) + ' par carte<span>·</span>réf. ' + U.pct(r.ref) + '</span>' + stock + '</li>';
+    }).join('');
+    var g = p.guarantee ? S.packOdds(id, true) : null;
+    U.modal('<div class="odds-modal is-' + p.theme + '">' +
+      '<header class="om-head"><p class="eyebrow">Probabilités</p><h2 class="om-title">' + p.name + '</h2>' +
+        '<p class="om-kicker">' + p.size + ' cartes<span>·</span>' + p.kicker + '</p>' + oddsBox(p) + '</header>' +
+      (wins.length ? '<section class="om-sec"><h3 class="om-h">À gagner</h3><div class="om-wins">' + wins.map(function (ed) {
+          return '<figure class="om-win">' + U.card(ed.id, { open: false, tilt: false, ctx: 'mini' }) + '<figcaption><b>' + U.esc(A.CHAR[ed.charId].name) + '</b><span class="rar-chip r-' + ed.rarity + '"><i></i>' + A.R[ed.rarity].label + '</span></figcaption></figure>';
+        }).join('') + '</div></section>' : '') +
+      '<section class="om-sec"><h3 class="om-h">Par rareté</h3><ul class="om-list">' + list + '</ul>' +
+        (g ? '<p class="om-guar">' + I('sparkle') + '<span><b>Dernière carte garantie Rare ou mieux</b> : ' + g.map(function (r) { return A.R[r.rarity].label + ' ' + U.pct(r.p); }).join(' · ') + '</span></p>' : '') +
+      '</section>' +
+      '<ul class="om-facts">' +
+        '<li>' + I('gift') + '<b>Rien à acheter</b><span>Coffrets et boosters d’événement se gagnent en jouant.</span></li>' +
+        '<li>' + I('sparkle') + '<b>Numéroté au tirage</b><span>Aucun numéro ne peut être émis deux fois.</span></li>' +
+        '<li>' + I('shield') + '<b>Gratuits protégés</b><span>Réserve et quotidien comptés par compte.</span></li>' +
+      '</ul>' +
+      '<details class="om-how"><summary>Comment sont calculées ces probabilités ?' + I('chevR') + '</summary>' +
+        '<p>Chaque carte est tirée selon un taux de référence par rareté, multiplié par la part du stock encore disponible : quand une rareté s’épuise, ses chances baissent et la part non attribuée revient à la rareté la plus courante. Les quantités d’édition (250, 100, 50…) ne sont pas des probabilités. « 1 sachet sur N » indique la chance d’obtenir au moins une carte de cette rareté dans un sachet.</p></details>' +
+      '</div>', { cls: 'is-small is-odds' });
+  }
 
   /* ======================================================================
      INVENTAIRE
@@ -965,20 +1323,27 @@
       var distinct = {}; items.forEach(function (i) { distinct[A.ED[i.ed].charId] = 1; });
       var complete = A.COLLECTIONS.filter(function (c) { return S.collectionProgress(c.id).pct >= 1; }).length;
       var showcase = items.filter(function (i) { return i.show; });
-      return '<section class="page-head"><div class="container">' +
-        hubHead('cartes') +
-        '<div class="kpis">' +
+      var nChars = Object.keys(distinct).length;
+      return hubHero('cartes', 'Toutes les cartes que vous avez tirées : exposez les plus belles, échangez ou vendez les doublons.',
           '<div><span>Cartes</span><b>' + items.length + '</b></div>' +
-          '<div><span>Personnages</span><b>' + Object.keys(distinct).length + '<small> / ' + A.CHARS.length + '</small></b></div>' +
+          '<div><span>Personnages</span><b>' + nChars + '<small> / ' + A.CHARS.length + '</small></b></div>' +
           '<div><span>Numérotées</span><b>' + numbered + '</b></div>' +
-          '<div><span>Collections terminées</span><b>' + complete + '<small> / ' + A.COLLECTIONS.length + '</small></b></div>' +
-        '</div></div></section>' +
-        (showcase.length ? '<section class="section-tight is-flush"><div class="container"><div class="showcase"><div class="showcase-head"><p class="eyebrow">Vitrine publique</p><p class="muted small">Ces cartes apparaissent sur votre profil.</p></div><div class="showcase-row">' +
-          showcase.map(function (i) { return '<div class="sc-item">' + U.card(i.ed, { serial: i.serial, uid: i.uid }) + '</div>'; }).join('') + '</div></div></div></section>' : '') +
-        '<section class="section-tight"><div class="container inv-layout">' +
+          '<div><span>Collections terminées</span><b>' + complete + '<small> / ' + A.COLLECTIONS.length + '</small></b></div>') +
+        // Vitrine publique : 5 emplacements, les libres en pointillé
+        '<section class="section-tight hub-sec"><div class="container">' +
+          U.secHead('Vitrine publique', 'Vos cartes exposées', Math.min(showcase.length, S.SHOWCASE_MAX), S.SHOWCASE_MAX, 'emplacements') +
+          '<p class="hub-note">Ces cartes apparaissent sur votre profil public.</p><div class="showcase-row is-slots">' +
+          showcase.slice(0, S.SHOWCASE_MAX).map(function (i) { return '<div class="sc-item">' + U.card(i.ed, { serial: i.serial, uid: i.uid }) + '</div>'; }).join('') +
+          Array.from({ length: Math.max(0, S.SHOWCASE_MAX - showcase.length) }, function () {
+            return '<div class="sc-item sc-empty"><span>' + I('star') + '<b>Emplacement libre</b><small>Ouvrez une carte, puis touchez « Vitrine »</small></span></div>';
+          }).join('') + '</div></div></section>' +
+        '<section class="section-tight hub-sec">' +
+          '<div class="container inv-layout">' +
           '<div class="inv-main">' +
-            '<div class="toolbar sticky-bar">' +
-              '<div class="chips scroll-x" data-f="rarity">' + [['all', 'Toutes']].concat(A.RARITIES.map(function (r) { return [r.id, r.label]; })).map(function (v) {
+          U.secHead('Inventaire', 'Toutes vos cartes') +
+          // Filtres : raretés sur la 1re ligne, collection, affichage, tri et échange sur la 2e
+            '<div class="toolbar sticky-bar inv-tools">' +
+              '<div class="chips scroll-x" data-f="rarity">' + [['all', 'Toutes']].concat(A.RARITIES.map(function (r) { return [r.id, r.label]; }), [['secret', 'Secrète']]).map(function (v) {
                 return '<button class="chip' + (v[0] !== 'all' ? ' chip-r r-' + v[0] : '') + (inv.rarity === v[0] ? ' is-active' : '') + '" data-v="' + v[0] + '">' + (v[0] !== 'all' ? '<i></i>' : '') + v[1] + '</button>';
               }).join('') + '</div>' +
               // Filtres compacts : la valeur suffit, l’intitulé est porté par aria-label / title.
@@ -992,7 +1357,7 @@
             '<div data-results></div>' +
           '</div>' +
           // Colonne latérale de taille bornée : elle ne grandit pas quand on ajoute des collections.
-          '<aside class="inv-side"><div class="side-card"><div class="side-head"><p class="eyebrow">Progression</p><span class="muted small">' + complete + ' / ' + A.COLLECTIONS.length + ' terminées</span></div>' + (function () {
+          '<aside class="inv-side"><div class="side-card"><div class="side-head"><p class="eyebrow">Collections en cours</p><span class="muted small">' + complete + ' / ' + A.COLLECTIONS.length + ' terminées</span></div>' + (function () {
             // Les collections en cours d’abord (les plus avancées en tête), puis les terminées.
             var list = A.COLLECTIONS.map(function (c) { return { c: c, pr: S.collectionProgress(c.id) }; });
             list.sort(function (a, b) { var da = a.pr.pct >= 1, db = b.pr.pct >= 1; return da !== db ? (da ? 1 : -1) : b.pr.pct - a.pr.pct; });
@@ -1040,7 +1405,24 @@
         return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^./, function (c) { return c.toUpperCase(); });
       }
       var more = null, CHUNK = 40, shownLast = 0;
+      // Rareté « Secrète » : les personnages secrets ne sont pas des cartes de booster. On montre ceux obtenus,
+      // puis ceux dont le portrait commence à se révéler (au moins un personnage de la collection possédé).
+      function drawSecrets() {
+        if (more) { more.disconnect(); more = null; }
+        var cols = A.COLLECTIONS.filter(function (c) { return A.SECRET && A.SECRET[c.id] && (inv.coll === 'all' || inv.coll === c.id); });
+        var got = cols.filter(function (c) { return S.trophy(c.id); });
+        var started = cols.filter(function (c) { return !S.trophy(c.id) && S.collectionProgress(c.id).owned > 0; })
+          .sort(function (a, b) { return S.collectionProgress(b.id).pct - S.collectionProgress(a.id).pct; });
+        function grid(list) { return '<div class="card-grid">' + list.map(function (c) {
+          var pr = S.collectionProgress(c.id);
+          return '<div class="cg-item">' + U.secretCard(c.id) + '<p class="cg-note">' + U.esc(c.name) + (S.trophy(c.id) ? '' : ' · ' + pr.owned + '/' + pr.total) + '</p></div>';
+        }).join('') + '</div>'; }
+        res.innerHTML = '<p class="result-count">' + got.length + ' personnage' + (got.length > 1 ? 's' : '') + ' secret' + (got.length > 1 ? 's' : '') + ' obtenu' + (got.length > 1 ? 's' : '') + '</p>' +
+          (got.length ? '<div class="inv-period"><p class="eyebrow">Obtenus</p>' + grid(got) + '</div>' : '<p class="inv-secret-note">Un personnage secret est remis quand une collection est complète. Chaque personnage obtenu révèle un fragment de son portrait.</p>') +
+          (started.length ? '<div class="inv-period"><p class="eyebrow">En cours de révélation</p>' + grid(started) + '</div>' : '');
+      }
       function draw(keep) {   // keep : garde au moins autant de tuiles qu’avant (sélection, sans saut de défilement)
+        if (inv.rarity === 'secret') { drawSecrets(); return; }
         var l = list();
         // Doublons empilés : une seule tuile par édition (l’exemplaire le mieux placé selon le tri),
         // les autres exemplaires apparaissent en pile derrière. En mode échange, chaque exemplaire est sélectionnable.
@@ -1055,7 +1437,11 @@
         }
         function tile(t) {
           var i = t.i;
-          return '<div class="cg-item' + (t.n > 1 ? ' is-stack' + (t.n > 2 ? ' is-stack-3' : '') : '') + '">' + U.card(i.ed, {
+          // Doublons : les autres exemplaires sont la même carte, décalée derrière (2 au plus), pas des feuilles vides
+          var ghosts = t.n > 1 ? Array.from({ length: Math.min(2, t.n - 1) }, function (_, k) {
+            return '<span class="cg-ghost is-' + (k + 1) + '" aria-hidden="true">' + U.card(i.ed, { serial: i.serial, open: false, tilt: false }) + '</span>';
+          }).reverse().join('') : '';
+          return '<div class="cg-item' + (t.n > 1 ? ' is-stack' + (t.n > 2 ? ' is-stack-3' : '') : '') + '">' + ghosts + U.card(i.ed, {
             serial: i.serial, uid: i.uid, fav: i.fav, show: i.show,
             badge: t.n > 1 ? '×' + t.n : (!inv.select ? '' : l.count[i.ed] > 1 ? 'Doublon ×' + l.count[i.ed] : ''),
             open: !inv.select, select: inv.select, selected: inv.selected.indexOf(i.uid) !== -1, tilt: !inv.select
@@ -1066,7 +1452,7 @@
         if (more) { more.disconnect(); more = null; }
         res.innerHTML = '<p class="result-count">' + l.items.length + ' carte' + (l.items.length > 1 ? 's' : '') +
           (tiles.length !== l.items.length ? ' · ' + tiles.length + ' différente' + (tiles.length > 1 ? 's' : '') : '') + '</p>' +
-          (l.items.length ? '<div data-tiles></div><div class="inv-more" data-more></div>' : '<div class="empty">Aucune carte pour ces filtres. <a href="#/boutique">Ouvrir un booster</a></div>');
+          (l.items.length ? '<div data-tiles></div><div class="inv-more" data-more></div>' : '<div class="empty">Aucune carte pour ces filtres. <a href="#/">Ouvrir un booster</a></div>');
         var box = res.querySelector('[data-tiles]'), sentinel = res.querySelector('[data-more]'), shown = 0, cur = null, grid = null;
         function chunk() {
           var end = Math.min(tiles.length, shown + CHUNK), html = '';
@@ -1160,7 +1546,7 @@
             '<button class="link-btn" data-clear>Réinitialiser les filtres</button>' +
           '</details></aside>' +
           '<div class="mk-main">' +
-            '<div class="toolbar"><label class="search grow">' + I('search') + '<input type="search" placeholder="Rechercher une carte, un personnage, un numéro…" value="' + U.esc(mk.q) + '" data-q></label>' +
+            '<div class="toolbar mk-bar"><label class="search grow">' + I('search') + '<input type="search" placeholder="Carte, personnage, numéro…" value="' + U.esc(mk.q) + '" data-q></label>' +
             '<label class="select"><span>Trier</span><select data-sort>' + [['recent', 'Plus récentes'], ['asc', 'Prix croissant'], ['desc', 'Prix décroissant'], ['rarity', 'Rareté'], ['serial', 'Numéro']].map(function (o) { return '<option value="' + o[0] + '"' + (mk.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label></div>' +
             '<div data-results></div>' +
           '</div>' +
@@ -1174,8 +1560,26 @@
           }).join('') + '</tbody></table></div></div></section>';
     },
     mount: function (root) {
-      var res = root.querySelector('[data-results]');
-      function draw() {
+      var res = root.querySelector('[data-results]'), STEP = 12, shown = STEP, list = [], more = null;
+      function tile(l) {
+        return '<div class="listing">' + U.card(l.ed, { serial: l.serial, badge: l.mine ? 'Votre annonce' : '' }) +
+          '<div class="listing-foot"><div class="listing-price">' + U.price(l.price) + '<span class="muted small">par ' + U.esc(l.seller) + '</span><span class="muted small">' + U.ago(l.at) + '</span></div>' +
+          (l.mine ? '<div class="row gap-s"><button class="btn btn-ghost btn-sm grow" data-unlist="' + l.id + '">Retirer</button></div>' :
+            '<div class="row gap-s"><button class="btn btn-primary btn-sm grow" data-buy="' + l.id + '">Acheter</button><button class="btn btn-ghost btn-sm" data-offer="' + l.id + '">Offre</button></div>') +
+          '</div></div>';
+      }
+      // Les annonces s’affichent par tranches de 12 au défilement (une grille entière est trop lourde sur iPhone)
+      function grow() {
+        var grid = res.querySelector('.card-grid'), sent = res.querySelector('[data-more]');
+        if (!grid || !sent) return;
+        var from = grid.children.length;
+        if (from >= list.length) { sent.remove(); return; }
+        grid.insertAdjacentHTML('beforeend', list.slice(from, Math.max(from + STEP, shown)).map(tile).join(''));
+        shown = grid.children.length;
+        if (shown >= list.length) sent.remove();
+      }
+      function draw(keep) {
+        if (!keep) shown = STEP;
         var q = mk.q.trim().toLowerCase();
         var L = S.listings().filter(function (l) {
           var e = A.ED[l.ed], ch = A.CHAR[e.charId], co = A.COLL[ch.coll];
@@ -1197,14 +1601,16 @@
           if (mk.sort === 'serial') return (a.serial || 9999) - (b.serial || 9999);
           return b.at - a.at;
         });
+        list = L;
         res.innerHTML = '<p class="result-count">' + L.length + ' annonce' + (L.length > 1 ? 's' : '') + '</p>' +
-          (L.length ? '<div class="card-grid is-market">' + L.map(function (l) {
-            return '<div class="listing">' + U.card(l.ed, { serial: l.serial, badge: l.mine ? 'Votre annonce' : '' }) +
-              '<div class="listing-foot"><div class="listing-price">' + U.price(l.price) + '<span class="muted small">par ' + U.esc(l.seller) + '</span><span class="muted small">' + U.ago(l.at) + '</span></div>' +
-              (l.mine ? '<div class="row gap-s"><button class="btn btn-ghost btn-sm grow" data-unlist="' + l.id + '">Retirer</button></div>' :
-                '<div class="row gap-s"><button class="btn btn-primary btn-sm grow" data-buy="' + l.id + '">Acheter</button><button class="btn btn-ghost btn-sm" data-offer="' + l.id + '">Offre</button></div>') +
-              '</div></div>';
-          }).join('') + '</div>' : '<div class="empty">Aucune annonce ne correspond à votre recherche.</div>');
+          (L.length ? '<div class="card-grid is-market">' + L.slice(0, shown).map(tile).join('') + '</div>' +
+            (L.length > shown ? '<div class="inv-more" data-more></div>' : '') : '<div class="empty">Aucune annonce ne correspond à votre recherche.</div>');
+        var sent = res.querySelector('[data-more]');
+        if (more) more.disconnect();
+        if (sent && 'IntersectionObserver' in window) {
+          more = new IntersectionObserver(function (en) { if (en[0].isIntersecting) grow(); }, { rootMargin: '600px 0px' });
+          more.observe(sent);
+        } else if (sent) { shown = L.length; grow(); }
       }
       draw();
       function labelOf(l) { var e = A.ED[l.ed]; return A.CHAR[e.charId].name + ' · ' + A.R[e.rarity].label + (e.supply ? ' ' + U.serial(l.serial, e.supply) : ''); }
@@ -1219,7 +1625,7 @@
               '<dl class="facts"><div><dt>Vendeur</dt><dd>' + U.esc(l.seller) + '</dd></div><div><dt>Prix</dt><dd>' + U.price(l.price) + '</dd></div><div><dt>Solde après achat</dt><dd>' + U.price(S.balance() - l.price) + '</dd></div></dl>',
             onOk: function () {
               var r = S.buy(l.id);
-              if (r.ok) { U.toast('Carte ajoutée à votre inventaire'); draw(); A.app.refreshChrome(); } else U.toast(r.error, 'error');
+              if (r.ok) { U.toast('Carte ajoutée à votre inventaire'); draw(true); A.app.refreshChrome(); } else U.toast(r.error, 'error');
             }
           });
           return;
@@ -1238,7 +1644,7 @@
             } });
           return;
         }
-        if ((t = e.target.closest('[data-unlist]'))) { S.unlist(t.getAttribute('data-unlist')); U.toast('Annonce retirée, la carte revient dans votre inventaire'); draw(); return; }
+        if ((t = e.target.closest('[data-unlist]'))) { S.unlist(t.getAttribute('data-unlist')); U.toast('Annonce retirée, la carte revient dans votre inventaire'); draw(true); return; }
         if (e.target.closest('[data-clear]')) { mk = { q: '', colls: [], rars: [], min: '', max: '', sort: 'recent', mine: false }; location.hash = '#/marketplace'; A.app.rerender(); }
       });
       root.addEventListener('change', function (e) {
@@ -1257,7 +1663,7 @@
         if (t.matches('[data-q],[data-min],[data-max]')) draw();
       });
       if (window.innerWidth < 900) { var d = root.querySelector('.mk-filters details'); if (d) d.open = false; }
-      this.refresh = draw;
+      this.refresh = function () { draw(true); };
     }
   };
 
@@ -1281,6 +1687,16 @@
         return '<label class="pf-row is-toggle"><div><b>' + title + '</b><small>' + hint + '</small></div>' +
           '<input type="checkbox" data-pref="' + key + '"' + (on ? ' checked' : '') + '><i class="switch-ui"></i></label>';
       }
+      // Collections triées : obtenues / commencées d’abord (score décroissant), puis l’ordre du catalogue
+      function byOwned(score) {
+        return A.COLLECTIONS.map(function (c, i) { return { c: c, s: +score(c), i: i }; })
+          .sort(function (x, y) { return y.s - x.s || x.i - y.i; }).map(function (x) { return x.c; });
+      }
+      // Les n premiers visibles, le reste replié derrière « Voir les N … » (la page faisait 12 000 px sur iPhone)
+      function fold(list, n, label, fn) {
+        var head = list.slice(0, n).map(fn).join(''), rest = list.slice(n);
+        return head + (rest.length ? '<details class="pf-fold"><summary>Voir les ' + list.length + ' ' + label + '</summary><div class="pf-fold-in">' + rest.map(fn).join('') + '</div></details>' : '');
+      }
       // Section façon catalogue : titre serif à gauche, contenu à droite, filets fins.
       function sec(eyebrow, title, desc, body) {
         return '<section class="pf-sec"><div class="pf-sec-head"><p class="eyebrow">' + eyebrow + '</p><h2 class="pf-sec-title">' + title + '</h2>' + (desc ? '<p class="muted small">' + desc + '</p>' : '') + '</div><div class="pf-sec-body">' + body + '</div></section>';
@@ -1302,13 +1718,14 @@
         '<div class="container pf-body">' +
           sec('Collection', 'Photo de profil', 'Chaque collection complétée débloque un portrait.',
             '<div class="pf-avatars"><button type="button" class="pf-av' + (S.avatar() ? '' : ' is-on') + '" data-avatar-pick=""><span class="avatar is-lg">' + A.app.initial() + '</span><small>Initiale</small></button>' +
-            A.COLLECTIONS.map(function (c) {
+            fold(byOwned(function (c) { return S.avatars().indexOf(c.id) !== -1; }), 7, 'portraits', function (c) {
               var own = S.avatars().indexOf(c.id) !== -1;
               return '<button type="button" class="pf-av' + (own ? '' : ' is-locked') + (S.avatar() === c.id ? ' is-on' : '') + '"' + (own ? ' data-avatar-pick="' + c.id + '"' : ' disabled title="Complétez ' + U.esc(c.name) + ' pour le débloquer"') + '>' +
                 '<span class="avatar is-lg has-pic' + (S.hasFrame() && own ? ' has-frame' : '') + '">' + U.avatarArt(c.id) + (own ? '' : '<i class="pf-av-lock">' + U.icon('lock') + '</i>') + '</span><small>' + U.esc(c.name) + '</small></button>';
-            }).join('') + '</div>') +
+            }) + '</div>') +
           sec('Collection', 'Personnages secrets', 'Un par collection, jamais en booster : chaque personnage obtenu révèle un fragment de son portrait.',
-            '<div class="pf-trophies">' + A.COLLECTIONS.map(function (c) { return '<div class="pf-trophy">' + U.secretCard(c.id) + '</div>'; }).join('') + '</div>') +
+            '<p class="pf-count"><b>' + A.COLLECTIONS.filter(function (c) { return S.trophy(c.id); }).length + '</b> obtenus sur ' + A.COLLECTIONS.length + '</p>' +
+            '<div class="pf-trophies">' + fold(byOwned(function (c) { return S.trophy(c.id) ? 2 : A.COLL[c.id].chars.some(function (id) { return S.ownsChar(id); }) ? 1 : 0; }), 4, 'personnages secrets', function (c) { return '<div class="pf-trophy">' + U.secretCard(c.id) + '</div>'; }) + '</div>') +
           sec('Collection', 'Titres', 'Gagnés en complétant les collections : tous les personnages, puis toutes les éditions.',
             (S.titles().length ? '<div class="pf-titles">' + S.titles().map(function (t) { return '<span class="pf-title">' + U.icon('laurel') + U.esc(t) + '</span>'; }).join('') + '</div>'
               : '<p class="muted">Aucun titre pour l’instant. Complétez une collection pour obtenir le premier.</p>') +
@@ -1400,6 +1817,269 @@
               '<li><b>Rareté</b> — pastille et filet de cadre. Satin discret à partir de Légendaire.</li>' +
             '</ol></div></div>' +
         '</div></section>';
+    }
+  };
+
+  /* ======================================================================
+     RARETÉS — planche de travail pour finaliser le cadre des cartes
+     (accessible seulement depuis le pied de page)
+     ====================================================================== */
+  var RZ = { ch: 'grece-zeus', bg: 'page', back: null };   // back : thème du dos affiché en grand (null = celui du Booster Atlas)
+  var RZ_BG = [['page', 'Page'], ['clair', 'Clair'], ['sombre', 'Sombre']];
+  // Jetons du cadre lus sur la carte réelle (atlas.css) : ce qui s’affiche est ce que l’on règle.
+  var RZ_TOKENS = [['--card-bg', 'Fond'], ['--card-line', 'Filet'], ['--rc', 'Pastille'], ['--f1', 'Métal'], ['--f2', 'Ombre'], ['--f3', 'Reflet']];
+  function rzChars() { return A.CHARS.filter(function (c) { return c.editions.length === A.RARITIES.length; }); }
+  function rzSerial(r) { return r.supply ? Math.max(1, Math.round(r.supply * 0.07)) : null; }
+  // Bloc de travail : en-tête, carte en grand, deux zooms ×3, variantes, jetons du cadre
+  function rzBlock(o) {
+    var zoom = function (cls, label) {
+      return '<figure class="rz-zoom ' + cls + '"><div class="rz-zoom-box"><div class="rz-zoom-in" aria-hidden="true">' + o.still + '</div></div><figcaption>' + label + '</figcaption></figure>';
+    };
+    return '<article class="rz-block ' + o.cls + '" id="rz-' + o.id + '">' +
+      '<header class="rz-head"><span class="rz-dot"></span><div><p class="eyebrow">' + o.kicker + '</p>' +
+        '<h2 class="h2">' + o.label + '</h2><p class="muted">' + o.desc + '</p></div></header>' +
+      '<div class="rz-stage"><div class="rz-big">' + o.big + '</div></div>' +
+      '<div class="rz-zooms">' + zoom('is-tl', 'Coin supérieur · ×3') + zoom('is-br', o.zoomBr || 'Pied de carte · ×3') + '</div>' +
+      '<div class="rz-states' + (o.states.length > 3 ? ' is-many' : '') + '">' + o.states.map(function (x) {
+        if (x[2] == null) return '<figure class="rz-mini">' + x[0] + '<figcaption>' + x[1] + '</figcaption></figure>';
+        return '<figure class="rz-mini is-pick' + (x[3] ? ' is-on' : '') + '" data-rz-pick="' + x[2] + '" role="button" tabindex="0" aria-pressed="' + !!x[3] + '">' + x[0] + '<figcaption>' + x[1] + '</figcaption></figure>';
+      }).join('') + '</div>' +
+      (o.tokens ? '<dl class="rz-tokens" data-rz-tokens></dl>' : '') +
+    '</article>';
+  }
+  function rzBack(theme) { var pk = A.PACKS.filter(function (x) { return x.theme === theme; })[0]; return '<div class="rz-back">' + U.cardBack(theme, pk && pk.name) + '</div>'; }
+  function rzBoard() {
+    var ch = A.CHAR[RZ.ch];
+    // Personnage secret : celui de la collection du personnage choisi (sinon le premier qui existe)
+    var cid = A.SECRET[ch.coll] ? ch.coll : Object.keys(A.SECRET).filter(function (k) { return A.COLL[k]; })[0], sc = A.SECRET[cid];
+    var side = A.RARITIES.map(function (r) {
+      return '<figure class="rz-mini">' + U.card(ch.id + '-' + r.id, { serial: rzSerial(r), open: false, tilt: false }) + '<figcaption>' + r.label + '</figcaption></figure>';
+    }).join('') + (sc ? '<figure class="rz-mini">' + U.secretCard(cid, { reveal: true }) + '<figcaption>Secrète</figcaption></figure>' : '');
+    var blocks = A.RARITIES.map(function (r) {
+      var ed = ch.id + '-' + r.id, still = U.card(ed, { serial: rzSerial(r), open: false, tilt: false });
+      return rzBlock({ id: r.id, cls: 'r-' + r.id, label: r.label, tokens: true, still: still,
+        kicker: 'Rang ' + (r.rank + 1) + ' sur ' + A.RARITIES.length + ' · ' + (r.supply ? r.supply + ' exemplaire' + (r.supply > 1 ? 's' : '') : 'tirage illimité'),
+        desc: U.esc(r.identity) + ' — ' + U.esc(r.desc),
+        big: U.card(ed, { serial: rzSerial(r) }),
+        states: [[still, 'Possédée'], [U.card(ed, { serial: rzSerial(r), open: false, tilt: false, missing: true }), 'Non possédée'], [U.card(ed, { unknown: true }), 'Non découverte']] });
+    }).join('');
+    var secret = sc ? rzBlock({ id: 'secret', cls: 'r-secret', label: 'Secrète',
+      kicker: 'Hors tirage · une par collection · platine', still: U.secretCard(cid, { reveal: true }),
+      desc: 'Hors booster, offerte quand la collection est complète. Ici : ' + U.esc(sc.name) + '.',
+      big: U.secretCard(cid, { reveal: true }),
+      states: [[U.secretCard(cid, { reveal: true }), 'Révélée'], [U.secretCard(cid, { locked: true }), 'En fragments']] }) : '';
+    // Dos : celui de chaque sachet (l’ouverture montre le dos du sachet ouvert)
+    var cur = RZ.back != null ? RZ.back : (A.PACK.standard ? A.PACK.standard.theme : '');
+    var backs = [['', 'Ivoire']].concat(A.PACKS.map(function (pk) { return [pk.theme, pk.name]; }));
+    var dos = rzBlock({ id: 'dos', cls: 'r-dos', label: 'Dos de carte',
+      kicker: 'Verso · ' + backs.length + ' déclinaisons', still: rzBack(cur), zoomBr: 'Coin inférieur · ×3',
+      desc: 'Le verso vu à l’ouverture, aux couleurs et au nom du sachet. Touchez un dos pour l’afficher en grand.',
+      big: rzBack(cur),
+      states: backs.map(function (b) { return [rzBack(b[0]), U.esc(b[1]), b[0], b[0] === cur]; }) });
+    var mesures = '<article class="rz-block rz-measure" id="rz-mesures"><header class="rz-head"><span class="rz-dot"></span><div><p class="eyebrow">Contrôle · mesuré en direct</p>' +
+      '<h2 class="h2">Mesures</h2><p class="muted">Chaque type de carte mesuré à sa taille réelle, ramené à 300 px de large.</p></div></header><div data-rz-measure></div></article>';
+    return '<div class="rz-block rz-all"><header class="rz-head"><div><p class="eyebrow">Vue d’ensemble</p><h2 class="h2">Côte à côte</h2>' +
+        '<p class="muted">Les six raretés du même personnage et la carte secrète, à la taille d’une grille de collection.</p></div></header>' +
+        '<div class="rz-stage"><div class="rz-row">' + side + '</div></div></div>' + blocks + secret + dos + mesures;
+  }
+  /* ---------- Mesures : contrôle de toutes les dimensions, en direct ----------
+     Chaque carte de la page est mesurée dans le navigateur, puis ramenée à une carte de 300 px de large
+     (les cartes se dessinent en cqw : les proportions sont les mêmes à toutes les tailles). */
+  var RZ_REF = 300;
+  function rzMeasureTargets() {
+    return A.RARITIES.map(function (r) { return [r.label, '#rz-' + r.id + ' .rz-big .card']; }).concat([
+      ['Secrète', '#rz-secret .rz-big .card'],
+      ['Secrète en fragments', '#rz-secret .rz-states .rz-mini:nth-child(2) .card'],
+      ['Non possédée', '#rz-base .rz-states .rz-mini:nth-child(2) .card'],
+      ['Non découverte', '#rz-base .rz-states .rz-mini:nth-child(3) .card'],
+      ['Dos', '#rz-dos .rz-big .rz-back']
+    ]);
+  }
+  // [groupe, libellé, fonction (m) → nombre | texte | null, décimales, réglage libre (non comparé)]
+  var RZ_ROWS = [
+    ['Carte', 'Largeur affichée (px réels)', function (m) { return m.w; }, 0, true],
+    ['Carte', 'Proportions (hauteur ÷ largeur)', function (m) { return m.h / m.w; }, 3],
+    ['Carte', 'Arrondi des coins', function (m) { return m.px(m.cs(m.shell).borderTopLeftRadius); }],
+    ['Carte', 'Trait du bord (1 px à toutes les tailles)', function (m) { return parseFloat(m.cs(m.shell).borderTopWidth); }, 2, true],
+    ['Carte', 'Marge intérieure (trait compris)', function (m) { var c = m.cs(m.shell); return m.px(c.borderTopWidth) + m.px(c.paddingTop); }],
+    ['Cadre', 'Cadre métal · épaisseur', function (m) {
+      var h = m.q('.card-holo'); if (!h) return null; var c = m.cs(h);
+      return c.backgroundImage === 'none' || +c.opacity === 0 ? 'aucun' : m.px(c.paddingTop); }],
+    ['Cadre', 'Cadre métal · opacité', function (m) { var h = m.q('.card-holo'); return h ? +m.cs(h).opacity : null; }, 2, true],
+    ['Cadre', 'Filet intérieur · retrait du bord', function (m) {
+      if (!m.inner) return null; var a = getComputedStyle(m.inner, '::after');
+      return a.content === 'none' ? 'aucun' : m.px(m.cs(m.inner).borderTopWidth) + m.px(a.top); }],
+    ['Cadre', 'Filet intérieur · arrondi', function (m) {
+      if (!m.inner) return null; var a = getComputedStyle(m.inner, '::after');
+      return a.content === 'none' ? 'aucun' : m.px(a.borderTopLeftRadius); }],
+    ['Illustration', 'Retrait gauche', function (m) { return m.box('.card-art', 'l'); }],
+    ['Illustration', 'Retrait haut', function (m) { return m.box('.card-art', 't'); }],
+    ['Illustration', 'Retrait droit', function (m) { return m.box('.card-art', 'r'); }],
+    ['Illustration', 'Largeur', function (m) { return m.box('.card-art', 'w'); }],
+    ['Illustration', 'Hauteur', function (m) { return m.box('.card-art', 'h'); }],
+    ['Illustration', 'Arrondi', function (m) { var a = m.q('.card-art'); return a ? m.px(m.cs(a).borderTopLeftRadius) : null; }],
+    ['Textes', 'Nom · taille', function (m) { return m.font('.card-name'); }],
+    ['Textes', 'Titre · taille', function (m) { return m.font('.card-title'); }],
+    ['Textes', 'Collection · taille', function (m) { return m.font('.card-coll'); }],
+    ['Textes', 'Numéro · taille', function (m) { return m.font('.card-serial'); }],
+    ['Textes', 'Statistiques · taille des valeurs', function (m) { return m.font('.card-stats b'); }],
+    ['Textes', 'Rareté · taille', function (m) { return m.font('.card-rar'); }],
+    ['Textes', 'Nom · retrait gauche', function (m) { return m.box('.card-name', 'l'); }],
+    ['Textes', 'Rareté · retrait droit', function (m) { return m.box('.card-rar', 'r'); }],
+    ['Écarts verticaux', 'Illustration → nom', function (m) { return m.gap('.card-art', '.card-name'); }],
+    ['Écarts verticaux', 'Nom → titre', function (m) { return m.gap('.card-name', '.card-title'); }],
+    ['Écarts verticaux', 'Titre → filet du pied', function (m) { return m.gap('.card-title', '.card-foot'); }],
+    ['Écarts verticaux', 'Filet du pied → statistiques', function (m) { var f = m.q('.card-foot'), s = m.q('.card-stats'); return f && s ? (m.rel(s).top - m.rel(f).top) * m.k : null; }],
+    ['Écarts verticaux', 'Statistiques → bas de la carte', function (m) { var s = m.q('.card-stats'); return s ? (m.h - m.rel(s).bottom) * m.k : null; }],
+    ['Dos', 'Cadre intérieur · retrait', function (m) { return m.box('.cb-frame', 'l'); }],
+    ['Dos', 'Emblème · largeur', function (m) { return m.box('.cb-mark', 'w'); }],
+    ['Dos', 'ATLAS · taille', function (m) { return m.font('.cb-name'); }],
+    ['Dos', 'Collection · retrait bas', function (m) { var c = m.q('.cb-coll'); return c ? (m.h - m.rel(c).bottom) * m.k : null; }]
+  ];
+  function rzMeasureOne(el) {
+    var r = el.getBoundingClientRect(), shell = el.querySelector('.card-inner') || el.querySelector('.card-back');
+    var m = {
+      w: r.width, h: r.height, k: RZ_REF / r.width, shell: shell, inner: el.querySelector('.card-inner'),
+      q: function (s) { return el.querySelector(s); },
+      cs: function (n) { return getComputedStyle(n); },
+      px: function (v) { return (parseFloat(v) || 0) * m.k; },
+      rel: function (n) { var b = n.getBoundingClientRect(); return { left: b.left - r.left, top: b.top - r.top, right: r.right - b.right, bottom: b.bottom - r.top, width: b.width, height: b.height }; },
+      box: function (s, side) {
+        var n = el.querySelector(s); if (!n) return null; var b = m.rel(n);
+        return { l: b.left, t: b.top, r: b.right, w: b.width, h: b.height }[side] * m.k; },
+      font: function (s) { var n = el.querySelector(s); return n ? m.px(getComputedStyle(n).fontSize) : null; },
+      // Écart entre le bas de a et le haut de b (texte : boîte de ligne) ; border = haut de la bordure de b
+      gap: function (a, b) { var x = el.querySelector(a), y = el.querySelector(b); return x && y ? (m.rel(y).top - m.rel(x).bottom) * m.k : null; }
+    };
+    return RZ_ROWS.map(function (row) { try { var v = row[2](m); return v == null || (typeof v === 'number' && isNaN(v)) ? null : v; } catch (e) { return null; } });
+  }
+  function rzFmt(v, d) { return v == null ? '—' : typeof v === 'number' ? v.toFixed(d == null ? 1 : d).replace('.', ',') : v; }
+  function rzMeasure(root) {
+    var host = root.querySelector('[data-rz-measure]'); if (!host) return;
+    // Les cartes sont mesurées telles qu’affichées (grandes cartes et vignettes), puis ramenées à 300 px de large :
+    // si une dimension ne suit pas la taille de la carte, elle ressort en écart.
+    var cols = rzMeasureTargets().map(function (t) {
+      var el = root.querySelector(t[1]); if (!el) return null;
+      return { label: t[0], vals: rzMeasureOne(el), k: RZ_REF / el.getBoundingClientRect().width, back: t[0] === 'Dos' };
+    }).filter(Boolean);
+    var diffs = [], group = '';
+    var body = RZ_ROWS.map(function (row, i) {
+      var head = row[0] !== group ? '<tr class="rz-mg"><th colspan="' + (cols.length + 1) + '">' + row[0] + '</th></tr>' : '';
+      group = row[0];
+      // Référence : la valeur la plus fréquente de la ligne (hors dos, qui est un autre objet)
+      var count = {}, ref = null, best = 0;
+      cols.forEach(function (c) { var v = c.vals[i]; if (v == null || c.back) return; var key = rzFmt(v, row[3]); count[key] = (count[key] || 0) + 1; if (count[key] > best) { best = count[key]; ref = v; } });
+      var cells = cols.map(function (c) {
+        var v = c.vals[i], off = false;
+        if (!row[4] && !c.back && v != null && ref != null) off = typeof v === 'number' && typeof ref === 'number' ? Math.abs(v - ref) > Math.max(.15, .15 * c.k) : v !== ref;   // moins de 0,15 px à l’écran : arrondi de rendu
+        if (off) diffs.push(c.label + ' · ' + row[1]);
+        return '<td class="' + (off ? 'is-off' : '') + (v == null ? ' is-na' : '') + '"' + (off ? ' title="Valeur habituelle : ' + rzFmt(ref, row[3]) + '"' : '') + '>' + rzFmt(v, row[3]) + '</td>';
+      }).join('');
+      return head + '<tr' + (row[4] ? ' class="is-free"' : '') + '><th scope="row">' + row[1] + (row[4] ? ' <small>réglage par rareté</small>' : '') + '</th>' + cells + '</tr>';
+    }).join('');
+    host.innerHTML =
+      '<p class="rz-mstate ' + (diffs.length ? 'is-off' : 'is-ok') + '">' + (diffs.length
+        ? diffs.length + ' écart' + (diffs.length > 1 ? 's' : '') + ' (surligné' + (diffs.length > 1 ? 's' : '') + ' ; la valeur habituelle s’affiche au survol)'
+        : 'Aucun écart : tous les types de carte ont exactement les mêmes dimensions, à toutes les tailles.') + ' <small>Les arrondis de rendu de moins de 0,15 px à l’écran sont ignorés.</small></p>' +
+      '<div class="rz-mwrap"><table class="rz-mtable"><thead><tr><th scope="col">Mesure (carte de ' + RZ_REF + ' px)</th>' +
+        cols.map(function (c) { return '<th scope="col">' + c.label + '</th>'; }).join('') + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+  function rzMeasureSoon(root) {
+    var go = function () { requestAnimationFrame(function () { rzMeasure(root); }); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+  function rzTokens(root) {
+    root.querySelectorAll('.rz-block[id]').forEach(function (b) {
+      var card = b.querySelector('.rz-big .card'), dl = b.querySelector('[data-rz-tokens]');
+      if (!card || !dl) return;
+      var cs = getComputedStyle(card);
+      dl.innerHTML = RZ_TOKENS.map(function (t) {
+        var v = cs.getPropertyValue(t[0]).trim();
+        if (!v) return '';
+        return '<div><dt><i style="background:' + U.esc(v) + '"></i>' + t[1] + '</dt><dd><code>' + t[0] + '</code> ' + U.esc(v) + '</dd></div>';
+      }).join('');
+    });
+  }
+
+  P.rarities = {
+    title: 'Raretés des cartes',
+    render: function (ctx) {
+      var q = ctx.query.perso;
+      if (q && A.CHAR[q] && A.CHAR[q].editions.length === A.RARITIES.length) RZ.ch = q;
+      return '<section class="page-head"><div class="container"><p class="eyebrow">Atelier de design</p><h1 class="h1">Les raretés</h1>' +
+        '<p class="lead">Chaque cadre de carte, en grand et de près, pour finaliser le design des six raretés, de la carte secrète et du dos.</p></div></section>' +
+        '<section class="section-tight"><div class="container">' +
+        '<div class="sticky-bar rz-bar">' +
+          '<label class="select is-compact" title="Personnage"><select data-rz-ch aria-label="Personnage">' + A.COLLECTIONS.map(function (co) {
+            var list = rzChars().filter(function (c) { return c.coll === co.id; });
+            return list.length ? '<optgroup label="' + U.esc(co.name) + '">' + list.map(function (c) {
+              return '<option value="' + c.id + '"' + (c.id === RZ.ch ? ' selected' : '') + '>' + U.esc(c.name) + '</option>';
+            }).join('') + '</optgroup>' : '';
+          }).join('') + '</select></label>' +
+          '<div class="rz-seg" role="group" aria-label="Fond">' + RZ_BG.map(function (b) {
+            return '<button class="chip' + (RZ.bg === b[0] ? ' is-active' : '') + '" data-rz-bg="' + b[0] + '">' + b[1] + '</button>';
+          }).join('') + '</div>' +
+          '<nav class="rz-jump" aria-label="Aller à une rareté">' + A.RARITIES.concat([{ id: 'secret', label: 'Secrète' }, { id: 'dos', label: 'Dos' }, { id: 'mesures', label: 'Mesures' }]).map(function (r) {
+            return '<a class="chip chip-r r-' + r.id + '" href="#/raretes" data-rz-go="' + r.id + '"><i></i>' + r.label + '</a>';
+          }).join('') + '</nav>' +
+        '</div>' +
+        '<div class="rz bg-' + RZ.bg + '" data-rz>' + rzBoard() + '</div></div></section>';
+    },
+    mount: function (root) {
+      var board = root.querySelector('[data-rz]'), bar = root.querySelector('.rz-bar');
+      rzTokens(root);
+      rzMeasureSoon(root);
+      // Redessine la planche sans bouger la page
+      function redraw() {
+        var y = window.scrollY;
+        board.innerHTML = rzBoard();
+        rzTokens(root);
+        rzMeasureSoon(root);
+        window.scrollTo({ top: y, behavior: 'instant' });
+      }
+      // Bloc sous la barre collante : c’est celui que l’on regarde
+      function current() {
+        var y = bar.getBoundingClientRect().bottom + 1, list = root.querySelectorAll('.rz-block[id]');
+        for (var i = 0; i < list.length; i++) { var r = list[i].getBoundingClientRect(); if (r.top <= y && r.bottom > y) return list[i]; }
+        return null;
+      }
+      function markJump() {
+        if (!root.isConnected) { window.removeEventListener('scroll', markJump); return; }
+        var c = current(), id = c ? c.id.slice(3) : '';
+        root.querySelectorAll('[data-rz-go]').forEach(function (x) { x.classList.toggle('is-active', x.getAttribute('data-rz-go') === id); });
+      }
+      window.addEventListener('scroll', markJump, { passive: true });
+      root.addEventListener('change', function (e) {
+        if (!e.target.matches('[data-rz-ch]')) return;
+        RZ.ch = e.target.value;   // même endroit de la page avec le nouveau personnage
+        redraw();
+      });
+      root.addEventListener('keydown', function (e) {
+        var k = e.target.closest && e.target.closest('[data-rz-pick]');
+        if (k && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); k.click(); }
+      });
+      root.addEventListener('click', function (e) {
+        var pk = e.target.closest('[data-rz-pick]');
+        if (pk) { RZ.back = pk.getAttribute('data-rz-pick'); redraw(); return; }
+        var b = e.target.closest('[data-rz-bg]');
+        if (b) {
+          RZ.bg = b.getAttribute('data-rz-bg');
+          board.className = 'rz bg-' + RZ.bg;
+          root.querySelectorAll('[data-rz-bg]').forEach(function (x) { x.classList.toggle('is-active', x === b); });
+          return;
+        }
+        var g = e.target.closest('[data-rz-go]');
+        if (g) {
+          e.preventDefault();
+          var t = root.querySelector('#rz-' + g.getAttribute('data-rz-go')), c = current();
+          if (!t) return;
+          // Déjà dans un bloc : on passe au même endroit de l’autre bloc (les blocs ont la même mise en page),
+          // sinon on arrive en haut du bloc, sous la barre.
+          if (c) window.scrollTo({ top: window.scrollY + t.getBoundingClientRect().top - c.getBoundingClientRect().top, behavior: 'instant' });
+          else window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - (parseFloat(getComputedStyle(bar).top) + bar.offsetHeight) - 16, behavior: 'smooth' });
+          markJump();
+        }
+      });
     }
   };
 })(window.ATLAS);
