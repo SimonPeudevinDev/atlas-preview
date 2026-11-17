@@ -27,6 +27,13 @@
 
   /* Règles partagées par les écrans et les vérifications, sans état de partie. */
   var C = A.combat = {};
+  /** Version du site (?v= de ce script) : les duels entre amis ne se lancent qu’entre deux pages de même version */
+  C.version = (function () { var sc = document.querySelector('script[src*="combat.js"]'), m = sc && /[?&]v=(\d+)/.exec(sc.src); return m ? m[1] : '0'; })();
+  /** Message quand l’autre joueur n’a pas la même version : qui doit recharger */
+  function versionGap(other) {
+    if (!other || other === C.version) return '';
+    return +other > +C.version ? 'Votre page n’est pas à jour : rechargez-la pour jouer.' : 'n’a pas la dernière version du site : il doit recharger sa page.';
+  }
   C.conquest = G;
   C.question = A.quiz.question;
   C.duel = { fighter: fighter, styles: function () { return STYLES; }, style: function (e) { return styleOf(A.ED[e] ? A.ED[e].charId : e); }, stats: function (e) { return duelStats(e); }, resolve: resolve, choose: botMove, mult: mult, manches: MANCHES, toWin: WIN_MANCHES, seed: function (x) { seedRng(x); }, rand: function () { return RNG(); } };
@@ -761,6 +768,8 @@
         NET.call('salle/' + id).then(function (room) {
           if (room.left || room.players.length > 1) { show('<div class="cb-intro cb-lobby"><p class="eyebrow">Défi entre amis</p><h2 class="cb-intro-name">Salle ' + U.esc(id) + '</h2><p class="cb-intro-rules">' + (room.left ? 'Ce défi a été annulé.' : 'Ce duel a déjà commencé.') + '</p><div class="cb-intro-actions"><button class="btn btn-ghost btn-lg" data-hub>Arène</button></div></div>'); return; }
           var host = room.players[0];
+          var gap = room.v !== undefined && NET.online() ? versionGap(room.v || '0') : '';
+          if (gap) { show('<div class="cb-intro cb-lobby"><p class="eyebrow">Défi entre amis</p><h2 class="cb-intro-name">' + U.esc(host.name) + ' vous défie</h2><p class="cb-intro-rules">' + (gap.charAt(0) === 'V' ? gap : U.esc(host.name) + ' ' + gap + ' Puis renvoyez-vous un lien.') + '</p><div class="cb-intro-actions"><button class="btn btn-ghost btn-lg" data-hub>Arène</button></div></div>'); return; }
           pvp = { role: 'guest', id: room.id, host: host };
           mode = 'duel';
           var can = roster().length >= 3;
@@ -823,6 +832,8 @@
       function essaiOther(s) {
         var o = s && s.other; if (!o) return '';
         var who = o.name && o.name !== 'Joueur' ? U.esc(o.name) + ' (Joueur ' + o.seat + ')' : 'Joueur ' + o.seat;
+        var gap = o.here ? versionGap(o.v || '0') : '';
+        if (gap) return gap.charAt(0) === 'V' ? gap : who + ' ' + gap;
         return !o.here ? 'Joueur ' + o.seat + ' n’est pas encore là' : o.ready ? who + ' est prêt' : who + ' est connecté et compose son équipe';
       }
       /** Salon : nom, lien de l’autre joueur, état de l’autre place, équipe parmi toutes les cartes */

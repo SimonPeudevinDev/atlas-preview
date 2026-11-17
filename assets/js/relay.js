@@ -217,7 +217,7 @@
     });
     var players = r.host ? [{ name: r.host.name, team: r.host.team }] : [];
     if (r.host && r.guest) players.push({ name: r.guest.name, team: r.guest.team });
-    return { id: r.id, seed: r.host ? r.host.seed : 0, left: r.left, moves: moves, played: played, players: players };
+    return { id: r.id, seed: r.host ? r.host.seed : 0, left: r.left, moves: moves, played: played, players: players, v: r.host && r.host.v ? String(r.host.v) : '' };
   }
   function watch(id, seat) {
     var r = room(id);
@@ -255,7 +255,7 @@
       r.role = 'host'; r.me = { p: 0, tok: tok, name: body.name };
       subscribe(ROOT + id + '/#');
       r.ready = Promise.resolve(r);
-      publish(ROOT + id + '/host', { name: body.name, team: body.team, seed: Math.floor(Math.random() * 2147483647), tok: tok }, true);
+      publish(ROOT + id + '/host', { name: body.name, team: body.team, seed: Math.floor(Math.random() * 2147483647), tok: tok, v: appV() }, true);
       return until(r, function () { return !!r.host; }, 8000).then(function () {
         return { id: id, p: 0, token: tok, link: link(r), room: pub(r) };
       });
@@ -300,14 +300,17 @@
     if (!v || v.gone || !s) return false;
     return s.live ? Date.now() - s.t < FRESH : Date.now() - (v.at || 0) < FRESH;
   }
+  /** Version du site (le ?v= des scripts) : deux navigateurs qui ne calculent pas le duel pareil ne doivent pas jouer ensemble */
+  function appV() { return String((A.combat && A.combat.version) || '0'); }
   function seatSend(r) {
     var m = r.me;
-    publish(ROOT + r.id + '/seat/' + r.seat, { tok: m.tok, name: m.name, at: Date.now(), team: m.team || null, ready: m.ready || null }, true);
+    publish(ROOT + r.id + '/seat/' + r.seat, { tok: m.tok, name: m.name, at: Date.now(), team: m.team || null, ready: m.ready || null, v: appV() }, true);
   }
   /** Partie : les deux places prêtes ; identifiant = les deux jetons « prêt » (Joueur 1 d’abord) */
   function seatMatch(r) {
     var a = r.seats[1], b = r.seats[2];
     if (!alive(r, 1) || !alive(r, 2) || !a.ready || !b.ready || !a.team || !b.team) return null;
+    if (String(a.v) !== String(b.v)) return null;   // versions différentes : pas de partie (l’un doit recharger)
     return { mid: a.ready + '-' + b.ready, players: [{ name: a.name, team: a.team }, { name: b.name, team: b.team }] };
   }
   function seatPub(r, mv) {
@@ -363,7 +366,7 @@
       if (mine && !mine.gone && mine.tok !== r.me.tok) { r.me = null; r.mid = null; return { lost: true, by: mine.name }; }
       if (!r.me) return null;
       var on = r.seat === 1 ? 2 : 1, o = r.seats[on];
-      return { seat: r.seat, tok: r.me.tok, other: { seat: on, here: alive(r, on), name: o && o.name, ready: !!(alive(r, on) && o.ready && o.team) }, match: seatMatch(r) };
+      return { seat: r.seat, tok: r.me.tok, v: appV(), other: { seat: on, here: alive(r, on), name: o && o.name, ready: !!(alive(r, on) && o.ready && o.team), v: o && o.v ? String(o.v) : '' }, match: seatMatch(r) };
     },
     leave: function (id) {
       var r = rooms[id]; if (!r || !r.me) return;
