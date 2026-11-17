@@ -133,7 +133,14 @@
 
   /* ---------- Équipe ---------- */
   var team = [];   // uids choisis (gardés le temps de la session)
+  var ALL = false; // combat d’essai : toutes les cartes du jeu, sans regarder la collection
+  /** Exemplaire : de la collection, ou virtuel (« all:<édition> ») pendant un combat d’essai */
+  function item(u) {
+    if (typeof u === 'string' && u.indexOf('all:') === 0) { var e = u.slice(4); return A.ED[e] ? { uid: u, ed: e } : null; }
+    return S.item(u);
+  }
   function roster() {
+    if (ALL) return A.EDITIONS.map(function (e) { return { uid: 'all:' + e.id, ed: e.id }; }).sort(function (a, b) { return power(b.ed) - power(a.ed); });
     // Le meilleur exemplaire de chaque personnage possédé
     var best = {};
     S.items().forEach(function (i) {
@@ -146,7 +153,7 @@
   function validTeam(limit) {
     var seen = {};
     team = team.filter(function (u) {
-      var it = S.item(u), ed = it && A.ED[it.ed];
+      var it = item(u), ed = it && A.ED[it.ed];
       if (!ed || seen[ed.charId]) return false;
       seen[ed.charId] = true; return true;
     }).slice(0, limit || 3);
@@ -154,12 +161,12 @@
   }
 
   function rivalTeam(mine, kind) {
-    var ranks = mine.map(function (u) { return A.R[A.ED[S.item(u).ed].rarity].rank; });
+    var ranks = mine.map(function (u) { return A.R[A.ED[item(u).ed].rarity].rank; });
     var used = {}, out = [];
-    mine.forEach(function (u) { used[A.ED[S.item(u).ed].charId] = 1; });
+    mine.forEach(function (u) { used[A.ED[item(u).ed].charId] = 1; });
     ranks.forEach(function (rk, index) {
       if (kind === 'terrains') {
-        var own = A.CHAR[A.ED[S.item(mine[index]).ed].charId], target = own.atk + own.def + own.esp;
+        var own = A.CHAR[A.ED[item(mine[index]).ed].charId], target = own.atk + own.def + own.esp;
         var available = A.CHARS.filter(function (ch) { return !used[ch.id]; });
         var nearest = available.sort(function (a, b) { return Math.abs(a.atk + a.def + a.esp - target) - Math.abs(b.atk + b.def + b.esp - target); }).slice(0, 16);
         var chosen = pick(nearest);
@@ -196,6 +203,8 @@
   /* ---------- Duel entre amis : réseau local (tools/lan/serve.py) ou Internet (relay.js, broker public) ---------- */
   var NET = {
     call: function (path, body) {
+      var rid = path.split('/')[1];
+      if (rid && A.relay && A.relay.has(rid)) return A.relay.call(path, body);
       return NET.ping().then(function (ok) {
         if (ok && ok.online) return A.relay.call(path, body);
         return NET.lan(path, body);
@@ -218,10 +227,10 @@
     online: function () { return !!(NET.ok && NET.ok.online); },
     /** Page fermée en pleine partie : prévenir l’adversaire */
     leave: function (g) {
-      if (NET.online()) A.relay.leave(g.id);
+      if (NET.online() || (A.relay && A.relay.has(g.id))) A.relay.leave(g.id);
       else if (NET.ok && navigator.sendBeacon) navigator.sendBeacon('api/salle/' + g.id + '/quitter', new Blob([JSON.stringify({ token: g.token })], { type: 'application/json' }));
     },
-    done: function (id) { if (NET.online()) A.relay.done(id); }
+    done: function (id) { if (A.relay && A.relay.has(id)) A.relay.done(id); }
   };
   /** Nom affiché chez l’adversaire : celui saisi pour les défis, sinon celui du profil (sauf « Vous ») */
   function myName() {
@@ -661,17 +670,19 @@
       function pvpQuit(silent) {
         var g = pvpToken();
         if (g && g.token) NET.call('salle/' + g.id + '/quitter', { token: g.token }).catch(function () {});
+        essaiEnd();
         pvp = null; resetMatch();
         if (!silent) A.app.rerender();
       }
-      function pvpLeft(name) { U.toast(name + ' a quitté le duel'); pvp = null; resetMatch(); A.app.rerender(); }
-      window.addEventListener('pagehide', function () { var g = pvpToken(); if (g && g.token) NET.leave(g); });
+      function pvpLeft(name) { U.toast(name + ' a quitté le duel'); pvp = null; resetMatch(); if (essai) { essaiLobby(); return; } A.app.rerender(); }
+      window.addEventListener('pagehide', function () { var g = pvpToken(); if (g && g.token) NET.leave(g); else if (essai && A.relay) A.relay.seat.leave(essai.id); });
+      window.addEventListener('hashchange', function () { if (essai && !/^#\/combat/.test(location.hash)) essaiEnd(); });
       /** Début de la partie entre amis : vos cartes contre les siennes, puis l’écran du programme habituel */
       function pvpBegin(info, room, mineEds) {
         resetMatch();
         var o = room.players[1 - info.p];
         currentRival = o.name;
-        var uids = info.p === 0 || team.length === 3 && mineEds.every(function (e, k) { var it = S.item(team[k]); return it && it.ed === e; }) ? team.slice() : [];
+        var uids = info.p === 0 || team.length === 3 && mineEds.every(function (e, k) { var it = item(team[k]); return it && it.ed === e; }) ? team.slice() : [];
         st = {
           manche: 0, tour: 0, score: { me: 0, foe: 0 }, wins: { me: 0, foe: 0 }, per: [], hist: { A: 0, D: 0, C: 0 }, last: null,
           mine: mineEds.map(function (e, k) { return fighter(e, uids[k]); }),
@@ -683,7 +694,7 @@
       }
       /** Hôte : crée la salle avec son équipe, affiche le lien et attend l’adversaire */
       function pvpHost() {
-        var eds = team.map(function (u) { return S.item(u).ed; });
+        var eds = team.map(function (u) { return item(u).ed; });
         NET.call('salle', { name: myName(), team: eds }).then(function (info) {
           pvp = { role: 'host', room: info };
           var link = info.link || info.lan + '/#/combat?salle=' + info.id, web = NET.online();
@@ -730,6 +741,104 @@
           pvpBegin(info, info.room, eds);
         },
           function (e) { if (pvp !== g) return; U.toast(e.message || 'Impossible de rejoindre'); pvp = null; A.app.rerender(); });
+      }
+      /* Combat d’essai : deux liens fixes (#/combat?essai=ID&j=1 et &j=2), toutes les cartes, deux joueurs au plus.
+         Les liens se réutilisent : chaque partie démarre quand les deux places sont prêtes. */
+      var essai = null, nameT = null;   // essai : { id, seat, eds }
+      function essaiHead(seat) { return '<p class="eyebrow">Combat d’essai · Duel tactique</p><h2 class="cb-intro-name">Joueur ' + seat + '</h2>'; }
+      function essaiLink(seat) { return A.relay.base() + '#/combat?essai=' + essai.id + '&j=' + seat; }
+      function essaiEnd() {
+        if (!essai) return;
+        if (A.relay) A.relay.seat.leave(essai.id);
+        essai = null; ALL = false; team = [];
+        if (/[?&]essai=/.test(location.hash)) { try { history.replaceState(null, '', '#/combat'); } catch (er) { /* ignore */ } }
+      }
+      function essaiFail(msg) {
+        show('<div class="cb-intro cb-lobby">' + essaiHead(essai ? essai.seat : 1) + '<p class="cb-intro-rules">' + msg + '</p>' +
+          '<div class="cb-intro-actions"><button class="btn btn-ghost btn-lg" data-essai-quit>Arène</button></div></div>');
+      }
+      function essaiOpen(id, seat, force) {
+        resetMatch(); pvp = null; mode = 'duel';
+        if (!essai || essai.id !== id || essai.seat !== seat) team = [];
+        essai = { id: id, seat: seat }; ALL = true;
+        show('<div class="cb-intro cb-lobby">' + essaiHead(seat) + '<p class="cb-wait"><i></i>Connexion…</p></div>');
+        if (!A.relay || !A.relay.ok()) { essaiFail('Ce navigateur ne peut pas se connecter au relais en ligne.'); return; }
+        var cur = essai;
+        A.relay.seat.open(id, seat).then(function (s) {
+          if (essai !== cur) return;
+          if (s.taken && !force) {
+            show('<div class="cb-intro cb-lobby">' + essaiHead(seat) +
+              '<p class="cb-intro-rules">Cette place est déjà prise' + (s.by ? ' par ' + U.esc(s.by) : '') + '. Deux joueurs au plus' + NB + ': ouvrez l’autre lien, ou reprenez la place si c’était vous.</p>' +
+              '<div class="cb-intro-actions"><button class="btn btn-gold btn-lg" data-essai-force>Reprendre la place</button><button class="btn btn-ghost btn-lg" data-essai-quit>Arène</button></div></div>');
+            return;
+          }
+          A.relay.seat.take(id, seat, myName());
+          essaiLobby();
+        }, function () { if (essai === cur) essaiFail('Connexion au relais impossible. Vérifiez la connexion, puis rouvrez le lien.'); });
+      }
+      function essaiOther(s) {
+        var o = s && s.other; if (!o) return '';
+        var who = o.name && o.name !== 'Joueur' ? U.esc(o.name) + ' (Joueur ' + o.seat + ')' : 'Joueur ' + o.seat;
+        return !o.here ? 'Joueur ' + o.seat + ' n’est pas encore là' : o.ready ? who + ' est prêt' : who + ' est connecté et compose son équipe';
+      }
+      /** Salon : nom, lien de l’autre joueur, état de l’autre place, équipe parmi toutes les cartes */
+      function essaiLobby() {
+        if (!essai) return;
+        resetMatch();
+        pvp = { role: 'essai' }; ALL = true; mode = 'duel';
+        A.relay.seat.reset(essai.id);
+        var other = essai.seat === 1 ? 2 : 1;
+        show('<div class="cb-intro cb-lobby">' + essaiHead(essai.seat) +
+          '<p class="cb-intro-rules">Toutes les cartes sont disponibles · deux joueurs au plus · 3 cartes, 2 manches gagnées l’emportent</p>' + nameField() +
+          '<p class="cb-wait" data-essai-other><i></i>' + essaiOther(A.relay.seat.state(essai.id)) + '</p>' +
+          '<p class="muted small">Lien du Joueur ' + other + NB + ':</p>' +
+          '<div class="cb-link"><input readonly value="' + U.esc(essaiLink(other)) + '" aria-label="Lien du Joueur ' + other + '" data-link><button class="btn btn-gold btn-sm" data-copy>Copier</button></div>' +
+          '<div class="cb-intro-actions"><button class="btn btn-gold btn-lg" data-pvp-pick>' + I('swords') + 'Choisir mon équipe</button>' +
+            '<button class="btn btn-ghost btn-lg" data-essai-random>Équipe au hasard</button></div>' +
+          '<div class="cb-intro-actions"><button class="btn btn-ghost btn-sm" data-essai-quit>Quitter</button></div></div>');
+        essaiWatch(false);
+      }
+      /** Équipe prête : la partie démarre dès que l’autre place l’est aussi */
+      function essaiReady(eds) {
+        if (!essai) return;
+        essai.eds = eds;
+        A.relay.seat.ready(essai.id, eds, myName());
+        show('<div class="cb-intro cb-lobby">' + essaiHead(essai.seat) +
+          '<p class="cb-intro-rules">Votre équipe est prête' + NB + ': ' + eds.map(function (e) { return U.esc(A.CHAR[A.ED[e].charId].name); }).join(', ') + '</p>' +
+          '<p class="cb-wait" data-essai-other><i></i>' + essaiOther(A.relay.seat.state(essai.id)) + '</p>' +
+          '<div class="cb-intro-actions"><button class="btn btn-ghost btn-lg" data-essai-back>Changer d’équipe</button></div></div>');
+        essaiWatch(true);
+      }
+      function essaiWatch(ready) {
+        clearTimeout(pollT);
+        var cur = essai;
+        (function loop() {
+          if (!box.isConnected || essai !== cur || st) return;
+          var s = A.relay.seat.state(cur.id); if (!s) return;
+          if (s.lost) {
+            show('<div class="cb-intro cb-lobby">' + essaiHead(cur.seat) + '<p class="cb-intro-rules">' + (s.by ? U.esc(s.by) : 'Quelqu’un') + ' a repris cette place depuis un autre appareil.</p>' +
+              '<div class="cb-intro-actions"><button class="btn btn-gold btn-lg" data-essai-force>Reprendre la place</button><button class="btn btn-ghost btn-lg" data-essai-quit>Arène</button></div></div>');
+            return;
+          }
+          var el = box.querySelector('[data-essai-other]');
+          if (el) el.innerHTML = '<i></i>' + essaiOther(s);
+          if (ready && s.match) {
+            A.relay.seat.begin(cur.id, s.match.mid);
+            pvpBegin({ id: cur.id, token: s.tok, p: cur.seat - 1 }, { seed: s.match.mid, players: s.match.players }, cur.eds);
+            return;
+          }
+          pollT = setTimeout(loop, 500);
+        })();
+      }
+      /** Trois personnages différents au hasard, parmi toutes les cartes */
+      function randomAll() {
+        var used = {}, out = [], eds = A.EDITIONS.slice();
+        while (out.length < 3 && eds.length) {
+          var e = eds.splice(Math.floor(Math.random() * eds.length), 1)[0];
+          if (used[e.charId]) continue;
+          used[e.charId] = 1; out.push(e.id);
+        }
+        return out;
       }
       function resetMatch() { qzClear(); clearTimeout(pollT); swapIn = false; if (skipTurn) { var sk = skipTurn; skipTurn = null; sk(); } clearTimeout(actionTimer); clearTimeout(introTimer); clearOverlays(); busy = false; st = null; }
       function clearOverlays() { document.querySelectorAll('body > [data-fx], body > [data-intro]').forEach(function (n) { n.parentNode.removeChild(n); }); }
@@ -804,7 +913,7 @@
         }
         // Banc : un socle par manche, la carte choisie y tombe ; × pour la retirer
         var seats = Array.from({ length: size }, function (_, k) {
-          var it = team[k] && S.item(team[k]);
+          var it = team[k] && item(team[k]);
           return '<div class="cb-seat' + (it ? ' is-full' : '') + (it && (team[k] === justAdded || justAdded === 'all') ? ' is-new' : '') + '" style="--i:' + k + '">' +
             '<p class="cb-seat-n">' + (mode === 'duel' ? 'Manche ' : 'Carte ') + (k + 1) + '</p>' +
             '<div class="cb-seat-card">' + (it ? (mode === 'duel' ? duelCard : U.card)(it.ed, { open: false, tilt: false, ctx: 'mini' }) +
@@ -817,7 +926,7 @@
         var duel = mode === 'duel', keys = duel ? [['pv', 'PV'], ['atk', 'ATQ'], ['def', 'DÉF']] : [['atk', 'ATQ'], ['def', 'DÉF'], ['esp', 'ESP']];
         var cap = duel ? duelMax() : { atk: 100, def: 100, esp: 100 };
         var tot = { atk: 0, def: 0, esp: 0, pv: 0 }, pw = 0;
-        team.forEach(function (u) { var it = S.item(u); if (!it) return; var ch = duel ? duelStats(it.ed) : A.CHAR[A.ED[it.ed].charId]; keys.forEach(function (x) { tot[x[0]] += ch[x[0]]; }); pw += power(it.ed); });
+        team.forEach(function (u) { var it = item(u); if (!it) return; var ch = duel ? duelStats(it.ed) : A.CHAR[A.ED[it.ed].charId]; keys.forEach(function (x) { tot[x[0]] += ch[x[0]]; }); pw += power(it.ed); });
         var stats = '<div class="cb-team-stats">' + keys.map(function (x) {
           return '<p><span>' + x[1] + '</span><i><b style="width:' + Math.min(100, tot[x[0]] / (size * cap[x[0]]) * 100).toFixed(1) + '%"></b></i><em>' + tot[x[0]] + '</em></p>';
         }).join('') + '<p class="cb-team-pw"><span>Puissance</span><em>' + pw + '</em></p></div>';
@@ -835,12 +944,12 @@
           '<span class="cb-pick-count" data-pick-count></span></div>';
         show('<div class="cb-pick">' +
           '<button class="back link-btn" data-hub>← Arène</button>' +
-          '<div class="cb-pick-head"><p class="eyebrow">' + MODES[mode].name + (pvp ? ' · Défi entre amis' : ' · Équipe') + '</p><h2 class="cb-pick-title">Composez votre équipe</h2>' +
+          '<div class="cb-pick-head"><p class="eyebrow">' + MODES[mode].name + (essai ? ' · Combat d’essai' : pvp ? ' · Défi entre amis' : ' · Équipe') + '</p><h2 class="cb-pick-title">Composez votre équipe</h2>' +
             '<p class="cb-pick-hint">' + MODES[mode].hint + '</p>' + (pvp ? nameField() : '') + '</div>' +
           '<div class="cb-bench" style="--cb-team-size:' + size + '">' + seats + '</div>' + stats +
           '<div class="cb-pick-bar"><button class="btn btn-ghost btn-sm" data-auto title="Équipe conseillée">' + I('sparkle') + '<span class="cb-lbl">Équipe conseillée</span></button>' +
             (team.length ? '<button class="btn btn-ghost btn-sm" data-clear title="Vider l’équipe">×<span class="cb-lbl"> Vider</span></button>' : '') +
-            '<button class="btn btn-gold btn-sm cb-pick-go" data-go' + (team.length === size ? '' : ' disabled') + '>' + I('swords') + (pvp ? (pvp.role === 'guest' ? 'Rejoindre le duel' : 'Créer le défi') : 'Trouver un adversaire') + ' <span>' + team.length + '/' + size + '</span></button></div>' +
+            '<button class="btn btn-gold btn-sm cb-pick-go" data-go' + (team.length === size ? '' : ' disabled') + '>' + I('swords') + (pvp ? (pvp.role === 'essai' ? 'Prêt' : pvp.role === 'guest' ? 'Rejoindre le duel' : 'Créer le défi') : 'Trouver un adversaire') + ' <span>' + team.length + '/' + size + '</span></button></div>' +
           filters +
           '<div class="card-grid cb-roster" data-roster></div>' +
         '</div>');
@@ -853,7 +962,7 @@
         var foes = rivalTeam(team, mode);
         currentRival = pick(RIVALS);
         if (mode !== 'duel') {
-          st = { mode: mode, mine: team.map(function (u) { return S.item(u).ed; }), foes: foes, finished: false };
+          st = { mode: mode, mine: team.map(function (u) { return item(u).ed; }), foes: foes, finished: false };
           if (mode === 'quiz') {
             st.manche = 0; st.wins = { me: 0, foe: 0 }; st.per = []; st.used = {}; st.dealt = 0; st.joker = 1; st.streak = { me: 0, foe: 0 }; st.phase = 'intro';
             st.fm = st.mine.map(function (e) { return fighter(e); }); st.ff = foes.map(function (e) { return fighter(e); });
@@ -862,7 +971,7 @@
         }
         st = {
           manche: 0, tour: 0, score: { me: 0, foe: 0 }, wins: { me: 0, foe: 0 }, per: [], hist: { A: 0, D: 0, C: 0 }, last: null,
-          mine: team.map(function (u) { return fighter(S.item(u).ed, u); }),
+          mine: team.map(function (u) { return fighter(item(u).ed, u); }),
           foes: foes.map(function (e) { return fighter(e); })
         };
         sfx('unlock');
@@ -873,7 +982,7 @@
           : mode === 'quiz' ? 'Questions éclair · le premier qui répond juste fait frapper sa carte · ' + WIN_MANCHES + ' manches gagnées l’emportent'
           : st.mine.length + ' déploiements · Une bannière de +20 · Contrôlez le plus de terrains';
         // Programme : en Duel, une colonne par manche (votre carte contre la sienne) ; sinon les deux équipes l’une sous l’autre
-        var mineEds = mode === 'duel' && st.mine && st.mine[0] && st.mine[0].ed ? st.mine.map(function (f) { return f.ed; }) : team.map(function (u) { return S.item(u).ed; });
+        var mineEds = mode === 'duel' && st.mine && st.mine[0] && st.mine[0].ed ? st.mine.map(function (f) { return f.ed; }) : team.map(function (u) { return item(u).ed; });
         // Chaque carte arrive face cachée (le dos du Booster Atlas, comme à l’ouverture des sachets) puis se retourne ; --i : rang d’apparition
         var pack = A.PACKS.filter(function (x) { return x.id === 'standard'; })[0] || A.PACKS[0];
         var back = U.cardBack(pack && pack.theme);
@@ -956,8 +1065,8 @@
         NET.call('salle/' + g.id + '/coup', { token: g.token, n: n, act: a }).catch(function () { /* l’interrogation réessaie */ });
         poll(g.id, function (room) {
           if (st !== cur) return false;
-          if (room.left) { pvpLeft(room.left); return false; }
           var pair = room.moves[String(n)];
+          if (!pair && room.left) { pvpLeft(room.left); return false; }
           if (!pair) { if (!(room.played[String(n)] || [])[g.p]) NET.call('salle/' + g.id + '/coup', { token: g.token, n: n, act: a }).catch(function () {}); return; }
           g.wait = null; g.n++;
           turn(a, pair[1 - g.p]);
@@ -1372,7 +1481,10 @@
 
       // Défi reçu par lien (#/combat?salle=ABCD)
       var salle = ctx && ctx.query.salle;
-      if (salle && A.relay && ctx.query.r) A.relay.prefer(ctx.query.r);
+      if ((salle || (ctx && ctx.query.essai)) && A.relay && ctx.query.r) A.relay.prefer(ctx.query.r);
+      // Combat d’essai (#/combat?essai=ID&j=1|2) : le lien reste dans l’adresse pour qu’un rechargement reprenne la place
+      var essaiQ = ctx && ctx.query.essai;
+      if (essaiQ && /^[A-Za-z0-9]{4,12}$/.test(essaiQ)) { setTimeout(function () { essaiOpen(String(essaiQ).toUpperCase(), String(ctx.query.j) === '2' ? 2 : 1); }, 0); }
       if (salle) { try { history.replaceState(null, '', '#/combat'); } catch (er) { /* ignore */ } setTimeout(function () { pvpGuest(String(salle).toUpperCase()); }, 0); }
       // « Défier un ami » : actif quand le site est servi par tools/lan/serve.py
       NET.ping().then(function (ok) {
@@ -1413,7 +1525,12 @@
       box.addEventListener('click', function (e) {
         var t;
         if ((t = e.target.closest('[data-mode]'))) { var chosen = t.getAttribute('data-mode'); if (MODES[chosen]) { mode = chosen; pickLimit = 30; pickScreen(); } return; }
-        if (e.target.closest('[data-hub]')) { if (pvpToken()) { pvpQuit(); return; } pvp = null; resetMatch(); A.app.rerender(); return; }
+        if (e.target.closest('[data-hub]')) { if (pvpToken()) { pvpQuit(); return; } if (essai) { essaiLobby(); return; } pvp = null; resetMatch(); A.app.rerender(); return; }
+        if (e.target.closest('[data-essai-quit]')) { essaiEnd(); pvp = null; resetMatch(); A.app.rerender(); return; }
+        if (e.target.closest('[data-essai-force]')) { if (essai) essaiOpen(essai.id, essai.seat, true); return; }
+        if (e.target.closest('[data-essai-random]')) { var re = randomAll(); team = re.map(function (x) { return 'all:' + x; }); essaiReady(re); return; }
+        if (e.target.closest('[data-essai-back]')) { if (essai) { A.relay.seat.reset(essai.id); pvp = { role: 'essai' }; pickLimit = 30; pickScreen(); } return; }
+        if (essai && e.target.closest('[data-pvp-new]')) { essaiLobby(); return; }
         if (e.target.closest('[data-pvp-new]')) { pvp = { role: 'host' }; mode = 'duel'; pickLimit = 30; pickScreen(); return; }
         if (e.target.closest('[data-pvp-quit]')) { pvpQuit(); return; }
         if (e.target.closest('[data-pvp-pick]')) { pickLimit = 30; pickScreen(); return; }
@@ -1464,7 +1581,7 @@
         }
         if (e.target.closest('[data-go]') || e.target.closest('[data-again]')) {
           if (validTeam(teamSize()).length !== teamSize() || teamSize() < 3) { pickScreen(); return; }
-          if (pvp && e.target.closest('[data-go]')) { var eds = team.map(function (u) { return S.item(u).ed; }); if (pvp.role === 'guest') pvpJoin(eds); else pvpHost(); return; }
+          if (pvp && e.target.closest('[data-go]')) { var eds = team.map(function (u) { return item(u).ed; }); if (pvp.role === 'guest') pvpJoin(eds); else if (pvp.role === 'essai') essaiReady(eds); else pvpHost(); return; }
           start(); return;
         }
         if (e.target.closest('[data-begin]')) {
@@ -1510,7 +1627,7 @@
         if (e.target.closest('[data-next]') || (st && mode === 'duel' && !busy && e.target.closest('.cb-arena .cb-fighter, .cb-arena .cb-log') && box.querySelector('.cb-next'))) { leaveArena(); return; }
       });
       // Filtres de l’équipe : recherche à la frappe, univers et tri au changement (seule la grille est redessinée)
-      box.addEventListener('input', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-pvp-name')) { try { localStorage.setItem('atlas-pvp-name', e.target.value.trim()); } catch (er) { /* ignore */ } return; } var f = e.target.getAttribute && e.target.getAttribute('data-pf'); if (f === 'q') { pf.q = e.target.value; pickLimit = 30; renderRoster(); } });
+      box.addEventListener('input', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-pvp-name')) { try { localStorage.setItem('atlas-pvp-name', e.target.value.trim()); } catch (er) { /* ignore */ } if (essai) { clearTimeout(nameT); nameT = setTimeout(function () { if (essai) A.relay.seat.rename(essai.id, myName()); }, 500); } return; } var f = e.target.getAttribute && e.target.getAttribute('data-pf'); if (f === 'q') { pf.q = e.target.value; pickLimit = 30; renderRoster(); } });
       // Menus déroulants : fermés au clic ailleurs sur la page et avec Échap
       function outside(e) { if (!box.isConnected) { document.removeEventListener('click', outside, true); document.removeEventListener('keydown', esc); return; } if (!e.target.closest || !e.target.closest('.cb-dd')) closeDropdowns(); }
       function esc(e) { if (e.key === 'Escape') closeDropdowns(); }
