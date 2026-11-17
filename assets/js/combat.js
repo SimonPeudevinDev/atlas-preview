@@ -15,7 +15,7 @@
     D: { label: 'Défendre', verb: 'se défend', icon: 'shield', hint: 'Pare et riposte' },
     C: { label: 'Charger', verb: 'charge', icon: 'flame', hint: 'Prochain coup ×2' }
   };
-  /** Multiplicateur de la prochaine attaque : chaque charge ajoute ×1 (×2, puis ×3 au plus, MAX_CHARGE). */
+  /** Multiplicateur de la prochaine attaque : chaque charge ajoute ×1 (×2, ×3, ×4… sans limite, MAX_CHARGE). */
   function mult(f) { return 1 + (f.charge || 0); }
   var RIVALS = ['Ariane', 'Hector_77', 'Nephtys', 'Le Cartographe', 'Sigrid', 'Ulysse_88', 'Mme Lune', 'Kenji', 'Basile', 'Inès_du_Nil', 'Ragnhild', 'Orphée_404'];
   var MODES = {
@@ -42,7 +42,7 @@
       pow: Math.round(ch.atk * 0.28 * (1 + rank * 0.04)),
       // Riposte quand on pare (DÉF affichée) : de 5 à 25 selon l’Esprit et la rareté, pour de vrais profils (attaquants / contreurs)
       spirit: Math.max(5, Math.min(25, Math.round(4 + (ch.esp - 60) * 0.35 + rank))),
-      guard: 0                                                  // 1 si la carte vient de se défendre
+      guard: 0                                                  // défenses d’affilée (2 au plus, MAX_GUARD)
     };
   }
   /** Stats du Duel montrées sur les cartes : PV (vie), ATQ (dégâts d’une attaque), DÉF (riposte quand on pare). */
@@ -57,11 +57,11 @@
     return U.card(edId, opts).replace(/<span class="card-stats">(?:<span>[^<]*<b>[^<]*<\/b><\/span>){3}<\/span>/,
       '<span class="card-stats is-duel"><span>PV<b>' + s.pv + '</b></span><span>ATQ<b>' + s.atk + '</b></span><span>DÉF<b>' + s.def + '</b></span></span>');
   }
-  /** Défendre : blocage total + riposte, mais jamais deux fois de suite. */
-  var MAX_GUARD = 1;
+  /** Défendre : blocage total + riposte, deux fois de suite au plus. */
+  var MAX_GUARD = 2;
   function canDefend(f) { return (f.guard || 0) < MAX_GUARD; }
-  /** Charge plafonnée : prochaine attaque ×3 au plus (deux charges). */
-  var MAX_CHARGE = 2;
+  /** Charge sans limite (en test) : remettre 2 pour plafonner la prochaine attaque à ×3. */
+  var MAX_CHARGE = Infinity;
   function canCharge(f) { return (f.charge || 0) < MAX_CHARGE; }
   function power(edId) { var ed = A.ED[edId], ch = A.CHAR[ed.charId]; return ch.atk + ch.def + ch.esp + A.R[ed.rarity].rank * 12; }
   var RNG = Math.random;
@@ -124,7 +124,7 @@
     if (foe.charge) { w.A += 1 + foe.charge * 0.8; w.C /= 1 + foe.charge; }
     // Coup de grâce : si une attaque simple suffit à finir le joueur, l’IA tente sa chance.
     if (foe.pow * mult(foe) >= me.hp) w.A += 1.5;
-    // Pas deux défenses de suite : l’IA ne défend pas juste après s’être défendue et frappe un joueur qui vient de le faire
+    // Défenses d’affilée limitées (MAX_GUARD) : l’IA respecte la règle et frappe un joueur qui ne peut plus se défendre
     if (!canDefend(foe)) w.D = 0; else if (foe.guard) w.D *= 0.4;
     if (!canDefend(me)) { w.A += 2.2; w.D *= 0.3; } else if (me.guard) w.A += 0.7;
     var tot = w.A + w.D + w.C, r = Math.random() * tot;
@@ -294,7 +294,7 @@
   function actHints(me) {
     return {
       A: me.pow * mult(me) + ' dégâts',
-      D: !canDefend(me) ? 'Pas deux fois de suite' : 'Riposte ' + me.spirit,
+      D: !canDefend(me) ? 'Pas ' + (MAX_GUARD + 1 === 2 ? 'deux' : 'trois') + ' fois de suite' : 'Riposte ' + me.spirit,
       C: canCharge(me) ? 'Attaque ×' + (mult(me) + 1) : 'Charge au maximum'
     };
   }
@@ -302,8 +302,9 @@
   function threatHTML(me, foe, who) {
     if (me.hp <= 0 || foe.hp <= 0) return '';
     var name = U.esc(who || currentRival);
-    if (!canDefend(foe)) return '<p class="cb-tip">' + name + ' vient de se défendre : pas de bouclier ce tour, frappez.</p>';
-    if (!canDefend(me)) return '<p class="cb-warn">Vous venez de vous défendre : attaquez ou chargez.</p>';
+    var twice = MAX_GUARD > 1 ? ' deux fois de suite' : '';
+    if (!canDefend(foe)) return '<p class="cb-tip">' + name + ' vient de se défendre' + twice + ' : pas de bouclier ce tour, frappez.</p>';
+    if (!canDefend(me)) return '<p class="cb-warn">Vous venez de vous défendre' + twice + ' : attaquez ou chargez.</p>';
     if (foe.charge) return '<p class="cb-warn">' + U.esc(who || currentRival) + ' a chargé : sa prochaine attaque fera ×' + mult(foe) + '. Défendre la pare.</p>';
     if (me.charge) return '<p class="cb-tip">Votre prochaine attaque fera ×' + mult(me) + '.</p>';
     return '';
@@ -1038,8 +1039,8 @@
             }).join('') + '</div>') +
           '<details class="cb-rules"><summary>Règles</summary><ul>' +
             '<li><b>Attaquer</b> inflige des dégâts, multipliés par la charge accumulée.</li>' +
-            '<li><b>Défendre</b> bloque toute attaque, même chargée, et renvoie la <b>DÉF</b> de votre carte en dégâts. Jamais deux fois de suite.</li>' +
-            '<li><b>Charger</b> rend votre prochaine attaque plus forte : ×2, puis ×3 au maximum. Aucun dégât immédiat ; subir une attaque n’annule pas la charge.</li>' +
+            '<li><b>Défendre</b> bloque toute attaque, même chargée, et renvoie la <b>DÉF</b> de votre carte en dégâts. ' + (MAX_GUARD > 1 ? 'Deux fois de suite au plus.' : 'Jamais deux fois de suite.') + '</li>' +
+            '<li><b>Charger</b> rend votre prochaine attaque plus forte : ' + (MAX_CHARGE === Infinity ? '×2, ×3, ×4… sans limite.' : '×2, puis ×' + (MAX_CHARGE + 1) + ' au maximum.') + ' Aucun dégât immédiat ; subir une attaque n’annule pas la charge.</li>' +
             '<li>La charge reste prête si vous défendez. Elle est consommée dès votre prochaine attaque, même si celle-ci est bloquée.</li>' +
             '<li>Maintenez le doigt (ou le clic) sur une carte pour lire son histoire.</li>' +
             '<li>Chaque manche se joue jusqu’au KO. Si les deux combattants tombent en même temps, la plus haute ATQ frappe la première et reste debout avec 1' + NB + 'PV. ' + WIN_MANCHES + ' manches gagnées remportent le duel.</li></ul></details>' +
