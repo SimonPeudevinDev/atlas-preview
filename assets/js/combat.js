@@ -1043,7 +1043,7 @@
             '<li><b>Charger</b> rend votre prochaine attaque plus forte : ' + (MAX_CHARGE === Infinity ? '×2, ×3, ×4… sans limite.' : '×2, puis ×' + (MAX_CHARGE + 1) + ' au maximum.') + ' Aucun dégât immédiat ; subir une attaque n’annule pas la charge.</li>' +
             '<li>La charge reste prête si vous défendez. Elle est consommée dès votre prochaine attaque, même si celle-ci est bloquée.</li>' +
             '<li>Maintenez le doigt (ou le clic) sur une carte pour lire son histoire.</li>' +
-            '<li>Chaque manche se joue jusqu’au KO. Si les deux combattants tombent en même temps, la plus haute ATQ frappe la première et reste debout avec 1' + NB + 'PV. ' + WIN_MANCHES + ' manches gagnées remportent le duel.</li></ul></details>' +
+            '<li>Chaque manche se joue jusqu’au KO. Si les deux combattants tombent en même temps, c’est un double KO' + NB + ': la manche est nulle. ' + WIN_MANCHES + ' manches gagnées remportent le duel ; à égalité, les dégâts totaux départagent.</li></ul></details>' +
         '</div>', keep);
       }
       function matchOver() { return st.wins.me >= WIN_MANCHES || st.wins.foe >= WIN_MANCHES || st.manche + 1 >= MANCHES; }
@@ -1087,14 +1087,7 @@
           else { var q = C.duel.resolve(foe, me, b, a); r = { me: q.foe, foe: q.me, lines: q.lines }; }
         } else r = C.duel.resolve(me, foe, a, b);
         me.hp -= r.me; foe.hp -= r.foe;
-        // Coups simultanés qui mettraient les deux KO : la plus haute ATQ frappe la première et tient debout à 1 PV.
-        if (me.hp <= 0 && foe.hp <= 0) {
-          var em = me.pow, ef = foe.pow;
-          var coin = g ? (C.duel.rand() < 0.5) === (g.p === 0) : Math.random() < 0.5;
-          var first = em !== ef ? (em > ef ? me : foe) : coin ? me : foe;
-          first.hp = 1;
-          r.lines.push(first.name + ' frappe le premier (ATQ) et tient debout');
-        }
+        // Coups simultanés qui mettent les deux cartes KO : vrai double KO, la manche est nulle (plus de départage à l’ATQ).
         if (g) C.duel.seed(null);
         st.score.me += r.foe; st.score.foe += r.me;
         var per = st.per[st.manche] || (st.per[st.manche] = { me: 0, foe: 0, win: null });
@@ -1108,8 +1101,7 @@
         (turns[st.manche] = turns[st.manche] || []).push({ n: st.tour, a: a, b: b, me: r.me, foe: r.foe });
         var oc = outcome(a, b, xa, r);
         var head = '<p class="cb-out' + (oc[1] ? ' is-' + oc[1] : '') + '">' + oc[0] + '</p>' + turnLine(turns[st.manche][turns[st.manche].length - 1]);
-        var esp = r.lines.filter(function (l) { return / \(ATQ\) /.test(l); });   // double KO départagé par l’ATQ
-        arena(head + esp.map(function (l) { return '<p>' + U.esc(l) + '</p>'; }).join('') + ko, { a: a, b: b }, hp0);
+        arena(head + ko, { a: a, b: b }, hp0);
         // Le tour se joue sur les deux cartes : elles s’élancent l’une vers l’autre avec épée, bouclier ou rose des vents
         // (choc à 0,76 s, fin à 1,9 s). Les PV baissent au choc. Un toucher sur l’arène passe l’animation.
         busy = true;
