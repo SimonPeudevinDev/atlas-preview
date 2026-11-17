@@ -29,20 +29,53 @@
   var C = A.combat = {};
   C.conquest = G;
   C.question = A.quiz.question;
-  C.duel = { fighter: fighter, stats: function (e) { return duelStats(e); }, resolve: resolve, choose: botMove, mult: mult, manches: MANCHES, toWin: WIN_MANCHES, seed: function (x) { seedRng(x); }, rand: function () { return RNG(); } };
+  C.duel = { fighter: fighter, styles: function () { return STYLES; }, style: function (e) { return styleOf(A.ED[e] ? A.ED[e].charId : e); }, stats: function (e) { return duelStats(e); }, resolve: resolve, choose: botMove, mult: mult, manches: MANCHES, toWin: WIN_MANCHES, seed: function (x) { seedRng(x); }, rand: function () { return RNG(); } };
   C.roster = function () { return roster(); };   // meilleurs exemplaires, du plus fort au plus faible (bloc Combat de l’accueil)
 
-  /** Combattant : statistiques du personnage + bonus de rareté */
+  /* ---------- Styles de jeu ----------
+     Chaque personnage a un style, tiré de sa stat la plus marquée (comparée à la médiane du jeu) :
+     un profil de stats (multiplicateurs) et une capacité qui change sa façon de jouer.
+     Équilibrés par simulation IA contre IA (10 000 manches, même rareté) : 39 à 40 % de victoires par style,
+     le reste en doubles KO ; aucun affrontement au-delà de 44 %. */
+  var STYLES = {
+    assaut: { label: 'Assaut', icon: 'swords', atk: 1.15, hp: 0.9, def: 0.8, pass: 'Percée', text: 'ses attaques parées touchent quand même, au tiers de leurs dégâts' },
+    rempart: { label: 'Rempart', icon: 'shield', atk: 0.85, hp: 1.25, def: 1.1, pass: 'Garde de fer', text: 'peut se défendre trois fois de suite' },
+    oracle: { label: 'Oracle', icon: 'sparkle', atk: 1.15, hp: 1.05, def: 1.4, pass: 'Prescience', text: 'sa charge n’est pas perdue quand son attaque est parée' },
+    poly: { label: 'Polyvalent', icon: 'star', atk: 1, hp: 1, def: 1, pass: 'Contre', text: 'parer une attaque lui donne une charge' }
+  };
+  var STYLE_OF = {}, NORM = null;
+  /** Médiane et dispersion (écart interquartile) de chaque stat dans tout le jeu */
+  function norm(k) {
+    var v = A.CHARS.map(function (c) { return c[k]; }).sort(function (a, b) { return a - b; }), q = function (x) { return v[Math.floor(v.length * x)]; };
+    return { mid: q(0.5), iqr: Math.max(1, q(0.75) - q(0.25)) };
+  }
+  function styleOf(charId) {
+    if (STYLE_OF[charId]) return STYLE_OF[charId];
+    if (!NORM) NORM = { atk: norm('atk'), def: norm('def'), esp: norm('esp') };
+    var ch = A.CHAR[charId];
+    // Écart à la médiane, rapporté à la dispersion de la stat : une DÉF peu variable pèse autant qu’une ESP très variable
+    var n = { atk: (ch.atk - NORM.atk.mid) / NORM.atk.iqr, def: (ch.def - NORM.def.mid) / NORM.def.iqr, esp: (ch.esp - NORM.esp.mid) / NORM.esp.iqr };
+    var order = ['atk', 'def', 'esp'].sort(function (a, b) { return n[b] - n[a]; });
+    var top = n[order[0]], gap = top - n[order[1]], spread = top - n[order[2]];
+    var st = spread < STYLE_FLAT || gap < STYLE_GAP ? 'poly' : { atk: 'assaut', def: 'rempart', esp: 'oracle' }[order[0]];
+    return (STYLE_OF[charId] = st);
+  }
+  var STYLE_FLAT = 0.5, STYLE_GAP = 0.1;   // profil plat ou deux stats au coude à coude (en dispersions) : Polyvalent
+  /** Bonus de rareté, visible et fixe : par rang (Base 0 … Unique 5), +1 ATQ, +1 DÉF, +5 PV */
+  var RAR_BONUS = { atk: 1, def: 1, hp: 5 };
+  function guardMax(f) { return MAX_GUARD + (f.style === 'rempart' ? 1 : 0); }
+
+  /** Combattant : stats du personnage, profil de son style, bonus de rareté */
   function fighter(edId, uid) {
-    var ed = A.ED[edId], ch = A.CHAR[ed.charId], rank = A.R[ed.rarity].rank;
-    var hp = Math.round(70 + ch.def * 0.4 + rank * 6);
+    var ed = A.ED[edId], ch = A.CHAR[ed.charId], rank = A.R[ed.rarity].rank, sk = styleOf(ed.charId), S2 = STYLES[sk];
     // Valeurs fixes, affichées telles quelles sur la carte (ATQ = dégâts, DÉF = riposte, PV = vie)
+    var hp = Math.round((70 + ch.def * 0.4) * S2.hp) + rank * RAR_BONUS.hp;
     return {
-      ed: edId, uid: uid, name: ch.name, rank: rank, hp: hp, max: hp, charge: 0,
-      pow: Math.round(ch.atk * 0.28 * (1 + rank * 0.04)),
-      // Riposte quand on pare (DÉF affichée) : de 5 à 25 selon l’Esprit et la rareté, pour de vrais profils (attaquants / contreurs)
-      spirit: Math.max(5, Math.min(25, Math.round(4 + (ch.esp - 60) * 0.35 + rank))),
-      guard: 0                                                  // défenses d’affilée (2 au plus, MAX_GUARD)
+      ed: edId, uid: uid, name: ch.name, rank: rank, hp: hp, max: hp, charge: 0, style: sk,
+      pow: Math.round(ch.atk * 0.28 * S2.atk) + rank * RAR_BONUS.atk,
+      // Riposte quand on pare (DÉF affichée) : selon l’Esprit, ou la Défense pour un Rempart
+      spirit: Math.max(4, Math.min(26, Math.round((4 + ((sk === 'rempart' ? ch.def : ch.esp) - 60) * 0.35) * S2.def))) + rank * RAR_BONUS.def,
+      guard: 0                                                  // défenses d’affilée (MAX_GUARD, une de plus pour un Rempart)
     };
   }
   /** Stats du Duel montrées sur les cartes : PV (vie), ATQ (dégâts d’une attaque), DÉF (riposte quand on pare). */
@@ -53,13 +86,19 @@
     return DUEL_MAX;
   }
   function duelCard(edId, opts) {
-    var s = duelStats(edId);
+    var s = duelStats(edId), sk = styleOf(A.ED[edId].charId);
     return U.card(edId, opts).replace(/<span class="card-stats">(?:<span>[^<]*<b>[^<]*<\/b><\/span>){3}<\/span>/,
-      '<span class="card-stats is-duel"><span>PV<b>' + s.pv + '</b></span><span>ATQ<b>' + s.atk + '</b></span><span>DÉF<b>' + s.def + '</b></span></span>');
+      '<span class="card-stats is-duel"><span>PV<b>' + s.pv + '</b></span><span>ATQ<b>' + s.atk + '</b></span><span>DÉF<b>' + s.def + '</b></span></span>')
+      .replace('<span class="card-glitter"></span>', '<span class="card-glitter"></span>' + styleChip(sk));
+  }
+  /** Pastille du style de jeu (bas de l’illustration) ; l’infobulle donne la capacité */
+  function styleChip(sk) {
+    var sy = STYLES[sk];
+    return '<span class="cb-style is-' + sk + '" title="' + U.esc(sy.label + ' · ' + sy.pass + ' : ' + sy.text) + '">' + U.icon(sy.icon) + sy.label + '</span>';
   }
   /** Défendre : blocage total + riposte, deux fois de suite au plus. */
   var MAX_GUARD = 2;
-  function canDefend(f) { return (f.guard || 0) < MAX_GUARD; }
+  function canDefend(f) { return (f.guard || 0) < guardMax(f); }
   /** Charge sans limite (en test) : remettre 2 pour plafonner la prochaine attaque à ×3. */
   var MAX_CHARGE = Infinity;
   function canCharge(f) { return (f.charge || 0) < MAX_CHARGE; }
@@ -83,9 +122,13 @@
       if (act !== 'A') return;
       var dmg = att.pow * mult(att);
       if (defAct === 'D') {
-        var rip = def.spirit;   // blocage total, la DÉF revient à l’attaquant
+        var rip = def.spirit;   // blocage, la DÉF revient à l’attaquant
         out[key === 'foe' ? 'me' : 'foe'] += rip;
         out.lines.push(def.name + ' pare et riposte (−' + rip + ')');
+        // Percée (Assaut) : l’attaque parée touche quand même, au tiers
+        if (att.style === 'assaut') { var chip = Math.max(1, Math.round(dmg / 3)); out[key] += chip; out.lines.push(att.name + ' perce la garde (−' + chip + ')'); }
+        // Contre (Polyvalent) : parer lui donne une charge
+        if (def.style === 'poly' && canCharge(def)) { def.charge = (def.charge || 0) + 1; out.lines.push(def.name + ' contre : prochaine attaque ×' + mult(def)); }
         return;
       }
       var txt = att.name + (att.charge ? ' lance une attaque ×' + mult(att) : ' frappe');
@@ -94,11 +137,11 @@
     }
     strike(me, foe, a, b, 'foe');
     strike(foe, me, b, a, 'me');
-    // Seule l’action Attaquer consomme la charge, même si cette attaque est parée.
-    [[me, a], [foe, b]].forEach(function (x) {
-      var f = x[0], act = x[1];
+    // Seule l’action Attaquer consomme la charge, même si cette attaque est parée (sauf Prescience : Oracle parée)
+    [[me, a, b], [foe, b, a]].forEach(function (x) {
+      var f = x[0], act = x[1], other = x[2];
       f.guard = act === 'D' ? (f.guard || 0) + 1 : 0;
-      if (act === 'A') f.charge = 0;
+      if (act === 'A') { if (f.style === 'oracle' && other === 'D' && f.charge) out.lines.push(f.name + ' garde sa charge (Prescience)'); else f.charge = 0; }
       else if (act === 'C') {
         f.charge = Math.min(MAX_CHARGE, f.charge + 1);
         out.lines.push(f.name + (f.charge > 1 ? ' accumule sa charge : prochaine attaque ×' : ' prépare sa prochaine attaque ×') + mult(f));
@@ -294,7 +337,7 @@
   function actHints(me) {
     return {
       A: me.pow * mult(me) + ' dégâts',
-      D: !canDefend(me) ? 'Pas ' + (MAX_GUARD + 1 === 2 ? 'deux' : 'trois') + ' fois de suite' : 'Riposte ' + me.spirit,
+      D: !canDefend(me) ? 'Pas ' + (['', 'deux', 'trois', 'quatre'][guardMax(me)] || guardMax(me) + 1) + ' fois de suite' : 'Riposte ' + me.spirit,
       C: canCharge(me) ? 'Attaque ×' + (mult(me) + 1) : 'Charge au maximum'
     };
   }
@@ -302,9 +345,9 @@
   function threatHTML(me, foe, who) {
     if (me.hp <= 0 || foe.hp <= 0) return '';
     var name = U.esc(who || currentRival);
-    var twice = MAX_GUARD > 1 ? ' deux fois de suite' : '';
-    if (!canDefend(foe)) return '<p class="cb-tip">' + name + ' vient de se défendre' + twice + ' : pas de bouclier ce tour, frappez.</p>';
-    if (!canDefend(me)) return '<p class="cb-warn">Vous venez de vous défendre' + twice + ' : attaquez ou chargez.</p>';
+    function twice(f) { var g = guardMax(f); return g > 1 ? ' ' + (['', '', 'deux', 'trois'][g] || g) + ' fois de suite' : ''; }
+    if (!canDefend(foe)) return '<p class="cb-tip">' + name + ' vient de se défendre' + twice(foe) + ' : pas de bouclier ce tour, frappez.</p>';
+    if (!canDefend(me)) return '<p class="cb-warn">Vous venez de vous défendre' + twice(me) + ' : attaquez ou chargez.</p>';
     if (foe.charge) return '<p class="cb-warn">' + U.esc(who || currentRival) + ' a chargé : sa prochaine attaque fera ×' + mult(foe) + '. Défendre la pare.</p>';
     if (me.charge) return '<p class="cb-tip">Votre prochaine attaque fera ×' + mult(me) + '.</p>';
     return '';
@@ -864,7 +907,7 @@
       function teamSize() { return mode === 'terrains' ? Math.min(5, roster().length) : 3; }
       /* Choix de l’équipe : banc (un socle par manche), forces de l’équipe, barre d’actions, filtres et grille.
          Les filtres (pf) restent le temps de la session ; changer un filtre ne redessine que la grille. */
-      var pf = { q: '', rar: '', coll: '', sort: 'power' }, justAdded = null;
+      var pf = { q: '', rar: '', coll: '', style: '', sort: 'power' }, justAdded = null;
       var SORTS = { power: 'Puissance', atk: 'Attaque', def: 'Défense', esp: 'Esprit', rar: 'Rareté', name: 'Nom' };
       var DUEL_SORTS = { power: 'Puissance', pv: 'PV', atk: 'Attaque', def: 'Défense', rar: 'Rareté', name: 'Nom' };
       function sorts() { return mode === 'duel' ? DUEL_SORTS : SORTS; }
@@ -875,6 +918,7 @@
           var ed = A.ED[i.ed], ch = A.CHAR[ed.charId], co = A.COLL[ch.coll];
           if (pf.rar && ed.rarity !== pf.rar) return false;
           if (pf.coll && ch.coll !== pf.coll) return false;
+          if (pf.style && mode === 'duel' && styleOf(ed.charId) !== pf.style) return false;
           return !q || norm(ch.name + ' ' + (ch.title || '') + ' ' + (co ? co.name : '')).indexOf(q) !== -1;
         });
         function key(i) { var ed = A.ED[i.ed], ch = A.CHAR[ed.charId];
@@ -940,6 +984,7 @@
           '<div class="chips scroll-x cb-chips" role="group" aria-label="Rareté"><button class="chip' + (!pf.rar ? ' is-active' : '') + '" data-pf-rar="">Toutes</button>' +
             rars.map(function (r) { return '<button class="chip chip-r r-' + r + (pf.rar === r ? ' is-active' : '') + '" data-pf-rar="' + r + '"><i></i>' + A.R[r].label + '</button>'; }).join('') + '</div>' +
           '<label class="search cb-search">' + I('search') + '<input type="search" data-pf="q" placeholder="Rechercher un personnage…" value="' + U.esc(pf.q) + '" aria-label="Rechercher un personnage"></label>' +
+          (mode === 'duel' ? dropdown('style', 'Style', [['', 'Tous les styles']].concat(Object.keys(STYLES).map(function (k) { return [k, STYLES[k].label]; }))) : '') +
           dropdown('coll', 'Univers', [['', 'Tous les univers']].concat(colls.map(function (c) { return [c, A.COLL[c] ? A.COLL[c].name : c]; }))) +
           dropdown('sort', 'Trier', Object.keys(sorts()).map(function (k) { return [k, sorts()[k]]; }), 'Trier : ') +
           '<span class="cb-pick-count" data-pick-count></span></div>';
@@ -1041,6 +1086,8 @@
             '<li><b>Attaquer</b> inflige des dégâts, multipliés par la charge accumulée.</li>' +
             '<li><b>Défendre</b> bloque toute attaque, même chargée, et renvoie la <b>DÉF</b> de votre carte en dégâts. ' + (MAX_GUARD > 1 ? 'Deux fois de suite au plus.' : 'Jamais deux fois de suite.') + '</li>' +
             '<li><b>Charger</b> rend votre prochaine attaque plus forte : ' + (MAX_CHARGE === Infinity ? '×2, ×3, ×4… sans limite.' : '×2, puis ×' + (MAX_CHARGE + 1) + ' au maximum.') + ' Aucun dégât immédiat ; subir une attaque n’annule pas la charge.</li>' +
+            '<li><b>Styles</b>' + NB + ': chaque carte a un style (pastille sur l’illustration) et une capacité. ' + Object.keys(STYLES).map(function (k) { var sy = STYLES[k]; return '<b>' + sy.label + '</b> (' + sy.pass + ')' + NB + ': ' + sy.text + '.'; }).join(' ') + '</li>' +
+            '<li><b>Rareté</b>' + NB + ': chaque rang au-dessus de Base ajoute +' + RAR_BONUS.atk + ' ATQ, +' + RAR_BONUS.def + ' DÉF et +' + RAR_BONUS.hp + ' PV.</li>' +
             '<li>La charge reste prête si vous défendez. Elle est consommée dès votre prochaine attaque, même si celle-ci est bloquée.</li>' +
             '<li>Maintenez le doigt (ou le clic) sur une carte pour lire son histoire.</li>' +
             '<li>Chaque manche se joue jusqu’au KO. Si les deux combattants tombent en même temps, c’est un double KO' + NB + ': la manche est nulle. ' + WIN_MANCHES + ' manches gagnées remportent le duel ; à égalité, les dégâts totaux départagent.</li></ul></details>' +
