@@ -31,6 +31,8 @@
   var subs = {};            // filtres à rétablir après reconnexion
   var rooms = {};
   var pending = [];        // paquets écrits pendant une coupure
+  var log = [];            // derniers événements de connexion (debug)
+  function note(m) { log.push(new Date().toISOString().slice(11, 23) + ' ' + m); if (log.length > 60) log.shift(); }
 
   function open(ix) {
     return new Promise(function (resolve, reject) {
@@ -57,7 +59,7 @@
             if (done) continue;
             done = true; clearTimeout(t);
             if (body[1] !== 0) { try { ws.close(); } catch (e) { /* ignore */ } reject(new Error('refus')); return; }
-            c.up = true;
+            c.up = true; note('connecté ' + BROKERS[ix]);
             c.ping = setInterval(function () { if (ws.readyState === 1) ws.send(new Uint8Array([0xC0, 0])); }, 25000);
             resolve(c);
           } else if (type === 3) {   // PUBLISH
@@ -69,7 +71,8 @@
         }
       };
       ws.onerror = function () { /* onclose suit */ };
-      ws.onclose = function () {
+      ws.onclose = function (ev) {
+        note('fermé ' + BROKERS[ix] + ' code ' + (ev && ev.code));
         clearInterval(c.ping);
         var was = c.up; c.up = false;
         if (!done) { done = true; clearTimeout(t); reject(new Error('fermé')); }
@@ -243,6 +246,11 @@
     },
     /** Fermeture de la page : prévenir l’adversaire (envoi immédiat si la connexion est ouverte) */
     leave: function (id) { var r = rooms[id]; if (r && r.me && !r.left) publish(ROOT + id + '/left', { name: r.me.name }, true); },
-    done: sweep
+    done: sweep,
+    /** État du relais (pour les tests) */
+    debug: function () {
+      return { broker: conn ? BROKERS[conn.ix] : null, up: !!(conn && conn.up), ws: conn ? conn.ws.readyState : -1, pending: pending.length, log: log.slice(-20),
+        rooms: Object.keys(rooms).map(function (k) { var r = rooms[k]; return { id: k, role: r.role, me: r.me && r.me.p, guest: !!r.guest, left: r.left, moves: r.moves }; }) };
+    }
   };
 })();
