@@ -201,10 +201,10 @@
     o = o || {};
     var mv = pk.querySelector('.pk-move'), rt = pk.querySelector('.pk-rot'), sh = pk.querySelector('.pk-shadow');
     var rest = [o.rx || 0, o.ry || 0], range = o.range || [12, 20];
-    var s = { rx: rest[0], ry: rest[1], vx: 0, vy: 0, ptr: null, idle: !!o.idle, t0: performance.now(), y: 0, sc: 1, tw: null, raf: 0, dead: false, shake: null };
+    var s = { rx: rest[0], ry: rest[1], vx: 0, vy: 0, ptr: null, idle: !!o.idle, ia: o.idle ? 1 : 0, t0: performance.now(), y: 0, sc: 1, tw: null, raf: 0, dead: false, shake: null };
 
     function apply(now) {
-      var fl = s.idle ? Math.sin((now - s.t0) / 650) * 6 : 0;
+      var fl = Math.sin((now - s.t0) / 650) * 6 * s.ia;   // flottement : son amplitude monte et descend en douceur (pas de saute au changement de sachet)
       var jx = 0, jy = 0, jr = 0;
       if (s.shake) {
         var k = (now - s.shake.t0) / s.shake.d;
@@ -223,13 +223,14 @@
     }
     function target(now) {
       if (s.ptr) return s.ptr;
-      if (s.idle) { var t = (now - s.t0) / 1000; return [rest[0] + Math.sin(t * 0.8) * 4.5, rest[1] + Math.sin(t * 0.55) * 14]; }
+      if (s.ia > 0.001) { var t = (now - s.t0) / 1000; return [rest[0] + Math.sin(t * 0.8) * 4.5 * s.ia, rest[1] + Math.sin(t * 0.55) * 14 * s.ia]; }
       return rest;
     }
     function frame(now) {
       s.raf = 0;
       if (s.dead) return;
-      var busy = !!s.shake;
+      var busy = !!s.shake, ig = s.idle ? 1 : 0;
+      s.ia += (ig - s.ia) * 0.05; if (Math.abs(ig - s.ia) < 0.002) s.ia = ig; else busy = true;
       if (s.tw) {
         var k = Math.min(1, (now - s.tw.t0) / s.tw.d), e = 1 - Math.pow(1 - k, 3), er = 1 - Math.pow(1 - k, 4);
         s.rx = s.tw.f.rx + (rest[0] - s.tw.f.rx) * er;

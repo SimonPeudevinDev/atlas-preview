@@ -164,7 +164,7 @@
     function tearPoint(p) {
       var b = pk.getBoundingClientRect();
       var x = dir >= 0 ? b.left + b.width * p : b.right - b.width * p;
-      return { x: x, y: b.top + b.height * 0.14, w: b.width, b: b };
+      return { x: x, y: b.top + b.height * ((A.pack3d && A.pack3d.tearRatio) || 0.14), w: b.width, b: b };   // hauteur de la déchirure du modèle chargé
     }
     // La déchirure suit le doigt avec un léger retard amorti : elle avance d’un mouvement continu, sans à-coups
     var tpGoal = 0, tpRaf = 0, tpT = 0;

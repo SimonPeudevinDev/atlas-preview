@@ -170,6 +170,11 @@
     // 10 Boosters Atlas au plus : les Boosters Atlas offerts rejoignent la réserve (l’excédent est retiré)
     if (state.tokens.standard) { state.charge.n = Math.min(S.CHARGE.max, state.charge.n + state.tokens.standard); if (state.charge.n >= S.CHARGE.max) state.charge.at = Date.now(); delete state.tokens.standard; }
     migrateMoved();
+    // Événement Japon (Saga du Soleil levant) : il remplace le Coffret du Conservateur, dont les exemplaires gagnés sont convertis
+    state.eventEnds = state.eventEnds || {};
+    if (!state.eventEnds.soleil) state.eventEnds.soleil = Date.now() + 26 * DAY + 5 * 3600000;
+    if (!state.eventEnds.nil) state.eventEnds.nil = Date.now() + 33 * DAY + 9 * 3600000;   // Saga du Nil
+    if (state.tokens.conservateur) { state.tokens.soleil = (state.tokens.soleil || 0) + state.tokens.conservateur; delete state.tokens.conservateur; }
     state.trophies = state.trophies || {}; state.avatars = state.avatars || [];
     if (S.UNLOCK_ALL) unlockAll();
     fillTestCopies();
@@ -286,7 +291,11 @@
   S.balance = function () { return S.UNLIMITED ? Infinity : state.wallet.balance; };
   S.dailyAvailable = function () { return state.lastDaily !== todayKey(); };
   S.nextDailyIn = function () { var d = new Date(); d.setHours(24, 0, 0, 0); return d - Date.now(); };
-  S.eventRemaining = function () { return Math.max(0, state.eventEndsAt - Date.now()); };
+  // Fin de chaque événement : la Saga du Nord (eventEndsAt, historique) et les suivants (eventEnds[id])
+  S.eventRemaining = function (packId) {
+    var end = packId && packId !== 'saga' ? (state.eventEnds || {})[packId] || 0 : state.eventEndsAt;
+    return Math.max(0, end - Date.now());
+  };
 
   /* ---------- Réserve de boosters gratuits ----------
      Un Booster Atlas revient toutes les 15 min, jusqu’à 10 en réserve. Le minuteur ne tourne
@@ -304,11 +313,11 @@
     var c = regen();
     return { n: c.n, max: S.CHARGE.max, next: c.n >= S.CHARGE.max ? 0 : Math.max(0, c.at + S.CHARGE.every - Date.now()) };
   };
-  /** Test : tout recharger (réserve pleine, quotidien disponible, 3 Coffrets et 3 Saga du Nord) */
+  /** Test : tout recharger (réserve pleine, quotidien disponible, 3 Saga du Nord et 3 Saga du Soleil levant) */
   S.devRefill = function () {
     state.charge = { n: S.CHARGE.max, at: Date.now() };
     state.lastDaily = null;
-    ['conservateur', 'saga'].forEach(function (id) { state.tokens[id] = Math.max(3, state.tokens[id] || 0); });
+    ['saga', 'soleil', 'nil'].forEach(function (id) { state.tokens[id] = Math.max(3, state.tokens[id] || 0); });
     emit();
   };
 
@@ -384,7 +393,7 @@
     var steps = [
       { id: 'explorateur', goal: n, of: 'started', label: 'Explorateur', reward: { eclats: 300 } },
       { id: 'premiere', goal: 1, of: 'done', label: 'Première collection complète', reward: { booster: 'standard' } },
-      { id: 'pantheon', goal: n, of: 'done', label: 'Panthéon complet', reward: { eclats: 3000, booster: 'conservateur', titre: g.title } }
+      { id: 'pantheon', goal: n, of: 'done', label: 'Panthéon complet', reward: { eclats: 3000, booster: 'standard', titre: g.title } }
     ];
     return steps.map(function (s) {
       s.have = Math.min(s.goal, pr[s.of]);
@@ -415,7 +424,7 @@
   var HUNTS = {
     rare: { label: 'Première rareté', desc: 'Obtenez une édition Rare ou plus précieuse.', min: 'rare', reward: { eclats: 200 } },
     epic: { label: 'Pièce de musée', desc: 'Obtenez une édition Épique ou plus précieuse.', min: 'epic', reward: { eclats: 400 } },
-    legendary: { label: 'Chef-d’œuvre', desc: 'Obtenez une édition Légendaire ou plus précieuse.', min: 'legendary', reward: { booster: 'conservateur' } },
+    legendary: { label: 'Chef-d’œuvre', desc: 'Obtenez une édition Légendaire ou plus précieuse.', min: 'legendary', reward: { booster: 'standard' } },
     trio: { label: 'Trois visages', desc: 'Réunissez trois éditions différentes d’un même personnage.', goal: 3, reward: { eclats: 300 } },
     numerotes: { label: 'Exemplaires numérotés', desc: 'Possédez trois exemplaires numérotés de cette collection.', goal: 3, reward: { eclats: 350 } },
     eventail: { label: 'L’éventail des raretés', desc: 'Possédez des cartes de trois raretés différentes dans cette collection.', goal: 3, reward: { eclats: 300 } }
@@ -509,7 +518,7 @@
   S.canOpen = function (packId) {
     var p = A.PACK[packId];
     if (p.daily && !S.dailyAvailable()) return { ok: false, reason: 'Déjà ouvert' };
-    if (p.event && S.eventRemaining() <= 0) return { ok: false, reason: 'Événement terminé' };
+    if (p.event && S.eventRemaining(packId) <= 0) return { ok: false, reason: 'Événement terminé' };
     if (p.timer && S.charges().n > 0) return { ok: true, charge: true };
     if (S.tokens(packId) > 0) return { ok: true, token: true };
     if (p.timer) return { ok: false, reason: 'Prochain dans ' + A.ui.clock(S.charges().next) };

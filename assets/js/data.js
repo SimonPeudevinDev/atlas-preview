@@ -2049,33 +2049,49 @@ window.ATLAS = window.ATLAS || {};
       id: 'daily', name: 'Booster quotidien', kicker: 'Offert chaque jour', price: 0, size: 3, theme: 'd-cognac', design: 'cadran', daily: true,
       cover: 'merveilleux-alice-base',
       collections: ALL.filter(function (c) { return ['nordique', 'creatures', 'jotnar', 'mondes'].indexOf(c) === -1; }),
-      odds: { base: 0.9, rare: 0.085, epic: 0.015 },
-      desc: 'Trois cartes pour découvrir de nouveaux personnages. Un booster par compte et par jour.',
+      // Un seul par jour : de meilleures chances que le Booster Atlas, jusqu’à l’Unique.
+      // Par sachet : Rare ~45 %, Épique 1 sur 12, Légendaire 1 sur 50, Mythique 1 sur 220, Unique 1 sur 1 000 environ
+      odds: { base: 0.78246, rare: 0.18, epic: 0.029, legendary: 0.0067, mythic: 0.0015, unique: 0.00034 },
+      desc: 'Trois cartes offertes chaque jour, avec les meilleures chances du musée : jusqu’à l’Unique. Un booster par compte et par jour.',
       // lure : rareté mise en avant dans « 1 chance sur N d’obtenir … ou mieux » · hook : accroche du bloc vedette
-      lure: 'epic',
-      hook: 'Trois cartes offertes, chaque jour. Qui rejoindra votre collection aujourd’hui ?'
+      lure: 'unique',
+      hook: 'Trois cartes offertes, chaque jour, et peut-être une Unique. Qui rejoindra votre collection aujourd’hui ?'
     },
     {
       id: 'standard', name: 'Booster Atlas', kicker: 'Offert toutes les 15 min', price: 0, timer: true, size: 5, theme: 'c-emeraude', design: 'astrolabe',
       cover: 'grece-athena-rare',
       collections: ALL,
-      odds: { base: 0.78, rare: 0.15, epic: 0.05, legendary: 0.015, mythic: 0.004, unique: 0.001 },
-      desc: 'Cinq cartes issues de l’ensemble des collections publiées. Un nouveau booster toutes les 15 minutes, jusqu’à 10 en réserve.',
-      lure: 'legendary',
+      // Jusqu’à 10 en réserve et un nouveau toutes les 15 min : taux modestes, jusqu’à la Légendaire.
+      // Par sachet : Rare 1 sur 4, Épique 1 sur 50, Légendaire 1 sur 1 000 environ
+      odds: { base: 0.9408, rare: 0.055, epic: 0.004, legendary: 0.0002 },
+      desc: 'Cinq cartes issues de l’ensemble des collections publiées, jusqu’à la Légendaire. Un nouveau booster toutes les 15 minutes, jusqu’à 10 en réserve.',
+      lure: 'epic',
       hook: 'Cinq cartes tirées dans toutes les collections du musée. Un nouveau booster vous attend toutes les 15 minutes.'
     },
     {
-      id: 'conservateur', name: 'Coffret du Conservateur', kicker: 'Récompense · carte numérotée garantie', price: 0, earned: true, size: 5, theme: 'c-bordeaux', design: 'astrolabe',
-      cover: 'histoire-napoleon-mythic',
-      collections: ALL,
-      odds: { base: 0.6, rare: 0.26, epic: 0.1, legendary: 0.03, mythic: 0.008, unique: 0.002 },
-      guarantee: { odds: { rare: 0.7, epic: 0.22, legendary: 0.06, mythic: 0.016, unique: 0.004 } },
-      desc: 'Cinq cartes, dont la dernière est obligatoirement une édition numérotée (Rare ou supérieure).',
+      // Deuxième événement (remplace l’ancien Coffret du Conservateur) : le Japon, pour un temps seulement
+      id: 'soleil', name: 'Saga du Soleil levant', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'e-vermillon', design: 'torii', event: true,
+      cover: 'kami-amaterasu-legendary',
+      collections: ['kami', 'yokai', 'samourais', 'epoques'],
+      odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
+      guarantee: { odds: { rare: 0.8, epic: 0.15, legendary: 0.035, mythic: 0.012, unique: 0.003 } },
+      desc: 'Booster de l’événement japonais : kami, yōkai, samouraïs et grandes époques. Une carte numérotée garantie.',
       lure: 'legendary',
-      hook: 'Le coffret des collectionneurs : cinq cartes, dont une édition numérotée garantie.'
+      hook: 'Amaterasu, les yōkai, les samouraïs… Le Japon s’invite au musée, pour un temps seulement. Une carte numérotée garantie dans chaque booster.'
     },
     {
-      id: 'saga', name: 'Saga du Nord', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'c-nuit', design: 'astrolabe', event: true,
+      // Troisième événement : l’Égypte (les Dieux du Nil et les Pharaons), sachet feuille d’or et encre lapis
+      id: 'nil', name: 'Saga du Nil', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'e-or', design: 'ailes', event: true,
+      cover: 'egypte-ra-legendary',
+      collections: ['egypte', 'pharaons'],
+      odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
+      guarantee: { odds: { rare: 0.8, epic: 0.15, legendary: 0.035, mythic: 0.012, unique: 0.003 } },
+      desc: 'Booster de l’événement égyptien : les dieux du Nil et les pharaons. Une carte numérotée garantie.',
+      lure: 'legendary',
+      hook: 'Râ, Anubis, Isis, Ramsès… Le Nil s’invite au musée, pour un temps seulement. Une carte numérotée garantie dans chaque booster.'
+    },
+    {
+      id: 'saga', name: 'Saga du Nord', kicker: 'Événement · durée limitée', price: 0, earned: true, size: 5, theme: 'e-glacier', design: 'runes', event: true,
       cover: 'nordique-odin-legendary',
       collections: ['nordique', 'creatures', 'jotnar', 'mondes'],
       odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
@@ -2094,6 +2110,15 @@ window.ATLAS = window.ATLAS || {};
     fixed: ['rare', 'epic', 'legendary', 'mythic', 'unique'],
     odds: { rare: 0.2, epic: 0.2, legendary: 0.2, mythic: 0.2, unique: 0.2 },
     desc: 'Pack de test : une Rare, une Épique, une Légendaire, une Mythique et une Unique.'
+  });
+  // Mis de côté (mode test, à côté du Pack Ultime) : le bleu nuit de l’ancienne Saga du Nord, à réutiliser plus tard
+  A.PACKS.push({
+    id: 'nuit', name: 'Booster Nuit', kicker: 'Réserve · ancien visuel', price: 0, size: 5, theme: 'c-nuit', design: 'astrolabe', test: true,
+    testNote: 'Le bleu nuit de l’ancienne Saga du Nord, gardé de côté',
+    cover: 'nordique-odin-legendary',
+    collections: ALL,
+    odds: { base: 0.72, rare: 0.19, epic: 0.065, legendary: 0.018, mythic: 0.005, unique: 0.002 },
+    desc: 'Booster de test : le visuel bleu nuit de l’ancienne Saga du Nord, gardé de côté.'
   });
   A.PACKS.forEach(function (p) { A.PACK[p.id] = p; });
 

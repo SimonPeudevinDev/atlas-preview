@@ -85,15 +85,15 @@
     var P0 = A.PACK.standard, PD = A.PACK.daily, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
     var dCan = S.canOpen(PD.id);
     for (var i = 0; i < ch.max; i++) pips += '<i' + (i < ch.n ? ' class="is-on"' : '') + '></i>';
-    var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : [], S.UNLIMITED && A.PACK.ultime ? [A.PACK.ultime] : []);   // Pack Ultime : mode test uniquement
+    var side = [A.PACK.saga, A.PACK.soleil, A.PACK.nil].filter(function (p) { return S.eventRemaining(p.id) > 0; }).concat(S.UNLIMITED ? [A.PACK.nuit, A.PACK.ultime].filter(Boolean) : []);   // Pack Ultime : mode test uniquement
     // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
-    var atlas = '<div class="play-slide" data-slide="0">' +
+    var atlas = '<div class="play-slide" data-slide="1">' +
         '<div class="play-stage is-' + P0.theme + '">' + PLAY_AURA + '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' + playSide(P0) + '</div>' + reserve(ch, tk) +
         '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + P0.id + '"' + (can.ok ? '' : ' disabled') + '>' +
           (can.ok ? 'Ouvrir un Booster Atlas' : 'Prochain dans <span data-clock="charge">' + U.clock(ch.next) + '</span>') + '</button>' +
         (A.multi && A.multi.count(P0.id) >= 2 ? '<button class="play-many" data-open-many="' + P0.id + '">' + I('cards') + 'Ouvrir les ' + A.multi.count(P0.id) + ' d’un coup</button>' : '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>') +   // place réservée : le sachet reste à la même hauteur d’un booster à l’autre
         '</div>';
-    var daily = '<div class="play-slide" data-slide="1">' +
+    var daily = '<div class="play-slide" data-slide="0">' +
         '<div class="play-stage is-' + PD.theme + '">' + PLAY_AURA + '<div class="play-pack' + (dCan.ok ? '"' + ' data-open-pack="' + PD.id + '"' : ' is-empty"') + '>' + A.pack.html(PD, { tilt: true }) + '</div>' + playSide(PD) + '</div>' +
         '<p class="play-day">' + (dCan.ok ? '<b>Prêt à ouvrir</b>' : 'Déjà ouvert aujourd’hui') + '</p>' +
         '<p class="play-clock">' + (dCan.ok ? 'Un nouveau chaque jour' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>') + '</p>' +
@@ -101,34 +101,34 @@
           (dCan.ok ? 'Ouvrir le Booster quotidien' : 'Prochain dans <span data-clock="daily">' + U.clock(S.nextDailyIn()) + '</span>') + '</button>' +
         '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>' +
         '</div>';
-    // Coffret, Saga : même présentation en grand quand on les choisit
-    var SHORT = { conservateur: 'Coffret', saga: 'Saga', ultime: 'Ultime' };
+    // Événements (Nord, Japon) : même présentation en grand quand on les choisit
+    var SHORT = { saga: 'Nord', soleil: 'Japon', nil: 'Égypte', nuit: 'Nuit', ultime: 'Ultime' };
     var extra = side.map(function (p, j) {
       var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
       return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
         '<div class="play-stage is-' + p.theme + '">' + PLAY_AURA + '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' + playSide(p) + '</div>' +
-        (p.test ? '<p class="play-day"><b>Illimité (test)</b></p><p class="play-clock">Une Rare, une Épique, une Légendaire, une Mythique et une Unique</p>'
+        (p.test ? '<p class="play-day"><b>Illimité (test)</b></p><p class="play-clock">' + (p.testNote || 'Une Rare, une Épique, une Légendaire, une Mythique et une Unique') + '</p>'
           : '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
-            '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>') +
-        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (p.test ? 'Ouvrir le Pack Ultime' : c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
+            '<p class="play-clock">' + (p.event ? 'Événement · encore ' + Math.ceil(S.eventRemaining(p.id) / 864e5) + ' jours' : n ? p.kicker : 'Missions et paliers de collection') + '</p>') +
+        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (p.test ? 'Ouvrir le ' + p.name : c.ok ? 'Ouvrir la ' + p.name : 'Aucune saga à ouvrir') + '</button>' +
         (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>') +
         '</div>';
     }).join('');
     // Sélecteur : une tuile par booster (mini sachet, nom, état)
     // Sélecteur sobre : des onglets texte de largeur fixe, un trait sous l’actif, un point quand il y a de quoi ouvrir
     function pick(p, k, name, ready) {
-      return '<button class="pick-b' + (k ? '' : ' is-on') + '" data-go="' + k + '" role="tab" aria-label="' + p.name + (ready ? ', prêt' : '') + '">' +
+      return '<button class="pick-b' + (k === 1 ? ' is-on' : '') + '" data-go="' + k + '" role="tab" aria-label="' + p.name + (ready ? ', prêt' : '') + '">' +
         name + (ready ? '<i class="pick-dot"></i>' : '') + '</button>';
     }
-    var picker = '<div class="pick" role="tablist" style="--n:' + (2 + side.length) + '">' +
-      pick(P0, 0, 'Atlas', ch.n > 0) + pick(PD, 1, 'Quotidien', dCan.ok) +
+    var picker = '<div class="pick' + (side.length > 3 ? ' is-many' : '') + '" role="tablist" style="--k:1;--n:' + (2 + side.length) + '">' +
+      pick(PD, 0, 'Quotidien', dCan.ok) + pick(P0, 1, 'Atlas', ch.n > 0) +   // le Booster Atlas au centre au départ, le quotidien à sa gauche
       side.map(function (p, j) { return pick(p, j + 2, SHORT[p.id], S.tokens(p.id) > 0); }).join('') +
       '<span class="pick-bar"></span></div>';
     return '<section class="play"><div class="container play-grid">' +
       '<div class="play-main">' +
         '<p class="eyebrow">Vos boosters</p>' +
         picker +
-        '<div class="play-slides">' + atlas + daily + extra + '</div>' +
+        '<div class="play-slides">' + daily + atlas + extra + '</div>' +
       '</div>' +
     '</div></section>';
   }
@@ -370,10 +370,15 @@
     mythic: 'Rouge vif sur fond sombre. Vingt-cinq collectionneurs seulement la posséderont.',
     unique: 'Une seule carte au monde, en noir et or. Le nom de son propriétaire reste dans sa provenance.'
   };
+  // Mythique et Unique ne sortent pas du Booster Atlas : on donne la chance du Booster quotidien
+  function dailyOdds(r) {
+    var c = packChance(A.PACK.daily, r.id), n = c > 0 ? Math.max(2, Math.round(1 / c)) : 0;
+    return n ? '<b>1 chance sur ' + U.num(n) + '</b> par Booster quotidien d’obtenir une carte ' + r.label + (r.id === 'unique' ? '.' : ' ou plus rare.') : '';
+  }
   function rsNow(r) {
     var c = packChance(A.PACK.standard, r.id), n = c > 0 ? Math.max(2, Math.round(1 / c)) : 0;
     var odds = r.rank === 0 ? 'Dans chaque Booster Atlas.'
-      : n ? '<b>1 chance sur ' + U.num(n) + '</b> par Booster Atlas d’obtenir une carte ' + r.label + (r.id === 'unique' ? '.' : ' ou plus rare.') : '';
+      : n ? '<b>1 chance sur ' + U.num(n) + '</b> par Booster Atlas d’obtenir une carte ' + r.label + (r.id === 'unique' ? '.' : ' ou plus rare.') : dailyOdds(r);
     return '<span class="rar-chip r-' + r.id + '"><i></i>' + r.label + '</span>' +
       '<p class="rs-supply"><b>' + (r.supply ? U.num(r.supply) : 'Illimité') + '</b><span>' + (r.supply ? (r.supply === 1 ? 'pièce au monde' : 'exemplaires numérotés') : 'tirage ouvert') + '</span></p>' +
       '<p class="rs-desc">' + RS_TEXT[r.id] + '</p>' +
@@ -526,21 +531,64 @@
       // Carrousel des deux sachets : onglets synchronisés, seul le sachet affiché flotte doucement
       var slides = root.querySelector('.play-slides'), tabs = root.querySelectorAll('.pick-b'), packs = root.querySelectorAll('.play-slide .pk');
       function current() { return slides ? Math.round(slides.scrollLeft / Math.max(1, slides.firstElementChild.offsetWidth)) : 0; }
+      // Onglets qui défilent (mobile, mode test) : l’onglet actif reste visible
+      function pickInView(pk0, k) {
+        var t = tabs[k]; if (!t || pk0.scrollWidth <= pk0.clientWidth + 1) return;
+        var l = t.offsetLeft - (pk0.clientWidth - t.offsetWidth) / 2;
+        pk0.scrollTo({ left: Math.max(0, l), behavior: 'smooth' });
+      }
       function sync() {
         var k = current();
         tabs.forEach(function (t, i) { t.classList.toggle('is-on', i === k); });
-        var pk0 = root.querySelector('.pick'); if (pk0) pk0.style.setProperty('--k', k);
+        var pk0 = root.querySelector('.pick'); if (pk0) { pk0.style.setProperty('--k', k); pickInView(pk0, k); }
         packs.forEach(function (pk, i) { if (pk._rig) pk._rig.idle(i === k); });
       }
       if (slides) {
         var st0;
-        slides.addEventListener('scroll', function () { clearTimeout(st0); st0 = setTimeout(sync, 80); }, { passive: true });
+        /* Sachets voisins visibles sur les côtés, en retrait et un peu plus petits (effet « vitrine »).
+           Chaque sachet reste dans sa diapositive : on le rapproche seulement du centre, selon la position du défilement. */
+        var cfRaf = 0;
+        function coverflow() {
+          cfRaf = 0;
+          var w = slides.firstElementChild.getBoundingClientRect().width; if (!w) return;
+          var pos = slides.scrollLeft / w, pk1 = slides.querySelector('.pk'), pw = pk1 ? pk1.offsetWidth : 200;
+          var off = Math.min(pw * 0.91 + 100, slides.clientWidth / 2 - 40 + pw * 0.41);   // ordinateur : à droite des boutons ; mobile : on en voit le bord
+          Array.prototype.forEach.call(slides.children, function (sl, i) {
+            var d = i - pos, ad = Math.abs(d), sg = d < 0 ? -1 : 1;
+            var x = sg * (ad <= 1 ? ad * off : off + (ad - 1) * off * 0.62);
+            sl.style.setProperty('--px', (x - d * w).toFixed(1) + 'px');
+            sl.style.setProperty('--ps', (1 - 0.18 * Math.min(ad, 1) - 0.08 * Math.max(0, Math.min(ad - 1, 1))).toFixed(3));
+            sl.style.setProperty('--po', (ad <= 1 ? 1 - 0.5 * ad : Math.max(0, 0.5 - (ad - 1) * 0.5)).toFixed(3));
+            sl.style.setProperty('--uo', Math.max(0, 1 - ad * 2.2).toFixed(3));
+            sl.style.zIndex = String(10 - Math.round(ad));
+            sl.classList.toggle('is-side', ad > 0.5);
+          });
+        }
+        function cfQueue() { if (!cfRaf) cfRaf = requestAnimationFrame(coverflow); }
+        slides.addEventListener('scroll', function () { cfQueue(); clearTimeout(st0); st0 = setTimeout(sync, 80); }, { passive: true });
+        window.addEventListener('resize', function cfR() { if (!slides.isConnected) { window.removeEventListener('resize', cfR); return; } cfQueue(); });
+        if (!(ctx && ctx.query.open)) slides.scrollLeft = slides.firstElementChild.offsetWidth;   // départ sur le Booster Atlas (2e)
+        coverflow();
+        // Toucher un sachet voisin l’amène au centre (sans l’ouvrir)
+        // (le sachet du centre passe au-dessus des voisins : on regarde donc où tombe le toucher)
+        slides.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          var hit = -1;
+          Array.prototype.forEach.call(slides.children, function (sl, i) {
+            if (hit > -1 || !sl.classList.contains('is-side')) return;
+            var r = sl.querySelector('.play-pack').getBoundingClientRect();
+            if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) hit = i;
+          });
+          if (hit < 0) return;
+          e.preventDefault(); e.stopPropagation();
+          glide(hit);
+        }, true);
         /* Passage d’un sachet à l’autre : glissement animé par le site lui-même (le défilement « doux » du navigateur
            saute d’un coup quand les animations du système sont coupées). Le sachet qui part recule et s’estompe,
            celui qui arrive s’avance ; le trait des onglets suit. */
         var glideRaf = 0;
         function glide(k) {
-          var w = slides.firstElementChild.offsetWidth, from = slides.scrollLeft, to = k * w, cur = current();
+          var w = slides.firstElementChild.getBoundingClientRect().width, from = slides.scrollLeft, to = k * w, cur = current();
           cancelAnimationFrame(glideRaf);
           Array.prototype.forEach.call(slides.children, function (c) { c.classList.remove('is-leave', 'is-arrive'); });
           if (Math.abs(to - from) < 1) { slides.classList.remove('is-gliding', 'is-dragging'); sync(); return; }
@@ -561,7 +609,7 @@
           })(t0);
         }
         tabs.forEach(function (t) { t.addEventListener('click', function () { glide(+t.getAttribute('data-go')); }); });
-        // Toucher Coffret ou Saga plus bas : on remonte et le sachet passe au premier plan
+        // Toucher un événement plus bas : on remonte et le sachet passe au premier plan
         root.querySelectorAll('[data-go-slide]').forEach(function (t) { t.addEventListener('click', function () {
           var k = +t.getAttribute('data-go-slide'), top = root.querySelector('.play').getBoundingClientRect().top + window.scrollY - 60;
           if (window.scrollY > top + 10) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
@@ -601,6 +649,11 @@
         sync();
       }
       root.addEventListener('click', function (e) {
+        // Test : sachet retenu (Strié) ↔ classique (le modèle 3D se charge au démarrage, d’où le rechargement)
+        if (e.target.closest('[data-pack-shape]')) {
+          try { localStorage.setItem('atlas-pack-shape', A.PACK_MODEL_PILLOW ? 'classic' : 'strie'); } catch (er) { /* stockage indisponible */ }
+          location.reload(); return;
+        }
         if (e.target.closest('[data-dev-refill]')) { S.devRefill(); U.toast('Tous les boosters sont rechargés (test)'); A.app.rerender(); return; }
         // Récompenses prêtes : on les récupère sans quitter l’accueil (les boosters gagnés arrivent dans le hub)
         if (claimClick(e)) return;
@@ -740,6 +793,8 @@
   function playSide(p) {
     return '<div class="play-tools">' +
       (S.UNLIMITED ? '<button class="play-tool is-test" data-dev-refill title="Tout recharger (test)" aria-label="Tout recharger (test)">' + I('reset') + '</button>' : '') +
+      (S.UNLIMITED ? '<button class="play-tool is-test' + (A.PACK_MODEL_PILLOW ? ' is-on' : '') + '" data-pack-shape title="Sachet : ' + (A.PACK_MODEL_PILLOW ? 'strié (revenir au classique)' : 'classique (revenir au strié)') + ' — test" aria-pressed="' + !!A.PACK_MODEL_PILLOW + '" aria-label="Changer de sachet (test)">' +
+        '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></button>' : '') +
       '<button class="play-tool" data-odds="' + p.id + '" title="Probabilités" aria-label="Probabilités du ' + U.esc(p.name) + '"><b>%</b></button></div>';
   }
   /* Arène : votre bilan, votre meilleure équipe (trois cartes) et les trois modes, jouables d’un geste */
@@ -1195,13 +1250,6 @@
     }
     return 1 - miss;
   }
-  /* Encart « 1 sur 18 » : la chance d’obtenir la rareté visée, mise en avant dans sa couleur. */
-  function oddsBox(p) {
-    if (p.fixed) return '<div class="pack-odds r-unique"><span class="po-n">5 <small>sur</small> 5</span><span class="po-t">cartes numérotées, de la <b>Rare</b> à l’<b>Unique</b></span></div>';
-    var rid = p.lure || 'epic', c = packChance(p, rid);
-    return '<div class="pack-odds r-' + rid + '"><span class="po-n">1 <small>sur</small> ' + (c >= 0.5 ? 2 : Math.max(2, Math.round(1 / c))) + '</span>' +
-      '<span class="po-t">chance d’obtenir une <b>' + A.R[rid].label + '</b> ou mieux</span></div>';
-  }
   /* Fenêtre « Probabilités » d’un booster (ouverte depuis l’accueil, bouton %).
      Lecture simple d’abord : pour chaque rareté, « 1 sachet sur N » (chance d’en avoir au moins une
      dans un sachet), puis le taux par carte et le stock restant. Le détail du calcul est replié. */
@@ -1223,32 +1271,36 @@
     var p = A.PACK[id], rows = S.packOdds(id).slice().reverse();   // de la plus rare à la plus courante
     var rs = packRarities(p).filter(function (r) { return r !== 'base'; });
     var wins = showcase(p, rs.concat(rs, rs), true).slice(0, 3);
+    // Une ligne par rareté : nom, barre de chance (échelle logarithmique, pour que l’Unique reste visible), « 1 sachet sur N »
+    var LOGMIN = Math.log(1 / 5000);
     var list = rows.map(function (r) {
       var R = A.R[r.rarity], c = rarityPackChance(p, r.rarity);
-      var stock = r.total == null ? '<span class="om-stock">Illimitée</span>'
-        : '<span class="om-stock"><i style="--s:' + Math.max(2, Math.round(r.remaining / Math.max(1, r.total) * 100)) + '%"></i>' + U.num(r.remaining) + ' / ' + U.num(r.total) + ' en stock</span>';
+      var w = c >= 0.995 ? 100 : Math.max(3, Math.min(100, (1 - Math.log(Math.max(c, 1 / 5000)) / LOGMIN) * 100));
       return '<li class="om-row r-' + r.rarity + '">' +
-        '<span class="rar-chip r-' + r.rarity + '"><i></i>' + R.label + '</span>' +
-        '<span class="om-odds">' + oneIn(c) + '</span>' +
-        '<span class="om-sub">' + U.pct(r.p) + ' par carte<span>·</span>réf. ' + U.pct(r.ref) + '</span>' + stock + '</li>';
+        '<span class="om-name"><i></i>' + R.label + '</span>' +
+        '<span class="om-bar" aria-hidden="true"><i style="--w:' + w.toFixed(1) + '%"></i></span>' +
+        '<span class="om-odds">' + oneIn(c) + '</span></li>';
     }).join('');
+    // Détail replié : taux par carte et stock restant
+    var table = '<table class="om-table"><thead><tr><th>Rareté</th><th>Par carte</th><th>Stock restant</th></tr></thead><tbody>' + rows.map(function (r) {
+      return '<tr class="r-' + r.rarity + '"><td><i></i>' + A.R[r.rarity].label + '</td><td>' + U.pct(r.p) + '</td><td>' + (r.total == null ? 'Illimité' : U.num(r.remaining) + ' / ' + U.num(r.total)) + '</td></tr>';
+    }).join('') + '</tbody></table>';
     var g = p.guarantee ? S.packOdds(id, true) : null;
+    // En-tête : la rareté vedette du booster, en grand
+    var lure = p.lure || 'epic', lc = rarityPackChance(p, lure), ln = lc >= 0.5 ? 2 : Math.max(2, Math.round(1 / lc));   // même chiffre que sa ligne dans la liste
+    var lureHTML = p.fixed ? '<div class="om-lure r-unique"><b>5<small>sur</small>5</b><span>cartes numérotées, de la Rare à l’Unique</span></div>'
+      : '<div class="om-lure r-' + lure + '"><b>1<small>sur</small>' + U.num(ln) + '</b><span class="om-lure-l">chance d’obtenir une <em>' + A.R[lure].label + '</em> dans un sachet</span><span class="om-lure-s">chance d’une <em>' + A.R[lure].label + '</em></span></div>';
     U.modal('<div class="odds-modal is-' + p.theme + '">' +
-      '<header class="om-head"><p class="eyebrow">Probabilités</p><h2 class="om-title">' + p.name + '</h2>' +
-        '<p class="om-kicker">' + p.size + ' cartes<span>·</span>' + p.kicker + '</p>' + oddsBox(p) + '</header>' +
-      (wins.length ? '<section class="om-sec"><h3 class="om-h">À gagner</h3><div class="om-wins">' + wins.map(function (ed) {
-          return '<figure class="om-win">' + U.card(ed.id, { open: false, tilt: false, ctx: 'mini' }) + '<figcaption><b>' + U.esc(A.CHAR[ed.charId].name) + '</b><span class="rar-chip r-' + ed.rarity + '"><i></i>' + A.R[ed.rarity].label + '</span></figcaption></figure>';
+      '<header class="om-head"><div class="om-id"><p class="eyebrow">Probabilités</p><h2 class="om-title">' + p.name + '</h2>' +
+        '<p class="om-kicker">' + p.size + ' cartes<span>·</span>' + p.kicker + '</p></div>' + lureHTML + '</header>' +
+      (wins.length ? '<section class="om-sec om-sec-wins"><h3 class="om-h">À gagner</h3><div class="om-wins">' + wins.map(function (ed) {
+          return '<figure class="om-win r-' + ed.rarity + '">' + U.card(ed.id, { open: false, tilt: false, ctx: 'mini' }) + '<figcaption><b>' + U.esc(A.CHAR[ed.charId].name) + '</b><span class="rar-chip r-' + ed.rarity + '"><i></i>' + A.R[ed.rarity].label + '</span></figcaption></figure>';
         }).join('') + '</div></section>' : '') +
-      '<section class="om-sec"><h3 class="om-h">Par rareté</h3><ul class="om-list">' + list + '</ul>' +
-        (g ? '<p class="om-guar">' + I('sparkle') + '<span><b>Dernière carte garantie Rare ou mieux</b> : ' + g.map(function (r) { return A.R[r.rarity].label + ' ' + U.pct(r.p); }).join(' · ') + '</span></p>' : '') +
+      '<section class="om-sec"><h3 class="om-h">Chances par sachet</h3><ul class="om-list">' + list + '</ul>' +
+        (g ? '<p class="om-guar" title="' + g.map(function (r) { return A.R[r.rarity].label + ' ' + U.pct(r.p).replace(/&nbsp;/g, ' '); }).join(' · ') + '">' + I('sparkle') + '<span><b>Dernière carte garantie</b> : une Rare ou mieux dans chaque sachet</span></p>' : '') +
       '</section>' +
-      '<ul class="om-facts">' +
-        '<li>' + I('gift') + '<b>Rien à acheter</b><span>Coffrets et boosters d’événement se gagnent en jouant.</span></li>' +
-        '<li>' + I('sparkle') + '<b>Numéroté au tirage</b><span>Aucun numéro ne peut être émis deux fois.</span></li>' +
-        '<li>' + I('shield') + '<b>Gratuits protégés</b><span>Réserve et quotidien comptés par compte.</span></li>' +
-      '</ul>' +
-      '<details class="om-how"><summary>Comment sont calculées ces probabilités ?' + I('chevR') + '</summary>' +
-        '<p>Chaque carte est tirée selon un taux de référence par rareté, multiplié par la part du stock encore disponible : quand une rareté s’épuise, ses chances baissent et la part non attribuée revient à la rareté la plus courante. Les quantités d’édition (250, 100, 50…) ne sont pas des probabilités. « 1 sachet sur N » indique la chance d’obtenir au moins une carte de cette rareté dans un sachet.</p></details>' +
+      '<details class="om-how"><summary>Détail et calcul des probabilités' + I('chevR') + '</summary>' + table +
+        '<p>Chaque carte est tirée selon un taux de référence par rareté, multiplié par la part du stock encore disponible : quand une rareté s’épuise, ses chances baissent et la part non attribuée revient à la rareté la plus courante. Les quantités d’édition (250, 100, 50…) ne sont pas des probabilités. « 1 sachet sur N » indique la chance d’obtenir au moins une carte de cette rareté dans un sachet.</p><p>Les numéros ne sont jamais émis deux fois. Réserve et quotidien sont comptés par compte ; les boosters d’événement se gagnent en jouant, rien n’est à acheter.</p></details>' +
       '</div>', { cls: 'is-small is-odds' });
   }
 
@@ -1461,41 +1513,76 @@
   /* ======================================================================
      MARKETPLACE
      ====================================================================== */
-  var mk = { q: '', colls: [], rars: [], min: '', max: '', sort: 'recent', mine: false };
+  /* Filtres : mêmes composants que « Mes cartes » (raretés en pastilles, puis menus compacts) */
+  var MK0 = { q: '', rarity: 'all', coll: 'all', price: 'all', only: 'all', sort: 'recent' };
+  var mk = Object.assign({}, MK0);
+  var MK_PRICES = { all: ['Tous les prix'], lt100: ['Moins de 100', 0, 99], to1k: ['100 à 1 000', 100, 1000], to5k: ['1 000 à 5 000', 1000, 5000], gt5k: ['Plus de 5 000', 5000, Infinity] };
+  var MK_SORTS = { recent: 'Plus récentes', asc: 'Prix croissant', desc: 'Prix décroissant', rarity: 'Rareté', serial: 'Numéro' };
+  function mkSelect(key, title, opts) {
+    return '<label class="select is-compact" title="' + title + '"><select data-mk="' + key + '" aria-label="' + title + '">' + opts.map(function (o) {
+      return '<option value="' + o[0] + '"' + (mk[key] === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+    }).join('') + '</select></label>';
+  }
+  /* Colonne de droite, comme « Mes cartes » : mes annonces, ventes récentes, portefeuille */
+  function mkSide() {
+    var L = S.listings(), mine = L.filter(function (l) { return l.mine; }), sales = S.sales();
+    function row(l, sub) {
+      var e = A.ED[l.ed];
+      return '<li><span>' + U.esc(A.CHAR[e.charId].name) + '<small>' + A.R[e.rarity].label + (e.supply ? ' · ' + U.serial(l.serial, e.supply) : '') + ' · ' + sub + '</small></span><b>' + U.num(l.price) + '</b></li>';
+    }
+    return '<div class="side-card"><div class="side-head"><p class="eyebrow">Mes annonces</p><span class="muted small">' + mine.length + ' en vente</span></div>' +
+        (mine.length ? '<ul class="ledger">' + mine.slice(0, 3).map(function (l) { return row(l, U.ago(l.at)); }).join('') + '</ul>' +
+          '<button class="side-more link-btn" data-mk-mine>' + (mine.length > 3 ? 'Voir les ' + mine.length + ' annonces' : 'Voir mes annonces') + ' ' + I('arrow') + '</button>'
+          : '<p class="muted small mk-side-note">Aucune carte en vente. Ouvrez une carte de votre inventaire, puis touchez « Mettre en vente ».</p><a class="side-more" href="#/inventaire">Mes cartes ' + I('arrow') + '</a>') + '</div>' +
+      '<div class="side-card"><div class="side-head"><p class="eyebrow">Ventes récentes</p><span class="muted small">' + sales.length + '</span></div><ul class="ledger">' +
+        sales.slice(0, 5).map(function (x) { return row(x, U.ago(x.at)); }).join('') + '</ul>' +
+        (sales.length ? '<a class="side-more" href="#/marketplace" data-mk-hist>Tout l’historique ' + I('arrow') + '</a>' : '') + '</div>' +
+      '<div class="side-card"><div class="side-head"><p class="eyebrow">Portefeuille</p><button class="link-btn small" data-buy>Recharger</button></div><p class="side-balance">' + U.price(S.balance()) + '</p></div>';
+  }
   P.market = {
     title: 'Marketplace',
     render: function (ctx) {
       if (ctx.query.q != null) mk.q = ctx.query.q;
       var L = S.listings(), sales = S.sales();
-      var vol = sales.filter(function (s) { return Date.now() - s.at < 86400000; }).reduce(function (a, s) { return a + s.price; }, 0);
+      // Chiffres clés de la salle : l’offre (annonces, vendeurs) et l’activité de la semaine (ventes, volume)
+      var week = sales.filter(function (s) { return Date.now() - s.at < 7 * 86400000; });
+      var vol = week.reduce(function (a, s) { return a + s.price; }, 0);
+      var sellers = {}; L.forEach(function (l) { sellers[l.seller] = 1; });
       return '<section class="page-head"><div class="container">' +
         '<p class="eyebrow">Salle des ventes</p><h1 class="h1">Marketplace</h1>' +
         '<p class="lead">Achetez et vendez des exemplaires entre collectionneurs, à prix fixe. Chaque annonce indique l’édition, le numéro et la provenance.</p>' +
         '<div class="kpis">' +
-          '<div><span>Annonces actives</span><b>' + L.length + '</b></div>' +
-          '<div><span>Volume 24 h</span><b>' + U.num(vol) + '<small> D</small></b></div>' +
-          '<div><span>Ventes récentes</span><b>' + sales.length + '</b></div>' +
-          '<div><span>Votre solde</span><b>' + U.num(S.balance()) + '<small> D</small></b></div>' +
+          '<div><span>Annonces</span><b>' + L.length + '</b></div>' +
+          '<div><span>Vendeurs</span><b>' + Object.keys(sellers).length + '</b></div>' +
+          '<div><span>Ventes · 7 jours</span><b>' + week.length + '</b></div>' +
+          '<div><span>Volume · 7 jours</span><b>' + U.price(vol) + '</b></div>' +
         '</div>' +
         '<div class="notice">' + I('lock') + '<span>Transactions simulées en <b>Éclats</b>. Aucun paiement ni retrait en euros dans le prototype ; les enchères arriveront dans une phase ultérieure.</span></div>' +
         '</div></section>' +
-        '<section class="section-tight"><div class="container mk-layout">' +
-          '<aside class="mk-filters"><details open><summary>' + I('filter') + 'Filtres</summary>' +
-            '<div class="f-group"><p class="f-label">Collection</p>' + A.COLLECTIONS.map(function (c) { return '<label class="check"><input type="checkbox" data-coll value="' + c.id + '"' + (mk.colls.indexOf(c.id) !== -1 ? ' checked' : '') + '><span></span>' + c.name + '</label>'; }).join('') + '</div>' +
-            '<div class="f-group"><p class="f-label">Rareté</p>' + A.RARITIES.map(function (r) { return '<label class="check"><input type="checkbox" data-rar value="' + r.id + '"' + (mk.rars.indexOf(r.id) !== -1 ? ' checked' : '') + '><span></span><i class="dot r-' + r.id + '"></i>' + r.label + '</label>'; }).join('') + '</div>' +
-            '<div class="f-group"><p class="f-label">Prix (Éclats)</p><div class="row gap-s"><input class="input" type="number" placeholder="Min" data-min value="' + mk.min + '"><input class="input" type="number" placeholder="Max" data-max value="' + mk.max + '"></div></div>' +
-            '<label class="toggle"><input type="checkbox" data-mine' + (mk.mine ? ' checked' : '') + '><span></span>Mes annonces</label>' +
-            '<button class="link-btn" data-clear>Réinitialiser les filtres</button>' +
-          '</details></aside>' +
-          '<div class="mk-main">' +
-            '<div class="toolbar mk-bar"><label class="search grow">' + I('search') + '<input type="search" placeholder="Carte, personnage, numéro…" value="' + U.esc(mk.q) + '" data-q></label>' +
-            '<label class="select"><span>Trier</span><select data-sort>' + [['recent', 'Plus récentes'], ['asc', 'Prix croissant'], ['desc', 'Prix décroissant'], ['rarity', 'Rareté'], ['serial', 'Numéro']].map(function (o) { return '<option value="' + o[0] + '"' + (mk.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label></div>' +
-            '<div data-results></div>' +
+        '<section class="section-tight"><div class="container inv-layout mk-layout">' +
+          '<div class="inv-main">' +
+          U.secHead('Annonces', 'Toutes les annonces') +
+          '<div class="toolbar sticky-bar inv-tools mk-tools">' +
+            '<div class="chips scroll-x" data-f="rarity">' + [['all', 'Toutes']].concat(A.RARITIES.map(function (r) { return [r.id, r.label]; })).map(function (v) {
+              return '<button class="chip' + (v[0] !== 'all' ? ' chip-r r-' + v[0] : '') + (mk.rarity === v[0] ? ' is-active' : '') + '" data-v="' + v[0] + '">' + (v[0] !== 'all' ? '<i></i>' : '') + v[1] + '</button>';
+            }).join('') + '</div>' +
+            '<div class="tb-filters">' +
+              '<label class="search mk-find">' + I('search') + '<input type="search" enterkeyhint="search" autocomplete="off" placeholder="Carte, numéro…" aria-label="Rechercher une carte, un personnage, un numéro" value="' + U.esc(mk.q) + '" data-q>' +
+                '<button type="button" class="cf-clear" data-q-clear aria-label="Effacer"' + (mk.q ? '' : ' hidden') + '>' + I('close') + '</button></label>' +
+              mkSelect('coll', 'Collection', [['all', 'Toutes les collections']].concat(A.COLLECTIONS.map(function (c) { return [c.id, c.name]; }))) +
+              mkSelect('price', 'Prix', Object.keys(MK_PRICES).map(function (k) { return [k, MK_PRICES[k][0]]; })) +
+              mkSelect('only', 'Afficher', [['all', 'Toutes les annonces'], ['mine', 'Mes annonces'], ['num', 'Numérotées']]) +
+              mkSelect('sort', 'Trier par', Object.keys(MK_SORTS).map(function (k) { return [k, MK_SORTS[k]]; })) +
+            '</div>' +
           '</div>' +
+          '<div data-results></div>' +
+          '</div>' +
+          '<aside class="inv-side" data-mk-side>' + mkSide() + '</aside>' +
         '</div></section>' +
-        '<section class="section"><div class="container">' + sectionHead('Historique', 'Ventes récentes') +
+        // Historique détaillé : vendeur, acheteur, date (la colonne n’en montre qu’un aperçu)
+        '<section class="section" id="mk-historique"><div class="container">' + sectionHead('Historique', 'Ventes récentes') +
           '<div class="table-wrap"><table class="table"><thead><tr><th>Carte</th><th>Édition</th><th class="hide-s">Vendeur</th><th class="hide-s">Acheteur</th><th>Prix</th><th class="hide-s">Date</th></tr></thead><tbody>' +
-          sales.slice(0, 12).map(function (s) {
+          sales.slice(0, 20).map(function (s) {
             var e = A.ED[s.ed], ch = A.CHAR[e.charId];
             return '<tr><td><b>' + ch.name + '</b></td><td><span class="rar-chip r-' + e.rarity + '"><i></i>' + A.R[e.rarity].label + '</span> <span class="muted mono">' + U.serial(s.serial, e.supply) + '</span></td>' +
               '<td class="hide-s">' + U.esc(s.from) + '</td><td class="hide-s">' + U.esc(s.to) + '</td><td>' + U.price(s.price) + '</td><td class="hide-s muted">' + U.ago(s.at) + '</td></tr>';
@@ -1507,7 +1594,7 @@
         return '<div class="listing">' + U.card(l.ed, { serial: l.serial, badge: l.mine ? 'Votre annonce' : '' }) +
           '<div class="listing-foot"><div class="listing-price">' + U.price(l.price) + '<span class="muted small">par ' + U.esc(l.seller) + '</span><span class="muted small">' + U.ago(l.at) + '</span></div>' +
           (l.mine ? '<div class="row gap-s"><button class="btn btn-ghost btn-sm grow" data-unlist="' + l.id + '">Retirer</button></div>' :
-            '<div class="row gap-s"><button class="btn btn-primary btn-sm grow" data-buy="' + l.id + '">Acheter</button><button class="btn btn-ghost btn-sm" data-offer="' + l.id + '">Offre</button></div>') +
+            '<div class="row gap-s"><button class="btn btn-primary btn-sm grow" data-mk-buy="' + l.id + '">Acheter</button><button class="btn btn-ghost btn-sm" data-offer="' + l.id + '">Offre</button></div>') +
           '</div></div>';
       }
       // Les annonces s’affichent par tranches de 12 au défilement (une grille entière est trop lourde sur iPhone)
@@ -1525,11 +1612,12 @@
         var q = mk.q.trim().toLowerCase();
         var L = S.listings().filter(function (l) {
           var e = A.ED[l.ed], ch = A.CHAR[e.charId], co = A.COLL[ch.coll];
-          if (mk.mine && !l.mine) return false;
-          if (mk.colls.length && mk.colls.indexOf(ch.coll) === -1) return false;
-          if (mk.rars.length && mk.rars.indexOf(e.rarity) === -1) return false;
-          if (mk.min !== '' && l.price < +mk.min) return false;
-          if (mk.max !== '' && l.price > +mk.max) return false;
+          var pr = MK_PRICES[mk.price] || MK_PRICES.all;
+          if (mk.only === 'mine' && !l.mine) return false;
+          if (mk.only === 'num' && l.serial == null) return false;
+          if (mk.coll !== 'all' && ch.coll !== mk.coll) return false;
+          if (mk.rarity !== 'all' && e.rarity !== mk.rarity) return false;
+          if (pr.length > 1 && (l.price < pr[1] || l.price > pr[2])) return false;
           if (q) {
             var hay = (ch.name + ' ' + ch.title + ' ' + co.name + ' ' + A.R[e.rarity].label + ' ' + U.serial(l.serial, e.supply)).toLowerCase();
             if (hay.indexOf(q) === -1) return false;
@@ -1544,9 +1632,12 @@
           return b.at - a.at;
         });
         list = L;
+        var side = root.querySelector('[data-mk-side]');
+        if (side) side.innerHTML = mkSide();
         res.innerHTML = '<p class="result-count">' + L.length + ' annonce' + (L.length > 1 ? 's' : '') + '</p>' +
           (L.length ? '<div class="card-grid is-market">' + L.slice(0, shown).map(tile).join('') + '</div>' +
-            (L.length > shown ? '<div class="inv-more" data-more></div>' : '') : '<div class="empty">Aucune annonce ne correspond à votre recherche.</div>');
+            (L.length > shown ? '<div class="inv-more" data-more></div>' : '') : '<div class="empty">Aucune annonce ne correspond à ces filtres. <button class="link-btn" data-clear>Réinitialiser les filtres</button></div>');
+        root.querySelector('[data-q-clear]').hidden = !mk.q;
         var sent = res.querySelector('[data-more]');
         if (more) more.disconnect();
         if (sent && 'IntersectionObserver' in window) {
@@ -1555,11 +1646,15 @@
         } else if (sent) { shown = L.length; grow(); }
       }
       draw();
+      function toTools() {
+        var bar = root.querySelector('.mk-tools'), y = window.scrollY + bar.getBoundingClientRect().top - 70;
+        if (window.scrollY > y) window.scrollTo({ top: y, behavior: 'smooth' });
+      }
       function labelOf(l) { var e = A.ED[l.ed]; return A.CHAR[e.charId].name + ' · ' + A.R[e.rarity].label + (e.supply ? ' ' + U.serial(l.serial, e.supply) : ''); }
       root.addEventListener('click', function (e) {
         var t;
-        if ((t = e.target.closest('[data-buy]'))) {
-          var l = S.listings().find(function (x) { return x.id === t.getAttribute('data-buy'); });
+        if ((t = e.target.closest('[data-mk-buy]'))) {
+          var l = S.listings().find(function (x) { return x.id === t.getAttribute('data-mk-buy'); });
           if (!l) return;
           U.confirm({
             eyebrow: 'Achat simulé', title: labelOf(l), ok: 'Acheter pour ' + U.num(l.price) + ' D',
@@ -1574,37 +1669,65 @@
         }
         if ((t = e.target.closest('[data-offer]'))) {
           var lo = S.listings().find(function (x) { return x.id === t.getAttribute('data-offer'); });
+          // Offre : pastilles « −5 % … −25 % » sous le prix demandé, et boutons − / + (pas arrondi selon le prix)
+          var stp = lo.price >= 5000 ? 100 : lo.price >= 1000 ? 10 : lo.price >= 100 ? 5 : 1;
+          var at = function (pc) { return Math.max(stp, Math.round(lo.price * (1 - pc / 100) / stp) * stp); };
+          var PCS = [5, 10, 15, 20, 25];
           U.modal('<div class="dialog"><p class="eyebrow">Offre d’achat</p><h2 class="h3">' + labelOf(lo) + '</h2>' +
             '<p class="muted">Prix demandé : ' + U.num(lo.price) + ' Éclats. Le vendeur sera notifié et pourra accepter ou refuser.</p>' +
-            '<label class="field"><span>Votre offre</span><div class="input-unit"><input type="number" min="1" value="' + Math.round(lo.price * 0.85 / 5) * 5 + '" data-amount><span>Éclats</span></div></label>' +
+            '<div class="field"><span>Votre offre</span>' +
+              '<div class="input-unit offer-amt"><button type="button" class="offer-step" data-step="-1" aria-label="Baisser de ' + stp + '">' + I('minus') + '</button>' +
+                '<input type="number" inputmode="numeric" min="1" step="' + stp + '" value="' + at(15) + '" data-amount aria-label="Votre offre"><span>Éclats</span>' +
+                '<button type="button" class="offer-step" data-step="1" aria-label="Monter de ' + stp + '">' + I('plus') + '</button></div>' +
+              '<div class="offer-pcs" role="group" aria-label="Réduction sur le prix demandé">' + PCS.map(function (pc) {
+                return '<button type="button" class="chip' + (pc === 15 ? ' is-active' : '') + '" data-pc="' + pc + '">−' + pc + '&nbsp;%</button>';
+              }).join('') + '</div>' +
+              '<p class="offer-hint" data-hint></p></div>' +
             '<div class="dialog-actions"><button class="btn btn-ghost" data-close>Annuler</button><button class="btn btn-primary" data-send>Envoyer l’offre</button></div></div>',
             { cls: 'is-small', mount: function (el, close) {
+              var inp = el.querySelector('[data-amount]'), hint = el.querySelector('[data-hint]');
+              function sync() {
+                var v = parseInt(inp.value, 10) || 0, d = Math.round((1 - v / lo.price) * 100);
+                el.querySelectorAll('[data-pc]').forEach(function (b) { b.classList.toggle('is-active', at(+b.getAttribute('data-pc')) === v); });
+                hint.textContent = !v ? '' : v >= lo.price ? 'Au prix demandé ou plus : achetez directement.' : 'Soit −' + d + ' % du prix demandé (' + U.num(lo.price - v) + ' Éclats d’écart).';
+              }
+              el.addEventListener('click', function (ev) {
+                var b = ev.target.closest('[data-pc],[data-step]');
+                if (!b) return;
+                if (b.hasAttribute('data-pc')) inp.value = at(+b.getAttribute('data-pc'));
+                else inp.value = Math.max(stp, Math.round(((parseInt(inp.value, 10) || 0) + stp * +b.getAttribute('data-step')) / stp) * stp);
+                sync();
+              });
+              inp.addEventListener('input', sync);
+              sync();
               el.querySelector('[data-send]').addEventListener('click', function () {
-                var r = S.offer(lo.id, parseInt(el.querySelector('[data-amount]').value, 10));
+                var r = S.offer(lo.id, parseInt(inp.value, 10));
                 if (r.ok) { close(); U.toast('Offre envoyée (simulation)'); } else U.toast(r.error, 'error');
               });
             } });
           return;
         }
         if ((t = e.target.closest('[data-unlist]'))) { S.unlist(t.getAttribute('data-unlist')); U.toast('Annonce retirée, la carte revient dans votre inventaire'); draw(true); return; }
-        if (e.target.closest('[data-clear]')) { mk = { q: '', colls: [], rars: [], min: '', max: '', sort: 'recent', mine: false }; location.hash = '#/marketplace'; A.app.rerender(); }
+        if ((t = e.target.closest('[data-f="rarity"] .chip'))) {
+          mk.rarity = t.getAttribute('data-v');
+          root.querySelectorAll('[data-f="rarity"] .chip').forEach(function (x) { x.classList.toggle('is-active', x === t); });
+          draw(); return;
+        }
+        if (e.target.closest('[data-mk-mine]')) { mk.only = 'mine'; root.querySelector('[data-mk="only"]').value = 'mine'; draw(); toTools(); return; }
+        if (e.target.closest('[data-mk-hist]')) { e.preventDefault(); var h = root.querySelector('#mk-historique'); if (h) window.scrollTo({ top: window.scrollY + h.getBoundingClientRect().top - 80, behavior: 'smooth' }); return; }
+        if (e.target.closest('[data-q-clear]')) { var qi = root.querySelector('[data-q]'); mk.q = ''; qi.value = ''; qi.focus(); draw(); return; }
+        if (e.target.closest('[data-clear]')) { mk = Object.assign({}, MK0); location.hash = '#/marketplace'; A.app.rerender(); }
       });
       root.addEventListener('change', function (e) {
         var t = e.target;
-        if (t.matches('[data-coll]')) mk.colls = [].slice.call(root.querySelectorAll('[data-coll]:checked')).map(function (x) { return x.value; });
-        if (t.matches('[data-rar]')) mk.rars = [].slice.call(root.querySelectorAll('[data-rar]:checked')).map(function (x) { return x.value; });
-        if (t.matches('[data-sort]')) mk.sort = t.value;
-        if (t.matches('[data-mine]')) mk.mine = t.checked;
+        if (!t.matches('[data-mk]')) return;
+        mk[t.getAttribute('data-mk')] = t.value;
         draw();
       });
       root.addEventListener('input', function (e) {
         var t = e.target;
-        if (t.matches('[data-q]')) mk.q = t.value;
-        if (t.matches('[data-min]')) mk.min = t.value;
-        if (t.matches('[data-max]')) mk.max = t.value;
-        if (t.matches('[data-q],[data-min],[data-max]')) draw();
+        if (t.matches('[data-q]')) { mk.q = t.value; draw(); }
       });
-      if (window.innerWidth < 900) { var d = root.querySelector('.mk-filters details'); if (d) d.open = false; }
       this.refresh = function () { draw(true); };
     }
   };

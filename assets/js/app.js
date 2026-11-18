@@ -19,7 +19,9 @@
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
     [/^\/raretes$/, P.rarities, ''],
-    [/^\/variantes$/, P.variants, ''],   // outil de test : pistes de design des cartes (variantes.js)
+    [/^\/variantes$/, P.variants, ''],
+    [/^\/design-booster$/, P.boosterLab, ''],   // outil de test : formes du sachet et anciennes versions (booster-lab.js)
+    [/^\/booster-solo$/, P.boosterSolo, ''],    // un sachet seul (contenu des fenêtres de la page ci-dessus)   // outil de test : pistes de design des cartes (variantes.js)
     [/^\/atelier$/, P.atelier, ''],
     [/^\/infos$/, P.infos, '']
   ];
@@ -62,7 +64,7 @@
       '<div class="footer-cols">' +
         '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/">Boosters</a><a href="#/collections">Collections</a><a href="#/marketplace">Marketplace</a></div>' +
         '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Mes cartes</a><a href="#/combat">Combat</a><a href="#/?open=daily" data-daily-open>Booster quotidien</a></div>' +
-        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><a href="#/raretes">Raretés des cartes</a><a href="#/variantes">Variantes de cartes</a><a href="#/combat-studio">Studio combat</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
+        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><a href="#/raretes">Raretés des cartes</a><a href="#/variantes">Variantes de cartes</a><a href="#/design-booster">Design des boosters</a><a href="#/combat-studio">Studio combat</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
       '</div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ATLAS · Édition I</span><em>Le monde, en cartes.</em></div>' +
     '</div>';
@@ -272,6 +274,13 @@
     }
     if (!match) match = ROUTES[0];
     var page = match[1];
+    // Forme du sachet choisie dans « Design des boosters » : le modèle 3D se charge au démarrage, on recharge donc une
+    // fois en quittant cette page pour que l’accueil et les ouvertures prennent la nouvelle forme
+    if (page !== P.boosterLab && page !== P.boosterSolo && !window.ATLAS_SHAPE_URL && window.ATLAS_SHAPES) {
+      var want = 'classic';
+      try { var st = localStorage.getItem('atlas-pack-shape') || 'strie'; if (window.ATLAS_SHAPES[st]) want = st; } catch (e) { want = 'strie'; }
+      if (want !== window.ATLAS_SHAPE) { location.reload(); return; }
+    }
     var ctx = { params: params, query: r.query };
     var view = document.getElementById('view');
     var y = window.scrollY;
@@ -282,7 +291,8 @@
     view.appendChild(root);
     if (page.mount) page.mount(root, ctx);
     current = page;
-    document.body.classList.toggle('is-combat', page === P.combat);   // page Combat : pas de pied de page, l’arène prend tout l’écran
+    document.body.classList.toggle('is-combat', page === P.combat);
+    document.body.classList.toggle('is-solo', page === P.boosterSolo);   // sachet seul : ni en-tête, ni barre, ni pied de page   // page Combat : pas de pied de page, l’arène prend tout l’écran
     document.title = 'ATLAS — ' + page.title;
     document.querySelectorAll('[data-nav]').forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('data-nav') === match[2]); });
     window.scrollTo(0, keepScroll ? y : 0);

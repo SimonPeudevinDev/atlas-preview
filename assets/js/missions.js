@@ -90,14 +90,14 @@
     slaves: [['tsar', 'Les contes du tsar', 'Le sorcier immortel, l’oiseau de feu et la sorcière de la forêt.', ['koschei', 'oiseaudefeu', 'babayaga']]],
     afrique: [['eaux', 'Les esprits des eaux', 'La mère des eaux, le dieu du Zambèze et le dragon des marais.', ['mamiwata', 'nyaminyami', 'ninkinanka']]]
   };
-  var NORD = ['nordique', 'creatures', 'jotnar', 'mondes'];
+  var NORD = ['nordique', 'creatures', 'jotnar', 'mondes'], JAPON = ['kami', 'yokai', 'samourais', 'epoques'], EGYPTE = ['egypte', 'pharaons'];
   A.MISSIONS = {};
   Object.keys(M).forEach(function (cid) {
     A.MISSIONS[cid] = M[cid].map(function (m) {
       var chars = m[3].map(function (s) { return s.indexOf(':') !== -1 ? s.replace(':', '-') : cid + '-' + s; });
       return { id: m[0], label: m[1], desc: m[2], chars: chars,
-        // Les grandes missions offrent un booster à gagner : la Saga du Nord pour les salles nordiques, le Coffret ailleurs
-        reward: chars.length >= 4 ? { booster: NORD.indexOf(cid) !== -1 ? 'saga' : 'conservateur', eclats: 200 } : { eclats: 150 * chars.length } };
+        // Les grandes missions offrent un booster : la saga de l’événement pour ses salles (Nord, Japon), un Booster Atlas ailleurs
+        reward: chars.length >= 4 ? { booster: NORD.indexOf(cid) !== -1 ? 'saga' : JAPON.indexOf(cid) !== -1 ? 'soleil' : EGYPTE.indexOf(cid) !== -1 ? 'nil' : 'standard', eclats: 200 } : { eclats: 150 * chars.length } };
     });
   });
 })(window.ATLAS);

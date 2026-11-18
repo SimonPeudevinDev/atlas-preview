@@ -19,7 +19,10 @@
    ========================================================================== */
 (function (A) {
   'use strict';
-  var T = window.THREE, M = A.PACK_MODEL;
+  // Sachet « référence » (test) : modèle coussin + illustration pleine page, s’il a été chargé ; sinon le sachet classique
+  var T = window.THREE, M = A.PACK_MODEL_PILLOW || A.PACK_MODEL, REF = !!A.PACK_MODEL_PILLOW;
+  // Face en illustration pleine page (essai d’après la référence) : désactivée, le propriétaire préfère les visuels habituels sur le modèle coussin
+  var FULL_ART = false;
   var P3 = A.pack3d = { ok: false };
   if (!T || !M || !window.HTMLCanvasElement) return;
 
@@ -28,7 +31,7 @@
   var TEAR_Y = H / 2 - M.info.tearFromTop;         // hauteur de la déchirure (repère three.js)
   var CRIMP_T = M.info.crimpTop * 100, CRIMP_B = M.info.crimpBottom * 100;
   var TY = M.info.tearFromTop * 100;               // déchirure en unités maquette
-  var S = 8;                                       // pixels de texture par unité maquette (800 × 1280)
+  var S = (window.innerWidth || 0) > 700 ? 10 : 8;   // pixels de texture par unité maquette (1000 × 1600 sur ordinateur, 800 × 1280 sur mobile)
   // Canevas plus grand que le sachet (rotation, capuchon qui s’envole, chute) — doit suivre booster.css (.pk-gl)
   var BOX = { x: -0.6, y: -0.45, w: 2.2, h: 2.2 };
   var PERSP = 1400, ORIGIN_Y = 0.4;                // comme .pk { perspective: 1400px; perspective-origin: 50% 40% }
@@ -65,6 +68,27 @@
     'd-petrole': dark('night', ['#1E5D6B', '#08222A', '#174C58', '#04161B', '#113D47', '#061C22'], { ink2: '#BCD9DE', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(3,22,27,.9)', glow: 'rgba(230,199,127,.24)' }),
     'd-cognac': dark('garnet', ['#8A5228', '#3A1E0A', '#73431F', '#2A1506', '#5E3518', '#331A08'], { ink2: '#EBD3BB', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(40,20,6,.9)', glow: 'rgba(230,199,127,.24)' }),
     'd-anthracite': dark('night', ['#4A4D53', '#16171A', '#3A3D42', '#0B0C0E', '#2B2D31', '#121315'], { ink2: '#C3C6CC', gold: '#D9DDE3', motif: ['#FFFFFF', '#D9DDE3', '#8E949D'], facet: 'rgba(8,9,11,.92)', glow: 'rgba(220,225,235,.2)', brand: ['#8E949D', '#FFFFFF', '#B9BEC6', '#FFFFFF', '#8E949D'], metal: 0.7 }),
+    // Événements : sachets clairs, pour trancher avec les sachets sombres (Atlas, quotidien, Ultime)
+    'e-glacier': dark('lapis', ['#5FA8E0', '#1C5E9C', '#4793CF', '#124878', '#3A82BF', '#175690'], { ink: '#F5FAFF', ink2: '#D8E9F8', gold: '#F2F7FC', motif: ['#FFFFFF', '#E3F0FB', '#9CC3E4'], facet: 'rgba(10,45,85,.85)', glow: 'rgba(235,245,255,.3)', brand: ['#B9D6EE', '#FFFFFF', '#CFE3F4', '#FFFFFF', '#B9D6EE'], halo: 'rgba(5,30,60,.45)', metal: 0.55, holo: 0.3 }),
+    'e-vermillon': dark('garnet', ['#E8533A', '#9C1F14', '#D9412B', '#7A140C', '#C3361F', '#8E1A10'], { ink: '#FFF6EA', ink2: '#FFDCCB', gold: '#F8E3B0', motif: ['#FFF4D6', '#F6D88E', '#C99A45'], facet: 'rgba(60,8,4,.88)', glow: 'rgba(255,236,200,.28)', halo: 'rgba(60,8,4,.45)', toriiInk: '#3B0B06', metal: 0.55, holo: 0.3 }),
+    // Saga du Nil : feuille d’or, encre lapis-lazuli
+    'e-or': light(['#ECCB78', '#9C6F22', '#DDB458', '#7A5216', '#C89E40', '#8C6420'], '#16203F', '#2B3A67', ['#3557B0', '#1E3A8A', '#0E1A40'], { metal: 0.85, holo: 0.12, facet: 'rgba(20,28,60,.85)', glow: 'rgba(255,240,200,.25)', halo: 'rgba(255,236,190,.35)' }),
+    // Propositions (page Design des boosters)
+    'p-laque': dark('night', ['#2A1512', '#0B0505', '#22100D', '#050202', '#1A0B09', '#0A0404'], { ink: '#F6EBDD', ink2: '#E7B9A8', gold: '#E8C27A', motif: ['#FFE3A6', '#E0B260', '#9C6B2A'], facet: 'rgba(8,2,2,.9)', glow: 'rgba(232,194,122,.2)', metal: 0.6 }),
+    'p-indigo': dark('lapis', ['#34478A', '#0E1636', '#283A76', '#080E24', '#1C2A5C', '#0B1330'], { ink: '#F3F5FA', ink2: '#C9D2EC', gold: '#EEF2FA', motif: ['#FFFFFF', '#DCE3F5', '#8E9CC8'], facet: 'rgba(6,10,30,.85)', glow: 'rgba(230,236,255,.22)', brand: ['#A9B6DC', '#FFFFFF', '#C4CEEA', '#FFFFFF', '#A9B6DC'], metal: 0.6 }),
+    'p-sakura': dark('garnet', ['#E3A0B4', '#A0506A', '#D689A0', '#7B3550', '#C27088', '#8C4460'], { ink: '#FFF7F8', ink2: '#FFDDE6', gold: '#FFF1D6', motif: ['#FFFFFF', '#FFE6EC', '#E8A3B6'], facet: 'rgba(110,40,65,.75)', glow: 'rgba(255,235,240,.3)', brand: ['#F2C9D4', '#FFFFFF', '#F8DDE5', '#FFFFFF', '#F2C9D4'], halo: 'rgba(90,25,45,.45)', metal: 0.6 }),
+    'p-or': light(['#ECCB78', '#9C6F22', '#DDB458', '#7A5216', '#C89E40', '#8C6420'], '#1B1208', '#4A3210', ['#3A2608', '#1E1304', '#0E0902'], { metal: 0.85, holo: 0.12, facet: 'rgba(30,18,4,.8)', glow: 'rgba(255,240,200,.25)', halo: 'rgba(255,236,190,.35)' }),
+    'p-sumi': dark('night', ['#56565B', '#1C1C1F', '#46464B', '#101012', '#34343A', '#161618'], { ink: '#F3F1EC', ink2: '#C8C4BC', gold: '#F0684A', motif: ['#FF9A7E', '#E8553A', '#9E2E1C'], facet: 'rgba(8,8,10,.9)', glow: 'rgba(240,104,74,.2)', toriiInk: '#0C0C0E', metal: 0.55 }),
+    'p-polaire': dark('night', ['#2B3A4A', '#0C141D', '#22303E', '#070C12', '#1A2531', '#0A1018'], { ink: '#EEF6F4', ink2: '#B5D3CF', gold: '#A6F2CF', motif: ['#D8FFEE', '#7DE8BC', '#2A9C7A'], facet: 'rgba(4,8,12,.9)', glow: 'rgba(125,232,188,.2)', brand: ['#7DCFAE', '#E8FFF4', '#A6F2CF', '#E8FFF4', '#7DCFAE'], metal: 0.55 }),
+    'p-aurore': dark('night', ['#1F6B6A', '#082827', '#195957', '#04191A', '#124544', '#061F1F'], { ink: '#F0FBF7', ink2: '#BFE6DC', gold: '#BDF7DC', motif: ['#EFFFF8', '#9FF0C8', '#3FB58A'], facet: 'rgba(2,14,14,.9)', glow: 'rgba(159,240,200,.22)', brand: ['#8FD9BC', '#F0FFF8', '#B5F2D8', '#F0FFF8', '#8FD9BC'], metal: 0.55 }),
+    'p-acier': dark('night', ['#7D858D', '#2C3136', '#69717A', '#1D2125', '#545C64', '#262A2F'], { ink: '#F4F6F8', ink2: '#CDD3D9', gold: '#EEF1F4', motif: ['#FFFFFF', '#D7DDE3', '#8C959E'], facet: 'rgba(18,20,24,.85)', glow: 'rgba(230,236,242,.2)', brand: ['#AEB6BE', '#FFFFFF', '#CDD3D9', '#FFFFFF', '#AEB6BE'], metal: 0.85 }),
+    'p-sang': dark('garnet', ['#7E1F28', '#2E070B', '#691820', '#1E0306', '#521119', '#250509'], { ink: '#F7ECE6', ink2: '#E3BDB4', gold: '#E9C98E', motif: ['#FFE9BE', '#E5C07E', '#A27A3A'], facet: 'rgba(20,2,4,.9)', glow: 'rgba(233,201,142,.2)', metal: 0.55 }),
+    'p-fjord': dark('lapis', ['#2C5F7A', '#0C2533', '#234F67', '#071923', '#1A3E52', '#0A1E2A'], { ink: '#EEF6FA', ink2: '#BFD8E6', gold: '#DCEBF3', motif: ['#FFFFFF', '#CFE4F0', '#7FA9C2'], facet: 'rgba(4,16,24,.88)', glow: 'rgba(207,228,240,.22)', brand: ['#9CC0D6', '#FFFFFF', '#BFD8E6', '#FFFFFF', '#9CC0D6'], metal: 0.55 }),
+    'p-lapis': dark('lapis', ['#2E54B0', '#0C1C4E', '#24479A', '#071233', '#1B387D', '#0A173F'], { ink: '#F6EED8', ink2: '#D4DCF2', gold: '#E9C46A', motif: ['#FFE7A3', '#E2B654', '#9C7424'], facet: 'rgba(5,12,40,.88)', glow: 'rgba(233,196,106,.22)', metal: 0.6 }),
+    'p-faience': dark('lapis', ['#2FB3A8', '#0D5B56', '#25A096', '#08413D', '#1C8279', '#0A4A45'], { ink: '#FFFBF0', ink2: '#D8F4F0', gold: '#F4D58A', motif: ['#FFF0C2', '#EBC66E', '#A8812F'], facet: 'rgba(4,40,38,.85)', glow: 'rgba(244,213,138,.25)', halo: 'rgba(3,40,38,.45)', metal: 0.6 }),
+    'p-obsidienne': dark('night', ['#2E2A26', '#0A0908', '#25211D', '#040404', '#1A1715', '#0B0A09'], { ink: '#F6EFE0', ink2: '#C2B59A', gold: '#E7C36F', motif: ['#FFEBB4', '#E7C36F', '#A27E38'], facet: 'rgba(0,0,0,.92)', glow: 'rgba(231,195,111,.24)', metal: 0.65 }),
+    'p-cuivre': dark('garnet', ['#C27744', '#6E3415', '#AE6536', '#55260C', '#94522A', '#5E2D10'], { ink: '#FFF3E6', ink2: '#F3D2B8', gold: '#FBE3B4', motif: ['#FFF5DC', '#F6D79A', '#C09450'], facet: 'rgba(60,20,4,.85)', glow: 'rgba(251,227,180,.25)', halo: 'rgba(60,20,4,.45)', metal: 0.6 }),
+    'p-malachite': dark('night', ['#3BA17C', '#145A43', '#2F8C6A', '#0D4232', '#23735A', '#0F4A38'], { ink: '#F8FCF6', ink2: '#CFEADD', gold: '#F2D58E', motif: ['#FFF1C8', '#ECCB7A', '#A88635'], facet: 'rgba(4,34,24,.88)', glow: 'rgba(242,213,142,.24)', halo: 'rgba(4,34,24,.45)', metal: 0.6 }),
     'c-noir': dark('night', ['#2C2925', '#0B0A09', '#211E1B', '#050505', '#181614', '#0C0B0A'], { ink: '#F6EFE0', ink2: '#B9AE99', gold: '#E6C77F', motif: ['#FFF0C4', '#E6C77F', '#A9823F'], facet: 'rgba(0,0,0,.92)', glow: 'rgba(230,199,127,.24)', metal: 0.7 })
   });
   var FOIL_STOPS = [0, 0.26, 0.46, 0.70, 0.88, 1];
@@ -73,6 +97,8 @@
   var SANS = 'Inter, system-ui, "Segoe UI", Roboto, sans-serif';
   // Mise en page commune de la face avant (unités maquette) : la fenêtre ne bouge jamais
   var WIN = { x: 12, y: 54, w: 76, h: 52, r: 1.4 };
+  // Sachet « référence » : illustration pleine page dans un liseré de film métallisé, entre les deux soudures
+  var ART = { x: 6, y: CRIMP_T + 2.4, w: 88, h: 160 - CRIMP_B - 3 - (CRIMP_T + 2.4), r: 1.2 };
 
   /* ---------- Contexte WebGL partagé (créé au premier sachet) ---------- */
   var R = null, scene, env, geo, lost = false, views = [];
@@ -190,7 +216,7 @@
     var infl = [];
     TG.forEach(function (t, i) {
       if (i % 2) return;
-      var amp = /^coin/.test(t.name) ? rnd(0.9, 2.2) : rnd(0.5, 1.5), ph = rnd(0, 6.283);
+      var amp = /^coin/.test(t.name) ? rnd(0.9, 2.2) : /^froissure/.test(t.name) ? rnd(0.6, 1.6) : rnd(0.5, 1.5), ph = rnd(0, 6.283);
       infl.push(amp * Math.cos(ph), amp * Math.sin(ph));
     });
     return {
@@ -200,8 +226,16 @@
       infl: infl
     };
   }
-  function clean() {
-    return { ear: [0, 0, 0, 0], earL: [0.1, 0.1, 0.1, 0.1], tab: [-0.14, 0.05, -0.07, -0.03], bow: [-0.005, -0.01], infl: TG.map(function () { return 0; }) };
+  // Sachet de la boutique : propre, mais chaque sachet a sa propre variante de froissures (fixe, tirée de son identifiant)
+  function clean(p) {
+    var h = A.hash ? A.hash((p && p.id) || 'pack') : 7, infl = [];
+    TG.forEach(function (t, i) {
+      if (i % 2) return;
+      var amp = 0, ph = 0;
+      if (/^froissure/.test(t.name)) { amp = 0.7 + (h % 7) / 10; ph = ((h >> (3 + i)) % 628) / 100; }
+      infl.push(amp * Math.cos(ph), amp * Math.sin(ph));
+    });
+    return { ear: [0, 0, 0, 0], earL: [0.1, 0.1, 0.1, 0.1], tab: [-0.14, 0.05, -0.07, -0.03], bow: [-0.005, -0.01], infl: infl };
   }
 
   /* ---------- Textures (dessinées une fois par sachet) ---------- */
@@ -251,13 +285,41 @@
     var g = x.createLinearGradient(50 - dx * L / 2, 80 - dy * L / 2, 50 + dx * L / 2, 80 + dy * L / 2);
     th.foil.forEach(function (c, i) { g.addColorStop(FOIL_STOPS[i], c); });
     x.fillStyle = g; x.fillRect(0, 0, 100, 160);
-    // Film brossé : fines stries verticales
-    for (var i = 0; i < 100; i += 0.35) {
-      x.fillStyle = (Math.sin(i * 12.9898) * 43758.5453 % 1 + 1) % 1 > 0.5 ? 'rgba(255,255,255,.035)' : 'rgba(0,0,0,.025)';
-      x.fillRect(i, 0, 0.18, 160);
+    // Film brossé : fines stries verticales (sachet « référence » : film lisse, sauf l’essai « strie » qui les garde à moitié)
+    var sk = REF ? (M.info.brush || 0) : 1, pitch = REF ? (M.info.pitch || 0.35) : 0.35;
+    if (sk)
+    for (var i = 0; i < 100; i += pitch) {
+      x.fillStyle = (Math.sin(i * 12.9898) * 43758.5453 % 1 + 1) % 1 > 0.5 ? 'rgba(255,255,255,' + (0.035 * sk) + ')' : 'rgba(0,0,0,' + (0.025 * sk) + ')';
+      x.fillRect(i, 0, pitch * 0.51, 160);
+    }
+    if (REF && M.info.bands) {                       // essai « strie 2 » : larges bandes de reflet, comme un métal satiné
+      for (var bx = 0; bx < 100; bx += 0.5) {
+        var bv = Math.sin(bx * 0.9) * 0.6 + Math.sin(bx * 2.3 + 1.7) * 0.4;
+        x.fillStyle = bv > 0 ? 'rgba(255,255,255,' + (0.05 * bv).toFixed(3) + ')' : 'rgba(0,0,0,' + (-0.04 * bv).toFixed(3) + ')';
+        x.fillRect(bx, 0, 0.5, 160);
+      }
     }
   }
+  // Sachet « référence » : soudures à nervures horizontales (4, et 8 dans le bloc de couture), comme sur la photo
+  function ribsY(b, n) { var o = []; for (var k = 0; k < n; k++) o.push(b[0] + b[1] * (0.08 + 0.84 * (k + 0.5) / n)); return o; }
+  function crimpsRef(x, th) {
+    [[0, CRIMP_T], [160 - CRIMP_B, CRIMP_B]].forEach(function (b) {
+      var g = x.createLinearGradient(0, b[0], 0, b[0] + b[1]);
+      g.addColorStop(0, 'rgba(0,0,0,.12)'); g.addColorStop(0.15, 'rgba(255,255,255,.06)'); g.addColorStop(0.85, 'rgba(255,255,255,.06)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
+      x.fillStyle = g; x.fillRect(0, b[0], 100, b[1]);
+      [[0, 100, 4]].forEach(function (zone, zi) {
+        ribsY(b, zone[2]).forEach(function (y) {
+          var h = b[1] / zone[2] * 0.22;                                  // nervures fines et douces (le relief vient surtout du modèle)
+          x.globalAlpha = zi ? 0.38 : 0.3;
+          x.fillStyle = th.hi; x.fillRect(zone[0], y - h, zone[1] - zone[0], h * 0.7);
+          x.fillStyle = th.lo; x.fillRect(zone[0], y + h * 0.3, zone[1] - zone[0], h * 0.6);
+          x.globalAlpha = 1;
+        });
+      });
+    });
+  }
   function crimps(x, th) {
+    if (REF) { crimpsRef(x, th); return; }
     [[0, CRIMP_T], [160 - CRIMP_B, CRIMP_B]].forEach(function (b) {
       var g = x.createLinearGradient(0, b[0], 0, b[0] + b[1]);
       g.addColorStop(0, 'rgba(0,0,0,.16)'); g.addColorStop(0.22, 'rgba(0,0,0,0)'); g.addColorStop(0.78, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.16)');
@@ -270,7 +332,15 @@
       x.globalAlpha = 1;
     });
   }
-  function teeth(x) {
+  function teeth(x, back) {
+    if (REF && !M.info.teeth) {                                    // bords nets (cran en V seulement si le modèle en a un) ; « teeth » : dents de scie du classique
+      if (!M.info.notch) return;
+      var nx = M.info.notch * 100;
+      if (back) nx = 100 - nx;                                     // le dos est en miroir : le cran traverse les deux faces au même endroit
+      x.save(); x.globalCompositeOperation = 'destination-out'; x.fillStyle = '#000';
+      x.beginPath(); x.moveTo(nx - 1.4, -1); x.lineTo(nx, 2.6); x.lineTo(nx + 1.4, -1); x.closePath(); x.fill();
+      x.restore(); return;
+    }
     // Dents de scie des soudures : on efface le film entre les dents (alphaTest)
     var n = 17, d = 1.25;
     x.save(); x.globalCompositeOperation = 'destination-out'; x.fillStyle = '#000';
@@ -341,7 +411,93 @@
     }
     x.fillStyle = gold(x, th, cy - 2, cy + 2); x.beginPath(); x.arc(cx, cy, R * 0.07, 0, 7); x.fill();
   }
+  // Runes du futhark ancien, en traits (boîte 0,8 × 2) : le canevas n’a pas de police runique
+  var RUNES = [
+    [[0, 0, 0, 2], [0, 0.5, 0.8, 0], [0, 1, 0.8, 0.5]], [[0, 0, 0, 2], [0, 0, 0.8, 0.5], [0.8, 0.5, 0.8, 2]],
+    [[0, 0, 0, 2], [0, 0.6, 0.7, 1], [0.7, 1, 0, 1.4]], [[0, 0, 0, 2], [0, 0, 0.7, 0.45], [0, 0.5, 0.7, 0.95]],
+    [[0, 0, 0, 2], [0, 0, 0.7, 0.45], [0.7, 0.45, 0, 0.9], [0, 0.9, 0.7, 2]], [[0.7, 0.3, 0, 1], [0, 1, 0.7, 1.7]],
+    [[0, 0.2, 0.8, 1.8], [0.8, 0.2, 0, 1.8]], [[0, 0, 0, 2], [0.8, 0, 0.8, 2], [0, 0.8, 0.8, 1.2]],
+    [[0.4, 0, 0.4, 2]], [[0.4, 0, 0.4, 2], [0.4, 0, 0, 0.5], [0.4, 0, 0.8, 0.5]],
+    [[0.4, 0, 0.4, 2], [0.4, 0.9, 0, 0.2], [0.4, 0.9, 0.8, 0.2]], [[0.7, 0, 0, 0.8], [0, 0.8, 0.7, 1.2], [0.7, 1.2, 0, 2]],
+    [[0, 0, 0, 2], [0.8, 0, 0.8, 2], [0, 0, 0.8, 0.8], [0.8, 0, 0, 0.8]], [[0, 0.2, 0, 1.8], [0.8, 0.2, 0.8, 1.8], [0, 0.2, 0.8, 1.8], [0.8, 0.2, 0, 1.8]],
+    [[0.4, 0, 0.8, 0.6], [0.8, 0.6, 0, 1.6], [0.4, 0, 0, 0.6], [0, 0.6, 0.8, 1.6]], [[0, 0, 0, 2], [0, 0, 0.7, 0.45], [0.7, 0.45, 0, 0.9]]
+  ];
+  function halo(x, th) {
+    var h = x.createRadialGradient(DCX, DCY, 2, DCX, DCY, DR + 8);
+    h.addColorStop(0, th.glow || 'rgba(234,203,134,.22)'); h.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = h; x.fillRect(0, DCY - DR - 10, 100, DR * 2 + 20);
+  }
+  // Cadre commun des emblèmes : halo, double anneau ; laisse un save() ouvert (chaque motif finit par x.restore())
+  function ringFrame(x, th) {
+    var g = gold(x, th, DCY - DR, DCY + DR);
+    x.save(); halo(x, th);
+    x.strokeStyle = g; x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+    x.lineWidth = 0.25; x.beginPath(); x.arc(DCX, DCY, DR + 1.4, 0, 7); x.stroke();
+    return g;
+  }
   var DESIGN = {
+    // Saga du Nord : l’arbre-monde Yggdrasil (branches et racines) dans un anneau de runes, sur film givré
+    runes: function (x, th) {
+      var g = gold(x, th, DCY - DR, DCY + DR);
+      x.save(); halo(x, th);
+      x.strokeStyle = g; x.fillStyle = g; x.lineCap = 'round';
+      x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+      x.lineWidth = 0.3; x.beginPath(); x.arc(DCX, DCY, DR - 5.4, 0, 7); x.stroke();
+      x.beginPath(); x.arc(DCX, DCY, DR + 1.4, 0, 7); x.stroke();
+      for (var k = 0; k < 24; k++) {                    // anneau de runes, chacune tournée vers le centre
+        var t = k / 24 * Math.PI * 2 - Math.PI / 2, rr0 = DR - 2.8, sc = 1.6, rn = RUNES[k % RUNES.length];
+        x.save(); x.translate(DCX + Math.cos(t) * rr0, DCY + Math.sin(t) * rr0); x.rotate(t + Math.PI / 2);
+        x.lineWidth = 0.36; x.beginPath();
+        rn.forEach(function (sg) { x.moveTo((sg[0] - 0.4) * sc, (sg[1] - 1) * sc); x.lineTo((sg[2] - 0.4) * sc, (sg[3] - 1) * sc); });
+        x.stroke(); x.restore();
+      }
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 6.2, 0, 7); x.clip();
+      function branch(px, py, a, len, d, spread, w) {
+        var ex = px + Math.cos(a) * len, ey = py + Math.sin(a) * len;
+        x.lineWidth = w; x.beginPath(); x.moveTo(px, py); x.lineTo(ex, ey); x.stroke();
+        if (d > 0) { branch(ex, ey, a - spread, len * 0.74, d - 1, spread, w * 0.68); branch(ex, ey, a + spread, len * 0.74, d - 1, spread, w * 0.68); }
+        else { x.beginPath(); x.arc(ex, ey, 0.32, 0, 7); x.fill(); }
+      }
+      var by = DCY + 4.2;
+      branch(DCX, by, -Math.PI / 2, 5.2, 6, 0.43, 1.5);           // tronc et ramure
+      branch(DCX, by, Math.PI / 2, 3.4, 4, 0.62, 1.15);             // racines
+      x.lineWidth = 0.22; x.globalAlpha = 0.7; x.beginPath(); x.moveTo(DCX - 9, by); x.lineTo(DCX + 9, by); x.stroke();
+      x.restore();
+      x.restore();
+    },
+    // Saga du Soleil levant : soleil vermillon, torii à l’encre et vagues seigaiha, sur papier crème
+    torii: function (x, th) {
+      var g = gold(x, th, DCY - DR, DCY + DR), ink = th.toriiInk || th.ink, paper = th.foil[2];
+      x.save(); halo(x, th);
+      x.strokeStyle = g; x.lineWidth = 0.55; x.beginPath(); x.arc(DCX, DCY, DR, 0, 7); x.stroke();
+      x.lineWidth = 0.25; x.beginPath(); x.arc(DCX, DCY, DR + 1.4, 0, 7); x.stroke();
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g; x.beginPath(); x.arc(DCX, DCY - 3, 14.5, 0, 7); x.fill();          // soleil
+      var wy = DCY + 8.6;                                                                  // vagues seigaiha
+      for (var row = 0; row < 7; row++) {
+        var yy = wy + row * 2.3, off = row % 2 ? 2.4 : 0;
+        for (var cx = DCX - DR - 4 + off; cx < DCX + DR + 4; cx += 4.8) {
+          [2.5, 1.75, 1.0].forEach(function (r, i) {
+            x.beginPath(); x.arc(cx, yy, r, Math.PI, 0); x.closePath();
+            if (i === 0) { x.fillStyle = paper; x.fill(); }
+            x.lineWidth = 0.22; x.strokeStyle = th.ink2; x.globalAlpha = 0.75; x.stroke(); x.globalAlpha = 1;
+          });
+        }
+      }
+      x.restore();
+      // Torii à l’encre, posé sur les vagues
+      x.fillStyle = ink;
+      var top = DCY - 10.2, base = wy - 0.6;
+      [-1, 1].forEach(function (sd) {                                                      // piliers, légèrement inclinés
+        x.beginPath(); x.moveTo(DCX + sd * 6.0, top + 2.4); x.lineTo(DCX + sd * 7.4, base); x.lineTo(DCX + sd * 5.9, base); x.lineTo(DCX + sd * 4.8, top + 2.4); x.closePath(); x.fill();
+      });
+      x.beginPath(); x.moveTo(DCX - 12.5, top - 1.2); x.quadraticCurveTo(DCX, top + 1.2, DCX + 12.5, top - 1.2);   // kasagi, bouts relevés
+      x.lineTo(DCX + 11.6, top + 0.9); x.quadraticCurveTo(DCX, top + 2.9, DCX - 11.6, top + 0.9); x.closePath(); x.fill();
+      x.fillRect(DCX - 10.2, top + 2.6, 20.4, 0.9);                                        // shimaki
+      x.fillRect(DCX - 9.4, top + 5.8, 18.8, 1.1);                                         // nuki
+      x.fillRect(DCX - 0.6, top + 2.6, 1.2, 3.4);                                          // gakuzuka
+      x.restore();
+    },
     // 1. Astrolabe : rose des vents gravée dans un limbe gradué, sur bleu nuit
     astrolabe: function (x, th) {
       var g = gold(x, th, DCY - DR, DCY + DR);
@@ -393,10 +549,404 @@
       x.fillStyle = g; x.beginPath(); x.arc(DCX, DCY, 6.2, 0, 7); x.fill();   // disque solaire
       x.strokeStyle = th.facet || 'rgba(0,0,0,.5)'; x.lineWidth = 0.3; x.beginPath(); x.arc(DCX, DCY, 4.6, 0, 7); x.stroke();
       x.restore();
+    },
+
+    /* ---------- Propositions (page Design des boosters) et Saga du Nil ---------- */
+    // Mont Fuji : soleil derrière le cône enneigé, bandes de nuages
+    fuji: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g; x.beginPath(); x.arc(DCX + 7, DCY - 7, 7.5, 0, 7); x.fill();
+      x.fillStyle = th.facet || 'rgba(0,0,0,.6)';
+      x.beginPath(); x.moveTo(DCX - 22, DCY + 13); x.quadraticCurveTo(DCX - 8, DCY + 2, DCX - 4.5, DCY - 9);
+      x.lineTo(DCX + 4.5, DCY - 9); x.quadraticCurveTo(DCX + 8, DCY + 2, DCX + 22, DCY + 13); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 0.4; x.stroke();
+      x.fillStyle = g; x.beginPath(); x.moveTo(DCX - 4.5, DCY - 9); x.lineTo(DCX + 4.5, DCY - 9);           // neige
+      x.lineTo(DCX + 6.6, DCY - 4.6); x.lineTo(DCX + 3.4, DCY - 5.8); x.lineTo(DCX + 1.2, DCY - 3.6); x.lineTo(DCX - 1.4, DCY - 5.6);
+      x.lineTo(DCX - 3.8, DCY - 3.8); x.lineTo(DCX - 6.6, DCY - 4.6); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 0.45; x.lineCap = 'round';
+      [[DCY + 6, -16, -4], [DCY + 9.5, 3, 15], [DCY + 15.5, -12, 10]].forEach(function (c) {           // nuages
+        x.beginPath(); x.moveTo(DCX + c[1], c[0]);
+        for (var k = 0; k <= 8; k++) x.lineTo(DCX + c[1] + (c[2] - c[1]) * k / 8, c[0] + Math.sin(k * 1.6) * 0.6);
+        x.stroke();
+      });
+      x.restore(); x.restore();
+    },
+    // Grande vague : une crête qui s’enroule en griffes d’écume, un petit Fuji au loin
+    vague: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.strokeStyle = g; x.lineCap = 'round';
+      for (var k = 0; k < 6; k++) {                                     // corps de la vague : courbes parallèles
+        var o = k * 1.9;
+        x.lineWidth = k ? 0.38 : 0.7;
+        x.beginPath(); x.moveTo(DCX - 22, DCY + 16 - o * 0.3);
+        x.bezierCurveTo(DCX - 14, DCY + 6 - o, DCX - 6, DCY - 14 + o * 0.6, DCX + 7 - o * 0.4, DCY - 12 + o);
+        x.bezierCurveTo(DCX + 14, DCY - 11 + o, DCX + 13, DCY - 3 + o * 0.7, DCX + 8, DCY - 3 + o * 0.6);
+        x.stroke();
+      }
+      x.fillStyle = g;
+      for (var c = 0; c < 9; c++) {                                     // griffes d’écume
+        var a = -2.6 + c * 0.32, cx = DCX + 6 + Math.cos(a) * 9, cy = DCY - 6 + Math.sin(a) * 8;
+        x.beginPath(); x.arc(cx, cy, 1.1 - c * 0.06, 0, 7); x.fill();
+      }
+      x.fillStyle = th.facet || 'rgba(0,0,0,.5)';                        // le Fuji, petit, au pied de la vague
+      x.beginPath(); x.moveTo(DCX + 2, DCY + 15); x.lineTo(DCX + 8, DCY + 8.6); x.lineTo(DCX + 10, DCY + 8.6); x.lineTo(DCX + 16, DCY + 15); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 0.3; x.stroke();
+      x.restore(); x.restore();
+    },
+    // Sakura : une grande fleur de cerisier, deux petites et la branche
+    sakura: function (x, th) {
+      var g = ringFrame(x, th);
+      function flower(cx, cy, r, rot) {
+        x.save(); x.translate(cx, cy); x.rotate(rot);
+        for (var k = 0; k < 5; k++) {
+          x.save(); x.rotate(k * Math.PI * 2 / 5);
+          x.beginPath(); x.moveTo(0, 0);
+          x.bezierCurveTo(-r * 0.55, -r * 0.3, -r * 0.5, -r * 0.95, -r * 0.12, -r);
+          x.lineTo(0, -r * 0.84); x.lineTo(r * 0.12, -r);
+          x.bezierCurveTo(r * 0.5, -r * 0.95, r * 0.55, -r * 0.3, 0, 0);
+          x.fillStyle = g; x.fill(); x.lineWidth = 0.2; x.strokeStyle = th.facet || 'rgba(0,0,0,.4)'; x.stroke();
+          x.restore();
+        }
+        x.fillStyle = th.facet || 'rgba(0,0,0,.5)'; x.beginPath(); x.arc(0, 0, r * 0.16, 0, 7); x.fill();
+        x.restore();
+      }
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.strokeStyle = g; x.lineWidth = 1.1; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(DCX - 20, DCY + 14); x.quadraticCurveTo(DCX - 6, DCY + 8, DCX + 2, DCY - 2); x.quadraticCurveTo(DCX + 8, DCY - 10, DCX + 18, DCY - 12); x.stroke();
+      x.lineWidth = 0.6; x.beginPath(); x.moveTo(DCX - 8, DCY + 8.5); x.quadraticCurveTo(DCX - 12, DCY + 2, DCX - 11, DCY - 4); x.stroke();
+      flower(DCX + 2, DCY - 1, 8.5, 0.2);
+      flower(DCX - 11, DCY - 6, 4.6, 0.7);
+      flower(DCX + 13, DCY - 11, 4, -0.3);
+      x.restore(); x.restore();
+    },
+    // Tomoe (mitsudomoe) : trois virgules qui tournent — tête ronde, queue qui longe le cercle et s’effile
+    tomoe: function (x, th) {
+      var g = ringFrame(x, th), R = 15;
+      x.save(); x.translate(DCX, DCY);
+      x.fillStyle = g;
+      for (var k = 0; k < 3; k++) {
+        var a = k * Math.PI * 2 / 3 - Math.PI / 2, hc = R * 0.5, hr = R * 0.3;
+        var hx = Math.cos(a) * hc, hy = Math.sin(a) * hc;
+        x.beginPath(); x.arc(hx, hy, hr, 0, 7); x.fill();                 // tête
+        x.beginPath();                                                      // queue : part du dos de la tête, longe le cercle, s’effile
+        x.moveTo(hx + Math.cos(a - 0.35) * hr, hy + Math.sin(a - 0.35) * hr);
+        x.arc(0, 0, R * 0.97, a + 0.05, a + 1.95, false);
+        x.quadraticCurveTo(Math.cos(a + 1.05) * R * 0.74, Math.sin(a + 1.05) * R * 0.74,
+          hx + Math.cos(a + Math.PI * 0.55) * hr, hy + Math.sin(a + Math.PI * 0.55) * hr);
+        x.closePath(); x.fill();
+      }
+      x.strokeStyle = g; x.lineWidth = 0.45; x.beginPath(); x.arc(0, 0, R + 2.2, 0, 7); x.stroke();
+      x.restore(); x.restore();
+    },
+    // Pagode à cinq toits relevés, soleil derrière
+    pagode: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g; x.beginPath(); x.arc(DCX + 9, DCY - 9, 6, 0, 7); x.fill();
+      x.fillStyle = th.toriiInk || th.facet || 'rgba(0,0,0,.7)';
+      x.fillRect(DCX - 0.35, DCY - 21, 0.7, 7);                           // flèche
+      for (var k = 0; k < 5; k++) {
+        var y = DCY - 13 + k * 5.6, w = 6 + k * 2.2;
+        x.fillRect(DCX - w * 0.55, y + 1.4, w * 1.1, 3.6);                 // étage
+        x.beginPath(); x.moveTo(DCX - w - 2.2, y - 0.8); x.quadraticCurveTo(DCX - w, y + 1.6, DCX, y + 0.6);   // toit relevé
+        x.quadraticCurveTo(DCX + w, y + 1.6, DCX + w + 2.2, y - 0.8); x.lineTo(DCX + w * 0.7, y + 2.2); x.lineTo(DCX - w * 0.7, y + 2.2); x.closePath(); x.fill();
+      }
+      x.strokeStyle = g; x.lineWidth = 0.35; x.beginPath(); x.moveTo(DCX - 22, DCY + 16.4); x.lineTo(DCX + 22, DCY + 16.4); x.stroke();
+      x.restore(); x.restore();
+    },
+    // Drakkar : coque à proue de dragon, voile rayée, vagues
+    drakkar: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.6)';
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g;
+      x.fillRect(DCX - 0.45, DCY - 17, 0.9, 20);                          // mât
+      x.beginPath(); x.moveTo(DCX - 9, DCY - 14); x.quadraticCurveTo(DCX, DCY - 16, DCX + 9, DCY - 14);   // voile
+      x.lineTo(DCX + 9.5, DCY + 1); x.quadraticCurveTo(DCX, DCY - 1, DCX - 9.5, DCY + 1); x.closePath(); x.fill();
+      x.fillStyle = dk; for (var k = 0; k < 3; k++) x.fillRect(DCX - 6.8 + k * 5.2, DCY - 14.4, 2.4, 15);   // rayures
+      x.fillStyle = g;
+      x.beginPath(); x.moveTo(DCX - 17, DCY + 2); x.quadraticCurveTo(DCX, DCY + 11, DCX + 17, DCY + 2);   // coque
+      x.lineTo(DCX + 14, DCY + 6.5); x.quadraticCurveTo(DCX, DCY + 12, DCX - 14, DCY + 6.5); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 1.1; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(DCX + 16, DCY + 3); x.quadraticCurveTo(DCX + 21, DCY - 4, DCX + 18, DCY - 8); x.quadraticCurveTo(DCX + 16, DCY - 10, DCX + 15.5, DCY - 7.5); x.stroke();   // proue
+      x.beginPath(); x.moveTo(DCX - 16, DCY + 3); x.quadraticCurveTo(DCX - 20, DCY - 3, DCX - 17.5, DCY - 6.5); x.stroke();   // poupe
+      x.fillStyle = dk; for (var s = 0; s < 6; s++) { x.beginPath(); x.arc(DCX - 10 + s * 4, DCY + 4.6, 1.15, 0, 7); x.fill(); }   // boucliers
+      x.lineWidth = 0.4;
+      for (var r = 0; r < 3; r++) { x.beginPath(); for (var k2 = 0; k2 <= 22; k2++) { var xx = DCX - 22 + k2 * 2, yy = DCY + 12 + r * 2.6 + Math.sin(k2 * 1.3 + r) * 0.7; if (k2) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); }
+      x.restore(); x.restore();
+    },
+    // Aurore boréale au-dessus des montagnes, étoiles
+    aurore: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      for (var b = 0; b < 3; b++) {                                       // rubans de l’aurore
+        x.save(); x.globalAlpha = 0.55 - b * 0.12;
+        for (var k = 0; k < 40; k++) {
+          var xx = DCX - 22 + k * 1.1, yy = DCY - 9 + b * 4 + Math.sin(k * 0.24 + b * 1.7) * 4;
+          var gr = x.createLinearGradient(0, yy - 9, 0, yy + 2);
+          gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, (th.motif || [th.gold, th.gold])[1]);
+          x.fillStyle = gr; x.fillRect(xx, yy - 9, 1.15, 11);
+        }
+        x.restore();
+      }
+      x.fillStyle = g;
+      [[-14, -15], [-6, -18], [4, -16], [12, -19], [17, -12], [-18, -9]].forEach(function (s) { x.beginPath(); x.arc(DCX + s[0], DCY + s[1], 0.45, 0, 7); x.fill(); });
+      x.fillStyle = th.facet || 'rgba(0,0,0,.7)';
+      x.beginPath(); x.moveTo(DCX - 23, DCY + 23); x.lineTo(DCX - 23, DCY + 10); x.lineTo(DCX - 13, DCY + 2); x.lineTo(DCX - 7, DCY + 7);
+      x.lineTo(DCX + 2, DCY - 1); x.lineTo(DCX + 10, DCY + 7); x.lineTo(DCX + 15, DCY + 4); x.lineTo(DCX + 23, DCY + 11); x.lineTo(DCX + 23, DCY + 23); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 0.4; x.stroke();
+      x.restore(); x.restore();
+    },
+    // Mjölnir : le marteau de Thor, entrelacs sur la tête, manche gainé
+    mjolnir: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.6)';
+      x.save(); x.translate(DCX, DCY);
+      x.fillStyle = g;
+      x.beginPath(); x.moveTo(-13, -15); x.lineTo(13, -15); x.lineTo(15, -11); x.lineTo(14, -2); x.lineTo(11, 1); x.lineTo(-11, 1); x.lineTo(-14, -2); x.lineTo(-15, -11); x.closePath(); x.fill();
+      x.strokeStyle = dk; x.lineWidth = 0.5;
+      x.beginPath(); x.moveTo(-10, -12); x.bezierCurveTo(-4, -2, 4, -14, 10, -4); x.moveTo(-10, -4); x.bezierCurveTo(-4, -14, 4, -2, 10, -12); x.stroke();
+      x.strokeRect(-12.5, -13.5, 25, 13);
+      x.fillStyle = g; x.fillRect(-1.8, 1, 3.6, 13);                       // manche
+      x.strokeStyle = dk; x.lineWidth = 0.35;
+      for (var k = 0; k < 6; k++) { x.beginPath(); x.moveTo(-1.8, 3 + k * 2); x.lineTo(1.8, 1.6 + k * 2); x.stroke(); }
+      x.fillStyle = g; x.beginPath(); x.arc(0, 16.5, 2.6, 0, 7); x.fill(); // pommeau
+      x.strokeStyle = dk; x.beginPath(); x.arc(0, 16.5, 1.3, 0, 7); x.stroke();
+      x.restore(); x.restore();
+    },
+    // Bouclier rond : planches, umbo, rivets
+    bouclier: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.6)';
+      x.save(); x.translate(DCX, DCY);
+      x.fillStyle = g; x.beginPath(); x.arc(0, 0, 17.5, 0, 7); x.fill();
+      x.strokeStyle = dk; x.lineWidth = 0.4;
+      x.save(); x.beginPath(); x.arc(0, 0, 15.6, 0, 7); x.clip();
+      for (var k = -4; k <= 4; k++) { x.beginPath(); x.moveTo(k * 3.6, -18); x.lineTo(k * 3.6, 18); x.stroke(); }   // planches
+      x.restore();
+      x.lineWidth = 0.7; x.beginPath(); x.arc(0, 0, 15.6, 0, 7); x.stroke();
+      for (var r = 0; r < 16; r++) { var a = r * Math.PI / 8; x.fillStyle = dk; x.beginPath(); x.arc(Math.cos(a) * 16.6, Math.sin(a) * 16.6, 0.45, 0, 7); x.fill(); }
+      x.fillStyle = dk; x.beginPath(); x.arc(0, 0, 5.6, 0, 7); x.fill();     // umbo
+      x.fillStyle = g; x.beginPath(); x.arc(0, 0, 4.4, 0, 7); x.fill();
+      x.fillStyle = 'rgba(255,255,255,.35)'; x.beginPath(); x.arc(-1.3, -1.3, 1.4, 0, 7); x.fill();
+      x.restore(); x.restore();
+    },
+    // Entrelacs : deux rubans tressés autour d’une rune (Algiz)
+    entrelacs: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.6)';
+      x.save(); x.translate(DCX, DCY); x.lineCap = 'round';
+      function band(ph) {
+        x.beginPath();
+        for (var k = 0; k <= 96; k++) { var a = k / 96 * Math.PI * 2, r = 15 + Math.sin(a * 6 + ph) * 3.2; if (k) x.lineTo(Math.cos(a) * r, Math.sin(a) * r); else x.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+        x.lineWidth = 2.2; x.strokeStyle = dk; x.stroke(); x.lineWidth = 1.5; x.strokeStyle = g; x.stroke();
+      }
+      band(0); band(Math.PI);
+      x.strokeStyle = g; x.lineWidth = 1.3;                                // rune Algiz
+      x.beginPath(); x.moveTo(0, 8); x.lineTo(0, -8); x.moveTo(0, -1); x.lineTo(-5, -7.5); x.moveTo(0, -1); x.lineTo(5, -7.5); x.stroke();
+      x.restore(); x.restore();
+    },
+    // ---------- Saga du Nil : propositions ----------
+    // Œil d’Horus (oudjat) : amande, pupille, sourcil, spirale et larme
+    oudjat: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.translate(DCX, DCY - 1); x.strokeStyle = g; x.fillStyle = g; x.lineCap = 'round'; x.lineJoin = 'round';
+      x.lineWidth = 1.5;
+      x.beginPath(); x.moveTo(-13, 0); x.quadraticCurveTo(0, -11, 14, -1); x.quadraticCurveTo(0, 7, -13, 0); x.stroke();   // amande
+      x.beginPath(); x.arc(0.5, -1.6, 3.6, 0, 7); x.fill();                                                               // pupille
+      x.lineWidth = 1.8; x.beginPath(); x.moveTo(-13, -8.5); x.quadraticCurveTo(0, -16, 15, -8); x.stroke();               // sourcil
+      x.lineWidth = 1.3; x.beginPath(); x.moveTo(14, -1); x.lineTo(19, -1); x.stroke();                                   // trait vers la tempe
+      x.lineWidth = 1.4; x.beginPath(); x.moveTo(-1, 3.4); x.lineTo(-2.5, 13); x.stroke();                                // larme
+      x.beginPath(); x.moveTo(4, 3.2); x.bezierCurveTo(6, 9, 13, 10, 12, 14.5); x.bezierCurveTo(11, 17.5, 7, 16, 8.5, 13.5); x.stroke();   // spirale
+      x.restore(); x.restore();
+    },
+    // Scarabée (Khépri) : il pousse le soleil, ailes déployées
+    scarabee: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.5)';
+      x.save(); x.translate(DCX, DCY + 2); x.fillStyle = g; x.strokeStyle = g; x.lineCap = 'round';
+      [-1, 1].forEach(function (sd) {                                     // ailes
+        for (var row = 0; row < 2; row++) for (var f = 0; f < 6 - row; f++) {
+          var x0 = sd * (5.5 + f * 2), y0 = -2 + row * 2.4 + f * 0.6, len = 4.6 - row * 1.1;
+          x.beginPath(); x.moveTo(x0, y0); x.lineTo(x0 + sd * 1.7, y0 + 0.4); x.lineTo(x0 + sd * 1.2, y0 + len); x.lineTo(x0 - sd * 0.2, y0 + len - 0.7); x.closePath(); x.fill();
+        }
+      });
+      x.beginPath(); x.ellipse(0, 4, 5.4, 7.2, 0, 0, 7); x.fill();         // corps
+      x.beginPath(); x.ellipse(0, -3.6, 3.6, 2.4, 0, 0, 7); x.fill();      // tête
+      x.strokeStyle = dk; x.lineWidth = 0.4; x.beginPath(); x.moveTo(0, -1.2); x.lineTo(0, 11); x.moveTo(-5, 1.4); x.lineTo(5, 1.4); x.stroke();
+      x.strokeStyle = g; x.lineWidth = 0.7;
+      x.beginPath(); x.moveTo(-2.4, -5.4); x.lineTo(-4, -9.5); x.moveTo(2.4, -5.4); x.lineTo(4, -9.5);   // pattes avant
+      x.moveTo(-4.6, 7); x.lineTo(-8, 11); x.moveTo(4.6, 7); x.lineTo(8, 11); x.stroke();
+      x.fillStyle = g; x.beginPath(); x.arc(0, -13.5, 4.3, 0, 7); x.fill(); // le soleil
+      x.restore(); x.restore();
+    },
+    // Ankh : la croix de vie, entre deux étoiles
+    ankh: function (x, th) {
+      var g = ringFrame(x, th);
+      x.save(); x.translate(DCX, DCY); x.fillStyle = g; x.strokeStyle = g;
+      x.lineWidth = 2.6; x.beginPath(); x.ellipse(0, -9.5, 4.6, 6.2, 0, 0, 7); x.stroke();   // boucle
+      x.beginPath(); x.moveTo(-10.5, -2.4); x.lineTo(10.5, -2.4); x.lineTo(10.5, 1.2); x.lineTo(-10.5, 1.2); x.closePath(); x.fill();   // traverse
+      x.beginPath(); x.moveTo(-1.6, 1); x.lineTo(1.6, 1); x.lineTo(2.6, 17); x.lineTo(-2.6, 17); x.closePath(); x.fill();   // tige
+      function star(cx, cy, r) { x.beginPath(); for (var k = 0; k < 10; k++) { var a = k * Math.PI / 5 - Math.PI / 2, rr = k % 2 ? r * 0.42 : r; x.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); } x.closePath(); x.fill(); }
+      star(-13, -10, 2.2); star(13, -10, 2.2); star(-12, 9, 1.4); star(12, 9, 1.4);
+      x.restore(); x.restore();
+    },
+    // Barque solaire de Râ : coque en papyrus aux bouts relevés, naos et soleil, eaux du Nil
+    barque: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.5)';
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g;
+      x.beginPath(); x.arc(DCX, DCY - 9, 5.2, 0, 7); x.fill();             // soleil
+      x.fillRect(DCX - 4.2, DCY - 2.6, 8.4, 5.6);                          // naos
+      x.fillStyle = dk; x.fillRect(DCX - 2.2, DCY - 1.2, 4.4, 4.2);
+      x.fillStyle = g;
+      x.beginPath(); x.moveTo(DCX - 19, DCY - 4);                            // coque
+      x.quadraticCurveTo(DCX - 16, DCY + 5, DCX, DCY + 6);
+      x.quadraticCurveTo(DCX + 16, DCY + 5, DCX + 19, DCY - 4);
+      x.quadraticCurveTo(DCX + 15, DCY + 1, DCX + 12, DCY + 3); x.lineTo(DCX - 12, DCY + 3);
+      x.quadraticCurveTo(DCX - 15, DCY + 1, DCX - 19, DCY - 4); x.closePath(); x.fill();
+      x.strokeStyle = g; x.lineWidth = 0.9; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(DCX - 19, DCY - 4); x.quadraticCurveTo(DCX - 21, DCY - 8, DCX - 18, DCY - 9.5); x.stroke();   // ombelles de papyrus
+      x.beginPath(); x.moveTo(DCX + 19, DCY - 4); x.quadraticCurveTo(DCX + 21, DCY - 8, DCX + 18, DCY - 9.5); x.stroke();
+      x.lineWidth = 0.6; x.beginPath(); x.moveTo(DCX + 9, DCY + 3); x.lineTo(DCX + 13, DCY + 10); x.stroke();   // rame
+      x.lineWidth = 0.4;
+      for (var r = 0; r < 3; r++) { x.beginPath(); for (var k = 0; k <= 22; k++) { var xx = DCX - 22 + k * 2, yy = DCY + 11 + r * 2.4 + Math.sin(k * 1.2 + r) * 0.55; if (k) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); }
+      x.restore(); x.restore();
+    },
+    // Lotus : trois fleurs de lotus et deux boutons sur l’eau
+    lotus: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.5)';
+      function flower(cx, cy, s) {
+        x.save(); x.translate(cx, cy); x.scale(s, s);
+        [[-1, 1], [1, 1], [-0.55, 0.85], [0.55, 0.85], [0, 1]].forEach(function (pt, i) {   // pétales, du fond vers l’avant
+          x.save(); x.rotate(pt[0] * 0.75);
+          x.beginPath(); x.moveTo(0, 0); x.quadraticCurveTo(-3.2 * pt[1], -5, 0, -10 * pt[1]); x.quadraticCurveTo(3.2 * pt[1], -5, 0, 0);
+          x.fillStyle = g; x.fill(); x.lineWidth = 0.3; x.strokeStyle = dk; x.stroke();
+          x.restore();
+        });
+        x.restore();
+      }
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.strokeStyle = g; x.lineWidth = 0.7; x.lineCap = 'round';
+      [[0, -2], [-10, 3], [10, 3], [-16, 7], [16, 6]].forEach(function (p) { x.beginPath(); x.moveTo(DCX + p[0], DCY + p[1]); x.lineTo(DCX + p[0] * 0.6, DCY + 13); x.stroke(); });   // tiges
+      flower(DCX, DCY - 2, 1.25); flower(DCX - 10, DCY + 3, 0.9); flower(DCX + 10, DCY + 3, 0.9);
+      x.fillStyle = g; [[-16, 7], [16, 6]].forEach(function (p) { x.beginPath(); x.ellipse(DCX + p[0], DCY + p[1] - 2.2, 1.4, 2.6, 0, 0, 7); x.fill(); });   // boutons
+      x.lineWidth = 0.4;
+      for (var r = 0; r < 3; r++) { x.beginPath(); for (var k = 0; k <= 22; k++) { var xx = DCX - 22 + k * 2, yy = DCY + 13 + r * 2.4 + Math.sin(k * 1.1 + r) * 0.5; if (k) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); }
+      x.restore(); x.restore();
+    },
+    // Saga du Nil : soleil ailé au-dessus des pyramides et du fleuve
+    ailes: function (x, th) {
+      var g = ringFrame(x, th), dk = th.facet || 'rgba(0,0,0,.5)';
+      x.save(); x.beginPath(); x.arc(DCX, DCY, DR - 1.6, 0, 7); x.clip();
+      x.fillStyle = g;
+      [-1, 1].forEach(function (sd) {                                     // ailes : trois rangs de plumes
+        for (var row = 0; row < 3; row++) {
+          for (var f = 0; f < 9 - row * 2; f++) {
+            var x0 = DCX + sd * (5 + f * 1.9), y0 = DCY - 10 + row * 2.1 + f * 0.32, len = 4.2 - row * 0.9 + f * 0.12;
+            x.beginPath(); x.moveTo(x0, y0); x.lineTo(x0 + sd * 1.5, y0 + 0.2); x.lineTo(x0 + sd * 1.1, y0 + len); x.lineTo(x0 - sd * 0.2, y0 + len - 0.6); x.closePath(); x.fill();
+          }
+        }
+      });
+      x.beginPath(); x.arc(DCX, DCY - 9, 4.2, 0, 7); x.fill();             // disque solaire
+      x.strokeStyle = dk; x.lineWidth = 0.35; x.beginPath(); x.arc(DCX, DCY - 9, 3.1, 0, 7); x.stroke();
+      [[-11, 7], [0, 9.5], [10, 6]].forEach(function (p) {                // pyramides
+        var bx = DCX + p[0], h = p[1], by = DCY + 13;
+        x.fillStyle = g; x.beginPath(); x.moveTo(bx - h * 0.95, by); x.lineTo(bx, by - h); x.lineTo(bx + h * 0.95, by); x.closePath(); x.fill();
+        x.fillStyle = dk; x.beginPath(); x.moveTo(bx, by - h); x.lineTo(bx + h * 0.95, by); x.lineTo(bx + h * 0.25, by); x.closePath(); x.fill();
+      });
+      x.strokeStyle = g; x.lineWidth = 0.4; x.lineCap = 'round';           // le Nil
+      for (var r = 0; r < 3; r++) { x.beginPath(); for (var k = 0; k <= 22; k++) { var xx = DCX - 22 + k * 2, yy = DCY + 15.5 + r * 2.2 + Math.sin(k * 1.1 + r) * 0.5; if (k) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); }
+      x.restore(); x.restore();
     }
   };
 
+  /* Face « référence » : l’illustration occupe tout le sachet, le logo en haut, le nom en grandes capitales dorées en bas */
+  function drawFrontRef(p, th, art) {
+    var c = cv(100 * S, 160 * S), x = ctxS(c), R = ART;
+    x.atlasStroke = th.stroke || 0;
+    foil(x, th); crimps(x, th);
+    x.save(); x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2.4 * S; x.shadowOffsetY = 0.8 * S;
+    rr(x, R.x, R.y, R.w, R.h, R.r); x.fillStyle = '#15110C'; x.fill(); x.restore();
+    x.save(); rr(x, R.x, R.y, R.w, R.h, R.r); x.clip();
+    if (art) {
+      var k = Math.max(R.w / art.width, R.h / art.height), aw = art.width * k, ah = art.height * k;
+      x.drawImage(art, R.x + (R.w - aw) / 2, R.y + (R.h - ah) * 0.4, aw, ah);
+    }
+    // Impression : l’illustration prend la teinte du sachet et gagne en profondeur (les illustrations générées sont pâles)
+    var real = !!(A.ED[p.cover] && A.ED[p.cover].media);                                // vraie peinture : teinte légère
+    x.globalCompositeOperation = 'multiply'; x.globalAlpha = real ? 0.28 : 0.62; x.fillStyle = th.foil[1]; x.fillRect(R.x, R.y, R.w, R.h);
+    x.globalCompositeOperation = 'soft-light'; x.globalAlpha = real ? 0.3 : 0.5; x.fillStyle = th.foil[0]; x.fillRect(R.x, R.y, R.w, R.h);
+    x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+    var vg = x.createRadialGradient(50, R.y + R.h * 0.5, R.w * 0.3, 50, R.y + R.h * 0.5, R.h * 0.62);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.35)'); x.fillStyle = vg; x.fillRect(R.x, R.y, R.w, R.h);
+    var gt = x.createLinearGradient(0, R.y, 0, R.y + R.h * 0.38);                     // voile sombre en haut : le logo reste lisible
+    gt.addColorStop(0, 'rgba(8,6,4,.9)'); gt.addColorStop(0.5, 'rgba(8,6,4,.55)'); gt.addColorStop(1, 'rgba(8,6,4,0)'); x.fillStyle = gt; x.fillRect(R.x, R.y, R.w, R.h * 0.38);
+    var gb = x.createLinearGradient(0, R.y + R.h * 0.58, 0, R.y + R.h);               // et en bas, pour le nom
+    gb.addColorStop(0, 'rgba(8,6,4,0)'); gb.addColorStop(1, 'rgba(8,6,4,.88)'); x.fillStyle = gb; x.fillRect(R.x, R.y + R.h * 0.58, R.w, R.h * 0.42);
+    x.restore();
+    x.lineWidth = 0.45; x.strokeStyle = gold(x, th, R.y, R.y + R.h); rr(x, R.x, R.y, R.w, R.h, R.r); x.stroke();
+    // Ligne de déchirure, discrète sur l’illustration
+    x.strokeStyle = 'rgba(255,255,255,.5)'; x.lineWidth = 0.3; x.setLineDash([1.1, 0.9]);
+    x.beginPath(); x.moveTo(0, TY); x.lineTo(100, TY); x.stroke(); x.setLineDash([]);
+    x.fillStyle = 'rgba(255,255,255,.6)'; x.beginPath(); x.moveTo(6.4, TY - 1.5); x.lineTo(9, TY); x.lineTo(6.4, TY + 1.5); x.fill();
+    // Logo
+    x.textBaseline = 'alphabetic';
+    x.save(); x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 1.6 * S;
+    brand(x, th, 50, R.y + 25.5, 15.5);
+    x.fillStyle = '#F6EEE0'; x.font = '600 3.6px ' + SANS; spaced(x, 'BOOSTER', 50, R.y + 31.5, 1.5);
+    x.restore();
+    // Nom du sachet : capitales dorées, sur une ligne si possible
+    var name = p.name.toUpperCase(), fs = 8.8, lines;
+    x.font = '600 ' + fs + 'px ' + SANS;
+    while (fs > 6.6 && x.measureText(name).width > 82) { fs -= 0.2; x.font = '600 ' + fs.toFixed(1) + 'px ' + SANS; }
+    lines = x.measureText(name).width > 82 ? wrap(x, name, 82) : [name];
+    var lh = fs * 1.05, by = R.y + R.h - 6.5 - (lines.length - 1) * lh;
+    x.save(); x.shadowColor = 'rgba(0,0,0,.7)'; x.shadowBlur = 1.4 * S; x.shadowOffsetY = 0.3 * S;
+    x.fillStyle = 'rgba(246,238,224,.86)'; x.font = '600 2.9px ' + SANS; spaced(x, p.kicker.toUpperCase(), 50, by - fs * 0.95 - 1.2, 0.6);
+    x.font = '600 ' + fs.toFixed(1) + 'px ' + SANS; x.textAlign = 'center';
+    x.fillStyle = gold(x, th, by - fs, by + (lines.length - 1) * lh);
+    lines.forEach(function (l, i) { x.fillText(l, 50, by + i * lh); });
+    x.restore();
+    teeth(x);
+    return c;
+  }
+  /* Sachet « référence » : l’encre (logo, motif, textes) est un marquage brillant, plus métallique et plus lisse que le film.
+     On la repère en comparant la face avec le même film sans rien d’imprimé, puis on en fait la carte rugosité / métal du sachet
+     (vert = rugosité, bleu = métal ; le matériau a alors un métal de 1 et la carte porte le métal propre au thème). */
+  var FILM_R = 112, INK_R = 18;                    // rugosité (0–255) du film et de l’encre, sachet « référence »
+  function foilMetal(th) { return Math.min(1, 0.55 + th.metal * 0.4); }
+  function inkPBR(face, th) {
+    var w = 400, h = 640, plain = cv(100 * S, 160 * S), px = ctxS(plain);   // assez fin pour que les bords de l’encre restent nets
+    foil(px, th); crimps(px, th);
+    function px8(c) { var o = cv(w, h), ox = o.getContext('2d'); ox.drawImage(c, 0, 0, w, h); return ox.getImageData(0, 0, w, h).data; }
+    var A1 = px8(face), B1 = px8(plain);
+    var out = cv(w, h), ox = out.getContext('2d'), img = ox.createImageData(w, h), d = img.data;
+    var glow = cv(w, h), gx = glow.getContext('2d'), gimg = gx.createImageData(w, h), gd = gimg.data;   // éclat propre de l’encre
+    // Film métallisé (reflets teintés par la couleur du sachet, pas de reflets blancs « plastique ») ; encre en métal poli
+    var mi = 255;
+    var mf = Math.round(foilMetal(th) * 255), ms = Math.round(foilMetal(th) * 0.85 * 255), ct = CRIMP_T / 160 * h, cb = h - CRIMP_B / 160 * h;
+    for (var y = 0; y < h; y++) for (var xx = 0; xx < w; xx++) {
+      var i = (y * w + xx) * 4, seal = y < ct || y > cb;
+      var diff = Math.abs(A1[i] - B1[i]) + Math.abs(A1[i + 1] - B1[i + 1]) + Math.abs(A1[i + 2] - B1[i + 2]);
+      var k = Math.max(0, Math.min(1, (diff - 40) / 90));          // part d’encre dans le pixel
+      if (y > TY / 160 * h - 1.5 && y < TY / 160 * h + 1.5) k = 0;    // la ligne de déchirure n’est pas de l’encre
+      var br = 0;   // pas de brossage dans les reflets : une rugosité qui change d’un pixel à l’autre fait scintiller (aspect pixelisé)
+      d[i] = 0;
+      d[i + 1] = Math.round((seal ? 150 : FILM_R + br) * (1 - k) + INK_R * k);   // film satiné, encre polie
+      d[i + 2] = Math.round((seal ? ms : mf) * (1 - k) + mi * k);
+      d[i + 3] = 255;
+      gd[i] = A1[i] * k; gd[i + 1] = A1[i + 1] * k; gd[i + 2] = A1[i + 2] * k; gd[i + 3] = 255;
+    }
+    ox.putImageData(img, 0, 0); gx.putImageData(gimg, 0, 0);
+    return { pbr: tex(out, false), glow: tex(glow, true) };
+  }
+  function plainPBR(th) {
+    var w = 50, h = 80, c = cv(w, h), x = c.getContext('2d');
+    x.fillStyle = 'rgb(0,' + FILM_R + ',' + Math.round(foilMetal(th) * 255) + ')'; x.fillRect(0, 0, w, h);   // dos : même film que la face
+    x.fillStyle = 'rgb(0,150,' + Math.round(foilMetal(th) * 0.85 * 255) + ')';
+    x.fillRect(0, 0, w, CRIMP_T / 160 * h); x.fillRect(0, h - CRIMP_B / 160 * h, w, CRIMP_B / 160 * h);
+    return tex(c, false);
+  }
   function drawFront(p, th, art) {
+    if (REF && FULL_ART) return drawFrontRef(p, th, art);
     var c = cv(100 * S, 160 * S), x = ctxS(c);
     x.atlasStroke = th.stroke || 0;
     foil(x, th); crimps(x, th);
@@ -427,7 +977,12 @@
     // Titre
     var y = WIN.y + WIN.h + 6.2;
     x.save(); x.shadowColor = th.halo || 'rgba(0,0,0,.45)'; x.shadowBlur = 1.2 * S; x.shadowOffsetY = 0.3 * S;      // lisibilité sur le film
-    x.fillStyle = th.gold; x.font = '600 3.5px ' + SANS; spaced(x, p.kicker.toUpperCase(), 50, y, 0.55);
+    // Surtitre : réduit s’il est trop long pour tenir dans la largeur du sachet (ex. « Récompense · carte numérotée garantie »)
+    var kt = p.kicker.toUpperCase(), kf = 3.5;
+    x.fillStyle = th.gold; x.font = '600 ' + kf + 'px ' + SANS;
+    var kw = spaced(x, kt, -1000, -1000, 0.55);
+    if (kw > 80) { kf = kf * 80 / kw; x.font = '600 ' + kf.toFixed(2) + 'px ' + SANS; }
+    spaced(x, kt, 50, y, 0.55 * kf / 3.5);
     x.font = '600 9.6px ' + SERIF; x.fillStyle = th.ink; x.textAlign = 'center';
     var lines = wrap(x, p.name, 76);
     y += 9.6;
@@ -474,7 +1029,7 @@
     x.globalAlpha = 1;
     x.font = '500 2.4px ' + SANS; x.fillStyle = th.ink2;
     spaced(x, 'PROTOTYPE · SANS VALEUR MARCHANDE · DUCATS NON CONVERTIBLES', 50, 160 - 19 - 0.5, 0.29);
-    teeth(x);
+    teeth(x, true);
     return c;
   }
   /* Rugosité (vert) et métal (bleu), partagés par tous les sachets */
@@ -484,17 +1039,18 @@
     function pbr(win) {
       var c = cv(100 * 4, 160 * 4), x = c.getContext('2d'); x.scale(4, 4);
       x.fillStyle = 'rgb(0,80,255)'; x.fillRect(0, 0, 100, 160);              // film : lisse et métallisé
-      for (var i = 0; i < 100; i += 0.5) {                                     // brossage
+      if (!REF) for (var i = 0; i < 100; i += 0.5) {                           // brossage
         x.fillStyle = 'rgba(0,' + (60 + ((i * 37) % 11) * 6) + ',255,.6)'; x.fillRect(i, 0, 0.25, 160);
       }
       x.fillStyle = 'rgb(0,140,190)';                                          // soudures : plus mates
       x.fillRect(0, 0, 100, CRIMP_T); x.fillRect(0, 160 - CRIMP_B, 100, CRIMP_B);
-      if (win) { x.fillStyle = 'rgb(0,150,0)'; rr(x, WIN.x, WIN.y, WIN.w, WIN.h, WIN.r); x.fill(); }   // illustration imprimée : pas de métal
+      if (win) { var Wr = REF && FULL_ART ? ART : WIN; x.fillStyle = 'rgb(0,150,0)'; rr(x, Wr.x, Wr.y, Wr.w, Wr.h, Wr.r); x.fill(); }   // illustration imprimée : pas de métal
       return tex(c, false);
     }
     var b = cv(100 * 4, 160 * 4), bx = b.getContext('2d'); bx.scale(4, 4);
     bx.fillStyle = '#808080'; bx.fillRect(0, 0, 100, 160);
     [[0, CRIMP_T], [160 - CRIMP_B, CRIMP_B]].forEach(function (s) {
+      if (REF) return;                                             // nervures : le relief vient du modèle (une texture de relief en plus les faisait rayer)
       for (var i = 0; i < 100; i += 1.6) {
         var g = bx.createLinearGradient(i, 0, i + 1.6, 0);
         g.addColorStop(0, '#5a5a5a'); g.addColorStop(0.35, '#d0d0d0'); g.addColorStop(0.7, '#5a5a5a'); g.addColorStop(1, '#5a5a5a');
@@ -503,11 +1059,14 @@
     });
     bx.fillStyle = '#6a6a6a';
     for (var k = 0; k < 100; k += 2) bx.fillRect(k, TY - 0.18, 1.1, 0.36);   // perforation
-    var a = cv(100 * 4, 160 * 4), ax = a.getContext('2d'); ax.scale(4, 4);
-    ax.fillStyle = '#fff'; ax.fillRect(0, 0, 100, 160); teeth(ax);
-    // alphaMap lit le canal vert : les dents effacées doivent être noires, pas transparentes
-    ax.globalCompositeOperation = 'destination-over'; ax.fillStyle = '#000'; ax.fillRect(0, 0, 100, 160);
-    return (shared = { pbrF: pbr(true), pbrB: pbr(false), bump: tex(b, false), alpha: tex(a, false) });
+    function alphaMap(back) {
+      var a = cv(100 * 4, 160 * 4), ax = a.getContext('2d'); ax.scale(4, 4);
+      ax.fillStyle = '#fff'; ax.fillRect(0, 0, 100, 160); teeth(ax, back);
+      // alphaMap lit le canal vert : les dents effacées doivent être noires, pas transparentes
+      ax.globalCompositeOperation = 'destination-over'; ax.fillStyle = '#000'; ax.fillRect(0, 0, 100, 160);
+      return tex(a, false);
+    }
+    return (shared = { pbrF: pbr(true), pbrB: pbr(false), bump: tex(b, false), alpha: alphaMap(false), alphaB: alphaMap(true) });
   }
   function tex(c, srgb) {
     var t = new T.CanvasTexture(c);
@@ -520,10 +1079,11 @@
   function texturesFor(p) {
     if (packTex[p.id]) return packTex[p.id];
     var th = THEMES[p.theme] || THEMES.ivory, ed = A.ED[p.cover], ch = A.CHAR[ed.charId];
-    var src = A.editionSrc ? A.editionSrc(ed, 200, { seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 })
-      : ed.image || A.artURI({ seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: WIN.w * 6, h: WIN.h * 6 });
+    var src = artSrc(p);
     return (packTex[p.id] = Promise.all([fonts(), loadImg(src)]).then(function (r) {
-      return { front: tex(drawFront(p, th, r[1]), true), back: tex(drawBack(p, th), true), th: th, noWin: !!p.design };
+      var fc = drawFront(p, th, r[1]);
+      return { front: tex(fc, true), back: tex(drawBack(p, th), true), th: th, noWin: !(REF && FULL_ART) && !!p.design,
+        ink: REF ? inkPBR(fc, th) : null, inkB: REF ? plainPBR(th) : null };
     }));
   }
 
@@ -593,6 +1153,14 @@
           'transformed.y += pa * 0.014 + curl * 0.01;\n' +
           'transformed.z += ' + o.peel.toFixed(1) + ' * (pa * (0.01 + above * 0.18) + curl * above * 0.12);\n');
       }
+      if (o.glint) {
+        // Encre dorée « marquage à chaud » : un éclat qui court sur l’encre quand le sachet tourne (reflet de deux lumières fixes)
+        sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>',
+          '#include <emissivemap_fragment>\n' +
+          'vec3 gvd = normalize(vViewPosition); vec3 grf = reflect(-gvd, normal);\n' +
+          'float glt = pow(max(dot(grf, normalize(vec3(-0.45, 0.65, 0.6))), 0.0), 22.0) + 0.7 * pow(max(dot(grf, normalize(vec3(0.6, -0.3, 0.75))), 0.0), 30.0);\n' +
+          'totalEmissiveRadiance *= 1.0 + 2.4 * glt;\n');
+      }
       if (o.guide) {
         sh.fragmentShader = 'uniform float uGuide;\nuniform float uGuideA;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>',
           '#include <emissivemap_fragment>\n' +
@@ -602,21 +1170,25 @@
           'totalEmissiveRadiance += vec3(1.0, 0.9, 0.68) * gl * uGuideA;\n');
       }
     };
-    mat.customProgramCacheKey = function () { return 'atlas2-' + (o.peel || 0) + (o.guide ? 'g' : ''); };
+    mat.customProgramCacheKey = function () { return 'atlas2-' + (o.peel || 0) + (o.guide ? 'g' : '') + (o.glint ? 'e' : ''); };
   }
   function materials(t, part, side, U) {
     var sh = sharedMaps(), front = side === 'F';
     var out = new T.MeshPhysicalMaterial({
-      map: front ? t.front : t.back, roughnessMap: front && !t.noWin ? sh.pbrF : sh.pbrB, metalnessMap: front && !t.noWin ? sh.pbrF : sh.pbrB,   // motif sans fenêtre : film uniforme
-      roughness: 1, metalness: t.th.metal, bumpMap: sh.bump, bumpScale: 0.45, alphaTest: 0.5,
-      clearcoat: 0.55, clearcoatRoughness: 0.22, iridescence: t.th.holo * 0.5, iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 520],
+      map: front ? t.front : t.back,
+      roughnessMap: t.ink ? (front ? t.ink.pbr : t.inkB) : front && !t.noWin ? sh.pbrF : sh.pbrB,   // motif sans fenêtre : film uniforme
+      metalnessMap: t.ink ? (front ? t.ink.pbr : t.inkB) : front && !t.noWin ? sh.pbrF : sh.pbrB,
+      roughness: 1, metalness: t.ink ? 1 : t.th.metal,                                                  // « référence » : encre brillante (inkPBR)
+      emissive: t.ink && front ? 0xffffff : 0x000000, emissiveMap: t.ink && front ? t.ink.glow : null, emissiveIntensity: 0.4, bumpMap: sh.bump, bumpScale: 0.45, alphaTest: 0.5,
+      // « référence » : presque pas de vernis (le vernis épais et l’irisé donnaient un aspect latex), film métallisé satiné
+      clearcoat: t.ink ? 0.12 : 0.55, clearcoatRoughness: t.ink ? 0.38 : 0.22, iridescence: t.th.holo * (t.ink ? 0.12 : 0.5), iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 520],
       envMapIntensity: t.th.env || 1.1, side: T.FrontSide
     });
     // Intérieur du film (visible sur les coins cornés, les languettes, l’ouverture) : aluminium poli, teinté par le sachet
     var inCol = new T.Color('#8E8A84').lerp(new T.Color(t.th.foil[1]), 0.4);
-    var inside = new T.MeshStandardMaterial({ color: inCol, metalness: 1, roughness: 0.17, alphaMap: sh.alpha, alphaTest: 0.5, side: T.BackSide, envMapIntensity: 1.35 });
+    var inside = new T.MeshStandardMaterial({ color: inCol, metalness: 1, roughness: 0.17, alphaMap: front ? sh.alpha : sh.alphaB, alphaTest: 0.5, side: T.BackSide, envMapIntensity: 1.35 });
     var sg = part === 'cap' ? (front ? 1 : -1) : 0;
-    shade(out, U, { peel: sg, guide: front });
+    shade(out, U, { peel: sg, guide: front, glint: front && !!t.ink });
     shade(inside, U, { peel: sg });
     out.transparent = inside.transparent = true;      // fondu : capuchon qui s’envole, corps qui tombe
     return [out, inside];
@@ -633,7 +1205,7 @@
     v.torn0 = 0; v.drop0 = 0; v.em0 = 0; v.raf = 0;
     // Sachet de la boutique : propre. Sachet qu'on ouvre (il contient les cartes) : froissé au hasard.
     var opening = !!pk.querySelector('.pk-stack');
-    var d = opening ? messy() : clean();
+    var d = opening ? messy() : clean(p);
     v.direct = opening || pk.hasAttribute('data-pk-direct');   // sachet animé en continu : affichage direct
     v.infl = d.infl;
     v.U = {
@@ -853,14 +1425,22 @@
   /** Remplace le rendu CSS d’un sachet par le modèle 3D (dès que ses textures sont prêtes). */
   /* Image plate de la face d’un sachet (même dessin que la 3D), pour les files de sachets légères
      (ouverture multiple). Mise en cache par sachet. */
+  // Illustration du sachet : celle de son édition de couverture (plus grande pour la face « référence »)
+  function artSrc(p) {
+    var ed = A.ED[p.cover], ch = A.CHAR[ed.charId], full = REF && FULL_ART, R = full ? ART : WIN;
+    var gen = { seed: ed.id, coll: ch.coll, rarity: ed.rarity, w: R.w * 6, h: R.h * 6 };
+    return A.editionSrc ? A.editionSrc(ed, full ? 420 : 200, gen) : ed.image || A.artURI(gen);
+  }
   var faceCache = {};
   P3.tearRatio = TY / 160;
   P3.crimpRatio = CRIMP_T / 160;   // hauteur de la languette du haut / hauteur du sachet
+  /** Oublie les textures d’un sachet (son visuel vient de changer) : les prochaines vues les redessinent. */
+  P3.forget = function (id) { delete packTex[id]; delete faceCache[id]; };
   P3.faceURL = function (p) {
     if (faceCache[p.id]) return faceCache[p.id];
     var th = THEMES[p.theme] || THEMES.ivory;
-    return (faceCache[p.id] = fonts().then(function () {
-      var c = drawFront(p, th, null);
+    return (faceCache[p.id] = Promise.all([fonts(), REF && FULL_ART ? loadImg(artSrc(p)) : null]).then(function (r) {
+      var c = drawFront(p, th, r[1]);
       return new Promise(function (res) {
         if (c.toBlob) c.toBlob(function (b) { res(b ? URL.createObjectURL(b) : c.toDataURL()); }, 'image/png');
         else res(c.toDataURL());
