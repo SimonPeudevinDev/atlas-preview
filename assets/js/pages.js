@@ -36,24 +36,6 @@
     return '<div class="section-head"><div><p class="eyebrow">' + eyebrow + '</p><h2 class="h2">' + title + '</h2></div>' +
       (link ? '<a class="link-arrow" href="' + link[1] + '">' + link[0] + ' ' + I('arrow') + '</a>' : '') + '</div>';
   }
-  function collTile(c, opts) {
-    opts = opts || {};
-    var pr = S.collectionProgress(c.id);
-    return '<a class="coll-tile' + (opts.cls ? ' ' + opts.cls : '') + '" href="#/collection/' + c.id + '">' +
-      '<div class="coll-art">' + (opts.art || collArt(c, { seed: c.id + '-banner', coll: c.id, rarity: c.status === 'event' ? 'legendary' : 'base', w: 640, h: 300 }, '(max-width: 900px) 50vw, 400px', opts.style)) +
-      (c.status === 'event' ? '<span class="tag tag-gold">Nouvelle collection</span>' : '') +
-      (S.readyCount(c.id) ? '<span class="tag tag-reward">' + U.icon('gift') + 'Récompense à récupérer</span>' : '') + '</div>' +
-      '<div class="coll-meta"><p class="eyebrow">' + c.family + ' · ' + c.edition + '</p><h3 class="coll-name">' + c.name + '</h3>' +
-      '<p class="coll-tag">' + c.tagline + '</p>' +
-      U.progress(pr.pct, '<span>' + pr.owned + ' / ' + pr.total + ' personnages</span><span>' + Math.round(pr.pct * 100) + ' %</span>') + nextReward(c.id) + '</div></a>';
-  }
-  // Prochain palier encore verrouillé, pour donner un objectif sur la tuile
-  function nextReward(cid) {
-    var s = S.rewards(cid).filter(function (x) { return x.state === 'locked'; })[0];
-    if (!s) return '';
-    var left = s.goal - s.have, unit = s.of === 'chars' ? 'personnage' : 'édition';
-    return '<p class="coll-next">' + U.rewardIcon(s.reward) + 'Encore ' + left + ' ' + unit + (left > 1 ? 's' : '') + ' pour : ' + U.esc(U.rewardText(s.reward)) + '</p>';
-  }
   /* Étagère : une collection globale = un en-tête (nom, jauge) + ses sous-collections
      en lignes, comme « Votre collection » sur l’accueil (vignette, progression, prochain palier) */
   function shelf(head, subs, eyebrow, folded) {
@@ -90,13 +72,6 @@
     return o + '<path d="M300 20v560M20 300h560" stroke-dasharray="2 5"/></g></svg>';
   }
 
-  /* ======================================================================
-     ACCUEIL
-     ====================================================================== */
-  /* ---------- Accueil : les boosters, comme dans un jeu ----------
-     Le Booster Atlas revient toutes les 15 min (10 en réserve), le quotidien chaque jour,
-     les autres se gagnent en jouant (missions, paliers, trophées). */
-  function chargeClock(ch) { return ch.n >= ch.max ? 'Réserve pleine · un nouveau toutes les 15 min' : 'Prochain dans <b data-clock="charge">' + U.clock(ch.next) + '</b>'; }
   // Réserve : une barre fine de 10 segments ; le segment en cours se remplit au fil des 15 minutes
   function reserve(ch, tk) {
     var seg = '', f = ch.n >= ch.max ? 0 : 1 - ch.next / S.CHARGE.every;
@@ -106,20 +81,11 @@
       '<p class="rv-txt"><b>' + ch.n + '</b> sur ' + ch.max + ' en réserve' + (tk ? ' <em>+' + tk + ' offert' + (tk > 1 ? 's' : '') + '</em>' : '') +
         '<span class="rv-sep">·</span>' + (ch.n >= ch.max ? 'pleine' : '+1 dans <b data-clock="charge">' + U.clock(ch.next) + '</b>') + '</p></div>';
   }
-  function playTile(p, k) {
-    var tk = S.tokens(p.id), can = S.canOpen(p.id), st;
-    if (p.daily) st = can.ok ? 'Prêt à ouvrir' : 'Prochain dans <b data-clock="daily">' + U.clock(S.nextDailyIn()) + '</b>';
-    else st = tk ? (tk > 1 ? tk + ' à ouvrir' : '1 à ouvrir') : 'À gagner : missions et paliers';
-    return '<article class="play-tile' + (can.ok ? ' is-ready' : '') + (p.event ? ' is-event' : '') + '" data-go-slide="' + k + '">' +
-      '<div class="pt-pack">' + A.pack.html(p) + (tk > 1 ? '<span class="pt-count">×' + tk + '</span>' : '') + '</div>' +
-      '<div class="pt-copy"><p class="pt-k">' + p.kicker + '</p><h3 class="pt-name">' + p.name + '</h3><p class="pt-st">' + st + '</p></div>' +
-      '<span class="pt-go">' + I('chevR') + '</span></article>';
-  }
   function playHTML() {
     var P0 = A.PACK.standard, PD = A.PACK.daily, ch = S.charges(), can = S.canOpen(P0.id), tk = S.tokens(P0.id), pips = '';
     var dCan = S.canOpen(PD.id);
     for (var i = 0; i < ch.max; i++) pips += '<i' + (i < ch.n ? ' class="is-on"' : '') + '></i>';
-    var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : []);
+    var side = [A.PACK.conservateur].concat(S.eventRemaining() > 0 ? [A.PACK.saga] : [], S.UNLIMITED && A.PACK.ultime ? [A.PACK.ultime] : []);   // Pack Ultime : mode test uniquement
     // Deux sachets côte à côte qu’on fait glisser : le Booster Atlas (réserve) et le Booster quotidien
     var atlas = '<div class="play-slide" data-slide="0">' +
         '<div class="play-stage is-' + P0.theme + '">' + PLAY_AURA + '<div class="play-pack' + (can.ok ? '"' + ' data-open-pack="' + P0.id + '"' : ' is-empty"') + '>' + A.pack.html(P0, { tilt: true }) + '</div>' + playSide(P0) + '</div>' + reserve(ch, tk) +
@@ -136,14 +102,15 @@
         '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>' +
         '</div>';
     // Coffret, Saga : même présentation en grand quand on les choisit
-    var SHORT = { conservateur: 'Coffret', saga: 'Saga' };
+    var SHORT = { conservateur: 'Coffret', saga: 'Saga', ultime: 'Ultime' };
     var extra = side.map(function (p, j) {
       var c = S.canOpen(p.id), n = S.tokens(p.id), many = A.multi ? A.multi.count(p.id) : 0;
       return '<div class="play-slide" data-slide="' + (j + 2) + '">' +
         '<div class="play-stage is-' + p.theme + '">' + PLAY_AURA + '<div class="play-pack' + (c.ok ? '"' + ' data-open-pack="' + p.id + '"' : ' is-empty"') + '>' + A.pack.html(p, { tilt: true }) + '</div>' + playSide(p) + '</div>' +
-        '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
-        '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>' +
-        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
+        (p.test ? '<p class="play-day"><b>Illimité (test)</b></p><p class="play-clock">Une Rare, une Épique, une Légendaire, une Mythique et une Unique</p>'
+          : '<p class="play-day">' + (n ? '<b>' + (n > 1 ? n + ' à ouvrir' : '1 à ouvrir') + '</b>' : 'À gagner en jouant') + '</p>' +
+            '<p class="play-clock">' + (n ? p.kicker : 'Missions et paliers de collection') + '</p>') +
+        '<button class="btn btn-primary btn-lg play-btn" data-open-pack="' + p.id + '"' + (c.ok ? '' : ' disabled') + '>' + (p.test ? 'Ouvrir le Pack Ultime' : c.ok ? 'Ouvrir le ' + SHORT[p.id] : 'Aucun ' + SHORT[p.id].toLowerCase() + ' à ouvrir') + '</button>' +
         (many >= 2 ? '<button class="play-many" data-open-many="' + p.id + '">' + I('cards') + 'Ouvrir les ' + many + ' d’un coup</button>' : '<span class="play-many is-ghost" aria-hidden="true">' + I('cards') + 'Ouvrir</span>') +
         '</div>';
     }).join('');
@@ -1234,31 +1201,6 @@
     var rid = p.lure || 'epic', c = packChance(p, rid);
     return '<div class="pack-odds r-' + rid + '"><span class="po-n">1 <small>sur</small> ' + (c >= 0.5 ? 2 : Math.max(2, Math.round(1 / c))) + '</span>' +
       '<span class="po-t">chance d’obtenir une <b>' + A.R[rid].label + '</b> ou mieux</span></div>';
-  }
-  /* Vignette : toujours l’aperçu généré (jamais l’illustration définitive), comme une preview. */
-  function miniCard(ed) {
-    return '<span class="mcard r-' + ed.rarity + '" title="' + U.esc(A.CHAR[ed.charId].name + ' · ' + A.R[ed.rarity].label) + '">' + A.artImg({ seed: ed.id, coll: A.CHAR[ed.charId].coll, rarity: ed.rarity }) + '<i></i></span>';
-  }
-  /* « À gagner » : les meilleures cartes possibles (hors Base), la plus rare d’abord. */
-  function winRow(p) {
-    // raretés de la plus haute à la plus basse (hors Base), répétées : si une rareté est épuisée, on passe à la suivante
-    var rs = packRarities(p).filter(function (r) { return r !== 'base'; });
-    var eds = showcase(p, rs.concat(rs, rs)).slice(0, 3);
-    return '<div class="pack-win"><span class="pack-win-label">À gagner</span><span class="pack-win-list">' + eds.map(miniCard).join('') + '</span></div>';
-  }
-  /* ---------- Probabilités ---------- */
-  function oddsTable(packId) {
-    var p = A.PACK[packId];
-    var rows = S.packOdds(packId);
-    var g = p.guarantee ? S.packOdds(packId, true) : null;
-    return '<div class="odds">' +
-      '<table class="table"><thead><tr><th>Rareté</th><th>Taux de référence</th><th>Taux réel</th><th class="hide-s">Stock restant</th><th class="hide-s">Éditions</th></tr></thead><tbody>' +
-      rows.map(function (r) {
-        return '<tr><td><span class="rar-chip r-' + r.rarity + '"><i></i>' + A.R[r.rarity].label + '</span></td><td class="muted">' + U.pct(r.ref) + '</td><td><b>' + U.pct(r.p) + '</b></td>' +
-          '<td class="hide-s">' + (r.remaining == null ? 'Illimité' : U.num(r.remaining) + ' / ' + U.num(r.total)) + '</td><td class="hide-s">' + r.editions + '</td></tr>';
-      }).join('') + '</tbody></table>' +
-      (g ? '<p class="odds-note"><b>Dernière carte garantie Rare ou mieux :</b> ' + g.map(function (r) { return A.R[r.rarity].label + ' ' + U.pct(r.p); }).join(' · ') + '</p>' : '') +
-      '</div>';
   }
   /* Fenêtre « Probabilités » d’un booster (ouverte depuis l’accueil, bouton %).
      Lecture simple d’abord : pour chaque rareté, « 1 sachet sur N » (chance d’en avoir au moins une

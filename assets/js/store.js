@@ -304,7 +304,6 @@
     var c = regen();
     return { n: c.n, max: S.CHARGE.max, next: c.n >= S.CHARGE.max ? 0 : Math.max(0, c.at + S.CHARGE.every - Date.now()) };
   };
-  S.refillCharges = function () { state.charge = { n: S.CHARGE.max, at: Date.now() }; emit(); };   // démo
   /** Test : tout recharger (réserve pleine, quotidien disponible, 3 Coffrets et 3 Saga du Nord) */
   S.devRefill = function () {
     state.charge = { n: S.CHARGE.max, at: Date.now() };
@@ -613,7 +612,6 @@
     var a = out.length ? afterDraw(readyBefore, duelsBefore) : { unlocked: [], duels: [] };
     return { ok: out.length > 0, packs: out, unlocked: a.unlocked, duels: a.duels };
   };
-  S.resetDaily = function () { state.lastDaily = null; emit(); };
   S.grant = function (n) {
     state.wallet.balance += n;
     state.ledger.unshift({ id: uid('tx'), at: Date.now(), type: 'grant', amount: n, label: 'Crédit de démonstration' });

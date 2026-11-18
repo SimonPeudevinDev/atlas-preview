@@ -289,12 +289,6 @@
     SFX.snap(0, NUM);
     tone({ type: 'triangle', f: f, dur: 0.06, gain: 0.05 * NUM });   // simple déclic, plus de cloche à chaque chiffre
   };
-  // Carte qui tourne sur elle-même : souffle qui accélère
-  SFX.whirl = function (d) {
-    noise({ f: 400, f2: 3200, q: 1.4, dur: d, gain: 0.06, a: d * 0.7 });
-    tone({ f: 110, f2: 330, dur: d, gain: 0.05, a: d * 0.8 });
-    for (var i = 0; i < 8; i++) noise({ f: 1800, q: 2, dur: 0.03, gain: 0.03 + i * 0.006, delay: d * (1 - Math.pow(0.78, i + 1)) });
-  };
   // Grand final Unique / Mythique : double impact, accord tenu très large, scintillement qui retombe
   SFX.mega = function (lite) {
     hit(0, 0.55); hit(0.16, 0.36);

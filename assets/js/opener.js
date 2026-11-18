@@ -481,38 +481,6 @@
       void y.offsetWidth; y.classList.add('is-on');
     }
 
-    /* Carte numérotée : le numéro se déroule chiffre par chiffre comme un compteur mécanique,
-       chaque chiffre se verrouille avec un déclic, un reflet balaie le tout, puis il se range dans la légende */
-    function stamp(c, b) {
-      if (reduce) return;
-      var s = document.createElement('div');
-      s.className = 'op-stamp r-' + c.ed.rarity;
-      s.style.left = (b.left + b.width / 2) + 'px'; s.style.top = (b.top + b.height * 0.5) + 'px';
-      var parts = U.serial(c.it.serial, c.ed.supply).split('/'), digs = parts[0].split(''), html = '';
-      digs.forEach(function (d, i) {
-        var n = 12 + i * 6 + Math.floor(Math.random() * 4), strip = '';
-        for (var k = n; k >= 0; k--) strip += '<b>' + ((+d - k % 10 + 10) % 10) + '</b>';   // finit sur le bon chiffre
-        html += '<span class="dg"><span class="dg-r" style="--n:' + n + ';--dd:' + (i * 0.22) + 's;--du:' + (0.9 + i * 0.25).toFixed(2) + 's">' + strip + '</span></span>';
-      });
-      s.innerHTML = '<span class="st-k">' + (c.ed.supply === 1 ? 'Pièce unique' : 'Exemplaire numéroté') + '</span>' +
-        '<span class="st-n"><span class="st-d">' + html + '</span>' + (parts[1] ? '<span class="st-of">/' + parts[1] + '</span>' : '') + '<span class="st-glint"></span></span>';
-      el.appendChild(s);
-      void s.offsetWidth; s.classList.add('is-on');
-      // déclic à chaque chiffre verrouillé, sceau sur le dernier
-      var t0 = 260;
-      digs.forEach(function (d, i) {
-        var at = t0 + (i * 0.22 + 0.9 + i * 0.25) * 1000;
-        setTimeout(function () {
-          if (closed) return;
-          var col = s.querySelectorAll('.dg')[i]; if (col) col.classList.add('is-lock');
-          if (i === digs.length - 1) { SFX.seal(c.r); A.haptic(12); s.classList.add('is-sealed'); }
-          else { SFX.snap(0, 0.22); A.haptic(4); }
-        }, at);
-      });
-      var lockEnd = t0 + ((digs.length - 1) * 0.47 + 0.9) * 1000;
-      setTimeout(function () { s.classList.add('is-out'); }, lockEnd + 700);
-      setTimeout(function () { s.remove(); }, lockEnd + 1500);
-    }
 
     /* Sortie de la carte : lancée (geste) ou rangée (toucher) */
     function throwOut(c, sign, v) {

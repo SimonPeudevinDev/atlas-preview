@@ -111,7 +111,6 @@
   function canCharge(f) { return (f.charge || 0) < MAX_CHARGE; }
   function power(edId) { var ed = A.ED[edId], ch = A.CHAR[ed.charId]; return ch.atk + ch.def + ch.esp + A.R[ed.rarity].rank * 12; }
   var RNG = Math.random;
-  function rnd(a, b) { return a + RNG() * (b - a); }
   /** Graine (texte) : même suite de nombres sur les deux appareils d’un duel entre amis ; null : retour au hasard. */
   function seedRng(seed) {
     if (seed == null) { RNG = Math.random; return; }
@@ -372,7 +371,6 @@
     '<path class="d" d="M40 11 L67 18 L65.5 48 Q62 71 40 84 Q18 71 14.5 48 L13 18 Z"/>' +
     '<path class="d f" d="M20 24 L30 21 M18 32 L33 27 M17 40 L35 34 M17 48 L36 41"/>' +
     '<path class="g" d="M40 30 L44 44 L58 48 L44 52 L40 66 L36 52 L22 48 L36 44 Z"/><circle class="gf" cx="40" cy="48" r="2.6"/></svg>';
-  function polar(r, d) { var a = d * Math.PI / 180; return (r * Math.cos(a)).toFixed(1) + ' ' + (r * Math.sin(a)).toFixed(1); }
   var COMPASS = '<svg class="atl-prop" viewBox="-50 -50 100 100" aria-hidden="true">' +
     '<path class="o" transform="rotate(45)" d="M0 -30 L4 -4 L30 0 L4 4 L0 30 L-4 4 L-30 0 L-4 -4 Z"/>' +
     '<path class="o g" d="M0 -46 L6 -6 L46 0 L6 6 L0 46 L-6 6 L-46 0 L-6 -6 Z"/>' +

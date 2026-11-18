@@ -44,9 +44,6 @@
   };
   // Thèmes des propositions de Booster Atlas
   THEMES.astro = Object.assign({}, THEMES.lapis, { foil: ['#24407F', '#0D1A3C', '#1C3366', '#070F26', '#162B58', '#0A1533'] });
-  // Coloris du Booster Atlas (motif Astrolabe), du plus simple au plus chic.
-  // motif : dégradé du dessin (clair → foncé) ; facet : face sombre de la rose ; glow : halo derrière le motif.
-  var DARKBRAND = ['#1A1A1A', '#4A4A4A', '#202020', '#5A5A5A', '#1A1A1A'];
   function light(foil, ink, ink2, motif, o) {           // film clair : texte et motif foncés
     return Object.assign({}, THEMES.ivory, { foil: foil, ink: ink, ink2: ink2, gold: motif[1], motif: motif, facet: 'rgba(255,255,255,.55)', glow: 'rgba(255,255,255,.35)',
       brand: [motif[2], motif[0], motif[2], motif[0], motif[2]], halo: 'rgba(255,255,255,.6)', metal: 0.35, holo: 0.1 }, o || {});
@@ -627,7 +624,6 @@
 
   /* ---------- Une vue = un sachet à l’écran ---------- */
   function easeOut(k) { return 1 - Math.pow(1 - k, 3); }
-  function easeIn(k) { return k * k * k; }
   function smooth(a, b, k) { var t = Math.max(0, Math.min(1, (k - a) / (b - a))); return t * t * (3 - 2 * t); }
 
   function View(pk, p) {

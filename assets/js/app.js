@@ -19,6 +19,7 @@
     [/^\/profil$/, P.profile, 'profile'],
     [/^\/design-system$/, P.design, ''],
     [/^\/raretes$/, P.rarities, ''],
+    [/^\/variantes$/, P.variants, ''],   // outil de test : pistes de design des cartes (variantes.js)
     [/^\/atelier$/, P.atelier, ''],
     [/^\/infos$/, P.infos, '']
   ];
@@ -61,7 +62,7 @@
       '<div class="footer-cols">' +
         '<div class="foot-nav"><p class="eyebrow">Explorer</p><a href="#/">Boosters</a><a href="#/collections">Collections</a><a href="#/marketplace">Marketplace</a></div>' +
         '<div class="foot-nav"><p class="eyebrow">Mon espace</p><a href="#/inventaire">Mes cartes</a><a href="#/combat">Combat</a><a href="#/?open=daily" data-daily-open>Booster quotidien</a></div>' +
-        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><a href="#/raretes">Raretés des cartes</a><a href="#/combat-studio">Studio combat</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
+        (A.store.UNLIMITED ? '<div class="foot-dev"><p class="eyebrow">Projet (test)</p><a href="#/design-system">Design system</a><a href="#/raretes">Raretés des cartes</a><a href="#/variantes">Variantes de cartes</a><a href="#/combat-studio">Studio combat</a><button class="link-btn" data-reset>Réinitialiser la démo</button></div>' : '') +   // outils de test : cachés en production
       '</div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ATLAS · Édition I</span><em>Le monde, en cartes.</em></div>' +
     '</div>';
